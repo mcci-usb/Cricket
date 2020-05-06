@@ -1,0 +1,328 @@
+#======================================================================
+# (c) 2020  MCCI, Inc.
+#----------------------------------------------------------------------
+# Project : UI3141/3201 Application
+# File    : loopWindow.py
+#----------------------------------------------------------------------
+# Loop Window for Switch 3141 and 3201
+#======================================================================
+
+#======================================================================
+# IMPORTS
+#======================================================================
+import wx
+
+import serialDev
+import usbDev
+
+from uiGlobals import *
+
+
+#======================================================================
+# COMPONENTS
+#======================================================================
+
+class LoopWindow(wx.Window):
+    def __init__(self, parent, top):
+        wx.Window.__init__(self, parent)
+
+        self.SetBackgroundColour("White")
+
+        #self.SetMinSize((200,200))
+
+        self.parent = parent
+        self.top = top
+
+        self.period = 0
+        self.duty = 0
+        self.cycle = 0
+
+        self.OnTime = 0
+        self.OffTime = 0
+        self.cycleCnt = 0
+
+        self.On_flg = False
+
+        self.start_flg = False
+
+        self.usb_flg = False
+
+        self.dlist = []
+
+        self.portno = 0
+        
+        self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
+                                      style = wx.ALIGN_CENTER)
+        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "1000", size=(50,-1), 
+                                    style = 0,
+                                    validator=NumericValidator(), 
+                                    name="ON/OFF period")
+        self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
+                                     style = wx.ALIGN_CENTER)
+
+        self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
+                                       style = wx.ALIGN_CENTER)
+        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
+                                     style = 0,
+                                     validator=NumericValidator(), 
+                                     name="ON/OFF period")
+        self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
+                                     style = wx.ALIGN_CENTER)
+
+        self.st_cycle   = wx.StaticText(self, -1, "Cycle ", size=(50,15), 
+                                        style = wx.ALIGN_CENTER)
+        self.tc_cycle   = wx.TextCtrl(self, ID_TC_CYCLE, "20", size=(50,-1), 
+                                      style = 0,
+                                      validator=NumericValidator(), 
+                                      name="ON/OFF period")
+        self.st_cnt   = wx.StaticText(self, -1, "", size=(30,15), 
+                                      style = wx.ALIGN_CENTER)
+
+        self.btn_start = wx.Button(self, ID_BTN_START, "Start", size=(60,25))
+        
+        self.tc_per.SetToolTip(wx.ToolTip("ON/OFF Interval. Min: 1 sec, "
+                                          "Max: 60 sec"))
+        self.btn_start.SetToolTip(wx.ToolTip("ON/OFF a selected port for a "
+                                             "interval until cycle completed"))
+        
+        self.tc_per.SetMaxLength(5)
+        self.tc_duty.SetMaxLength(2)
+        self.tc_cycle.SetMaxLength(3)
+
+        self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
+        self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
+        self.bs_cycle = wx.BoxSizer(wx.HORIZONTAL)
+        self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.bs_pers.Add(40,50,0)
+        self.bs_pers.Add(self.st_per,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_pers.Add(15,50,0)
+        self.bs_pers.Add(self.tc_per,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+        self.bs_pers.Add(15,50,0)
+        self.bs_pers.Add(self.st_ms,0, wx.ALIGN_CENTER_VERTICAL)
+
+        self.bs_duty.Add(40,50,0)
+        self.bs_duty.Add(self.st_duty,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_duty.Add(15,50,0)
+        self.bs_duty.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+        self.bs_duty.Add(15,50,0)
+        self.bs_duty.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
+
+        self.bs_cycle.Add(40,50,0)
+        self.bs_cycle.Add(self.st_cycle,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_cycle.Add(15,50,0)
+        self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_cycle.Add(15,50,0)
+        self.bs_cycle.Add(self.st_cnt,0, wx.ALIGN_CENTER_VERTICAL)
+
+        self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
+
+        sb = wx.StaticBox(self, -1, "Loop Mode")
+        
+        self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
+
+        self.timer = wx.Timer(self)
+        self.timer_usb = wx.Timer(self)
+
+        self.bs_vbox.AddMany([
+            (10,10,0),
+            (self.bs_pers, 1, wx.EXPAND),
+            (self.bs_duty, 1, wx.EXPAND),
+            (self.bs_cycle, 1, wx.EXPAND),
+            (0,15,0),
+            (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
+            (10,15,0)
+            ])
+
+        self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
+        self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
+        self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
+        
+        self.SetSizer(self.bs_vbox)
+        self.bs_vbox.Fit(self)
+        self.Layout()
+
+        self.update_controls()
+
+
+    def StartAuto(self, evt):
+        if(self.start_flg):
+            self.stop_loop()
+        else:
+            if(self.check_valid_input()):
+                if(self.top.get_delay_status()):
+                    dlg = wx.MessageDialog(self,'Click Yes to continue with '\
+                                          'USB device tree changes enabled\n',
+                                          'Need USB device tree changes ?', 
+                                           wx.NO|wx.YES)
+                    if(dlg.ShowModal() == wx.ID_NO):
+                        self.top.disable_usb_scan()
+                self.start_loop()
+            else:
+                wx.MessageBox('Input box left blank','Error', wx.OK)
+
+    def TimerServ(self, evt):
+        if self.top.con_flg:
+            if(self.usb_flg == False):
+                if(self.On_flg):
+                    self.port_off_cmd(self.portno)
+                    self.On_flg = False
+                    self.cycleCnt = self.cycleCnt + 1
+                    self.st_cnt.SetLabel(str(self.cycleCnt))
+                    if(self.cycleCnt >= self.cycle):
+                        self.top.print_on_log("Loop Mode Completed\n")
+                        self.timer.Stop()
+                        self.btn_start.SetLabel("Start")
+                        self.start_flg = False
+                        self.top.enable_model()
+                    else:    
+                        self.timer.Start(self.OffTime)
+                else:
+                    self.port_on_cmd(self.portno)
+                    self.timer.Start(self.OnTime)
+                    self.On_flg = True
+
+    def UsbTimer(self, e):
+        self.timer_usb.Stop()
+        try:
+            usbDev.get_tree_change(self.top)
+        except:
+            self.top.print_on_usb("USB Read Error!")
+        self.usb_flg = False 
+
+    def get_period(self):
+        dper = self.tc_per.GetValue()
+        if(dper == ""):
+            dper = "1000"
+        pval = int(dper)
+        if(pval < 1000):
+            pval = 1000
+        elif(pval > 60000):
+            pval = 60000
+
+        self.tc_per.SetValue(str(pval))
+        return self.tc_per.GetValue()
+
+    def get_duty(self):
+        duty = self.tc_duty.GetValue()
+        if (duty == ""):
+            duty = "0"
+
+        return duty
+
+    def get_cycle(self):
+        cycle = self.tc_cycle.GetValue()
+        if (cycle == ""):
+            cycle = "0"
+
+        return cycle
+
+    def update_controls(self):
+        if(self.top.con_flg):
+            self.btn_start.Enable()
+        else:
+            self.btn_start.Disable()
+
+    def enable_start(self):
+        self.btn_start.Enable()
+
+    def disable_start(self):
+        self.btn_start.Disable()
+
+    def get_all_three(self):
+        self.period = int(self.get_period())
+        self.duty = int(self.get_duty())
+        self.cycle = int(self.get_cycle())
+
+        self.OnTime = self.period * (self.duty/100)
+        self.OffTime = self.period - self.OnTime
+
+    def check_valid_input(self):
+        strPer = self.tc_per.GetValue()
+        if(strPer == ''):
+            return False
+        strDuty = self.tc_duty.GetValue()
+        if(strDuty == ''):
+            return False 
+        strCycle = self.tc_cycle.GetValue()
+        if(strCycle == ''):
+            return False
+        return True   
+
+    def loop_start_msg(self):
+        self.get_all_three()
+        lmstr = "Loop Mode start : ON-Time = {d1} ms,".\
+                format(d1=int(self.OnTime)) + \
+                " OFF-Time = {d2} ms,".\
+                format(d2=int(self.OffTime)) + \
+                " Cycle = {d3}\n".format(d3=self.cycle)
+        
+        self.top.print_on_log(lmstr)
+
+    def start_loop(self):
+        self.portno = self.top.get_switch_port()
+        self.start_flg = True
+        self.loop_start_msg()
+        self.btn_start.SetLabel("Stop")
+        if(self.timer.IsRunning() == False):
+            self.top.disable_model()
+            self.cycleCnt = 0
+            self.On_flg = True
+            self.port_on_cmd(self.portno)
+            self.timer.Start(self.OnTime)
+
+    def stop_loop(self):
+        self.start_flg = False
+        self.btn_start.SetLabel("Start")
+        self.top.enable_model()
+        self.timer.Stop()
+        self.top.print_on_log("Loop Mode Interrupted\n")
+
+    def print_cycle_info(self):
+        strCnt = "Cycle : {cs}\t".format(cs=str(self.cycleCnt + 1))
+        self.top.print_on_log(strCnt)
+
+    def port_on_cmd(self, pno):
+        cmd = 'port'+' '+str(pno)+'\r\n'
+        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        if res == 0: 
+            outstr = outstr.replace('p', 'P')
+            outstr = outstr.replace('1', '1 ON')
+            outstr = outstr.replace('2', '2 ON')
+            outstr = outstr.replace('3', '3 ON')
+            outstr = outstr.replace('4', '4 ON')
+
+            self.top.port_led_update(pno-1, True)
+            
+            self.top.print_on_log(outstr)
+        if(self.top.get_delay_status()):
+            self.keep_delay()
+        
+    def port_off_cmd(self, pno):
+        cmd = 'port'+' '+'0'+'\r\n'
+        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        if res == 0:
+            outstr = outstr.replace('p', 'P')
+            outstr = outstr.replace('0', ""+str(pno)+" OFF")
+
+            self.top.port_led_update(pno-1, False)
+            
+        self.top.print_on_log(outstr)
+
+        if(self.top.get_delay_status()):
+            self.keep_delay()
+    
+    def keep_delay(self):
+        self.usb_flg = True
+        self.timer_usb.Start(int(self.top.get_enum_delay()))
+
+    def update_controls(self):
+        if(self.top.con_flg):
+            self.enable_start()
+        else:
+            self.disable_start()
+            self.timer.Stop()
+            self.start_flg = False
+            self.st_cnt.SetLabel("")
