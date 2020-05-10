@@ -39,5 +39,5 @@ Pyinstaller is distributed under GPL License
 	   This will create a executable file in the 'dist' folder.
   
 ### Installation setup creation
-Inno Setup Compiler is a free installer application, user need to setup this application with the executable file created through Pyinstaller and other dependcies required for the UI application.
+Inno Setup Compiler is a free installer application, user need to setup this application with the executable file created through Pyinstaller and other dependencies required for the UI application.
 * Link - (https://jrsoftware.org/isinfo.php)
