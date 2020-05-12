@@ -46,7 +46,7 @@ def search_port():
                                 parity=serial.PARITY_NONE, timeout=1, 
                                 stopbits=serial.STOPBITS_ONE)
 
-            time.sleep(0.4)
+            time.sleep(1)
     
             cmd = 'version\r\n'
     

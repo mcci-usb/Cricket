@@ -57,9 +57,9 @@ class ComWindow(wx.Panel):
         self.vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.vbox.AddMany([
-            (10,20,0),
+            #(10,20,0),
             (self.szr_top, 0, wx.EXPAND | wx.ALL),
-            (10,30,0)
+            #(10,30,0)
             ])
         
         self.SetSizer(self.vbox)

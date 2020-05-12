@@ -35,10 +35,10 @@ class LogWindow(wx.Window):
         self.btn_save = wx.Button(self, ID_BTN_AUTO, "Save", size=(60, -1))  
         self.btn_clear = wx.Button(self, ID_BTN_CLEAR, "Clear", size=(60, -1))     
 
-        self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, size=(600,360))
+        self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, size=(-1,-1))
         self.scb.SetEditable(False)
         self.scb.SetBackgroundColour((255,255,255))
-        self.SetMinSize((600,360))
+        #self.SetMinSize((600,360))
 
         self.btn_save.SetToolTip(wx.ToolTip("Save Log content into a text file"))
 
@@ -55,11 +55,18 @@ class LogWindow(wx.Window):
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearLogWindow)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveLogWindow)
 
+        self.szr_top = wx.BoxSizer(wx.VERTICAL)
+        self.szr_top.AddMany([
+            (5,0,0),
+            (self.scb, 1, wx.EXPAND),
+            (5,0,0)
+            ])
+
         self.vbox.AddMany([
             (self.hbox, 0, wx.ALIGN_LEFT),
             (10,5,0),
-            (self.scb, 0, wx.ALIGN_RIGHT),
-            (0,20,0)
+            (self.szr_top, 1, wx.EXPAND),
+            (0,0,0)
             ])
 
         self.SetSizer(self.vbox)

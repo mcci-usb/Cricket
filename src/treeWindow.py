@@ -55,11 +55,11 @@ class UsbTreeWindow(wx.Window):
                                      style = wx.ALIGN_CENTER)
 
         self.btn_clear = wx.Button(self, ID_BTN_UCLEAR, "Clear", 
-                                   size=(50, -1))
+                                   size=(60, -1))
 
-        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Refresh", size=(50,25))
+        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Refresh", size=(60,-1))
 
-        self.btn_save = wx.Button(self, -1, "Save", size=(50,25))
+        self.btn_save = wx.Button(self, -1, "Save", size=(60,-1))
 
         self.st_td   = wx.StaticText(self, -1, " Total Device : ", 
                                      style=wx.ALIGN_CENTER)
@@ -75,7 +75,7 @@ class UsbTreeWindow(wx.Window):
 
         
         self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
-                               size=(270,550))
+                               size=(-1,-1))
 
         self.scb.SetEditable(False)
         self.scb.SetBackgroundColour((255,255,255))
@@ -84,14 +84,14 @@ class UsbTreeWindow(wx.Window):
                                              "100 msec, Max: 60 sec"))
         self.btn_save.SetToolTip(wx.ToolTip("Save USB device Log into"
                                             " a text file"))
-        
+
         self.hbox.Add(10,30,0)
         self.hbox.Add(self.chk_box,0, wx.ALIGN_CENTRE_VERTICAL)
         self.hbox.Add(20,0,0)
         self.hbox.Add(self.st_delay,0, wx.ALIGN_CENTRE_VERTICAL)
         self.hbox.Add(self.tc_delay,0, wx.ALIGN_CENTRE_VERTICAL)
         self.hbox.Add(self.st_ms,0, wx.ALIGN_CENTRE_VERTICAL)
-        self.hbox.Add(23,0,0)
+        self.hbox.Add(33,0,0)
         self.hbox.Add(self.btn_ref, 0, flag=wx.ALIGN_RIGHT | 
                       wx.LEFT, border = 0)
 
@@ -107,10 +107,10 @@ class UsbTreeWindow(wx.Window):
 
         self.hbox3.Add(10,30,0)
         self.hbox3.Add(self.chk_ts,0, wx.ALIGN_CENTRE_VERTICAL)
-        self.hbox3.Add(33,0,0)
+        self.hbox3.Add(23,0,0)
         self.hbox3.Add(self.btn_clear, 0, wx.ALIGN_RIGHT)
-        self.hbox3.Add(20,0,0)
-        self.hbox3.Add(self.btn_save,0, flag=wx.ALIGN_RIGHT, border=40)
+        self.hbox3.Add(34,0,0)
+        self.hbox3.Add(self.btn_save,0, flag=wx.RIGHT, border=0)
         
         self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshUsbBus)
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearUsbWindow)
@@ -118,10 +118,10 @@ class UsbTreeWindow(wx.Window):
 
         self.tc_delay.SetMaxLength(5)
 
-        self.szr_top = wx.BoxSizer(wx.HORIZONTAL)
+        self.szr_top = wx.BoxSizer(wx.VERTICAL)
         self.szr_top.AddMany([
             (5,0,0),
-            (self.scb, 0, wx.ALIGN_RIGHT | wx.ALIGN_TOP),
+            (self.scb, 1, wx.EXPAND),
             (5,0,0)
             ])
 
@@ -131,7 +131,7 @@ class UsbTreeWindow(wx.Window):
             (10, 7, 0),
             (self.hbox3, 0, wx.EXPAND),
             (10, 0, 0),
-            (self.szr_top, 0, wx.ALIGN_LEFT | wx.ALIGN_BOTTOM)
+            (self.szr_top, 1, wx.ALIGN_LEFT | wx.ALIGN_BOTTOM | wx.EXPAND)
             ])
 
         self.vbox.Hide(self.hbox2)

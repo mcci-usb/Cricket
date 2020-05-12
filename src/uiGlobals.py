@@ -104,11 +104,11 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 #======================================================================
 # GLOBAL STRINGS
 #======================================================================
-VERSION_NAME  = "\nMCCI® USB Switch - 3141/3201"
+VERSION_NAME  = "\nMCCI"+u"\u00AE"+" USB Switch - 3141/3201"
 VERSION_ID    = ""
 VERSION_TITLE = "\n"
 VERSION_DATE  = "\nVer 1.2  -  2020-04-21\n"
-VERSION_COPY  = "\nCopyright © 2020 MCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
 
 VERSION_STR = "Version 0.1.0"
 

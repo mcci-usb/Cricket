@@ -94,31 +94,35 @@ class LoopWindow(wx.Window):
         self.bs_cycle = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.bs_pers.Add(40,50,0)
+        self.bs_pers.Add(40,0,0)
         self.bs_pers.Add(self.st_per,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_pers.Add(15,50,0)
         self.bs_pers.Add(self.tc_per,0, wx.ALIGN_CENTER | 
                          wx.ALIGN_CENTER_VERTICAL)
         self.bs_pers.Add(15,50,0)
         self.bs_pers.Add(self.st_ms,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_pers.Add(40,0,0)
 
-        self.bs_duty.Add(40,50,0)
+        self.bs_duty.Add(40,0,0)
         self.bs_duty.Add(self.st_duty,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_duty.Add(15,50,0)
         self.bs_duty.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
                          wx.ALIGN_CENTER_VERTICAL)
         self.bs_duty.Add(15,50,0)
         self.bs_duty.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_duty.Add(40,0,0)
 
-        self.bs_cycle.Add(40,50,0)
+        self.bs_cycle.Add(40,0,0)
         self.bs_cycle.Add(self.st_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(15,50,0)
         self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(15,50,0)
         self.bs_cycle.Add(self.st_cnt,0, wx.ALIGN_CENTER_VERTICAL)
+        self.bs_cycle.Add(40,0,0)
 
         self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
 
+        
         sb = wx.StaticBox(self, -1, "Loop Mode")
         
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)

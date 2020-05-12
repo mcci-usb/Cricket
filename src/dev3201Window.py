@@ -125,7 +125,7 @@ class Dev3201Window(wx.Window):
         self.hbox2.Add(self.rbtn_p3, flag=wx.ALIGN_CENTER_VERTICAL | 
                        wx.LEFT, border=3)
         self.hbox2.Add(self.tc_led4, flag=wx.ALIGN_CENTER | wx.LEFT, 
-                       border = 10)
+                       border = 15)
         self.hbox2.Add(self.rbtn_p4, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
                        border=3)
 

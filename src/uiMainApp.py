@@ -48,16 +48,7 @@ class UiPanel(wx.Panel):
 
         self.SetBackgroundColour('White')
 
-        vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox2 = wx.BoxSizer(wx.VERTICAL)
-        vbox3 = wx.BoxSizer(wx.VERTICAL)
-        
-        self.hboxtop = wx.BoxSizer(wx.HORIZONTAL)
-        lvbox = wx.BoxSizer(wx.VERTICAL)
-        rvbox = wx.BoxSizer(wx.VERTICAL)
-        
-        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL, False,'MS Shell Dlg 2'))
 
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
@@ -65,48 +56,43 @@ class UiPanel(wx.Panel):
         self.logPan = logWindow.LogWindow(self, parent)
         self.treePan = treeWindow.UsbTreeWindow(self, parent)
         self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
-         
-        hbox1.Add(30,50,0)
-        hbox1.Add(self.logPan, 1, wx.EXPAND, 1)
-        hbox1.Add(30,50,0)
 
-        self.hboxd1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxd2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxloop = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox12 = wx.BoxSizer(wx.HORIZONTAL)
-        
-        self.hboxd1.Add(self.dev3141Pan,1,wx.ALIGN_CENTER)
-        self.hboxd2.Add(self.dev3201Pan,1,wx.ALIGN_CENTER)
-        self.hboxloop.Add(self.loopPan,1,wx.ALIGN_CENTER)
+        self.hboxdl = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxdl.Add(self.dev3141Pan, 0, 0)
+        self.hboxdl.Add(self.dev3201Pan, 0, 0)
+        self.hboxdl.Add((20,0), 1, wx.EXPAND)
+        self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
 
-        self.hbox12.Add(self.hboxd1,0,wx.ALIGN_LEFT)
-        self.hbox12.Add(self.hboxd2,0,wx.ALIGN_LEFT)
-        self.remove_3201()
+        self.hboxdl.Hide(self.dev3141Pan)
 
-        self.hboxtop.Add(30,50,0)
-        self.hboxtop.Add(self.hbox12,1,wx.ALIGN_LEFT)
-        self.hboxtop.Add(50,50,0)
-        self.hboxtop.Add(self.hboxloop,1, wx.ALIGN_RIGHT)
-        self.hboxtop.Add(0,50,0)
+        self.vboxl = wx.BoxSizer(wx.VERTICAL)
 
-        lvbox.Add(0,20,0)
-        lvbox.Add(self.hboxtop, 1, wx.ALIGN_LEFT)
-        lvbox.Add(0,30,0)
-        lvbox.Add(hbox1, 1, wx.ALIGN_LEFT | wx.EXPAND, 1)
-        lvbox.Add(0,10,0)
+        self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
+        self.vboxl.Add((0,20), 0, 0)
+        self.vboxl.Add(self.logPan, 1, wx.EXPAND)
 
-        rvbox.Add(self.comPan, 1, wx.ALIGN_RIGHT)
-        rvbox.Add(30,0,0)
-        rvbox.Add(self.treePan,1, wx.ALIGN_RIGHT)
-        rvbox.Add(30,10,0)
+        self.vboxr = wx.BoxSizer(wx.VERTICAL)
+        self.vboxr.Add(self.comPan, 0 ,wx.ALIGN_RIGHT)
+        self.vboxr.Add((0,20), 0, 0)
+        self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT)
 
-        self.hbox.Add(lvbox,1, wx.EXPAND, 10)
-        self.hbox.Add(rvbox,1, wx.ALIGN_RIGHT)
-        self.hbox.Add(20,30,0)
+        self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.SetSizer(self.hbox)
+        self.hboxm.Add((20,0), 1, wx.EXPAND)
+        self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
+        self.hboxm.Add((20,0), 1, wx.EXPAND)
+        self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
+        self.hboxm.Add((20,0), 1, wx.EXPAND)
+
+        self.vboxm = wx.BoxSizer(wx.VERTICAL)
+        self.vboxm.Add((0,20), 0, wx.EXPAND)
+        self.vboxm.Add(self.hboxm, 1, wx.EXPAND)
+        self.vboxm.Add((0,20), 0, wx.EXPAND)
+
+
+        self.SetSizer(self.vboxm)
         self.SetAutoLayout(True)
-        self.hbox.Fit(self)
+        self.vboxm.Fit(self)
         self.Layout()
 
        
@@ -149,20 +135,14 @@ class UiPanel(wx.Panel):
     def disable_start(self):
         self.loopPan.disable_start()
 
-    def remove_3201(self):
-        self.hbox12.Hide(self.hboxd2)
-
-    def remove_3141(self):
-        self.hbox12.Hide(self.hboxd1)
-
     def show_3201(self):
-        self.hbox12.Hide(self.hboxd1)
-        self.hbox12.Show(self.hboxd2)
+        self.hboxdl.Hide(self.dev3141Pan)
+        self.hboxdl.Show(self.dev3201Pan)
         self.Layout()
         
     def show_3141(self):
-        self.hbox12.Hide(self.hboxd2)
-        self.hbox12.Show(self.hboxd1)
+        self.hboxdl.Hide(self.dev3201Pan)
+        self.hboxdl.Show(self.dev3141Pan)
 
     def get_switch_port(self):
         if(self.parent.selDevice == '3141'):
@@ -198,7 +178,7 @@ class UiMainFrame (wx.Frame):
         #super(UiMainFrame, self).__init__(parent, title=title)
         wx.Frame.__init__(self, None, -1, "MCCI USB Switch 3141/3201 - "+
                           VERSION_STR, pos=wx.Point(80,40), 
-                          size=wx.Size(1020,720))
+                          size=wx.Size(980,720))
 
         self.Bind(wx.EVT_CLOSE, self.WinClose)
 
@@ -355,12 +335,6 @@ class UiMainFrame (wx.Frame):
     def disable_start(self):
         self.panel.disable_start()
 
-    def remove_3201(self):
-        self.panel.remove_3201()
-
-    def remove_3141(self):
-        self.panel.remove_3141()
-
     def show_3201(self):
         self.panel.show_3201()
 
@@ -435,7 +409,7 @@ class UiApp(wx.App):
 
     def CustInit(self):
         self.frame = UiMainFrame(parent=None, title="MCCI - UI3141")
-        self.locale = wx.Locale(wx.Locale.GetSystemLanguage())
+        self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
         
 
 #======================================================================
