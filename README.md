@@ -15,9 +15,10 @@ This application is designed to create simple User Interface for USB Switch 3141
 
 #### Installation
 * python 3.* (Installation steps [here](https://realpython.com/installing-python/))
-* pip install wxpython
+* pip install wxpython==4.0.7.post2
 * pip install pyserial
 * pip install pyusb
+* pip install libusb
 * pip install libusb1
 
 #### Web link

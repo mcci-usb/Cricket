@@ -149,7 +149,7 @@ class UsbTreeWindow(wx.Window):
         if(self.wait_flg == False):
             self.btn_ref.Disable()
             self.wait_flg = True
-            threading.Thread(target=self.UsbThread).start()
+            threading.Thread(target=self.UsbThread).run()
 
     def ClearUsbWindow(self, e):
         self.scb.SetValue("")
