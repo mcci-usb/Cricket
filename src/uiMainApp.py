@@ -14,6 +14,7 @@ import wx
 
 import serial
 import webbrowser
+from sys import platform
 
 from uiGlobals import *
 
@@ -48,7 +49,12 @@ class UiPanel(wx.Panel):
 
         self.SetBackgroundColour('White')
 
-        self.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL, False,'MS Shell Dlg 2'))
+        self.font_size = DEFAULT_FONT_SIZE
+
+        if platform == "darwin":
+            self.font_size = MAC_FONT_SIZE
+
+        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL, False,'MS Shell Dlg 2'))
 
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
@@ -143,6 +149,7 @@ class UiPanel(wx.Panel):
     def show_3141(self):
         self.hboxdl.Hide(self.dev3201Pan)
         self.hboxdl.Show(self.dev3141Pan)
+        self.Layout()
 
     def get_switch_port(self):
         if(self.parent.selDevice == '3141'):
@@ -231,7 +238,7 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.MenuHandler)
 
-        self.SetIcon(wx.Icon("mcci_logo.ico"))
+        self.SetIcon(wx.Icon("./icons/mcci_logo.ico"))
 
         self.Show()
 

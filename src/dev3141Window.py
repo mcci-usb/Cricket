@@ -39,11 +39,10 @@ class Dev3141Window(wx.Panel):
         self.vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
 
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox1l = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox1r = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.rbtn_p1 = wx.RadioButton(self, ID_RBTN_P1, "Port 1", 
                                       style=wx.RB_GROUP)
@@ -88,23 +87,26 @@ class Dev3141Window(wx.Panel):
         self.led.append(self.tc_led1)
         self.led.append(self.tc_led2)
 
-        self.hbox1.Add(self.tc_led1, flag=wx.ALIGN_LEFT |  
-                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20)
-        self.hbox1.Add(self.rbtn_p1, 1, flag=wx.ALIGN_CENTER_VERTICAL | 
-                       wx.LEFT, border=3)
-        self.hbox1.Add(self.tc_led2, flag=wx.ALIGN_CENTER | wx.LEFT, 
+        self.hboxs1.Add(self.tc_led1, flag=wx.ALIGN_LEFT |   
+                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20 )
+        self.hboxs1.Add(self.rbtn_p1, flag=wx.ALIGN_CENTER_VERTICAL | 
+                       wx.LEFT , border=3)
+        self.hboxs1.Add(self.tc_led2, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 
                        border = 10)
-        self.hbox1.Add(self.rbtn_p2, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
+        self.hboxs1.Add(self.rbtn_p2, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
                        border=3)
-        self.hbox1.Add(0,0,0)
-        self.hbox1.Add(self.btn_tog, flag=wx.RIGHT | wx.ALIGN_RIGHT, 
+        
+        self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
+        self.hbox1.Add(0,1,0)
+        self.hbox1.Add(self.btn_tog, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
                        border=20)
 
-        self.hbox2.Add(self.st_ss, 1, flag=wx.ALIGN_LEFT | wx.LEFT | 
-                       wx.EXPAND, border=20)
-        self.hbox2.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT )
+        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT, 
+                       border=20 )
+        self.hbox2.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox2.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |
-                       wx.ALIGN_RIGHT, border=15)
+                       wx.ALIGN_RIGHT, border=18)
+
 
         self.hbox3.Add(self.btn_do, flag=wx.LEFT, border=20 )
         self.hbox3.Add(self.st_do, flag=wx.ALIGN_RIGHT | 
