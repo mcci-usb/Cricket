@@ -4,41 +4,50 @@
 
 This application is designed to create simple User Interface for USB Switch 3141 and 3201 , to make the user's interaction as simple and efficient as possible.
 
-## Required
+## Prerequisites for running or building
 
-### Development environment 
-* python 3.7.6
-* wxPython 4.0.7.post2
-* pyserial 3.4
-* pyusb 1.0.2
-* libusb1 1.7.1 
+### Windows
 
-#### Installation
 * python 3.* (Installation steps [here](https://realpython.com/installing-python/))
 * pip install wxpython==4.0.7.post2
 * pip install pyserial
 * pip install pyusb
 * pip install libusb
 * pip install libusb1
+* pip install pyinstaller
 
-#### Web link
-* wxPython  (https://wxpython.org/), (https://pypi.org/project/wxPython/)
-* pyserial  (https://pypi.org/project/pyserial/)
-* pyusb     (https://pypi.org/project/pyusb/)
-* libusb1   (https://pypi.org/project/libusb1/)
+### Linux and Mac
 
-### Exe creation (Pacakaged App)
-Pyinstaller bundles a Python application and all its dependencies into a single package. The user can run the pacakged app without installing a Pyhton interpreter or any modules.
-Pyinstaller is distributed under GPL License 
+* python 3
+* sudo apt-get install pip3
+* sudo pip3 install wxpython==4.0.7.post2
+* sudo pip3 install pyserial
+* sudo pip3 install pyusb
+* sudo pip3 install libusb
+* sudo pip3 install libusb1
+* sudo pip3 install pyinstaller
 
-	Installation command
-	* pip install pyinstaller
-	* Link - (https://pypi.org/project/PyInstaller/)
+## Build and Package creation
+Pyinstaller -  Interprets the python script, bundles the application with its dependencies and provide a stand-alone executable.
 
-	Command to build exe
-	* 'pyinstaller --onefile --windowed --icon=mcci_logo.ico main.py' .
-	   This will create a executable file in the 'dist' folder.
-  
-### Installation setup creation
-Inno Setup Compiler is a free installer application, user need to setup this application with the executable file created through Pyinstaller and other dependencies required for the UI application.
-* Link - (https://jrsoftware.org/isinfo.php)
+### Windows and Linux
+* 'pyinstaller --distpath ./exeout/ --workpath ./exeout/build/ -F -w -i=./icons/mcci_logo.ico main.py -n UI3141-3201' .
+
+### Mac
+* 'pyinstaller --distpath ./exeout/ --workpath ./exeout/build/ -F -w -i=./icons/mcci_logo.icns main.py -n UI3141-3201' .
+
+*  This will create a executable file 'UI3141-3201' in the 'exeout' folder.
+
+## Installer setup
+### Windows
+Inno Setup - Installer which creates single exe to install the application in the OS.
+
+* Install Inno Setup compiler-6.0.5 (Download stable release [here](https://jrsoftware.org/isdl.php#stable)
+* Run the iss script file 'UI3141-Installer-Windows'
+
+The Inno setup script takes the application exe 'UI3141-3201' from 'exeout' folder and leavs the installtion exe 'UI3141-3201-Windows' in the 'AppInstaller' folder	
+
+### Mac
+Packages - Installer which repackages altogether in the PKG format
+
+
