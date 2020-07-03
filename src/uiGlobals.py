@@ -22,6 +22,10 @@ SB_DEV_ID    = 1
 SB_SERIAL_ID = 2
 SB_STATUS_ID = 3
 
+# Font Size
+DEFAULT_FONT_SIZE = 8
+MAC_FONT_SIZE = 10
+
 # Base directory (populated by main module)
 BASE_DIR = None
 

@@ -29,7 +29,7 @@ class Dev3201Window(wx.Window):
         self.parent = parent
         self.top = top
 
-        self.SetMinSize((270, 240))
+        self.SetMinSize((290, 240))
 
         self.rbtn_p1 = wx.RadioButton(self, ID_RBTN_P1, "Port 1", 
                                       style=wx.RB_GROUP)
@@ -90,6 +90,9 @@ class Dev3201Window(wx.Window):
         self.hbox5 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxi = wx.BoxSizer(wx.HORIZONTAL)
 
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
+
         self.led = []
         self.rbtn = []
         self.btnStat = False
@@ -108,30 +111,37 @@ class Dev3201Window(wx.Window):
             self.led[i].SetBackgroundColour("black")
             self.led[i].SetEditable(False)
 
-        self.hbox1.Add(self.tc_led1, flag=wx.ALIGN_LEFT |   
+        
+        self.hboxs1.Add(self.tc_led1, flag=wx.ALIGN_LEFT |   
                        wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20 )
-        self.hbox1.Add(self.rbtn_p1, 1, flag=wx.ALIGN_CENTER_VERTICAL | 
+        self.hboxs1.Add(self.rbtn_p1, flag=wx.ALIGN_CENTER_VERTICAL | 
                        wx.LEFT , border=3)
-        self.hbox1.Add(self.tc_led2, flag=wx.ALIGN_CENTER | wx.LEFT, 
+        self.hboxs1.Add(self.tc_led2, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 
                        border = 10)
-        self.hbox1.Add(self.rbtn_p2, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
+        self.hboxs1.Add(self.rbtn_p2, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
                        border=3)
-        self.hbox1.Add(0,0,0)
-        self.hbox1.Add(self.btn_tog, flag=wx.RIGHT | wx.LEFT | wx.ALIGN_RIGHT,
-                       border=18)
+        
+        self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
+        self.hbox1.Add(0,1,0)
+        self.hbox1.Add(self.btn_tog, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
+                       border=20)
 
-        self.hbox2.Add(self.tc_led3, flag=wx.ALIGN_LEFT |   
+        
+        self.hboxs2.Add(self.tc_led3, flag=wx.ALIGN_LEFT |   
                        wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20 )
-        self.hbox2.Add(self.rbtn_p3, flag=wx.ALIGN_CENTER_VERTICAL | 
+        self.hboxs2.Add(self.rbtn_p3, flag=wx.ALIGN_CENTER_VERTICAL | 
                        wx.LEFT, border=3)
-        self.hbox2.Add(self.tc_led4, flag=wx.ALIGN_CENTER | wx.LEFT, 
-                       border = 15)
-        self.hbox2.Add(self.rbtn_p4, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
+        self.hboxs2.Add(self.tc_led4, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 
+                       border = 10)
+        self.hboxs2.Add(self.rbtn_p4, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
                        border=3)
 
-        self.hbox3.Add(self.st_ss, 1, flag=wx.ALIGN_LEFT | wx.LEFT | 
-                       wx.EXPAND, border=20 )
-        self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT )
+        
+        self.hbox2.Add(self.hboxs2)
+
+        self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT, 
+                       border=20 )
+        self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox3.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |
                        wx.ALIGN_RIGHT, border=18)
 
