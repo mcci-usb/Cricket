@@ -114,7 +114,7 @@ VERSION_TITLE = "\n"
 VERSION_DATE  = "\nVer 1.2  -  2020-04-21\n"
 VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
 
-VERSION_STR = "Version 0.1.0"
+VERSION_STR = "Version 1.0.0"
 
 
 #======================================================================
