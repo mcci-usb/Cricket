@@ -12,6 +12,7 @@
 #======================================================================
 import wx
 
+import os
 import serial
 import webbrowser
 from sys import platform
@@ -208,10 +209,8 @@ class UiMainFrame (wx.Frame):
         self.panel = UiPanel(self)
 
         fileMenu = wx.Menu()
-        fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N",
-                                            "New window")
-        fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4",
-                                            "Close this window")
+        fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
+        fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
         # create the help menu
         helpMenu = wx.Menu()
         helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")

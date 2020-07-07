@@ -345,12 +345,6 @@ class Dev3201Window(wx.Window):
     def update_amps(self, str):
         self.st_amps.SetLabel(str)
 
-    def get_interval(self):
-        tival = self.tc_ival.GetValue()
-        if (tival == ""):
-            tival = "0"
-        return tival
-
     def stop_auto(self):
         self.btn_auto.SetLabel("Auto")
         self.enable_port_ctrl()
@@ -532,3 +526,16 @@ class Dev3201Window(wx.Window):
             for i in range(4):
                 self.led[i].SetBackgroundColour('black')
                 self.led[i].SetLabel("")
+
+    def get_interval(self):
+        tival = self.tc_ival.GetValue()
+        if(tival == ""):
+            tival = "1000"
+        ival = int(tival)
+        if(ival < 1000):
+            ival = 1000
+        elif(ival > 60000):
+            ival = 60000
+
+        self.tc_ival.SetValue(str(ival))
+        return self.tc_ival.GetValue()
