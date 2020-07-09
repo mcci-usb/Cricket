@@ -52,4 +52,4 @@ For Linux and Mac
 
 ## GUI Preview
 
-![UI Preview](assets/UI-3141_3201.jpg)
+![UI Preview](assets/UI-3141_3201.png)
