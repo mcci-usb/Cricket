@@ -65,7 +65,7 @@ Note:
 
 ## Interpret python source
 
-Traverse to 'src' folder
+Move to the directory `destdir/ui-3141-3201/src/`
 
 Run the below command
 
@@ -78,6 +78,14 @@ For Linux and Mac
 ```shell
 'python3 main.py'
 ```
+
+## Version change process
+
+To update the version for each release
+
+* Move to the directory `destdir/ui-3141-3201/src/`
+* Open the file `uiGlobals.py`
+* Update the value of the String Macro `VERSION_STR`
 
 ## GUI Preview
 
