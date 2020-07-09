@@ -60,7 +60,8 @@ sudo pip3 install pyinstaller
 ```
 
 Note:
-* If the installation of wxpython is not success, perform 
+* If the installation of wxpython is not success, perform `sudo apt-get install build-essential libgtk-3-dev`
+* Some times the installation of wxpython takes longer time (>30 minutes).
 
 ## Interpret python source
 
