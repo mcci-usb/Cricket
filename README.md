@@ -1,5 +1,17 @@
 # UI-3141-3201
 
+## List of Contents
+
+<!-- TOC depthFrom:2 updateOnSave:true -->
+
+- [About Application](#about-application)
+- [Prerequisites for running or building](#prerequisites-for-running-or-building)
+- [Interpret python source](#interpret-python-source)
+- [Version change process](#version-change-process)
+- [GUI Preview](#gui-preview)
+
+<!-- /TOC -->
+
 ## About Application
 
 This application is designed to create simple User Interface for USB Switch 3141 and 3201 , to make the user's interaction as simple and efficient as possible.
@@ -71,12 +83,12 @@ Run the below command
 
 For Windows 
 ```shell
-'python main.py'  
+python main.py  
 ```
 
 For Linux and Mac
 ```shell
-'python3 main.py'
+python3 main.py
 ```
 
 ## Version change process
