@@ -42,7 +42,7 @@ class ComWindow(wx.Panel):
         self.btn_connect = wx.Button(self, ID_BTN_CONNECT, "Connect", 
                                      size=(70,-1))
 
-        sb = wx.StaticBox(self, -1,"Select Model")
+        sb = wx.StaticBox(self, -1,"Manage Model")
         self.szr_top = wx.StaticBoxSizer(sb, wx.HORIZONTAL)
         self.szr_top.AddMany([
             (10,50,0),
