@@ -10,6 +10,17 @@ It is a cross platform GUI application developed by using WxPython.
 
 <strong>On Windows:</strong>
 
+Development environment
+
+* OS - Windows 10 64 bit
+* Python - 3.7.6
+* wxpython - 4.0.7.post2
+* pyserial - 3.4
+* pyusb - 1.0.2
+* libusb - 1.0.22b9
+* libusb1 - 1.8
+* pyinstaller - 3.6 
+
 Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install
 
 ```shell
@@ -23,9 +34,23 @@ pip install pyinstaller
 
 <strong>On Linux and Mac:</strong>
 
+Development environment
+
+* Linux OS - Ubuntu 20.4 64 bit
+* Python - 3.8.2
+* Mac OS - High Sierra
+* Python - 3.7.0
+* wxpython - 4.0.7.post2
+* pyserial - 3.4
+* pyusb - 1.0.2
+* libusb - 1.0.22b9
+* libusb1 - 1.8
+* pyinstaller - 3.6  
+
 ```shell
+sudo apt-get update
 sudo apt-get install python3
-sudo apt-get install pip3
+sudo apt-get install python3-pip
 sudo pip3 install wxpython==4.0.7.post2
 sudo pip3 install pyserial
 sudo pip3 install pyusb
@@ -33,6 +58,9 @@ sudo pip3 install libusb
 sudo pip3 install libusb1
 sudo pip3 install pyinstaller
 ```
+
+Note:
+* If the installation of wxpython is not success, perform 
 
 ## Interpret python source
 
