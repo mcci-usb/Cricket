@@ -77,7 +77,7 @@ Note:
 
 ## Interpret python source
 
-Move to the directory `destdir/ui-3141-3201/src/`
+Move to the directory `destdir/src/`
 
 Run the below command
 
@@ -95,7 +95,7 @@ python3 main.py
 
 To update the version for each release
 
-* Move to the directory `destdir/ui-3141-3201/src/`
+* Move to the directory `destdir/src/`
 * Open the file `uiGlobals.py`
 * Update the value of the String Macro `VERSION_STR`
 
