@@ -48,9 +48,9 @@ pip install pyinstaller
 
 Development environment
 
-* Linux OS - Ubuntu 20.4 64 bit
+* Linux OS - Ubuntu 20.04 64 bit
 * Python - 3.8.2
-* Mac OS - High Sierra
+* Mac OS - High Sierra 10.13.6
 * Python - 3.7.0
 * wxpython - 4.0.7.post2
 * pyserial - 3.4
