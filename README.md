@@ -98,6 +98,7 @@ To update the version for each release
 * Move to the directory `destdir/src/`
 * Open the file `uiGlobals.py`
 * Update the value of the String Macro `VERSION_STR`
+* Update the VERSION.md `destdir/VERSION.md`
 
 ## GUI Preview
 
