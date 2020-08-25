@@ -211,6 +211,7 @@ class UiMainFrame (wx.Frame):
         fileMenu = wx.Menu()
         fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
         fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
+
         # create the help menu
         helpMenu = wx.Menu()
         helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
@@ -219,7 +220,7 @@ class UiMainFrame (wx.Frame):
         helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
         helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
         helpMenu.AppendSeparator()
-        helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
+        helpMenu.Append(wx.ID_ABOUT, "About...")
 
         # create menubar
         menuBar = wx.MenuBar()
@@ -236,6 +237,8 @@ class UiMainFrame (wx.Frame):
         self.UpdateAll(["Port", "", ""])
 
         self.Bind(wx.EVT_MENU, self.MenuHandler)
+        self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
+        self.Bind(wx.EVT_MENU, self.OnExitApplication, id=wx.ID_EXIT)
 
         self.SetIcon(wx.Icon("./icons/mcci_logo.ico"))
 
@@ -249,10 +252,6 @@ class UiMainFrame (wx.Frame):
         id = e.GetId()
         if(id == ID_MENU_FILE_CLOSE):
             self.OnCloseWindow()
-        elif(id == ID_MENU_FILE_EXIT):
-            self.OnExitApplication()
-        elif(id == ID_MENU_HELP_ABOUT):
-            self.OnAboutWindow()
         elif(id == ID_MENU_HELP_3141):
              webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/", 
                              new=0, autoraise=True)
@@ -293,7 +292,7 @@ class UiMainFrame (wx.Frame):
         #print("Script Window")
         pass
 
-    def OnAboutWindow(self):
+    def OnAboutWindow(self, e):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
@@ -302,7 +301,7 @@ class UiMainFrame (wx.Frame):
         # Close this window
         self.Close(True)
 
-    def OnExitApplication (self):
+    def OnExitApplication (self, e):
         self.Close(True)
 
     def WinClose(self, evt):
