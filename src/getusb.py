@@ -11,9 +11,12 @@
 # IMPORTS
 #======================================================================
 import sys
+import os
 
 import usb.util
 from usb.backend import libusb1
+
+import xml.dom.minidom
 
 #======================================================================
 # COMPONENTS
@@ -24,7 +27,7 @@ def scan_usb():
     hub_list = []
     per_list = []
     master_list = []
-
+    
     tot_list = []
 
     masterDict = {} 
@@ -33,12 +36,15 @@ def scan_usb():
 
     path = path.replace("python.exe", "")
 
-    backend1 = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
-               path + "Lib/site-packages/libusb/_platform/_windows/x86"+
-               "/libusb-1.0.dll")
+    backend = None
+
+    if sys.platform == 'windows':
+        backend = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
+                   path + "Lib/site-packages/libusb/_platform/_windows/x86"+
+                   "/libusb-1.0.dll")
 
     #generator object
-    usb_devices = usb.core.find(find_all=True, backend=backend1)   
+    usb_devices = usb.core.find(find_all=True, backend=backend)   
 
     for d in usb_devices:  # Device object
         if(d.bDeviceClass == 9 and d.port_number == 0):
@@ -77,7 +83,7 @@ def scan_usb():
         try:
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
-                               backend=backend1)
+                               backend=backend)
             for cfg in dl:
                 sclist = list(range(cfg.bNumInterfaces))
                 for i in cfg:
@@ -92,7 +98,7 @@ def scan_usb():
         try:
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
-                               backend=backend1)
+                               backend=backend)
             for cfg in dl:
                 sclist = list(range(cfg.bNumInterfaces))
                 for i in cfg:
@@ -108,7 +114,22 @@ def scan_usb():
     for i in range(len(per_list)):
         master_list.append(per_list[i])
 
-    tot_list.append(len(hc_list))
+    if sys.platform == 'darwin':
+        xmldoc = os.popen("system_profiler -xml SPUSBDataType")
+        domobj = xml.dom.minidom.parseString(xmldoc.read())
+        keynode = domobj.getElementsByTagName("key")
+        cn = []
+        hc = []
+        for node in keynode:
+            cn.append(node.childNodes)
+        for cnode in cn:
+            nk = cnode.item(0).data
+            if nk == 'host_controller':
+                hc.append(nk)
+        tot_list.append(len(hc))
+    else:
+        tot_list.append(len(hc_list))
+
     tot_list.append(len(hub_list))
     tot_list.append(len(per_list))
 

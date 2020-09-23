@@ -47,14 +47,16 @@ class LoopWindow(wx.Window):
 
         self.usb_flg = False
 
+        self.pulse_flg = False
+
         self.dlist = []
 
         self.portno = 0
         
         self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
                                       style = wx.ALIGN_CENTER)
-        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "1000", size=(50,-1), 
-                                    style = 0,
+        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "2000", size=(50,-1), 
+                                    style = wx.TE_PROCESS_ENTER,
                                     validator=NumericValidator(), 
                                     name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
@@ -63,7 +65,7 @@ class LoopWindow(wx.Window):
         self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
                                        style = wx.ALIGN_CENTER)
         self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
-                                     style = 0,
+                                     style = wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
@@ -141,6 +143,8 @@ class LoopWindow(wx.Window):
             ])
 
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
+        #self.tc_per.Bind(wx.EVT_TEXT_ENTER, self.OnEnterPeriod)
+        #self.tc_duty.Bind(wx.EVT_TEXT_ENTER, self.OnEnterDuty)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         
@@ -156,20 +160,18 @@ class LoopWindow(wx.Window):
             self.stop_loop()
         else:
             if(self.check_valid_input()):
-                if(self.top.get_delay_status()):
-                    dlg = wx.MessageDialog(self,'Click Yes to continue with '\
-                                          'USB device tree changes enabled\n',
-                                          'Need USB device tree changes ?', 
-                                           wx.NO|wx.YES)
-                    if(dlg.ShowModal() == wx.ID_NO):
-                        self.top.disable_usb_scan()
-                self.start_loop()
+                self.get_all_three()
+                if(self.usb_dly_warning()):
+                    self.start_loop()
             else:
                 wx.MessageBox('Input box left blank','Error', wx.OK)
 
     def TimerServ(self, evt):
         if self.top.con_flg:
+            self.pulse_flg = True
             if(self.usb_flg == False):
+                self.timer.Stop()
+                self.pulse_flg = False
                 if(self.On_flg):
                     self.port_off_cmd(self.portno)
                     self.On_flg = False
@@ -180,7 +182,7 @@ class LoopWindow(wx.Window):
                         self.timer.Stop()
                         self.btn_start.SetLabel("Start")
                         self.start_flg = False
-                        self.top.enable_model()
+                        self.enable_controls(True)
                     else:    
                         self.timer.Start(self.OffTime)
                 else:
@@ -194,7 +196,36 @@ class LoopWindow(wx.Window):
             usbDev.get_tree_change(self.top)
         except:
             self.top.print_on_usb("USB Read Error!")
-        self.usb_flg = False 
+        self.usb_flg = False
+        
+        if(self.start_flg == True & self.pulse_flg == True):
+            self.timer.Start(1)
+
+    def OnEnterPeriod(self, evt):
+        self.get_all_three()
+        self.usb_dly_warning()
+    
+    def OnEnterDuty(self, evt):
+        self.get_all_three()
+        self.usb_dly_warning()
+        
+    def usb_dly_warning(self):
+        if(self.top.get_delay_status()):
+            if((int(self.OnTime) < int(self.top.get_enum_delay())) |
+               (int(self.OffTime) < int(self.top.get_enum_delay()))):
+                title = ("USB device tree delay warning!")
+                msg = ("USB device tree delay should be less than "
+                       "the Port ON and OFF Period."
+                       "\nClick Yes to continue without "
+                       "USB device tree changes"
+                       "\nClick No to exit the Loop mode")
+                dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
+                if(dlg.ShowModal() == wx.ID_YES):
+                    self.top.disable_usb_scan()
+                    return True
+                else:
+                    return False
+        return True
 
     def get_period(self):
         dper = self.tc_per.GetValue()
@@ -208,6 +239,9 @@ class LoopWindow(wx.Window):
 
         self.tc_per.SetValue(str(pval))
         return self.tc_per.GetValue()
+
+    def set_period(self, strval):
+        self.tc_per.SetValue(strval)
 
     def get_duty(self):
         duty = self.tc_duty.GetValue()
@@ -243,6 +277,10 @@ class LoopWindow(wx.Window):
         self.OnTime = self.period * (self.duty/100)
         self.OffTime = self.period - self.OnTime
 
+    def get_loop_param(self):
+        self.get_all_three()
+        return self.OnTime, self.OffTime, self.duty
+
     def check_valid_input(self):
         strPer = self.tc_per.GetValue()
         if(strPer == ''):
@@ -270,8 +308,8 @@ class LoopWindow(wx.Window):
         self.start_flg = True
         self.loop_start_msg()
         self.btn_start.SetLabel("Stop")
+        self.enable_controls(False)
         if(self.timer.IsRunning() == False):
-            self.top.disable_model()
             self.cycleCnt = 0
             self.On_flg = True
             self.port_on_cmd(self.portno)
@@ -280,7 +318,7 @@ class LoopWindow(wx.Window):
     def stop_loop(self):
         self.start_flg = False
         self.btn_start.SetLabel("Start")
-        self.top.enable_model()
+        self.enable_controls(True)
         self.timer.Stop()
         self.top.print_on_log("Loop Mode Interrupted\n")
 
@@ -330,3 +368,18 @@ class LoopWindow(wx.Window):
             self.timer.Stop()
             self.start_flg = False
             self.st_cnt.SetLabel("")
+
+    def enable_loop_controls(self, stat):
+        if(stat == True):
+            self.tc_per.Enable()
+            self.tc_duty.Enable()
+            self.tc_cycle.Enable()
+        else:
+            self.tc_per.Disable()
+            self.tc_duty.Disable()
+            self.tc_cycle.Disable()
+
+    def enable_controls(self, stat):
+        self.enable_loop_controls(stat)
+        self.top.enable_enum_controls(stat)
+        self.top.enable_auto_controls(stat)
