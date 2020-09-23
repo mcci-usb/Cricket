@@ -47,7 +47,8 @@ class UsbTreeWindow(wx.Window):
                                         style=wx.ALIGN_CENTER)
 
         self.tc_delay   = wx.TextCtrl(self, -1, "1000", size=(50,-1), 
-                                      style = 0,
+                                      style = wx.TE_CENTRE |
+                                      wx.TE_PROCESS_ENTER,
                                       validator=NumericValidator(),
                                       name="Enumeration Delay")
 
@@ -115,6 +116,8 @@ class UsbTreeWindow(wx.Window):
         self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshUsbBus)
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearUsbWindow)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveUsbLog)
+        #self.tc_delay.Bind(wx.EVT_TEXT_ENTER, self.OnEnterDelay)
+        self.chk_box.Bind(wx.EVT_CHECKBOX, self.OnCheckBox)
 
         self.tc_delay.SetMaxLength(5)
 
@@ -162,6 +165,12 @@ class UsbTreeWindow(wx.Window):
         self.wait_flg = False
         self.btn_ref.Enable()
 
+    def OnEnterDelay(self, evt):
+        self.update_interval_period()
+
+    def OnCheckBox(self, evt):
+        self.update_interval_period()
+
     def get_time_stamp(self):
         ct = datetime.now()
         dtstr = ct.strftime("%Y-%m-%d  %H:%M:%S.%f")
@@ -199,3 +208,27 @@ class UsbTreeWindow(wx.Window):
 
     def disable_usb_scan(self):
         self.chk_box.SetValue(False)
+
+    def update_interval_period(self):
+        if(self.get_delay_status()):
+            onTime, offTime, duty = self.top.get_loop_param()
+            if(int(onTime) >= int(offTime)):
+                if(int(offTime) < int(self.get_enum_delay())):
+                    duty = 100 - duty
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_period(str(ndly))
+            else:
+                if(int(onTime) < int(self.get_enum_delay())):
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_period(str(ndly))
+            
+            if(int(self.top.get_interval()) < int(self.get_enum_delay())):
+                self.top.set_interval(self.get_enum_delay())
+
+    def enable_enum_controls(self, stat):
+        if(stat == True):
+            self.chk_box.Enable()
+            self.tc_delay.Enable()
+        else:
+            self.chk_box.Disable()
+            self.tc_delay.Disable()

@@ -13,6 +13,7 @@
 import wx
 
 import os
+import sys
 import serial
 import webbrowser
 from sys import platform
@@ -41,7 +42,6 @@ class MultiStatus (wx.StatusBar):
         self.SetFieldsCount(5)
         self.SetStatusWidths([-1, -1, -3, -2, -8])
 
-        
 class UiPanel(wx.Panel):
     def __init__(self, parent):
         super(UiPanel, self).__init__(parent)
@@ -95,14 +95,12 @@ class UiPanel(wx.Panel):
         self.vboxm.Add((0,20), 0, wx.EXPAND)
         self.vboxm.Add(self.hboxm, 1, wx.EXPAND)
         self.vboxm.Add((0,20), 0, wx.EXPAND)
-
-
+        
         self.SetSizer(self.vboxm)
         self.SetAutoLayout(True)
         self.vboxm.Fit(self)
         self.Layout()
 
-       
     def PrintLog(self, strin):
         self.logPan.print_on_log(strin)
 
@@ -135,6 +133,18 @@ class UiPanel(wx.Panel):
             self.dev3201Pan.enable_auto()
         else:
             self.dev3141Pan.enable_auto()
+
+    def get_interval(self):
+        if(self.parent.selDevice == '3141'):
+            return self.dev3141Pan.get_interval()
+        else:
+            return self.dev3201Pan.get_interval()
+
+    def set_interval(self, strval):
+        if(self.parent.selDevice == '3141'):
+            self.dev3141Pan.set_interval(strval)
+        else:
+            self.dev3201Pan.set_interval(strval)
 
     def enable_start(self):
         self.loopPan.enable_start()
@@ -169,26 +179,29 @@ class UiPanel(wx.Panel):
         self.dev3141Pan.update_controls()
         self.loopPan.update_controls()
 
-    def enable_model(self):
-        self.dev3141Pan.enable_model()
-        self.dev3201Pan.enable_model()
-
-    def disable_model(self):
-        self.dev3141Pan.disable_model()
-        self.dev3201Pan.disable_model()
+    def enable_model(self, stat):
+        self.dev3141Pan.enable_model(stat)
+        self.dev3201Pan.enable_model(stat)
 
     def disable_usb_scan(self):
         self.treePan.disable_usb_scan()
+
+    def get_loop_param(self):
+        return self.loopPan.get_loop_param()
+
+    def set_period(self, strval):
+        self.loopPan.set_period(strval)
+
+    def enable_enum_controls(self, stat):
+        self.treePan.enable_enum_controls(stat)
 
 
 class UiMainFrame (wx.Frame):
     def __init__ (self, parent, title):
         #super(UiMainFrame, self).__init__(parent, title=title)
-        wx.Frame.__init__(self, None, -1, "MCCI USB Switch 3141/3201 - "+
-                          VERSION_STR, pos=wx.Point(80,40), 
+        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI USB Switch 3141/3201 - "+
+                          VERSION_STR, pos=wx.Point(80,80),
                           size=wx.Size(980,720))
-
-        self.Bind(wx.EVT_CLOSE, self.WinClose)
 
         self.SetMinSize((980,600))
 
@@ -207,27 +220,44 @@ class UiMainFrame (wx.Frame):
         self.masterList = []
         
         self.panel = UiPanel(self)
-
-        fileMenu = wx.Menu()
-        fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
-        fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
+        
+        self.menuBar = wx.MenuBar()
+        
+        
+        if sys.platform != 'darwin':
+           self.fileMenu = wx.Menu()
+           #fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
+           self.fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
 
         # create the help menu
-        helpMenu = wx.Menu()
-        helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
-        helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
-        helpMenu.AppendSeparator()
-        helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
-        helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
-        helpMenu.AppendSeparator()
-        helpMenu.Append(wx.ID_ABOUT, "About...")
-
+        self.helpMenu = wx.Menu()
+        self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
+        self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
+        self.helpMenu.AppendSeparator()
+        self.helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
+        self.helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
+        self.helpMenu.AppendSeparator()
+        
+        if sys.platform == 'darwin':
+            self.helpMenu.Append(wx.ID_ABOUT, "About UI-3141-3201")
+        else:
+            self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
+        
+        if sys.platform == 'darwin':
+            self.winMenu = wx.Menu()
+            self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
+            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW, "&UI-3141-3201\tAlt+Ctrl+1")
+            self.winMenu.Check(ID_MENU_WIN_SHOW, True)
+        
+        
         # create menubar
-        menuBar = wx.MenuBar()
-        menuBar.Append(fileMenu,    "&File")
-        menuBar.Append(helpMenu,    "&Help")
-
-        self.SetMenuBar(menuBar)
+        if sys.platform != 'darwin':
+            self.menuBar.Append(self.fileMenu,    "&File")
+        else:
+            self.menuBar.Append(self.winMenu,    "&Window")
+        self.menuBar.Append(self.helpMenu,    "&Help")
+        
+        self.SetMenuBar(self.menuBar)
 
         # create the statusbar
         self.statusbar = MultiStatus(self)
@@ -236,36 +266,44 @@ class UiMainFrame (wx.Frame):
 
         self.UpdateAll(["Port", "", ""])
 
-        self.Bind(wx.EVT_MENU, self.MenuHandler)
-        self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
-        self.Bind(wx.EVT_MENU, self.OnExitApplication, id=wx.ID_EXIT)
+        #self.Bind(wx.EVT_MENU, self.MenuHandler)
+        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_WEB)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_PORT)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
+        self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
+        self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
+
+        if sys.platform == 'darwin':
+            self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
+            self.Bind(wx.EVT_ICONIZE, self.OnIconize)
 
         self.SetIcon(wx.Icon("./icons/mcci_logo.ico"))
 
         self.Show()
-
+        
         td, usbList = getusb.scan_usb()
         self.save_usb_list(usbList)
         self.update_usb_status(td)
-        
-    def MenuHandler(self, e):
-        id = e.GetId()
-        if(id == ID_MENU_FILE_CLOSE):
-            self.OnCloseWindow()
-        elif(id == ID_MENU_HELP_3141):
-             webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/", 
-                             new=0, autoraise=True)
+
+    def OnClickHelp(self, event):
+        id = event.GetId()
+        if(id == ID_MENU_HELP_3141):
+            webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
+                            new=0, autoraise=True)
         elif(id == ID_MENU_HELP_3201):
-             webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"
-                             "-type-c-connection-exerciser/",
-                             new=0, autoraise=True)
+            webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"
+                            "-type-c-connection-exerciser/",
+                            new=0, autoraise=True)
         elif(id == ID_MENU_HELP_WEB):
             webbrowser.open("https://mcci.com/", new=0, autoraise=True)
         elif(id == ID_MENU_HELP_PORT):
-            webbrowser.open("https://portal.mcci.com/portal/home", new=0, 
+            webbrowser.open("https://portal.mcci.com/portal/home", new=0,
                             autoraise=True)
-        elif(id == ID_MENU_SCRIPT_NEW):
-            self.OnScriptWindow()
+        elif(id == ID_MENU_HELP_ABOUT):
+            self.OnAboutWindow(event)
 
     def UpdateStatusBar (self):
         self.statusbar.Refresh()
@@ -292,20 +330,32 @@ class UiMainFrame (wx.Frame):
         #print("Script Window")
         pass
 
-    def OnAboutWindow(self, e):
+    def OnAboutWindow(self, event):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnCloseWindow (self):
+    def OnCloseWindow (self, event):
         # Close this window
         self.Close(True)
+    
+    def OnIconize (self, event):
+        # Close this window
+        if self.IsIconized():
+            self.winMenu.Check(ID_MENU_WIN_SHOW, False)
+        else:
+            self.winMenu.Check(ID_MENU_WIN_SHOW, True)
+        event.Skip()
+    
+    def OnHideWindow (self, event):
+        # Close this window
+        self.winMenu.Check(ID_MENU_WIN_SHOW, False)
+        self.Iconize(True)
 
-    def OnExitApplication (self, e):
-        self.Close(True)
-
-    def WinClose(self, evt):
-        self.Destroy()
+    def OnShowWindow (self, event):
+        # Close this window
+        self.winMenu.Check(ID_MENU_WIN_SHOW, True)
+        self.Iconize(False)
 
     def print_on_log(self, strin):
         self.panel.PrintLog(strin)
@@ -340,11 +390,23 @@ class UiMainFrame (wx.Frame):
     def disable_start(self):
         self.panel.disable_start()
 
+    def get_loop_param(self):
+        return self.panel.get_loop_param()
+
+    def set_period(self, strval):
+        self.panel.set_period(strval)
+
     def show_3201(self):
         self.panel.show_3201()
 
     def show_3141(self):
         self.panel.show_3141()
+
+    def get_interval(self):
+        return self.panel.get_interval()
+
+    def set_interval(self, strval):
+        self.panel.set_interval(strval)
 
     def get_switch_port(self):
         return self.panel.get_switch_port()
@@ -363,6 +425,12 @@ class UiMainFrame (wx.Frame):
 
     def disable_usb_scan(self):
         self.panel.disable_usb_scan()
+
+    def enable_auto_controls(self, stat):
+        self.panel.enable_model(stat)
+
+    def enable_enum_controls(self, stat):
+        self.panel.enable_enum_controls(stat)
 
     def update_usb_status(self, dl):
         strUsb = " USB Devices     Host Controller: {d1}     ".\

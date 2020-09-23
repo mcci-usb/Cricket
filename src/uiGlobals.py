@@ -44,6 +44,7 @@ ID_TC_CYCLE = 1006
 
 ID_BTN_START  = 1007
 
+ID_MENU_SHOW_APP  = 1008
 # Menu
 ID_MENU_FILE_NEW    = 1011
 ID_MENU_FILE_CLOSE  = 1012
@@ -85,6 +86,10 @@ ID_BTN_CLEAR = 1034
 ID_BTN_REF = 1035
 ID_BTN_UCLEAR = 1036
 
+# Menu for Mac
+ID_MENU_WIN_MIN = 1037
+ID_MENU_WIN_SHOW = 1038
+
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
@@ -111,7 +116,7 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 VERSION_NAME  = "\nMCCI"+u"\u00AE"+" USB Switch - 3141/3201"
 VERSION_ID    = ""
 VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
-VERSION_STR = "Version 1.0.2"
+VERSION_STR = "Version 1.2.0"
 
 
 #======================================================================

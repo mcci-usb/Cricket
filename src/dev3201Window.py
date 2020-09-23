@@ -50,7 +50,8 @@ class Dev3201Window(wx.Window):
         
         self.st_si   = wx.StaticText(self, -1, "Interval")
         self.tc_ival   = wx.TextCtrl(self, ID_TC_INTERVAL, "1000", 
-                                     size=(50,-1), style = 0,
+                                     size=(50,-1), style = wx.TE_CENTRE |
+                                     wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
@@ -79,6 +80,8 @@ class Dev3201Window(wx.Window):
         self.pcnt = 0
 
         self.usb_flg = False
+
+        self.pulse_flg = False
 
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
@@ -194,6 +197,7 @@ class Dev3201Window(wx.Window):
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.btn_tog.Bind(wx.EVT_BUTTON, self.OnOffPort)
+        #self.tc_ival.Bind(wx.EVT_TEXT_ENTER, self.OnEnterInterval)
 
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
 
@@ -208,7 +212,8 @@ class Dev3201Window(wx.Window):
         if(self.top.auto_flg):
             self.stop_auto()
         else:
-            self.start_auto()
+            if(self.usb_dly_warning()):
+                self.start_auto()
 
     def VoltsCmd(self, evt):
         strin = "--"
@@ -246,12 +251,16 @@ class Dev3201Window(wx.Window):
 
     def TimerServ(self, evt):
         if(self.top.con_flg):
+            self.pulse_flg = True
             if(self.usb_flg == False):
+                self.pulse_flg = False
+                self.timer.Stop()
                 self.on_port(self.pcnt)
         
                 self.pcnt = self.pcnt + 1
                 if(self.pcnt >= 4):
                     self.pcnt = 0
+                self.timer.Start(int(self.get_interval()))
         else:
             self.stop_auto()
             self.disable_buttons()
@@ -259,16 +268,22 @@ class Dev3201Window(wx.Window):
     def UsbTimer(self, e):
         self.timer_usb.Stop()
         usbDev.get_tree_change(self.top)
-        self.rbtn_p1.Enable()
-        self.rbtn_p2.Enable()
-        self.rbtn_p3.Enable()
-        self.rbtn_p4.Enable()
-        self.btn_tog.Enable()
-        self.usb_flg = False 
+        self.usb_flg = False
+        if(self.top.auto_flg == True & self.pulse_flg == True):
+            self.timer.Start(1)
+        else:
+            self.btn_tog.Enable()
+            self.top.enable_enum_controls(True)
+            self.btn_auto.Enable()
+            self.top.enable_start()
 
     def OnOffPort(self, evt):
         if self.usb_flg == False:
             self.btnStat = not self.btnStat
+            self.btn_tog.Disable()
+            self.btn_auto.Disable()
+            self.top.disable_start()
+            self.top.enable_enum_controls(False)
             if(self.btnStat):
                 self.disable_all_rb()
                 self.port_on_cmd(self.port)
@@ -288,6 +303,26 @@ class Dev3201Window(wx.Window):
             id = id - ID_RBTN_P1
             self.port = id + 1
             self.check_ss_support()
+
+    def OnEnterInterval(self, evt):
+        self.usb_dly_warning()
+
+    def usb_dly_warning(self):
+        if(int(self.get_interval()) < int(self.top.get_enum_delay())):
+            if(self.top.get_delay_status()):
+                title = ("USB device tree delay warning!")
+                msg = ("USB device tree delay should be less than "
+                       "the Port Switching Interval."
+                       "\nClick Yes to continue without "
+                       "USB device tree changes"
+                       "\nClick No to exit the Auto mode")
+                dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
+                if(dlg.ShowModal() == wx.ID_YES):
+                    self.top.disable_usb_scan()
+                    return True
+                else:
+                    return False
+        return True
 
     def disable_all_rb(self):
         self.btn_tog.SetLabel('OFF')
@@ -347,8 +382,9 @@ class Dev3201Window(wx.Window):
 
     def stop_auto(self):
         self.btn_auto.SetLabel("Auto")
-        self.enable_port_ctrl()
+        self.enable_auto_ctrl(True)
         self.top.enable_start()
+        self.top.enable_enum_controls(True)
         self.top.auto_flg = False
         self.timer.Stop()
         self.port_off_cmd(self.pcnt+1)
@@ -359,9 +395,10 @@ class Dev3201Window(wx.Window):
     def start_auto(self):
         self.top.auto_flg = True
         self.btn_auto.SetLabel("Stop")
+        self.enable_auto_ctrl(False)
+        self.top.disable_start()
+        self.top.enable_enum_controls(False)
         if(self.timer.IsRunning() == False):
-            self.disable_port_ctrl()
-            self.top.disable_start()
             self.tog_flg = False
             self.timer.Start(int(self.get_interval()))
 
@@ -390,6 +427,11 @@ class Dev3201Window(wx.Window):
         
         if(self.top.get_delay_status()):
             self.keep_delay()
+        elif(self.top.auto_flg == False):
+            self.btn_tog.Enable()
+            self.top.enable_enum_controls(True)
+            self.btn_auto.Enable()
+            self.top.enable_start()
         
     def port_off_cmd(self, pno):
         cmd = 'port'+' '+'0'+'\r\n'
@@ -401,6 +443,11 @@ class Dev3201Window(wx.Window):
         
         if(self.top.get_delay_status()):
             self.keep_delay()
+        elif(self.top.auto_flg == False):
+            self.btn_tog.Enable()
+            self.top.enable_enum_controls(True) 
+            self.btn_auto.Enable()
+            self.top.enable_start()
 
     def keep_delay(self):
         self.btn_tog.Disable()
@@ -411,29 +458,29 @@ class Dev3201Window(wx.Window):
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
 
-    def disable_model(self):
-        self.btn_tog.Disable()
-        self.rbtn_p1.Disable()
-        self.rbtn_p2.Disable()
-        self.rbtn_p3.Disable()
-        self.rbtn_p4.Disable()
+    def enable_model(self, stat):
+        if(stat == True):
+            self.btn_tog.Enable()
+            self.rbtn_p1.Enable()
+            self.rbtn_p2.Enable()
+            self.rbtn_p3.Enable()
+            self.rbtn_p4.Enable()
+            self.btn_volts.Enable()
+            self.btn_amps.Enable()
+            self.btn_auto.Enable()
+            self.check_ss_support()
+        else:
+            self.btn_tog.Disable()
+            self.rbtn_p1.Disable()
+            self.rbtn_p2.Disable()
+            self.rbtn_p3.Disable()
+            self.rbtn_p4.Disable()
         
-        self.btn_volts.Disable()
-        self.btn_amps.Disable()
-        self.rbtn_ss0.Disable()
-        self.rbtn_ss1.Disable()
-        self.btn_auto.Disable()
-
-    def enable_model(self):
-        self.btn_tog.Enable()
-        self.rbtn_p1.Enable()
-        self.rbtn_p2.Enable()
-        self.rbtn_p3.Enable()
-        self.rbtn_p4.Enable()
-        self.btn_volts.Enable()
-        self.btn_amps.Enable()
-        self.btn_auto.Enable()
-        self.check_ss_support()
+            self.btn_volts.Disable()
+            self.btn_amps.Disable()
+            self.rbtn_ss0.Disable()
+            self.rbtn_ss1.Disable()
+            self.btn_auto.Disable()
 
     def update_controls(self):
         if(self.top.con_flg):
@@ -486,21 +533,25 @@ class Dev3201Window(wx.Window):
         self.btn_volts.Enable()
         self.btn_amps.Enable()
         self.btn_tog.Enable()
-        
-    def disable_port_ctrl(self):
-        self.rbtn_p1.Disable()
-        self.rbtn_p2.Disable()
-        self.rbtn_p3.Disable()
-        self.rbtn_p4.Disable()
-        self.rbtn_ss0.Disable()
-        self.rbtn_ss1.Disable()
-        
-    def enable_port_ctrl(self):
-        self.rbtn_p1.Enable()
-        self.rbtn_p2.Enable()
-        self.rbtn_p3.Enable()
-        self.rbtn_p4.Enable()
-        self.check_ss_support()
+
+    def enable_auto_ctrl(self, stat):
+        if(stat == True):
+            self.rbtn_p1.Enable()
+            self.rbtn_p2.Enable()
+            self.rbtn_p3.Enable()
+            self.rbtn_p4.Enable()
+            self.btn_tog.Enable()
+            self.check_ss_support()
+            self.tc_ival.Enable()
+        else:
+            self.rbtn_p1.Disable()
+            self.rbtn_p2.Disable()
+            self.rbtn_p3.Disable()
+            self.rbtn_p4.Disable()
+            self.rbtn_ss0.Disable()
+            self.rbtn_ss1.Disable()
+            self.btn_tog.Disable()
+            self.tc_ival.Disable()
 
     def on_port(self, pno):
         self.port_on_cmd(pno+1)
@@ -539,3 +590,6 @@ class Dev3201Window(wx.Window):
 
         self.tc_ival.SetValue(str(ival))
         return self.tc_ival.GetValue()
+
+    def set_interval(self, strval):
+        self.tc_ival.SetValue(strval)
