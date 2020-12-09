@@ -52,6 +52,13 @@ class LoopWindow(wx.Window):
         self.dlist = []
 
         self.portno = 0
+
+        self.cb_psel = wx.ComboBox(self,
+                                     size=(50,-1),
+                                     style = wx.TE_PROCESS_ENTER)
+        self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
+                                      style = wx.ALIGN_CENTER)
+     
         
         self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
                                       style = wx.ALIGN_CENTER)
@@ -90,11 +97,20 @@ class LoopWindow(wx.Window):
         self.tc_per.SetMaxLength(5)
         self.tc_duty.SetMaxLength(2)
         self.tc_cycle.SetMaxLength(3)
+        self.cb_psel.SetMaxLength(1)
 
+        self.bs_psel = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_cycle = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.bs_psel.Add(40,0,0)
+        self.bs_psel.Add(self.st_port,0, wx.ALIGN_CENTER)
+        self.bs_psel.Add(15,20,0)
+        self.bs_psel.Add(self.cb_psel,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+        self.bs_psel.Add(40,0,0)
 
         self.bs_pers.Add(40,0,0)
         self.bs_pers.Add(self.st_per,0, wx.ALIGN_CENTER_VERTICAL)
@@ -131,17 +147,18 @@ class LoopWindow(wx.Window):
 
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
-
         self.bs_vbox.AddMany([
-            (10,10,0),
+            (0,5,0),
+            (self.bs_psel,1, wx.EXPAND),
+            (0,0,0),
             (self.bs_pers, 1, wx.EXPAND),
+            (0,0,0),
             (self.bs_duty, 1, wx.EXPAND),
             (self.bs_cycle, 1, wx.EXPAND),
-            (0,15,0),
+            (0,0,0),
             (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
-            (10,15,0)
+            (0,5,0)
             ])
-
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
         #self.tc_per.Bind(wx.EVT_TEXT_ENTER, self.OnEnterPeriod)
         #self.tc_duty.Bind(wx.EVT_TEXT_ENTER, self.OnEnterDuty)
@@ -304,7 +321,9 @@ class LoopWindow(wx.Window):
         self.top.print_on_log(lmstr)
 
     def start_loop(self):
-        self.portno = self.top.get_switch_port()
+        self.cval = self.cb_psel.GetValue()
+        self.portno = int(self.cval)
+        #self.portno = self.top.get_switch_port()
         self.start_flg = True
         self.loop_start_msg()
         self.btn_start.SetLabel("Stop")
@@ -383,3 +402,11 @@ class LoopWindow(wx.Window):
         self.enable_loop_controls(stat)
         self.top.enable_enum_controls(stat)
         self.top.enable_auto_controls(stat)
+    
+    def set_port_list(self, port):
+        self.cb_psel.Clear()
+        for i in range(port):
+            self.cb_psel.Append(str(i+1))
+        self.cb_psel.SetSelection(0)
+        
+ 

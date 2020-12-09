@@ -67,6 +67,7 @@ class Dev3141Window(wx.Panel):
                                      name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
+
         self.btn_auto = wx.Button(self, ID_BTN_AUTO, "Auto", size=(60,25))
 
         self.tc_ival.SetMaxLength(5)
@@ -113,7 +114,6 @@ class Dev3141Window(wx.Panel):
         self.hbox3.Add(self.st_do, flag=wx.ALIGN_RIGHT | 
                        wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.LEFT, 
                        border=30)
-                   
         self.hbox4.Add(self.st_si, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
         self.hbox4.Add(self.tc_ival, flag=wx.ALIGN_CENTER_VERTICAL | 

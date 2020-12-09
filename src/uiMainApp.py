@@ -191,6 +191,8 @@ class UiPanel(wx.Panel):
 
     def set_period(self, strval):
         self.loopPan.set_period(strval)
+    def set_port_list(self, port):
+        self.loopPan.set_port_list(port)
 
     def enable_enum_controls(self, stat):
         self.treePan.enable_enum_controls(stat)
@@ -398,9 +400,10 @@ class UiMainFrame (wx.Frame):
 
     def show_3201(self):
         self.panel.show_3201()
-
+        self.panel.set_port_list(4)
     def show_3141(self):
         self.panel.show_3141()
+        self.panel.set_port_list(2)
 
     def get_interval(self):
         return self.panel.get_interval()

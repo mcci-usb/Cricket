@@ -68,7 +68,6 @@ class Dev3201Window(wx.Window):
         self.btn_amps = wx.Button(self, ID_BTN_AMPS, "Amps", size=(50,25))
         self.st_amps   = wx.StaticText(self, -1, " --- ", 
                                        style = wx.ALIGN_CENTER)
-
         self.tc_ival.SetToolTip(wx.ToolTip("Switching Interval. Min: 1 sec, "
                                            "Max: 60 sec"))
         self.btn_auto.SetToolTip(wx.ToolTip("Switch between All Ports "
@@ -78,6 +77,8 @@ class Dev3201Window(wx.Window):
         self.p2 = 0
 
         self.pcnt = 0
+
+        self.On_flg = False
 
         self.usb_flg = False
 
@@ -167,7 +168,7 @@ class Dev3201Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.ALIGN_LEFT | 
                        wx.ALIGN_CENTER_VERTICAL)
-        
+       
         sb = wx.StaticBox(self, -1, "Model 3201")
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
@@ -256,7 +257,6 @@ class Dev3201Window(wx.Window):
                 self.pulse_flg = False
                 self.timer.Stop()
                 self.on_port(self.pcnt)
-        
                 self.pcnt = self.pcnt + 1
                 if(self.pcnt >= 4):
                     self.pcnt = 0
@@ -306,7 +306,7 @@ class Dev3201Window(wx.Window):
 
     def OnEnterInterval(self, evt):
         self.usb_dly_warning()
-
+   
     def usb_dly_warning(self):
         if(int(self.get_interval()) < int(self.top.get_enum_delay())):
             if(self.top.get_delay_status()):
@@ -592,4 +592,4 @@ class Dev3201Window(wx.Window):
         return self.tc_ival.GetValue()
 
     def set_interval(self, strval):
-        self.tc_ival.SetValue(strval)
+       self.tc_ival.SetValue(strval)
