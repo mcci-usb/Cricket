@@ -78,14 +78,15 @@ class LoopWindow(wx.Window):
         self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
 
-        self.st_cycle   = wx.StaticText(self, -1, "Cycle ", size=(50,15), 
+        self.st_cycle   = wx.StaticText(self, -1, "Repeat ", size=(50,15), 
                                         style = wx.ALIGN_CENTER)
         self.tc_cycle   = wx.TextCtrl(self, ID_TC_CYCLE, "20", size=(50,-1), 
                                       style = 0,
                                       validator=NumericValidator(), 
                                       name="ON/OFF period")
-        self.st_cnt   = wx.StaticText(self, -1, "", size=(30,15), 
+        self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
                                       style = wx.ALIGN_CENTER)
+        self.cb_cycle = wx.CheckBox (self, -1, label = 'Until Stopped')
 
         self.btn_start = wx.Button(self, ID_BTN_START, "Start", size=(60,25))
         
@@ -117,7 +118,7 @@ class LoopWindow(wx.Window):
         self.bs_pers.Add(15,50,0)
         self.bs_pers.Add(self.tc_per,0, wx.ALIGN_CENTER | 
                          wx.ALIGN_CENTER_VERTICAL)
-        self.bs_pers.Add(15,50,0)
+        self.bs_pers.Add(0,20,0)
         self.bs_pers.Add(self.st_ms,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_pers.Add(40,0,0)
 
@@ -126,7 +127,7 @@ class LoopWindow(wx.Window):
         self.bs_duty.Add(15,50,0)
         self.bs_duty.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
                          wx.ALIGN_CENTER_VERTICAL)
-        self.bs_duty.Add(15,50,0)
+        self.bs_duty.Add(0,50,0)
         self.bs_duty.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_duty.Add(40,0,0)
 
@@ -136,9 +137,13 @@ class LoopWindow(wx.Window):
         self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(15,50,0)
         self.bs_cycle.Add(self.st_cnt,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_cycle.Add(40,0,0)
+        self.bs_cycle.Add(1,0,0)
 
         self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
+        self.bs_cycle.Add(1,0,0)
+        self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL,
+                                            border = 0)
+        self.bs_cycle.Add(5,10,0)
 
         
         sb = wx.StaticBox(self, -1, "Loop Mode")
@@ -148,7 +153,7 @@ class LoopWindow(wx.Window):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         self.bs_vbox.AddMany([
-            (0,5,0),
+            (0,0,0),
             (self.bs_psel,1, wx.EXPAND),
             (0,0,0),
             (self.bs_pers, 1, wx.EXPAND),
@@ -194,12 +199,15 @@ class LoopWindow(wx.Window):
                     self.On_flg = False
                     self.cycleCnt = self.cycleCnt + 1
                     self.st_cnt.SetLabel(str(self.cycleCnt))
-                    if(self.cycleCnt >= self.cycle):
-                        self.top.print_on_log("Loop Mode Completed\n")
-                        self.timer.Stop()
-                        self.btn_start.SetLabel("Start")
-                        self.start_flg = False
-                        self.enable_controls(True)
+                    if(self.cb_cycle.GetValue() != True):
+                        if(self.cycleCnt >= self.cycle):
+                            self.top.print_on_log("Loop Mode Completed\n")
+                            self.timer.Stop()
+                            self.btn_start.SetLabel("Start")
+                            self.start_flg = False
+                            self.enable_controls(True)
+                        else:    
+                            self.timer.Start(self.OffTime)
                     else:    
                         self.timer.Start(self.OffTime)
                 else:
@@ -308,6 +316,9 @@ class LoopWindow(wx.Window):
         strCycle = self.tc_cycle.GetValue()
         if(strCycle == ''):
             return False
+        strInf = self.cb_cycle.GetValue()
+        if(strInf == ''):
+            return False
         return True   
 
     def loop_start_msg(self):
@@ -315,9 +326,11 @@ class LoopWindow(wx.Window):
         lmstr = "Loop Mode start : ON-Time = {d1} ms,".\
                 format(d1=int(self.OnTime)) + \
                 " OFF-Time = {d2} ms,".\
-                format(d2=int(self.OffTime)) + \
-                " Cycle = {d3}\n".format(d3=self.cycle)
-        
+                format(d2=int(self.OffTime)) 
+        if(self.cb_cycle.GetValue() == True):
+            lmstr = lmstr +" Cycle = indefinite\n"
+        else:
+            lmstr = lmstr +" Cycle = {d3}\n".format(d3=self.cycle)
         self.top.print_on_log(lmstr)
 
     def start_loop(self):
@@ -393,10 +406,12 @@ class LoopWindow(wx.Window):
             self.tc_per.Enable()
             self.tc_duty.Enable()
             self.tc_cycle.Enable()
+            self.cb_cycle.Enable()
         else:
             self.tc_per.Disable()
             self.tc_duty.Disable()
             self.tc_cycle.Disable()
+            self.cb_cycle.Disable()
 
     def enable_controls(self, stat):
         self.enable_loop_controls(stat)
