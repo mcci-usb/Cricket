@@ -22,6 +22,17 @@ SB_DEV_ID    = 1
 SB_SERIAL_ID = 2
 SB_STATUS_ID = 3
 
+MODE_MANUAL = 0
+MODE_AUTO   = 1
+MODE_LOOP   = 2
+
+DEV_3141    = 0
+DEV_3201    = 1
+DEV_2101    = 2
+
+DEVICES    = ["3141", "3201", "2101"]
+
+
 # Font Size
 DEFAULT_FONT_SIZE = 8
 MAC_FONT_SIZE = 10
@@ -53,6 +64,7 @@ ID_MENU_SCRIPT_NEW = 1014
 
 ID_MENU_HELP_3141 = 1015
 ID_MENU_HELP_3201 = 1016
+ID_MENU_HELP_2101 = 1039
 ID_MENU_HELP_WEB = 1017
 ID_MENU_HELP_PORT = 1018
 
@@ -113,10 +125,10 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 #======================================================================
 # GLOBAL STRINGS
 #======================================================================
-VERSION_NAME  = "\nMCCI"+u"\u00AE"+" USB Switch - 3141/3201"
+VERSION_NAME  = "\nMCCI"+u"\u00AE"+" Cricket UI"
 VERSION_ID    = ""
 VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
-VERSION_STR = "Version 2.x.x"
+VERSION_STR = "Version 2.0.1"
 
 
 #======================================================================

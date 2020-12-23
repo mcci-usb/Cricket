@@ -144,19 +144,23 @@ class UsbTreeWindow(wx.Window):
         self.Layout()
 
 
+    #Export usbWindow content to a File 
     def SaveUsbLog(self, e):
         content = self.scb.GetValue()
         self.top.save_file(content, "*.txt")
 
+    # Refresh USB Device Tree View Changes
     def RefreshUsbBus(self, e):
         if(self.wait_flg == False):
             self.btn_ref.Disable()
             self.wait_flg = True
             threading.Thread(target=self.UsbThread).run()
 
+    # Clear USB Device Tree Changes View Log Window
     def ClearUsbWindow(self, e):
         self.scb.SetValue("")
 
+    # Thread for USB Timr
     def UsbThread(self):
         try:
             usbDev.get_tree_change(self.top)
@@ -165,18 +169,18 @@ class UsbTreeWindow(wx.Window):
         self.wait_flg = False
         self.btn_ref.Enable()
 
-    def OnEnterDelay(self, evt):
-        self.update_interval_period()
-
+    # Event hanler for USB selection 
     def OnCheckBox(self, evt):
         self.update_interval_period()
 
+    # Get System Time stamp for data log
     def get_time_stamp(self):
         ct = datetime.now()
         dtstr = ct.strftime("%Y-%m-%d  %H:%M:%S.%f")
         cstr = "[" + dtstr[:-3] + "]  "
         return cstr
 
+    # Show the USB Device Tree View Changes
     def print_on_usb(self, strin):
         ctstr = "\n"
         if(self.chk_ts.GetValue() == True):
@@ -184,6 +188,7 @@ class UsbTreeWindow(wx.Window):
         ctstr = ctstr + strin
         self.scb.AppendText(ctstr)
 
+    # Get USB device Enumeration delay
     def get_enum_delay(self):
         edly = self.tc_delay.GetValue()
         
@@ -200,15 +205,19 @@ class UsbTreeWindow(wx.Window):
         
         return self.tc_delay.GetValue()
 
+    # Check for USB Enumeration delay selection
     def get_delay_status(self):
         if(self.chk_box.GetValue() == True):
             return True
         else:
             return False
 
+    # Disble USB scan option selection
+    # Called when USB delay is greater than the Port Switching delay
     def disable_usb_scan(self):
         self.chk_box.SetValue(False)
 
+    # Override the Switching Interval period based on USB delay
     def update_interval_period(self):
         if(self.get_delay_status()):
             onTime, offTime, duty = self.top.get_loop_param()
@@ -225,8 +234,9 @@ class UsbTreeWindow(wx.Window):
             if(int(self.top.get_interval()) < int(self.get_enum_delay())):
                 self.top.set_interval(self.get_enum_delay())
 
-    def enable_enum_controls(self, stat):
-        if(stat == True):
+    # Enable/Disble USB selection option widgets
+    def update_controls(self, mode):
+        if(mode == MODE_MANUAL):
             self.chk_box.Enable()
             self.tc_delay.Enable()
         else:

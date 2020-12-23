@@ -16,6 +16,7 @@ import serialDev
 import usbDev
 
 from uiGlobals import *
+import control2101 as d2101
 
 
 #======================================================================
@@ -135,7 +136,7 @@ class LoopWindow(wx.Window):
         self.bs_cycle.Add(self.st_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(15,50,0)
         self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_cycle.Add(15,50,0)
+        self.bs_cycle.Add(1,20,0)
         self.bs_cycle.Add(self.st_cnt,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(1,0,0)
 
@@ -165,8 +166,6 @@ class LoopWindow(wx.Window):
             (0,5,0)
             ])
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
-        #self.tc_per.Bind(wx.EVT_TEXT_ENTER, self.OnEnterPeriod)
-        #self.tc_duty.Bind(wx.EVT_TEXT_ENTER, self.OnEnterDuty)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         
@@ -174,11 +173,13 @@ class LoopWindow(wx.Window):
         self.bs_vbox.Fit(self)
         self.Layout()
 
-        self.update_controls()
+        self.enable_controls(True)
 
 
+    # Loop button click event
     def StartAuto(self, evt):
         if(self.start_flg):
+            self.top.print_on_log("Loop Mode Interrupted\n")
             self.stop_loop()
         else:
             if(self.check_valid_input()):
@@ -188,6 +189,7 @@ class LoopWindow(wx.Window):
             else:
                 wx.MessageBox('Input box left blank','Error', wx.OK)
 
+    # Loop mode Timer service
     def TimerServ(self, evt):
         if self.top.con_flg:
             self.pulse_flg = True
@@ -195,26 +197,25 @@ class LoopWindow(wx.Window):
                 self.timer.Stop()
                 self.pulse_flg = False
                 if(self.On_flg):
-                    self.port_off_cmd(self.portno)
+                    self.port_on(self.portno, False)
                     self.On_flg = False
                     self.cycleCnt = self.cycleCnt + 1
-                    self.st_cnt.SetLabel(str(self.cycleCnt))
                     if(self.cb_cycle.GetValue() != True):
+                        self.tc_cycle.SetLabel(str(self.cycle - self.cycleCnt))
                         if(self.cycleCnt >= self.cycle):
+                            self.tc_cycle.SetLabel(str(self.cycle))
                             self.top.print_on_log("Loop Mode Completed\n")
-                            self.timer.Stop()
-                            self.btn_start.SetLabel("Start")
-                            self.start_flg = False
-                            self.enable_controls(True)
+                            self.stop_loop()
                         else:    
                             self.timer.Start(self.OffTime)
                     else:    
                         self.timer.Start(self.OffTime)
                 else:
-                    self.port_on_cmd(self.portno)
+                    self.port_on(self.portno, True)
                     self.timer.Start(self.OnTime)
                     self.On_flg = True
 
+    # USB Tree View Changes Timer Service
     def UsbTimer(self, e):
         self.timer_usb.Stop()
         try:
@@ -226,14 +227,7 @@ class LoopWindow(wx.Window):
         if(self.start_flg == True & self.pulse_flg == True):
             self.timer.Start(1)
 
-    def OnEnterPeriod(self, evt):
-        self.get_all_three()
-        self.usb_dly_warning()
-    
-    def OnEnterDuty(self, evt):
-        self.get_all_three()
-        self.usb_dly_warning()
-        
+    # Throws USB delay warning message, when the user wants to initiate loop mode
     def usb_dly_warning(self):
         if(self.top.get_delay_status()):
             if((int(self.OnTime) < int(self.top.get_enum_delay())) |
@@ -252,48 +246,39 @@ class LoopWindow(wx.Window):
                     return False
         return True
 
+    # Get ONOFF period
     def get_period(self):
         dper = self.tc_per.GetValue()
         if(dper == ""):
-            dper = "1000"
+            dper = "50"
         pval = int(dper)
-        if(pval < 1000):
-            pval = 1000
+        if(pval < 50):
+            pval = 50
         elif(pval > 60000):
             pval = 60000
 
         self.tc_per.SetValue(str(pval))
         return self.tc_per.GetValue()
 
+    # Set Period Called by USB Tree Window when there is a need to override the period
     def set_period(self, strval):
         self.tc_per.SetValue(strval)
 
+    # Get Duty value
     def get_duty(self):
         duty = self.tc_duty.GetValue()
         if (duty == ""):
             duty = "0"
-
         return duty
 
+    # Get Cycle value
     def get_cycle(self):
         cycle = self.tc_cycle.GetValue()
         if (cycle == ""):
             cycle = "0"
-
         return cycle
 
-    def update_controls(self):
-        if(self.top.con_flg):
-            self.btn_start.Enable()
-        else:
-            self.btn_start.Disable()
-
-    def enable_start(self):
-        self.btn_start.Enable()
-
-    def disable_start(self):
-        self.btn_start.Disable()
-
+    # Get Period, Duty and Cycle values then calculate ON Time and OFF Time
     def get_all_three(self):
         self.period = int(self.get_period())
         self.duty = int(self.get_duty())
@@ -302,10 +287,12 @@ class LoopWindow(wx.Window):
         self.OnTime = self.period * (self.duty/100)
         self.OffTime = self.period - self.OnTime
 
+    # Send ON, OFF Time and Duty to USB Tree Window for USB delay validation
     def get_loop_param(self):
         self.get_all_three()
         return self.OnTime, self.OffTime, self.duty
 
+    # Check the input text box of Period, Duty and Cycle
     def check_valid_input(self):
         strPer = self.tc_per.GetValue()
         if(strPer == ''):
@@ -321,6 +308,22 @@ class LoopWindow(wx.Window):
             return False
         return True   
 
+    # Start Loop Mode
+    def start_loop(self):
+        self.cval = self.cb_psel.GetValue()
+        self.portno = int(self.cval)
+        self.start_flg = True
+        self.top.set_mode(MODE_LOOP)
+        self.loop_start_msg()
+        self.btn_start.SetLabel("Stop")
+        #self.stop_loop_mode()
+        if(self.timer.IsRunning() == False):
+            self.cycleCnt = 0
+            self.On_flg = True
+            self.port_on(self.portno, True)
+            self.timer.Start(self.OnTime)
+    
+    # Loop Mode start message log send to the Log Window
     def loop_start_msg(self):
         self.get_all_three()
         lmstr = "Loop Mode start : ON-Time = {d1} ms,".\
@@ -333,95 +336,58 @@ class LoopWindow(wx.Window):
             lmstr = lmstr +" Cycle = {d3}\n".format(d3=self.cycle)
         self.top.print_on_log(lmstr)
 
-    def start_loop(self):
-        self.cval = self.cb_psel.GetValue()
-        self.portno = int(self.cval)
-        #self.portno = self.top.get_switch_port()
-        self.start_flg = True
-        self.loop_start_msg()
-        self.btn_start.SetLabel("Stop")
-        self.enable_controls(False)
-        if(self.timer.IsRunning() == False):
-            self.cycleCnt = 0
-            self.On_flg = True
-            self.port_on_cmd(self.portno)
-            self.timer.Start(self.OnTime)
-
+    # Stop Loop Mode - 1. When click stop 2. When cycle completed
     def stop_loop(self):
         self.start_flg = False
         self.btn_start.SetLabel("Start")
-        self.enable_controls(True)
+        self.top.set_mode(MODE_MANUAL)
         self.timer.Stop()
-        self.top.print_on_log("Loop Mode Interrupted\n")
-
-    def print_cycle_info(self):
-        strCnt = "Cycle : {cs}\t".format(cs=str(self.cycleCnt + 1))
-        self.top.print_on_log(strCnt)
-
-    def port_on_cmd(self, pno):
-        cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
-        if res == 0: 
-            outstr = outstr.replace('p', 'P')
-            outstr = outstr.replace('1', '1 ON')
-            outstr = outstr.replace('2', '2 ON')
-            outstr = outstr.replace('3', '3 ON')
-            outstr = outstr.replace('4', '4 ON')
-
-            self.top.port_led_update(pno-1, True)
-            
-            self.top.print_on_log(outstr)
+     
+    # Port ON/OFF command send to Connected Device Module
+    def port_on(self, portno, stat):
+        self.top.port_on(portno, stat)
         if(self.top.get_delay_status()):
             self.keep_delay()
-        
-    def port_off_cmd(self, pno):
-        cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
-        if res == 0:
-            outstr = outstr.replace('p', 'P')
-            outstr = outstr.replace('0', ""+str(pno)+" OFF")
 
-            self.top.port_led_update(pno-1, False)
-            
-        self.top.print_on_log(outstr)
-
-        if(self.top.get_delay_status()):
-            self.keep_delay()
-    
+    # USB delay Timer start
     def keep_delay(self):
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
 
-    def update_controls(self):
-        if(self.top.con_flg):
-            self.enable_start()
+    # Enable/Disable widgets when mode changed
+    def update_controls(self, mode):
+        if mode == MODE_MANUAL:
+            self.enable_controls(True)
         else:
-            self.disable_start()
-            self.timer.Stop()
-            self.start_flg = False
-            self.st_cnt.SetLabel("")
+            self.enable_controls(False)
 
-    def enable_loop_controls(self, stat):
-        if(stat == True):
+    # Widgets Disable/Enable
+    def enable_controls(self, stat):
+        if(stat):
+            self.cb_psel.Enable()
             self.tc_per.Enable()
             self.tc_duty.Enable()
             self.tc_cycle.Enable()
             self.cb_cycle.Enable()
+            self.btn_start.Enable()
         else:
+            self.cb_psel.Disable()
             self.tc_per.Disable()
             self.tc_duty.Disable()
             self.tc_cycle.Disable()
             self.cb_cycle.Disable()
+            if self.top.mode != MODE_LOOP:
+                self.btn_start.Disable()
+        if not self.top.con_flg:
+            self.btn_start.Disable()
 
-    def enable_controls(self, stat):
-        self.enable_loop_controls(stat)
-        self.top.enable_enum_controls(stat)
-        self.top.enable_auto_controls(stat)
-    
+    # Set Port list to Combo box when Device gets connected
     def set_port_list(self, port):
         self.cb_psel.Clear()
         for i in range(port):
             self.cb_psel.Append(str(i+1))
         self.cb_psel.SetSelection(0)
-        
- 
+
+    # Called when device get disconnected
+    def device_disconnected(self):
+        self.stop_loop()

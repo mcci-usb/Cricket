@@ -17,6 +17,8 @@ import usbDev
 
 from uiGlobals import *
 
+PORTS = 4
+
 #======================================================================
 # COMPONENTS
 #======================================================================
@@ -29,19 +31,34 @@ class Dev3201Window(wx.Window):
         self.parent = parent
         self.top = top
 
-        self.SetMinSize((290, 240))
+        self.pcnt = 0
 
-        self.rbtn_p1 = wx.RadioButton(self, ID_RBTN_P1, "Port 1", 
-                                      style=wx.RB_GROUP)
-        self.tc_led1   = wx.TextCtrl(self, -1, " ", size=(13,13))
-        self.rbtn_p2 = wx.RadioButton(self, ID_RBTN_P2, "Port 2")
-        self.tc_led2   = wx.TextCtrl(self, -1, " ", size=(13,13))
-        self.btn_tog = wx.Button(self, ID_BTN_ONOFF, "ON",size=(55,25))
+        self.duty = 0
+        self.OnTime = 0
+        self.OffTime = 0
 
-        self.rbtn_p3 = wx.RadioButton(self, ID_RBTN_P3, "Port 3")
-        self.tc_led3   = wx.TextCtrl(self, -1, " ", size=(13,13))
-        self.rbtn_p4 = wx.RadioButton(self, ID_RBTN_P4, "Port 4")
-        self.tc_led4   = wx.TextCtrl(self, -1, " ", size=(13,13))
+        self.On_flg = False
+        self.auto_flg = False
+        self.pulse_flg = False
+
+        self.usb_flg = False
+
+        self.timer = wx.Timer(self)
+        self.timer_usb = wx.Timer(self)
+        
+        self.SetMinSize((290, 260))
+        
+        self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (40,15))
+        self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (40,15))
+        self.st_p3 = wx.StaticText(self, -1, "Port 3", size = (40,15))
+        self.st_p4 = wx.StaticText(self, -1, "Port 4", size = (40,15))
+
+        self.picf = wx.Bitmap ("btn_off.png", wx.BITMAP_TYPE_ANY)
+        self.picn = wx.Bitmap ("btn_on.png", wx.BITMAP_TYPE_ANY)
+        self.btn_p1 = wx.BitmapButton(self, 0, self.picf, size= (55,20))
+        self.btn_p2 = wx.BitmapButton(self, 1, self.picf, size= (55,20))
+        self.btn_p3 = wx.BitmapButton(self, 2, self.picf, size= (55,20))
+        self.btn_p4 = wx.BitmapButton(self, 3, self.picf, size= (55,20))
 
         self.st_ss   = wx.StaticText(self, -1, "SuperSpeed")
         self.rbtn_ss1 = wx.RadioButton(self, ID_RBTN_SS1, "Enable", 
@@ -55,6 +72,14 @@ class Dev3201Window(wx.Window):
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
+                                     style = wx.ALIGN_CENTER)
+        self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
+                                       style = wx.ALIGN_CENTER)
+        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
+                                     style = wx.TE_PROCESS_ENTER,
+                                     validator=NumericValidator(), 
+                                     name="ON/OFF period")
+        self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
         self.btn_auto = wx.Button(self, ID_BTN_AUTO, "Auto", size=(60,25))
 
@@ -73,76 +98,42 @@ class Dev3201Window(wx.Window):
         self.btn_auto.SetToolTip(wx.ToolTip("Switch between All Ports "
                                             "for a interval until stop"))
         
-        self.p1 = 0
-        self.p2 = 0
-
-        self.pcnt = 0
-
-        self.On_flg = False
-
-        self.usb_flg = False
-
-        self.pulse_flg = False
-
-        self.timer = wx.Timer(self)
-        self.timer_usb = wx.Timer(self)
-
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox5 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxi = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox6 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.led = []
-        self.rbtn = []
-        self.btnStat = False
-
-        self.led.append(self.tc_led1)
-        self.led.append(self.tc_led2)
-        self.led.append(self.tc_led3)
-        self.led.append(self.tc_led4)
-
-        self.rbtn.append(self.rbtn_p1)
-        self.rbtn.append(self.rbtn_p2)
-        self.rbtn.append(self.rbtn_p3)
-        self.rbtn.append(self.rbtn_p4)
-
-        for i in range(4):
-            self.led[i].SetBackgroundColour("black")
-            self.led[i].SetEditable(False)
-
         
-        self.hboxs1.Add(self.tc_led1, flag=wx.ALIGN_LEFT |   
-                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20 )
-        self.hboxs1.Add(self.rbtn_p1, flag=wx.ALIGN_CENTER_VERTICAL | 
-                       wx.LEFT , border=3)
-        self.hboxs1.Add(self.tc_led2, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 
-                       border = 10)
-        self.hboxs1.Add(self.rbtn_p2, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
-                       border=3)
+        self.hboxs1.Add(self.st_p1,0, flag=wx.ALIGN_LEFT | wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL, border=20 )
         
+        self.hboxs1.Add(self.btn_p1, flag=wx.ALIGN_CENTER_VERTICAL | 
+                       wx.LEFT,  border = -1)
+        self.hboxs1.Add(self.st_p2, 0, flag=wx.ALIGN_LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border = 20 )
+        self.hboxs1.Add(self.btn_p2, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL, border = 85 )
+        
+        self.hboxs2.Add(self.st_p3, flag=wx.ALIGN_LEFT | wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL, border=20 )
+        
+        self.hboxs2.Add(self.btn_p3, flag=wx.ALIGN_CENTER_VERTICAL | 
+                       wx.LEFT,  border = -1)
+        self.hboxs2.Add(self.st_p4, 0, flag=wx.ALIGN_LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border = 20 )
+        self.hboxs2.Add(self.btn_p4, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL, border = 85 )
+
         self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
         self.hbox1.Add(0,1,0)
-        self.hbox1.Add(self.btn_tog, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
-                       border=20)
-
+        self.hbox2.Add(self.hboxs2, flag=wx.ALIGN_CENTER_VERTICAL )
+        self.hbox1.Add(0,1,0)
         
-        self.hboxs2.Add(self.tc_led3, flag=wx.ALIGN_LEFT |   
-                       wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border=20 )
-        self.hboxs2.Add(self.rbtn_p3, flag=wx.ALIGN_CENTER_VERTICAL | 
-                       wx.LEFT, border=3)
-        self.hboxs2.Add(self.tc_led4, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 
-                       border = 10)
-        self.hboxs2.Add(self.rbtn_p4, flag=wx.ALIGN_CENTER_VERTICAL| wx.LEFT, 
-                       border=3)
-
-        
-        self.hbox2.Add(self.hboxs2)
-
         self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT, 
                        border=20 )
         self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
@@ -157,6 +148,11 @@ class Dev3201Window(wx.Window):
                        wx.ALIGN_CENTER_VERTICAL )
         self.hbox4.Add(self.btn_auto, 0, flag=wx.ALIGN_RIGHT | 
                        wx.LEFT, border = 30)
+        self.hbox6.Add(self.st_duty, flag=wx.ALIGN_LEFT | wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL, border=20)
+        self.hbox6.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+        self.hbox6.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
 
         self.hboxi.Add(self.st_info, flag=wx.ALIGN_LEFT | wx.LEFT, border=20 )
 
@@ -185,10 +181,13 @@ class Dev3201Window(wx.Window):
             (self.hbox5, 0, wx.EXPAND),
             (0,22,0),
             (self.hbox4, 0, wx.EXPAND),
-            (10,10,0)
+            (10,10,0),
+            (self.hbox6, 0, wx.EXPAND ),
+            (0,20,0)
             ])
        
         self.SetSizer(self.vbox)
+        self.SetAutoLayout(True)
         self.vbox.Fit(self)
         self.Layout()
 
@@ -197,25 +196,43 @@ class Dev3201Window(wx.Window):
         self.btn_amps.Bind(wx.EVT_BUTTON, self.AmpsCmd)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
-        self.btn_tog.Bind(wx.EVT_BUTTON, self.OnOffPort)
-        #self.tc_ival.Bind(wx.EVT_TEXT_ENTER, self.OnEnterInterval)
-
+        
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
+        self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p1)
+        self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p2)
+        self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p3)
+        self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p4)
 
-        self.rbtn_p1.SetValue(True)
+        self.tc_duty.SetMaxLength(2)
+
+        self.rbtn = []
+        self.rbtn.append(self.btn_p1)
+        self.rbtn.append(self.btn_p2)
+        self.rbtn.append(self.btn_p3)
+        self.rbtn.append(self.btn_p4)
+
+        self.btnStat = [False, False, False, False]
         self.rbtn_ss1.SetValue(True)
-        self.port = 1
+        
+        self.enable_controls(False)
 
-        self.update_controls()
 
-
+    # Event Handler for 4 Port Switches
+    def OnOffPort (self, e):
+        co = e.GetEventObject()
+        cbi = co.GetId()
+        if self.top.mode == MODE_MANUAL and not self.usb_flg:
+            self.port_on_manual(cbi)
+    
+    # Event Handler for Auto Button
     def OprAuto(self, evt):
-        if(self.top.auto_flg):
+        if(self.auto_flg):
             self.stop_auto()
         else:
             if(self.usb_dly_warning()):
                 self.start_auto()
 
+    # Event Handler for Volts Button
     def VoltsCmd(self, evt):
         strin = "--"
         res, outstr = serialDev.send_volts_cmd(self.top.devHand)
@@ -230,6 +247,7 @@ class Dev3201Window(wx.Window):
             self.update_volts(outstr)
         self.top.print_on_log("Volts : "+outstr+"\n")
 
+    # Event Handler for Amps Button
     def AmpsCmd(self, evt):
         strin = "--"
         res, outstr = serialDev.send_amps_cmd(self.top.devHand)
@@ -250,63 +268,69 @@ class Dev3201Window(wx.Window):
             self.update_amps(outstr)
         self.top.print_on_log("Amps : "+outstr+"\n")
 
-    def TimerServ(self, evt):
-        if(self.top.con_flg):
-            self.pulse_flg = True
-            if(self.usb_flg == False):
-                self.pulse_flg = False
-                self.timer.Stop()
-                self.on_port(self.pcnt)
-                self.pcnt = self.pcnt + 1
-                if(self.pcnt >= 4):
-                    self.pcnt = 0
-                self.timer.Start(int(self.get_interval()))
-        else:
-            self.stop_auto()
-            self.disable_buttons()
-
-    def UsbTimer(self, e):
-        self.timer_usb.Stop()
-        usbDev.get_tree_change(self.top)
-        self.usb_flg = False
-        if(self.top.auto_flg == True & self.pulse_flg == True):
-            self.timer.Start(1)
-        else:
-            self.btn_tog.Enable()
-            self.top.enable_enum_controls(True)
-            self.btn_auto.Enable()
-            self.top.enable_start()
-
-    def OnOffPort(self, evt):
-        if self.usb_flg == False:
-            self.btnStat = not self.btnStat
-            self.btn_tog.Disable()
-            self.btn_auto.Disable()
-            self.top.disable_start()
-            self.top.enable_enum_controls(False)
-            if(self.btnStat):
-                self.disable_all_rb()
-                self.port_on_cmd(self.port)
-            else:
-                self.enable_all_rb()
-                self.port_off_cmd(self.port)
-            self.update_port_stat()
-
+    # Event handler for Speed change Radio buttons
     def PortSpeedChanged(self, e):
         rb = e.GetEventObject()
         id = rb.GetId()
 
-        if(id >= ID_RBTN_SS0):
-            id = id - ID_RBTN_SS0
-            self.speed_cmd(id)
-        else:
-            id = id - ID_RBTN_P1
-            self.port = id + 1
-            self.check_ss_support()
+        if id == ID_RBTN_SS1:
+            self.speed_cmd(1)
+        elif id == ID_RBTN_SS0:
+            self.speed_cmd(0)
 
-    def OnEnterInterval(self, evt):
-        self.usb_dly_warning()
-   
+    # Timer Event for Port ON/OFF in Auto Mode
+    def TimerServ(self, evt):
+        if self.top.con_flg:
+            self.pulse_flg = True
+            if(self.usb_flg == False):
+                self.timer.Stop()
+                self.pulse_flg = False
+                if(self.On_flg):
+                    self.port_on(self.pcnt+1, False)
+                    self.On_flg = False
+                    if self.auto_flg:
+                        self.timer.Start(self.OffTime)
+                else:
+                    self.pcnt = self.pcnt + 1
+                    if(self.pcnt >= 4):
+                        self.pcnt = 0
+                    self.port_on(self.pcnt+1, True)
+                    if self.auto_flg:
+                        self.timer.Start(self.OnTime)
+                        self.On_flg = True
+
+    # Timer Event for USB Tree View Changes
+    def UsbTimer(self, e):
+        self.timer_usb.Stop()
+        usbDev.get_tree_change(self.top)
+        self.usb_flg = False
+        if(self.auto_flg == True & self.pulse_flg == True):
+            self.timer.Start(1)
+        else:
+            #self.top.enable_enum_controls(True)
+            #self.btn_auto.Enable()
+            #self.top.enable_start()
+            pass
+
+    # Startup Message for Auto Mode            
+    def Auto_strat_msg(self):
+        self.get_all()
+        lmstr = "Auto Mode start : ON-Time = {d1} ms,".\
+                format(d1=int(self.OnTime)) + \
+                " OFF-Time = {d2} ms\n".\
+                format(d2=int(self.OffTime)) 
+        self.top.print_on_log(lmstr)
+
+    # Port ON in Manual Mode
+    def port_on_manual(self, port):
+        for i in range (len (self.rbtn)):
+            if(port == i):
+                self.btnStat[port] = not self.btnStat[port]
+                self.port_on(port+1, self.btnStat[port])
+            else:
+                self.btnStat[i] = False
+
+    # Check USB delay while starting Auto Mode
     def usb_dly_warning(self):
         if(int(self.get_interval()) < int(self.top.get_enum_delay())):
             if(self.top.get_delay_status()):
@@ -324,94 +348,22 @@ class Dev3201Window(wx.Window):
                     return False
         return True
 
-    def disable_all_rb(self):
-        self.btn_tog.SetLabel('OFF')
-        self.rbtn_p1.Disable()
-        self.rbtn_p2.Disable()
-        self.rbtn_p3.Disable()
-        self.rbtn_p4.Disable()
-        self.rbtn_ss0.Disable()
-        self.rbtn_ss1.Disable()
-
-    def enable_all_rb(self):
-        self.btn_tog.SetLabel('ON')
-        self.rbtn_p1.Enable()
-        self.rbtn_p2.Enable()
-        self.rbtn_p3.Enable()
-        self.rbtn_p4.Enable()
-        self.rbtn_ss0.Enable()
-        self.rbtn_ss1.Enable()
-
-    def update_port_stat(self):
-        if(self.btnStat):
-            self.btn_tog.SetLabel('OFF')
-            for i in range(4):
-                if(i == (self.port - 1)):
-                    self.led[i].SetBackgroundColour('Red')
-                else:
-                    self.led[i].SetBackgroundColour('black')
-                self.led[i].SetLabel("")
-                self.rbtn[i].Disable()    
-            self.rbtn_ss0.Disable()
-            self.rbtn_ss1.Disable()
+    # Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command received 
+    # from Loop Window
+    def port_on(self, port, stat):
+        if(stat):
+            self.port_on_cmd(port)
         else:
-            self.btn_tog.SetLabel('ON')
-            for i in range(4):
-                self.led[i].SetBackgroundColour('black')
-                self.led[i].SetLabel("")
-                self.rbtn[i].Enable()
-            self.rbtn_ss0.Enable()
-            self.rbtn_ss1.Enable()
+            self.port_off_cmd(port)
+        self.port_led_update(port-1, stat)
 
-    def check_ss_support(self):
-        if(self.port > 2):
-            self.rbtn_ss0.Disable()
-            self.rbtn_ss1.Disable()
-        else:
-            self.rbtn_ss0.Enable()
-            self.rbtn_ss1.Enable()
+        if(self.top.mode != MODE_LOOP):
+            if(self.top.get_delay_status()):
+                self.keep_delay()
 
-    def get_switch_port(self):
-        return self.port
+        self.enable_ss_controls(port, stat)
 
-    def update_volts(self, str):
-        self.st_volts.SetLabel(str)
-
-    def update_amps(self, str):
-        self.st_amps.SetLabel(str)
-
-    def stop_auto(self):
-        self.btn_auto.SetLabel("Auto")
-        self.enable_auto_ctrl(True)
-        self.top.enable_start()
-        self.top.enable_enum_controls(True)
-        self.top.auto_flg = False
-        self.timer.Stop()
-        self.port_off_cmd(self.pcnt+1)
-        self.btnStat = False
-        self.btn_tog.SetLabel('ON')
-        self.update_port_stat()
-
-    def start_auto(self):
-        self.top.auto_flg = True
-        self.btn_auto.SetLabel("Stop")
-        self.enable_auto_ctrl(False)
-        self.top.disable_start()
-        self.top.enable_enum_controls(False)
-        if(self.timer.IsRunning() == False):
-            self.tog_flg = False
-            self.timer.Start(int(self.get_interval()))
-
-    def speed_cmd(self,val):
-        cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
-        if res == 0:
-            outstr = outstr.replace('s', 'S')
-            outstr = outstr.replace('1', 'Enabled')
-            outstr = outstr.replace('0', 'Disabled')
-        
-        self.top.print_on_log(outstr)
-
+    # Port ON Command
     def port_on_cmd(self, pno):
         cmd = 'port'+' '+str(pno)+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -421,18 +373,10 @@ class Dev3201Window(wx.Window):
             outstr = outstr.replace('2', '2 ON')
             outstr = outstr.replace('3', '3 ON')
             outstr = outstr.replace('4', '4 ON')
-            if(self.top.auto_flg):
-                outstr = outstr[:-2] + "; Other Ports are OFF\n"
+            outstr = outstr[:-2] + "; Other Ports are OFF\n"
             self.top.print_on_log(outstr)
         
-        if(self.top.get_delay_status()):
-            self.keep_delay()
-        elif(self.top.auto_flg == False):
-            self.btn_tog.Enable()
-            self.top.enable_enum_controls(True)
-            self.btn_auto.Enable()
-            self.top.enable_start()
-        
+    # Port OFF Command   
     def port_off_cmd(self, pno):
         cmd = 'port'+' '+'0'+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -440,156 +384,198 @@ class Dev3201Window(wx.Window):
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
             self.top.print_on_log(outstr)
-        
-        if(self.top.get_delay_status()):
-            self.keep_delay()
-        elif(self.top.auto_flg == False):
-            self.btn_tog.Enable()
-            self.top.enable_enum_controls(True) 
-            self.btn_auto.Enable()
-            self.top.enable_start()
+    
+    # Enable/Disable the Speed Button based on Ports
+    def enable_ss_controls(self, port, stat):
+        if self.top.mode == MODE_MANUAL:
+            if stat:
+                if(port > 2):
+                    self.rbtn_ss0.Disable()
+                    self.rbtn_ss1.Disable()
+                else:
+                    self.rbtn_ss0.Enable()
+                    self.rbtn_ss1.Enable() 
+            else:
+                self.rbtn_ss0.Enable()
+                self.rbtn_ss1.Enable()
 
+    # Add Delay in Port ON/OFF based on USB option
     def keep_delay(self):
-        self.btn_tog.Disable()
-        self.rbtn_p1.Disable()
-        self.rbtn_p2.Disable()
-        self.rbtn_p3.Disable()
-        self.rbtn_p4.Disable()
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
 
-    def enable_model(self, stat):
-        if(stat == True):
-            self.btn_tog.Enable()
-            self.rbtn_p1.Enable()
-            self.rbtn_p2.Enable()
-            self.rbtn_p3.Enable()
-            self.rbtn_p4.Enable()
-            self.btn_volts.Enable()
-            self.btn_amps.Enable()
-            self.btn_auto.Enable()
-            self.check_ss_support()
-        else:
-            self.btn_tog.Disable()
-            self.rbtn_p1.Disable()
-            self.rbtn_p2.Disable()
-            self.rbtn_p3.Disable()
-            self.rbtn_p4.Disable()
-        
-            self.btn_volts.Disable()
-            self.btn_amps.Disable()
-            self.rbtn_ss0.Disable()
-            self.rbtn_ss1.Disable()
-            self.btn_auto.Disable()
-
-    def update_controls(self):
-        if(self.top.con_flg):
-            #self.top.UpdateSingle("3201 Switch", 2)
-            self.top.UpdateSingle("", 2)
-            self.top.print_on_log("3201 Switch Connected!\n")
-            self.btn_tog.Enable()
-            self.btn_volts.Enable()
-            self.btn_amps.Enable()
-            self.btn_auto.Enable()
-            self.rbtn_ss1.SetValue(True)
-            if(self.top.init_flg):
-                self.speed_cmd(self.get_speed_input())
-                self.top.init_flg = False
-        else:
-            self.disable_buttons()
-    
-    def disable_buttons(self):
-        self.btn_tog.Disable()
-        self.btn_volts.Disable()
-        self.btn_amps.Disable()
-        self.btn_auto.Disable()
-
-        for i in range(len(self.led)):
-            self.led[i].SetBackgroundColour('black')
-            self.led[i].SetLabel("")
-        
-    def get_speed_input(self):
-        if(self.rbtn_ss1.GetValue()):
-            return 1
-        else:
-            return 0
-
-    def disable_auto(self):
-        self.rbtn_p1.Disable()
-        self.rbtn_p2.Disable()
-        self.rbtn_p3.Disable()
-        self.rbtn_p4.Disable()
-        self.btn_auto.Disable()
-        self.btn_volts.Disable()
-        self.btn_amps.Disable()
-        self.btn_tog.Disable()
-        
-    def enable_auto(self):
-        self.rbtn_p1.Enable()
-        self.rbtn_p2.Enable()
-        self.rbtn_p3.Enable()
-        self.rbtn_p4.Enable()
-        self.btn_auto.Enable()
-        self.btn_volts.Enable()
-        self.btn_amps.Enable()
-        self.btn_tog.Enable()
-
-    def enable_auto_ctrl(self, stat):
-        if(stat == True):
-            self.rbtn_p1.Enable()
-            self.rbtn_p2.Enable()
-            self.rbtn_p3.Enable()
-            self.rbtn_p4.Enable()
-            self.btn_tog.Enable()
-            self.check_ss_support()
-            self.tc_ival.Enable()
-        else:
-            self.rbtn_p1.Disable()
-            self.rbtn_p2.Disable()
-            self.rbtn_p3.Disable()
-            self.rbtn_p4.Disable()
-            self.rbtn_ss0.Disable()
-            self.rbtn_ss1.Disable()
-            self.btn_tog.Disable()
-            self.tc_ival.Disable()
-
-    def on_port(self, pno):
-        self.port_on_cmd(pno+1)
-        self.update_led_status(pno)
-
-    def update_led_status(self, pno):
-         for i in range(len(self.led)):
-            if(i == pno):
-                self.led[i].SetBackgroundColour("red")
-            else:
-                self.led[i].SetBackgroundColour("black")
-            self.led[i].SetLabel("")
-
-    def port_led_update(self, pno, stat):
+    # Update the Port Indication
+    def port_led_update(self, port, stat):
         if(stat):
             for i in range(4):
-                if(i == pno):
-                    self.led[i].SetBackgroundColour('Red')
+                if(i == port):
+                    self.rbtn[port].SetBitmap(self.picn)
                 else:
-                    self.led[i].SetBackgroundColour('black')
-                self.led[i].SetLabel("")
+                    self.rbtn[i].SetBitmap(self.picf)
         else:
             for i in range(4):
-                self.led[i].SetBackgroundColour('black')
-                self.led[i].SetLabel("")
+                self.rbtn[i].SetBitmap(self.picf)
 
+    # Called when changing the Mode - Called by set_mode
+    def update_controls(self, mode):
+        if mode == MODE_MANUAL:
+            self.enable_controls(True)
+        else:
+            self.enable_controls(False)
+
+    # Enable/Disable All Widgets in UI3201
+    def enable_controls(self, stat):
+        if not self.top.con_flg:
+            stat = False
+        self.enable_port_controls(stat)
+        self.enable_speed_controls(stat)
+        self.enable_va_controls(stat)
+        self.enable_auto_controls(stat)
+        
+    # Enable/Diasble 4 Port Switches
+    def enable_port_controls(self, stat):
+        stat = self.top.con_flg
+        if(stat):
+            self.btn_p1.Enable()
+            self.btn_p2.Enable()
+            self.btn_p3.Enable()
+            self.btn_p4.Enable()
+        else:
+            self.btn_p1.Disable()
+            self.btn_p2.Disable()
+            self.btn_p3.Disable()
+            self.btn_p4.Disable()
+
+    # Enable/Disale Speed controls
+    def enable_speed_controls(self, stat):
+        if(stat):
+            self.rbtn_ss0.Enable()
+            self.rbtn_ss1.Enable()
+        else:
+            self.rbtn_ss0.Disable()
+            self.rbtn_ss1.Disable()
+
+    # Enable/Disable Auto Controls
+    def enable_auto_controls(self, stat):
+        if(stat):
+            self.btn_auto.Enable()
+            self.tc_ival.Enable()
+            self.tc_duty.Enable()
+        else:
+            if self.top.mode != MODE_AUTO:
+                self.btn_auto.Disable()
+            self.tc_ival.Disable()
+            self.tc_duty.Disable()
+
+    # Enable/Disable Volt/Amp Controls
+    def enable_va_controls(self, stat):
+        if(stat):
+            self.btn_amps.Enable()
+            self.btn_volts.Enable()
+        else:
+            self.btn_amps.Disable()
+            self.btn_volts.Disable()
+
+    # Calculate Port ON Time and OFF Time from Interval and Duty
+    def get_all(self):
+        self.interval = int(self.get_interval())
+        self.duty = int(self.get_duty())
+
+        self.OnTime = self.interval* (self.duty/100)
+        self.OffTime = self.interval - self.OnTime
+
+    # Read Interval from Input text
     def get_interval(self):
         tival = self.tc_ival.GetValue()
         if(tival == ""):
-            tival = "1000"
+            tival = "50"
         ival = int(tival)
-        if(ival < 1000):
-            ival = 1000
+        if(ival < 50):
+            ival = 50
         elif(ival > 60000):
             ival = 60000
 
         self.tc_ival.SetValue(str(ival))
         return self.tc_ival.GetValue()
 
+    # Interval override by USB Tree View Changes Delay
     def set_interval(self, strval):
        self.tc_ival.SetValue(strval)
+
+    # Read Duty from Input text
+    def get_duty(self):
+        duty = self.tc_duty.GetValue()
+        if (duty == ""):
+            duty = "0"
+        return duty
+
+    # Print the Voltage level in Label
+    def update_volts(self, str):
+        self.st_volts.SetLabel(str)
+
+    # Print the Amps level in Label
+    def update_amps(self, str):
+        self.st_amps.SetLabel(str)
+
+    # Start Auto Mode
+    def start_auto(self):
+        self.auto_flg = True
+        self.btn_auto.SetLabel("Stop")
+        self.top.set_mode(MODE_AUTO)
+        self.Auto_strat_msg()
+        if(self.timer.IsRunning() == False):
+            self.timer.Start(int(self.get_interval()))
+
+    # Stop Auto Mode
+    def stop_auto(self):
+        self.auto_flg = False
+        self.btn_auto.SetLabel("Auto")
+        self.top.set_mode(MODE_MANUAL)
+        self.top.print_on_log("Auto Mode Stopped!\n")
+        self.timer.Start(1)
+
+    # Speed change command to 3141 Device
+    def speed_cmd(self,val):
+        cmd = 'superspeed'+' '+str(val)+'\r\n'
+        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
+        if res == 0:
+            outstr = outstr.replace('s', 'S')
+            outstr = outstr.replace('1', 'Enabled')
+            outstr = outstr.replace('0', 'Disabled')
+        self.top.print_on_log(outstr)
+    
+    # Called by Com Window When Device Connected
+    def device_connected(self):
+        if(self.top.con_flg):
+            res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            if res == 0 and outstr == '':
+                res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            if res == 0:
+                if(outstr != ''):
+                    self.init_ports(int(outstr))
+                self.top.UpdateSingle("", 2)
+                self.enable_controls(True)
+                self.top.set_port_list(PORTS)
+            else:
+                self.top.print_on_log("No response from 3201, please connect again!\n")
+                self.enable_controls(False) 
+
+    def device_disconnected(self):
+        if self.auto_flg:
+            self.auto_flg = False
+            self.btn_auto.SetLabel("Start")
+            self.timer.Stop()
+
+    # During connect map the indication to the device status
+    def init_ports(self, port):
+        if(port == 0):
+            self.port_led_update(port, False)
+            self.enable_ss_controls(port, False)
+        else:
+            self.port_led_update(port-1, True)
+            self.btnStat[port-1] = True
+            self.enable_ss_controls(port, True)
+        if(port > 2):
+            self.rbtn_ss0.SetValue(True)
+        else:
+            self.rbtn_ss1.SetValue(True)
