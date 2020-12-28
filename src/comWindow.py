@@ -37,7 +37,7 @@ class ComWindow(wx.Panel):
                                   size=(55,25))
 
         self.cb_device = wx.ComboBox(self,
-                                     size=(100, -1),
+                                     size=(128, -1),
                                      choices=self.dlist,
                                      style=wx.CB_DROPDOWN)
         
@@ -80,6 +80,9 @@ class ComWindow(wx.Panel):
     # Event Handler for Device Search Button
     # Scan the list Switches(3141, 3201 & 2101) over the USB bus
     def ScanDevice(self, evt):
+         self.search_device()
+    
+    def search_device(self):
         self.top.UpdateSingle("Searching Switch", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
@@ -125,8 +128,7 @@ class ComWindow(wx.Panel):
                 self.top.con_flg = False
                 wx.MessageBox("Switch Disconnected !", "Port Error", wx.OK)
                 self.disconnect_device()
-        self.timer_lp.Stop()
-
+    
     # Called when device discoonect required
     def disconnect_device(self):
         self.top.device_disconnected()
@@ -162,15 +164,25 @@ class ComWindow(wx.Panel):
         return txt[0], txt[1].replace(")","")
 
     # Called when connect device initiated
-    def connect_device(self):
+    def connect_device(self):    
         self.cb_device.Disable()
         self.top.selPort, devname = self.get_selected_com()
         for i in range(len(DEVICES)):
             if devname == DEVICES[i]:
                 self.top.selDevice = i
                 break
-        
         if self.top.selDevice == DEV_2101:
             self.device_connected()
         elif(serialDev.open_serial_device(self.top)):
             self.device_connected()
+        
+    # Do connect device automatically if last connected device is available
+    def auto_connect(self):
+        if(self.top.ldata['port'] != '' and self.top.ldata['device'] != ''):
+            instr = ""+self.top.ldata['port']+"("+DEVICES[self.top.ldata['device']]+")"
+            self.search_device()
+            if self.cb_device.FindString(instr) >= 0:
+                self.cb_device.SetValue(instr)
+                self.connect_device()
+                self.btn_connect.Enable()
+                self.top.set_mode(MODE_MANUAL)

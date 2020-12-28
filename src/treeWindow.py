@@ -58,9 +58,9 @@ class UsbTreeWindow(wx.Window):
         self.btn_clear = wx.Button(self, ID_BTN_UCLEAR, "Clear", 
                                    size=(60, -1))
 
-        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Refresh", size=(60,-1))
+        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Refresh", size=(55,-1))
 
-        self.btn_save = wx.Button(self, -1, "Save", size=(60,-1))
+        self.btn_save = wx.Button(self, -1, "Save", size=(55,-1))
 
         self.st_td   = wx.StaticText(self, -1, " Total Device : ", 
                                      style=wx.ALIGN_CENTER)

@@ -47,7 +47,7 @@ class Dev2101Window(wx.Panel):
 
         self.portcmd = SS_CONNECT
 
-        self.SetMinSize((270, 260))
+        self.SetMinSize((280, 270))
 
         sb = wx.StaticBox(self, -1, "Model 2101")
 
@@ -115,7 +115,7 @@ class Dev2101Window(wx.Panel):
  
         self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
         self.hbox1.Add(0,1,0)
-        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT, 
+        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT |wx.ALIGN_CENTER_VERTICAL,
                        border=20 )
         self.hbox2.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox2.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |
@@ -339,6 +339,7 @@ class Dev2101Window(wx.Panel):
         else:
             if self.top.mode != MODE_AUTO:
                 self.btn_auto.Disable()
+            self.tc_ival.SetFocus()
             self.tc_ival.Disable()
             self.tc_duty.Disable()
 

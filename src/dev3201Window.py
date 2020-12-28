@@ -46,7 +46,7 @@ class Dev3201Window(wx.Window):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         
-        self.SetMinSize((290, 260))
+        self.SetMinSize((280, 270))
         
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (40,15))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (40,15))
@@ -134,7 +134,7 @@ class Dev3201Window(wx.Window):
         self.hbox2.Add(self.hboxs2, flag=wx.ALIGN_CENTER_VERTICAL )
         self.hbox1.Add(0,1,0)
         
-        self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT, 
+        self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT |  wx.ALIGN_CENTER_VERTICAL,
                        border=20 )
         self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox3.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |
@@ -464,6 +464,7 @@ class Dev3201Window(wx.Window):
         else:
             if self.top.mode != MODE_AUTO:
                 self.btn_auto.Disable()
+            self.tc_ival.SetFocus()
             self.tc_ival.Disable()
             self.tc_duty.Disable()
 
@@ -500,7 +501,7 @@ class Dev3201Window(wx.Window):
 
     # Interval override by USB Tree View Changes Delay
     def set_interval(self, strval):
-       self.tc_ival.SetValue(strval)
+        self.tc_ival.SetValue(strval)
 
     # Read Duty from Input text
     def get_duty(self):

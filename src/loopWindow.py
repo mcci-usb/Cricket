@@ -201,9 +201,9 @@ class LoopWindow(wx.Window):
                     self.On_flg = False
                     self.cycleCnt = self.cycleCnt + 1
                     if(self.cb_cycle.GetValue() != True):
-                        self.tc_cycle.SetLabel(str(self.cycle - self.cycleCnt))
+                        self.tc_cycle.SetValue(str(self.cycle - self.cycleCnt))
                         if(self.cycleCnt >= self.cycle):
-                            self.tc_cycle.SetLabel(str(self.cycle))
+                            self.tc_cycle.SetValue(str(self.cycle))
                             self.top.print_on_log("Loop Mode Completed\n")
                             self.stop_loop()
                         else:    

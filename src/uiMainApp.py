@@ -14,9 +14,12 @@ import wx
 
 import os
 import sys
+from sys import platform
+
+
 import serial
 import webbrowser
-from sys import platform
+import shelve
 
 from uiGlobals import *
 
@@ -47,6 +50,8 @@ class UiPanel(wx.Panel):
     def __init__(self, parent):
         super(UiPanel, self).__init__(parent)
 
+        wx.GetApp().SetAppName("CricketUI")
+
         self.parent = parent
 
         self.SetBackgroundColour('White')
@@ -56,7 +61,8 @@ class UiPanel(wx.Panel):
         if platform == "darwin":
             self.font_size = MAC_FONT_SIZE
 
-        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL, False,'MS Shell Dlg 2'))
+        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,\
+                             False,'MS Shell Dlg 2'))
 
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
@@ -110,8 +116,8 @@ class UiPanel(wx.Panel):
         self.SetAutoLayout(True)
         self.vboxm.Fit(self)
         self.Layout()
+        
 
-    
     def PrintLog(self, strin):
         self.logPan.print_on_log(strin)
 
@@ -127,7 +133,7 @@ class UiPanel(wx.Panel):
         return self.treePan.get_delay_status()
 
     def get_interval(self):
-        self.devObj[self.parent.selDevice].get_interval(strval)
+        self.devObj[self.parent.selDevice].get_interval()
  
     def set_interval(self, strval):
         self.devObj[self.parent.selDevice].set_interval(strval)
@@ -164,7 +170,10 @@ class UiPanel(wx.Panel):
     def device_disconnected(self):
         self.devObj[self.parent.selDevice].device_disconnected()
         self.loopPan.device_disconnected()
-        
+
+    def auto_connect(self):
+        self.comPan.auto_connect()
+
 
 class UiMainFrame (wx.Frame):
     def __init__ (self, parent, title):
@@ -176,6 +185,8 @@ class UiMainFrame (wx.Frame):
         self.SetMinSize((980,600))
 
         self.init_flg = True
+
+        self.ldata = {}
 
         self.selPort = None
 
@@ -210,14 +221,14 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
         
         if sys.platform == 'darwin':
-            self.helpMenu.Append(wx.ID_ABOUT, "About UI-3141-3201")
+            self.helpMenu.Append(wx.ID_ABOUT, "About CricketUI")
         else:
             self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
         
         if sys.platform == 'darwin':
             self.winMenu = wx.Menu()
             self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
-            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW, "&UI-3141-3201\tAlt+Ctrl+1")
+            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW, "&CricketUI\tAlt+Ctrl+1")
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         
         
@@ -260,6 +271,12 @@ class UiMainFrame (wx.Frame):
         self.save_usb_list(usbList)
         self.update_usb_status(td)
 
+        try:
+            self.LoadDevice()
+            self.panel.auto_connect()
+        except:
+            pass
+
     # Event Handler for Help Menu
     def OnClickHelp(self, event):
         id = event.GetId()
@@ -272,8 +289,7 @@ class UiMainFrame (wx.Frame):
                             new=0, autoraise=True)
         elif(id == ID_MENU_HELP_2101):
             webbrowser.open("https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/",
-                            new=0, autoraise=True)
-
+                                    new=0, autoraise=True)
         elif(id == ID_MENU_HELP_WEB):
             webbrowser.open("https://mcci.com/", new=0, autoraise=True)
         elif(id == ID_MENU_HELP_PORT):
@@ -404,6 +420,7 @@ class UiMainFrame (wx.Frame):
     # Called by COM Window when devide get connected
     def device_connected(self):
         self.panel.device_connected()
+        self.StoreDevice()
 
     # Called by COM Window when the device get disconnected
     def device_disconnected(self):
@@ -436,7 +453,7 @@ class UiMainFrame (wx.Frame):
                                                      os.W_OK)):
                 self.dirname = dirname
             try:
-                f = open(filename, 'w')
+                f = open(filename, 'c')
                 f.write(contents)
                 f.close()
             except IOError:
@@ -454,6 +471,18 @@ class UiMainFrame (wx.Frame):
             wx.EndBusyCursor()
 
         return
+
+    def StoreDevice(self):
+        ds = shelve.open('config.txt')
+        ds['port'] = self.selPort
+        ds['device'] = self.selDevice
+        ds.close()
+
+    def LoadDevice(self):
+        ds = shelve.open('config.txt')
+        self.ldata['port'] = ds['port']
+        self.ldata['device'] = ds['device']
+        ds.close()        
         
 
 class UiApp(wx.App):
@@ -464,13 +493,13 @@ class UiApp(wx.App):
     def CustInit(self):
         self.frame = UiMainFrame(parent=None, title="MCCI - UI3141")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
+
         
 
 #======================================================================
 # MAIN PROGRAM
 #======================================================================
 def run():
-    
     app = UiApp()
     app.CustInit()
     app.MainLoop()
