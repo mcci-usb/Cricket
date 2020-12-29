@@ -178,7 +178,7 @@ class UiPanel(wx.Panel):
 class UiMainFrame (wx.Frame):
     def __init__ (self, parent, title):
         #super(UiMainFrame, self).__init__(parent, title=title)
-        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI Cricket UI - "+
+        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI "+APP_NAME+" - "+
                           VERSION_STR, pos=wx.Point(80,80),
                           size=wx.Size(980,720))
 
@@ -453,7 +453,7 @@ class UiMainFrame (wx.Frame):
                                                      os.W_OK)):
                 self.dirname = dirname
             try:
-                f = open(filename, 'c')
+                f = open(filename, 'w')
                 f.write(contents)
                 f.close()
             except IOError:

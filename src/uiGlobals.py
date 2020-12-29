@@ -15,6 +15,8 @@ import wx
 #======================================================================
 # GLOBAL VARIABLES
 #======================================================================
+APP_NAME = "Cricket UI"
+APP_VERSION = "2.0.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -71,8 +73,7 @@ ID_MENU_HELP_ABOUT = 1020
 
 # Dev3141-3201 Window
 ID_BTN_AUTO = 1030
-ID_BTN_DC = 1031
-ID_BTN_ONOFF = 1032
+ID_BTN_ONOFF = 1031
 
 # Radio Buttons
 ID_RBTN_SS0 = 1040
@@ -119,10 +120,10 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 #======================================================================
 # GLOBAL STRINGS
 #======================================================================
-VERSION_NAME  = "\nMCCI"+u"\u00AE"+" Cricket UI"
+VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
 VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
-VERSION_STR = "Version 2.0.0"
+VERSION_STR = "Version "+APP_VERSION
 
 
 #======================================================================

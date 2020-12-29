@@ -43,6 +43,7 @@ class Dev3141Window(wx.Panel):
         self.usb_flg = False 
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+        self.timer_do = wx.Timer(self)
 
         self.SetMinSize((280, 270))
 
@@ -67,7 +68,7 @@ class Dev3141Window(wx.Panel):
         self.rbtn_ss1 = wx.RadioButton(self, ID_RBTN_SS1, "Enable", 
                                        style=wx.RB_GROUP)
         self.rbtn_ss0 = wx.RadioButton(self, ID_RBTN_SS0, "Disable")
-        self.btn_do = wx.Button(self, ID_BTN_DC, "Check Orientation", 
+        self.stlbl_do = wx.StaticText(self, -1, "Orientation : ", 
                                 size=(-1,-1))
         self.st_do   = wx.StaticText(self, -1, " --- ", style=wx.ALIGN_CENTER)
 
@@ -111,13 +112,13 @@ class Dev3141Window(wx.Panel):
         self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
         self.hbox1.Add(0,1,0)
 
-        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 
+        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL , 
                        border=20 )
         self.hbox2.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox2.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |
                        wx.ALIGN_RIGHT, border=18)
 
-        self.hbox3.Add(self.btn_do, flag=wx.LEFT, border=20 )
+        self.hbox3.Add(self.stlbl_do, flag=wx.LEFT, border=20 )
         self.hbox3.Add(self.st_do, flag=wx.ALIGN_RIGHT | 
                        wx.ALIGN_CENTER_VERTICAL | wx.RIGHT | wx.LEFT, 
                        border=30)
@@ -157,10 +158,10 @@ class Dev3141Window(wx.Panel):
         self.Bind(wx.EVT_BUTTON,self.OnOffPort, self.btn_p1)
         self.Bind(wx.EVT_BUTTON,self.OnOffPort, self.btn_p2)
         self.btn_auto.Bind(wx.EVT_BUTTON, self.OprAuto)
-        self.btn_do.Bind(wx.EVT_BUTTON, self.GetStatus)
         
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
+        self.Bind(wx.EVT_TIMER, self.DoTimer, self.timer_do)
 
         self.rbtn = []
         self.rbtn.append(self.btn_p1)
@@ -228,6 +229,11 @@ class Dev3141Window(wx.Panel):
             #self.top.enable_start()
             pass
 
+    # Timer Event for USB Tree View Changes
+    def DoTimer(self, e):
+        self.timer_do.Stop()
+        self.get_orientation()
+        
    # Startup Message for Auto Mode
     def Auto_strat_msg(self):
         self.get_all()
@@ -243,6 +249,10 @@ class Dev3141Window(wx.Panel):
             if(port == i):
                 self.btnStat[port] = not self.btnStat[port]
                 self.port_on(port+1, self.btnStat[port])
+                if(self.btnStat[port]):
+                   self.timer_do.Start(3000)
+                else:
+                   self.timer_do.Stop()
             else:
                 self.btnStat[i] = False
 
@@ -367,10 +377,7 @@ class Dev3141Window(wx.Panel):
 
     # Enable/Disable Device Orientation Controls
     def enable_do_controls(self, stat):
-        if(stat):
-            self.btn_do.Enable()
-        else:
-            self.btn_do.Disable()
+        pass
     
     # Calculate Port ON Time and OFF Time from Interval and Duty
     def get_all(self):
@@ -432,25 +439,34 @@ class Dev3141Window(wx.Panel):
             outstr = outstr.replace('0', 'Disabled')
         self.top.print_on_log(outstr)
 
-        
-    def GetStatus(self, e):
+    # Get Device Orientation from the Status    
+    def get_orientation(self):    
         strin = "--"
         res, outstr = serialDev.send_status_cmd(self.top.devHand)
         if res == 0:
             restr = outstr.split('\n')
+            cc1detect = None
+            cc1led = None
             for instr in restr:
                 if 'CC1 detect:' in instr:
                     fstr = instr.split('0x')
-                    hint = int(fstr[1], 16)
-                    hv = hex(hint)
-                    if(hint > 0x20):
-                        strin = "Normal"
-                    else:
-                        strin = "Flip"
-
-                    self.update_carrier(strin)
-                    self.top.print_on_log("Device Orientation : "+strin+"\n")
+                    cc1detect = int(fstr[1], 16)
+                elif 'CC1 led:' in instr:
+                    lstr = instr.split(':')
+                    cc1led = int(lstr[1])
                     break
+            if cc1led == 0 and cc1detect < 20:
+                strin = "Flip"
+            elif cc1led == 1 and cc1detect > 20:
+                strin = "Normal"
+            
+            self.update_carrier(strin)
+            self.top.print_on_log("Device Orientation : "+strin+"\n")
+            #self.top.print_on_log("Device Orientation : "+str(cc1led)+", "+str(cc1detect)+", "+strin+"\n")
+        else:
+            self.update_carrier(strin)
+            strin = "Device Error"
+            self.top.print_on_log("Device Orientation : "+strin+"\n")
 
     # Display the Carrier direction in UI
     def update_carrier(self, str):

@@ -115,7 +115,7 @@ class Dev2101Window(wx.Panel):
  
         self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
         self.hbox1.Add(0,1,0)
-        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT |wx.ALIGN_CENTER_VERTICAL,
+        self.hbox2.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 
                        border=20 )
         self.hbox2.Add(self.rbtn_ss1, flag=wx.ALIGN_LEFT | wx.LEFT, border = 20)
         self.hbox2.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT |

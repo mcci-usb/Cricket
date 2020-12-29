@@ -55,7 +55,7 @@ class LoopWindow(wx.Window):
         self.portno = 0
 
         self.cb_psel = wx.ComboBox(self,
-                                     size=(50,-1),
+                                     size=(53,-1),
                                      style = wx.TE_PROCESS_ENTER)
         self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
                                       style = wx.ALIGN_CENTER)
