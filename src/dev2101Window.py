@@ -61,8 +61,8 @@ class Dev2101Window(wx.Panel):
         self.hbox5 = wx.BoxSizer (wx.HORIZONTAL)
         
         self.st_port = wx.StaticText(self, -1, "Port", size = (40, 15)) 
-        self.picf = wx.Bitmap ("btn_off.png", wx.BITMAP_TYPE_ANY)
-        self.picn = wx.Bitmap ("btn_on.png", wx.BITMAP_TYPE_ANY)
+        self.picf = wx.Bitmap ("./icons/btn_off.png", wx.BITMAP_TYPE_ANY)
+        self.picn = wx.Bitmap ("./icons/btn_on.png", wx.BITMAP_TYPE_ANY)
         self.btn_p1 = wx.BitmapButton(self, 0, self.picf,size= (55,20))
         self.st_ss   = wx.StaticText(self, -1, "SuperSpeed")
         self.rbtn_ss1 = wx.RadioButton(self, ID_RBTN_SS1, "Enable", 

@@ -60,8 +60,8 @@ class Dev3141Window(wx.Panel):
         
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (40,15))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (40,15))
-        self.picf = wx.Bitmap ("btn_off.png", wx.BITMAP_TYPE_ANY)
-        self.picn = wx.Bitmap ("btn_on.png", wx.BITMAP_TYPE_ANY)
+        self.picf = wx.Bitmap ("./icons/btn_off.png", wx.BITMAP_TYPE_ANY)
+        self.picn = wx.Bitmap ("./icons/btn_on.png", wx.BITMAP_TYPE_ANY)
         self.btn_p1 = wx.BitmapButton(self, 0, self.picf, size= (55,20))
         self.btn_p2 = wx.BitmapButton(self, 1, self.picf, size= (55,20))
         self.st_ss   = wx.StaticText(self, -1, "SuperSpeed")
