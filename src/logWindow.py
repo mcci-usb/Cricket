@@ -50,7 +50,7 @@ class LogWindow(wx.Window):
         self.hbox.Add(120,0,0)
         self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.btn_save, 1, flag=wx.ALIGN_RIGHT | wx.ALIGN_LEFT , border = 60)
+        self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , border = 10)
 
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearLogWindow)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveLogWindow)

@@ -58,31 +58,31 @@ class LoopWindow(wx.Window):
                                      size=(53,-1),
                                      style = wx.TE_PROCESS_ENTER)
         self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
-                                      style = wx.ALIGN_CENTER)
+                                      style = wx.ALIGN_RIGHT)
      
         
         self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
-                                      style = wx.ALIGN_CENTER)
+                                      style = wx.ALIGN_RIGHT)
         self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "2000", size=(50,-1), 
-                                    style = wx.TE_PROCESS_ENTER,
+                                    style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
                                     validator=NumericValidator(), 
                                     name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
 
         self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
-                                       style = wx.ALIGN_CENTER)
+                                       style = wx.ALIGN_RIGHT)
         self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
-                                     style = wx.TE_PROCESS_ENTER,
+                                     style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
 
         self.st_cycle   = wx.StaticText(self, -1, "Repeat ", size=(50,15), 
-                                        style = wx.ALIGN_CENTER)
+                                        style = wx.ALIGN_RIGHT)
         self.tc_cycle   = wx.TextCtrl(self, ID_TC_CYCLE, "20", size=(50,-1), 
-                                      style = 0,
+                                      style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
                                       validator=NumericValidator(), 
                                       name="ON/OFF period")
         self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
@@ -116,7 +116,7 @@ class LoopWindow(wx.Window):
 
         self.bs_pers.Add(40,0,0)
         self.bs_pers.Add(self.st_per,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_pers.Add(15,50,0)
+        self.bs_pers.Add(15,20,0)  #height changed here
         self.bs_pers.Add(self.tc_per,0, wx.ALIGN_CENTER | 
                          wx.ALIGN_CENTER_VERTICAL)
         self.bs_pers.Add(0,20,0)
@@ -136,12 +136,10 @@ class LoopWindow(wx.Window):
         self.bs_cycle.Add(self.st_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(15,50,0)
         self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_cycle.Add(1,20,0)
-        self.bs_cycle.Add(self.st_cnt,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(1,0,0)
 
         self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
-        self.bs_cycle.Add(1,0,0)
+        self.bs_cycle.Add(10,0,0)
         self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL,
                                             border = 0)
         self.bs_cycle.Add(5,10,0)
@@ -154,16 +152,13 @@ class LoopWindow(wx.Window):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         self.bs_vbox.AddMany([
-            (0,0,0),
             (self.bs_psel,1, wx.EXPAND),
-            (0,0,0),
             (self.bs_pers, 1, wx.EXPAND),
-            (0,0,0),
             (self.bs_duty, 1, wx.EXPAND),
             (self.bs_cycle, 1, wx.EXPAND),
-            (0,0,0),
+            (0,10,0),
             (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
-            (0,5,0)
+            (0,10,0)
             ])
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
@@ -341,6 +336,7 @@ class LoopWindow(wx.Window):
         self.start_flg = False
         self.btn_start.SetLabel("Start")
         self.top.set_mode(MODE_MANUAL)
+        self.top.print_on_log("Loop Mode Stopped!\n")
         self.timer.Stop()
      
     # Port ON/OFF command send to Connected Device Module
@@ -390,4 +386,5 @@ class LoopWindow(wx.Window):
 
     # Called when device get disconnected
     def device_disconnected(self):
-        self.stop_loop()
+        if self.start_flg:
+            self.stop_loop()

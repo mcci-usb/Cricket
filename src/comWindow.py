@@ -42,7 +42,7 @@ class ComWindow(wx.Panel):
                                      style=wx.CB_DROPDOWN)
         
         self.btn_connect = wx.Button(self, ID_BTN_CONNECT, "Connect", 
-                                     size=(70,-1))
+                                     size=(80,-1))
 
         sb = wx.StaticBox(self, -1,"Manage Model")
         self.szr_top = wx.StaticBoxSizer(sb, wx.HORIZONTAL)
