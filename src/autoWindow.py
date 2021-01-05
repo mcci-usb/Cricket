@@ -237,31 +237,6 @@ class AutoWindow(wx.Window):
         self.OnTime = self.interval* (self.duty/100)
         self.OffTime = self.interval - self.OnTime
 
-    # Read Interval from Input text
-    def get_interval(self):
-        tival = self.tc_ival.GetValue()
-        if(tival == ""):
-            tival = "50"
-        ival = int(tival)
-        if(ival < 50):
-            ival = 50
-        elif(ival > 60000):
-            ival = 60000
-
-        self.tc_ival.SetValue(str(ival))
-        return self.tc_ival.GetValue()
-
-    # Interval override by USB Tree View Changes Delay
-    def set_interval(self, strval):
-       self.tc_ival.SetValue(strval)
-
-    # Read Duty from Input text
-    def get_duty(self):
-        duty = self.tc_duty.GetValue()
-        if (duty == ""):
-            duty = "0"
-        return duty
-
     # Set Port list to Combo box when Device gets connected
     def set_port_count(self, port):
         self.total_ports = port
