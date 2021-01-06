@@ -84,6 +84,7 @@ class AutoWindow(wx.Window):
         self.btn_auto = wx.Button(self, ID_BTN_AUTO, "Auto", size=(60,25))
 
         self.tc_ival.SetMaxLength(5)
+        self.tc_duty.SetMaxLength(2)
         
         self.tc_ival.SetToolTip(wx.ToolTip("Switching Interval. Min: 1 sec, "
                                            "Max: 60 sec"))
@@ -213,10 +214,10 @@ class AutoWindow(wx.Window):
     def get_interval(self):
         tival = self.tc_ival.GetValue()
         if(tival == ""):
-            tival = "50"
+            tival = "1000"
         ival = int(tival)
-        if(ival < 50):
-            ival = 50
+        if(ival < 1000):
+            ival = 1000
         elif(ival > 60000):
             ival = 60000
 
@@ -231,8 +232,13 @@ class AutoWindow(wx.Window):
     def get_duty(self):
         duty = self.tc_duty.GetValue()
         if (duty == ""):
-            duty = "0"
-        return duty
+            duty = "50"
+        ival = int(duty)
+        if(ival == 0):
+            ival = 1
+        
+        self.tc_duty.SetValue(str(ival))
+        return self.tc_duty.GetValue()
 
     # Set Port list to Combo box when Device gets connected
     def set_port_count(self, port):

@@ -67,7 +67,7 @@ class ComWindow(wx.Panel):
         self.Layout()
 
         self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
-                                            "Switches (3141, 3201)"))
+                                            "Models (3141, 3201, 2101)"))
 
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         self.btn_connect.Bind(wx.EVT_BUTTON, self.ConnectDevice)
@@ -83,7 +83,7 @@ class ComWindow(wx.Panel):
          self.search_device()
     
     def search_device(self):
-        self.top.UpdateSingle("Searching Switch", 3)
+        self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
         
@@ -102,10 +102,10 @@ class ComWindow(wx.Panel):
         if(len(key_list)):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
-            self.top.UpdateSingle("Switch(s) found", 3)
+            self.top.UpdateSingle("Modle(s) found", 3)
         else:
             self.btn_connect.Disable()
-            self.top.UpdateSingle("No Switches found", 3)
+            self.top.UpdateSingle("No Models found", 3)
 
     # Event Handler for Device Connect/Disconnect
     def ConnectDevice(self, evt):
@@ -126,7 +126,7 @@ class ComWindow(wx.Panel):
                 self.timer_lp.Start(700)
             else:
                 self.top.con_flg = False
-                wx.MessageBox("Switch Disconnected !", "Port Error", wx.OK)
+                wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
                 self.disconnect_device()
     
     # Called when device discoonect required
@@ -144,7 +144,7 @@ class ComWindow(wx.Panel):
         srlist.append("")
         srlist.append("Disconnected")
         self.top.UpdateAll(srlist)
-        self.top.print_on_log(DEVICES[self.top.selDevice]+" Switch Disconnected!\n")
+        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Disconnected!\n")
     
     # Called when device connect required
     def device_connected(self):
@@ -154,7 +154,7 @@ class ComWindow(wx.Panel):
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         self.timer_lp.Start(500)
-        self.top.print_on_log(DEVICES[self.top.selDevice]+" Switch Connected!\n")
+        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Connected!\n")
         self.top.device_connected()
 
     # Get the selected switch through the index of Combobox

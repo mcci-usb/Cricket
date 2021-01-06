@@ -118,11 +118,6 @@ class UiPanel(wx.Panel):
         self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
 
-        '''self.vboxm = wx.BoxSizer(wx.VERTICAL)
-        self.vboxm.Add((0,20), 0, wx.EXPAND)
-        self.vboxm.Add(self.hboxm, 1, wx.EXPAND)
-        self.vboxm.Add((0,20), 0, wx.EXPAND)'''
-        
         self.SetSizer(self.hboxm)
         self.SetAutoLayout(True)
         self.hboxm.Fit(self)

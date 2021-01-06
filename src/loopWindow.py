@@ -177,12 +177,9 @@ class LoopWindow(wx.Window):
             self.top.print_on_log("Loop Mode Interrupted\n")
             self.stop_loop()
         else:
-            if(self.check_valid_input()):
-                self.get_all_three()
-                if(self.usb_dly_warning()):
-                    self.start_loop()
-            else:
-                wx.MessageBox('Input box left blank','Error', wx.OK)
+            self.get_all_three()
+            if(self.usb_dly_warning()):
+                self.start_loop()
 
     # Loop mode Timer service
     def TimerServ(self, evt):
@@ -245,10 +242,10 @@ class LoopWindow(wx.Window):
     def get_period(self):
         dper = self.tc_per.GetValue()
         if(dper == ""):
-            dper = "50"
+            dper = "1000"
         pval = int(dper)
-        if(pval < 50):
-            pval = 50
+        if(pval < 1000):
+            pval = 1000
         elif(pval > 60000):
             pval = 60000
 
@@ -263,15 +260,26 @@ class LoopWindow(wx.Window):
     def get_duty(self):
         duty = self.tc_duty.GetValue()
         if (duty == ""):
-            duty = "0"
-        return duty
+            duty = "50"
+        ival = int(duty)
+        if(ival == 0):
+            ival = 1
+        
+        self.tc_duty.SetValue(str(ival))
+        return self.tc_duty.GetValue()
+
 
     # Get Cycle value
     def get_cycle(self):
         cycle = self.tc_cycle.GetValue()
         if (cycle == ""):
-            cycle = "0"
-        return cycle
+            cycle = "20"
+        cval = int(cycle)
+        if(cval < 1):
+            cval = 1
+
+        self.tc_cycle.SetValue(str(cval))
+        return self.tc_cycle.GetValue()
 
     # Get Period, Duty and Cycle values then calculate ON Time and OFF Time
     def get_all_three(self):
@@ -286,22 +294,6 @@ class LoopWindow(wx.Window):
     def get_loop_param(self):
         self.get_all_three()
         return self.OnTime, self.OffTime, self.duty
-
-    # Check the input text box of Period, Duty and Cycle
-    def check_valid_input(self):
-        strPer = self.tc_per.GetValue()
-        if(strPer == ''):
-            return False
-        strDuty = self.tc_duty.GetValue()
-        if(strDuty == ''):
-            return False 
-        strCycle = self.tc_cycle.GetValue()
-        if(strCycle == ''):
-            return False
-        strInf = self.cb_cycle.GetValue()
-        if(strInf == ''):
-            return False
-        return True   
 
     # Start Loop Mode
     def start_loop(self):
