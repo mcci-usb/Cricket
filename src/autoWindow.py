@@ -229,14 +229,6 @@ class AutoWindow(wx.Window):
             duty = "0"
         return duty
 
-    # Calculate Port ON Time and OFF Time from Interval and Duty
-    def get_all(self):
-        self.interval = int(self.get_interval())
-        self.duty = int(self.get_duty())
-
-        self.OnTime = self.interval* (self.duty/100)
-        self.OffTime = self.interval - self.OnTime
-
     # Set Port list to Combo box when Device gets connected
     def set_port_count(self, port):
         self.total_ports = port
