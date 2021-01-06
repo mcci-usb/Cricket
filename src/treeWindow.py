@@ -229,9 +229,20 @@ class UsbTreeWindow(wx.Window):
                 if(int(onTime) < int(self.get_enum_delay())):
                     ndly = int((int(self.get_enum_delay())*100)/duty)
                     self.top.set_period(str(ndly))
+
+            onTime, offTime, duty = self.top.get_auto_param()
+            if(int(onTime) >= int(offTime)):
+                if(int(offTime) < int(self.get_enum_delay())):
+                    duty = 100 - duty
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_interval(str(ndly))
+            else:
+                if(int(onTime) < int(self.get_enum_delay())):
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_interval(str(ndly))
             
-            if(int(self.top.get_interval()) < int(self.get_enum_delay())):
-                self.top.set_interval(self.get_enum_delay())
+            '''if(int(self.top.get_interval()) < int(self.get_enum_delay())):
+                self.top.set_interval(self.get_enum_delay())'''
 
     # Enable/Disble USB selection option widgets
     def update_controls(self, mode):

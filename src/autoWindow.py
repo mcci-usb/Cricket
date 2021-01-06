@@ -189,7 +189,7 @@ class AutoWindow(wx.Window):
 
     # Startup Message for Auto Mode
     def Auto_strat_msg(self):
-        self.get_all()
+        self.get_all_three()
         lmstr = "Auto Mode start : ON-Time = {d1} ms,".\
                 format(d1=int(self.OnTime)) + \
                 " OFF-Time = {d2} ms\n".\
@@ -197,12 +197,17 @@ class AutoWindow(wx.Window):
         self.top.print_on_log(lmstr)
 
     # Calculate Port ON Time and OFF Time from Interval and Duty
-    def get_all(self):
+    def get_all_three(self):
         self.interval = int(self.get_interval())
         self.duty = int(self.get_duty())
 
         self.OnTime = self.interval* (self.duty/100)
         self.OffTime = self.interval - self.OnTime
+
+    # Send ON, OFF Time and Duty to USB Tree Window for USB delay validation
+    def get_auto_param(self):
+        self.get_all_three()
+        return self.OnTime, self.OffTime, self.duty
 
     # Read Interval from Input text
     def get_interval(self):

@@ -155,6 +155,9 @@ class UiPanel(wx.Panel):
     def get_loop_param(self):
         return self.loopPan.get_loop_param()
 
+    def get_auto_param(self):
+        return self.autoPan.get_auto_param()
+
     def set_period(self, strval):
         self.loopPan.set_period(strval)
     
@@ -400,6 +403,10 @@ class UiMainFrame (wx.Frame):
     # Get Loop Window delay parameters
     def get_loop_param(self):
         return self.panel.get_loop_param()
+
+    # Get Auto Window delay parameters
+    def get_auto_param(self):
+        return self.panel.get_auto_param()
     
     # Set Loop Mode period
     def set_period(self, strval):
