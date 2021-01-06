@@ -1,4 +1,4 @@
-# UI-CricketUI
+# CricketUI
 
 ## List of Contents
 
@@ -14,7 +14,7 @@
 
 ## About Application
 
-This application is designed to create simple User Interface for USB Switch 3141 and 3201 , to make the user's interaction as simple and efficient as possible.
+This application is designed to create simple User Interface for USB Switch 3141 3201 and 2101 , to make the user's interaction as simple and efficient as possible.
 
 It is a cross platform GUI application developed by using WxPython.
 
@@ -58,6 +58,7 @@ Development environment
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * pyinstaller - 3.6  
+* hidapi - 0.10.1  - Only for Mac OS
 
 ```shell
 sudo apt-get update
@@ -69,6 +70,7 @@ sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
 sudo pip3 install pyinstaller
+brew install hidapi - Only for Mac OS
 ```
 
 Note:
@@ -97,9 +99,10 @@ To update the version for each release
 
 * Move to the directory `destdir/src/`
 * Open the file `uiGlobals.py`
-* Update the value of the String Macro `VERSION_STR`
+* Update the value of the String Macro `APP_VERSION`
 * Update the VERSION.md `destdir/VERSION.md`
 
 ## GUI Preview
 
-![UI Preview](assets/UI-3141_3201.png)
+![UI Preview](assets/CricketUI.png)
+

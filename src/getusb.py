@@ -22,6 +22,8 @@ import xml.dom.minidom
 # COMPONENTS
 #======================================================================
 
+# Scan the USB bus for the list of plugged devices
+# Required for device tree view changes
 def scan_usb():
     hc_list = []
     hub_list = []

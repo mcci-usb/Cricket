@@ -20,6 +20,7 @@ from uiGlobals import *
 # COMPONENTS
 #======================================================================
 
+# Get USB Device Tree changes list
 def get_tree_change(top):
     dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
@@ -34,34 +35,33 @@ def get_tree_change(top):
     if(len(adlist) == 0 and len(rmlist) == 0):
         strout = ("No Change\n")
     
-    cnt = 0
     if(len(rmlist)):
         strout = strout + "Removed\n"
-        dlist = get_usb_class(rmlist)
-        for dev in rmlist:
-            s = ','
-            strin = s.join(dlist[cnt])
-            cnt = cnt + 1
-            hvid = ("%X"%int(dev.get('vid'))).zfill(4)
-            hpid = ("%X"%int(dev.get('pid'))).zfill(4)
-            vpid = " (VID_"+hvid+"; PID_"+hpid+")"
-            strout = strout + str(cnt)+ ". " + strin + vpid + "\n"
-    
-    cnt = 0
-    if(len(adlist)):
+        strout = strout + get_usb_device_info(rmlist)
+
+    if(len(adlist)):   
         strout = strout + "Added\n"
-        dlist = get_usb_class(adlist)
-        for dev in adlist:
-            s = ','
-            strin = s.join(dlist[cnt])
-            cnt = cnt + 1
-            hvid = ("%X"%int(dev.get('vid'))).zfill(4)
-            hpid = ("%X"%int(dev.get('pid'))).zfill(4)
-            vpid = " (VID_"+hvid+"; PID_"+hpid+")"
-            strout = strout + str(cnt)+ ". " + strin + vpid + "\n"
+        strout = strout + get_usb_device_info(adlist)
+
     top.save_usb_list(newlist)
     top.print_on_usb(strout)
-        
+
+# Show VID, PID and Speed info of added/removed USB devices
+def get_usb_device_info(udlist):
+    dlist = get_usb_class(udlist)
+    cnt = 0
+    strdev = ""
+    for dev in udlist:
+        s = ','
+        strin = s.join(dlist[cnt])
+        cnt = cnt + 1
+        hvid = ("%X"%int(dev.get('vid'))).zfill(4)
+        hpid = ("%X"%int(dev.get('pid'))).zfill(4)
+        vpid = " (VID_"+hvid+"; PID_"+hpid+"; "+usbSpeed.get(dev.get('speed')-1)+")"
+        strdev = strdev + str(cnt)+ ". " + strin + vpid + "\n"
+    return strdev
+
+# Get USB class        
 def get_usb_class(clist):
     nlist = []
     for i in range(len(clist)):

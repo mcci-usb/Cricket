@@ -16,6 +16,8 @@ import wx
 import search
 import serialDev
 
+import control2101 as d2101
+
 from uiGlobals import *
 
 #======================================================================
@@ -35,12 +37,12 @@ class ComWindow(wx.Panel):
                                   size=(55,25))
 
         self.cb_device = wx.ComboBox(self,
-                                     size=(100, -1),
+                                     size=(128, -1),
                                      choices=self.dlist,
                                      style=wx.CB_DROPDOWN)
         
         self.btn_connect = wx.Button(self, ID_BTN_CONNECT, "Connect", 
-                                     size=(70,-1))
+                                     size=(80,-1))
 
         sb = wx.StaticBox(self, -1,"Manage Model")
         self.szr_top = wx.StaticBoxSizer(sb, wx.HORIZONTAL)
@@ -57,9 +59,7 @@ class ComWindow(wx.Panel):
         self.vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.vbox.AddMany([
-            #(10,20,0),
             (self.szr_top, 0, wx.EXPAND | wx.ALL),
-            #(10,30,0)
             ])
         
         self.SetSizer(self.vbox)
@@ -67,7 +67,7 @@ class ComWindow(wx.Panel):
         self.Layout()
 
         self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
-                                            "Switches (3141, 3201)"))
+                                            "Models (3141, 3201, 2101)"))
 
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         self.btn_connect.Bind(wx.EVT_BUTTON, self.ConnectDevice)
@@ -77,16 +77,24 @@ class ComWindow(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.ComServ, self.timer_lp)
 
 
+    # Event Handler for Device Search Button
+    # Scan the list Switches(3141, 3201 & 2101) over the USB bus
     def ScanDevice(self, evt):
-        self.top.UpdateSingle("Searching Switch", 3)
+         self.search_device()
+    
+    def search_device(self):
+        self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
         
         plist = search.search_port()
         key_list = list(plist.keys())
         val_list = list(plist.values())
+        dlist = d2101.scan_2101()
+        for dl in dlist:
+            key_list.append(dl)
+            val_list.append(DEVICES[DEV_2101])
 
-        nlist = []
         for i in range(len(key_list)):
             str1 = key_list[i]+"("+val_list[i]+")"
             self.cb_device.Append(str1)
@@ -94,20 +102,22 @@ class ComWindow(wx.Panel):
         if(len(key_list)):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
-            self.top.UpdateSingle("Switch(s) found", 3)
+            self.top.UpdateSingle("Modle(s) found", 3)
         else:
             self.btn_connect.Disable()
-            self.top.UpdateSingle("No Switches found", 3)
+            self.top.UpdateSingle("No Models found", 3)
 
+    # Event Handler for Device Connect/Disconnect
     def ConnectDevice(self, evt):
         self.btn_connect.Disable()
         if(self.top.con_flg):
             self.disconnect_device()
         else:
-            self.connect_switch()
+            self.connect_device()
         self.btn_connect.Enable()
-        self.top.update_controls()
+        self.top.set_mode(MODE_MANUAL)
 
+    # Scanning the USB/COM port for device unplugging
     def ComServ(self, e):
         if self.top.con_flg:
             self.timer_lp.Stop()
@@ -116,45 +126,63 @@ class ComWindow(wx.Panel):
                 self.timer_lp.Start(700)
             else:
                 self.top.con_flg = False
-                wx.MessageBox("Switch Disconnected !", "Port Error", wx.OK)
+                wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
                 self.disconnect_device()
-
+    
+    # Called when device discoonect required
     def disconnect_device(self):
+        self.top.device_disconnected()
         self.top.selPort = None
         self.top.con_flg = False
         self.btn_connect.Disable()
         self.top.devHand.close()
         self.btn_connect.SetLabel("Connect")
         self.timer_lp.Stop()
-        self.top.print_on_log("Device disconnected !\n")
-        self.top.update_controls()
         srlist = []
         srlist.append("Port")
         srlist.append("")
         srlist.append("")
         srlist.append("Disconnected")
         self.top.UpdateAll(srlist)
-
-    def switch_connected(self):
+        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Disconnected!\n")
+    
+    # Called when device connect required
+    def device_connected(self):
         self.btn_connect.SetLabel("Disconnect")
         self.top.con_flg = True
         self.top.UpdatePort()
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         self.timer_lp.Start(500)
-        self.top.init_flg = True
+        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Connected!\n")
+        self.top.device_connected()
 
+    # Get the selected switch through the index of Combobox
     def get_selected_com(self):
         self.cval = self.cb_device.GetValue()
         txt = self.cval.split("(")
         return txt[0], txt[1].replace(")","")
 
-    def connect_switch(self):
+    # Called when connect device initiated
+    def connect_device(self):    
         self.cb_device.Disable()
-        self.top.selPort, self.top.selDevice = self.get_selected_com()
-        if(serialDev.open_serial_device(self.top)):
-            self.switch_connected()
-            if self.top.selDevice == '3201':
-                self.top.show_3201()
-            else:
-                self.top.show_3141()
+        self.top.selPort, devname = self.get_selected_com()
+        for i in range(len(DEVICES)):
+            if devname == DEVICES[i]:
+                self.top.selDevice = i
+                break
+        if self.top.selDevice == DEV_2101:
+            self.device_connected()
+        elif(serialDev.open_serial_device(self.top)):
+            self.device_connected()
+        
+    # Do connect device automatically if last connected device is available
+    def auto_connect(self):
+        if(self.top.ldata['port'] != '' and self.top.ldata['device'] != ''):
+            instr = ""+self.top.ldata['port']+"("+DEVICES[self.top.ldata['device']]+")"
+            self.search_device()
+            if self.cb_device.FindString(instr) >= 0:
+                self.cb_device.SetValue(instr)
+                self.connect_device()
+                self.btn_connect.Enable()
+                self.top.set_mode(MODE_MANUAL)
