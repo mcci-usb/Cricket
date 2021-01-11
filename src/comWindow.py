@@ -144,7 +144,7 @@ class ComWindow(wx.Panel):
         srlist.append("")
         srlist.append("Disconnected")
         self.top.UpdateAll(srlist)
-        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Disconnected!\n")
+        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]+" Disconnected!\n")
     
     # Called when device connect required
     def device_connected(self):
@@ -154,7 +154,7 @@ class ComWindow(wx.Panel):
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         self.timer_lp.Start(500)
-        self.top.print_on_log(DEVICES[self.top.selDevice]+" Model Connected!\n")
+        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]+" Connected!\n")
         self.top.device_connected()
 
     # Get the selected switch through the index of Combobox
