@@ -190,12 +190,15 @@ class UiPanel(wx.Panel):
 class UiMainFrame (wx.Frame):
     def __init__ (self, parent, title):
         #super(UiMainFrame, self).__init__(parent, title=title)
+        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI "+APP_NAME+" - "+
+                          VERSION_STR, pos=wx.Point(80,5),
+                          size=wx.Size(1020,680))
+
         self.ytop = 5
         if sys.platform == 'darwin':
-            self.ytop = 35
-        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI "+APP_NAME+" - "+
-                          VERSION_STR, pos=wx.Point(80,self.ytop),
-                          size=wx.Size(1020,680))
+            self.ytop = 25
+
+        self.SetPosition((80,self.ytop))
 
         self.SetMinSize((1020,680))
 
