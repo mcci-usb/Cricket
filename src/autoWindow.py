@@ -136,7 +136,7 @@ class AutoWindow(wx.Window):
         if(self.auto_flg):
             self.stop_auto()
         else:
-            if(self.usb_dly_warning()):
+            if(self.usb_dly_warning() and self.onoff_dly_warning()):
                 self.start_auto()
 
     # Start Auto Mode
@@ -272,6 +272,22 @@ class AutoWindow(wx.Window):
                     return True
                 else:
                     return False
+        return True
+
+    # Check ON/OFF Time interval if it is < 500 msec popup a warning message
+    def onoff_dly_warning(self):
+        self.get_all_three()
+        if (self.OnTime < 500 or self.OffTime < 500):
+            title = ("Port ON/OFF time warning!")
+            msg = ("For Device safety, it is recommended to keep "
+                       "Port ON/OFF time > 500 msec."
+                       "\nClick Yes if you wish to continue"
+                       "\nClick No to exit the Auto mode")
+            dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
+            if(dlg.ShowModal() == wx.ID_YES):
+                return True
+            else:
+                return False
         return True
 
     # Enable/Disable widgets when mode changed

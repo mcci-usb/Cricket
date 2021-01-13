@@ -102,7 +102,7 @@ class ComWindow(wx.Panel):
         if(len(key_list)):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
-            self.top.UpdateSingle("Modle(s) found", 3)
+            self.top.UpdateSingle("Model(s) found", 3)
         else:
             self.btn_connect.Disable()
             self.top.UpdateSingle("No Models found", 3)

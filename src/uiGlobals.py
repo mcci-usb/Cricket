@@ -15,7 +15,7 @@ import wx
 #======================================================================
 # GLOBAL VARIABLES
 #======================================================================
-APP_NAME = "Cricket UI"
+APP_NAME = "Cricket"
 APP_VERSION = "2.0.0"
 
 # StatusBar ID
@@ -34,10 +34,18 @@ DEV_2101    = 2
 
 DEVICES    = ["3141", "3201", "2101"]
 
+IMG_ICON = "mcci_logo.ico"
+IMG_LOGO = "mcci_logo.png"
+IMG_BTN_ON = "btn_on.png"
+IMG_BTN_OFF = "btn_off.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
 MAC_FONT_SIZE = 10
+
+# Window Position fron Top
+DEFAULT_YPOS = 5
+YPOS_MAC = 25
 
 # Base directory (populated by main module)
 BASE_DIR = None

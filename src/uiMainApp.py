@@ -16,7 +16,6 @@ import os
 import sys
 from sys import platform
 
-
 import serial
 import webbrowser
 import shelve
@@ -194,9 +193,9 @@ class UiMainFrame (wx.Frame):
                           VERSION_STR, pos=wx.Point(80,5),
                           size=wx.Size(1020,680))
 
-        self.ytop = 5
+        self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
-            self.ytop = 25
+            self.ytop = YPOS_MAC
 
         self.SetPosition((80,self.ytop))
 
@@ -281,7 +280,8 @@ class UiMainFrame (wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
             self.Bind(wx.EVT_ICONIZE, self.OnIconize)
 
-        self.SetIcon(wx.Icon("./icons/mcci_logo.ico"))
+        base = os.path.abspath(os.path.dirname(__file__))
+        self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
 
         self.Show()
         
@@ -504,7 +504,7 @@ class UiMainFrame (wx.Frame):
         ds = shelve.open('config.txt')
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
-        ds.close()        
+        ds.close()  
         
 
 class UiApp(wx.App):
@@ -513,7 +513,7 @@ class UiApp(wx.App):
         return True
 
     def CustInit(self):
-        self.frame = UiMainFrame(parent=None, title="MCCI - UI3141")
+        self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
 
         
