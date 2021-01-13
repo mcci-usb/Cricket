@@ -50,7 +50,7 @@ class UiPanel(wx.Panel):
     def __init__(self, parent):
         super(UiPanel, self).__init__(parent)
 
-        wx.GetApp().SetAppName("CricketUI")
+        wx.GetApp().SetAppName("Cricket")
 
         self.parent = parent
 
@@ -189,7 +189,7 @@ class UiPanel(wx.Panel):
 class UiMainFrame (wx.Frame):
     def __init__ (self, parent, title):
         #super(UiMainFrame, self).__init__(parent, title=title)
-        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI "+APP_NAME+" - "+
+        wx.Frame.__init__(self, None, id = wx.ID_ANY, title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
                           size=wx.Size(1020,680))
 
@@ -238,14 +238,14 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
         
         if sys.platform == 'darwin':
-            self.helpMenu.Append(wx.ID_ABOUT, "About CricketUI")
+            self.helpMenu.Append(wx.ID_ABOUT, "About Cricket")
         else:
             self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
         
         if sys.platform == 'darwin':
             self.winMenu = wx.Menu()
             self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
-            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW, "&CricketUI\tAlt+Ctrl+1")
+            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW, "&Cricket\tAlt+Ctrl+1")
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         
         
