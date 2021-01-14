@@ -11,6 +11,7 @@
 # IMPORTS
 #======================================================================
 import wx
+import os
 
 import serialDev
 import usbDev
@@ -54,8 +55,10 @@ class Dev3201Window(wx.Window):
         self.st_p3 = wx.StaticText(self, -1, "Port 3", size = (-1,-1))
         self.st_p4 = wx.StaticText(self, -1, "Port 4", size = (-1,-1))
 
-        self.picf = wx.Bitmap ("./icons/btn_off.png", wx.BITMAP_TYPE_ANY)
-        self.picn = wx.Bitmap ("./icons/btn_on.png", wx.BITMAP_TYPE_ANY)
+        base = os.path.abspath(os.path.dirname(__file__))
+        self.picf = wx.Bitmap (base+"/icons/"+IMG_BTN_OFF, wx.BITMAP_TYPE_ANY)
+        self.picn = wx.Bitmap (base+"/icons/"+IMG_BTN_ON, wx.BITMAP_TYPE_ANY)
+
         self.btn_p1 = wx.BitmapButton(self, 0, self.picf, size= (-1,-1))
         self.btn_p2 = wx.BitmapButton(self, 1, self.picf, size= (-1,-1))
         self.btn_p3 = wx.BitmapButton(self, 2, self.picf, size= (-1,-1))

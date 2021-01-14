@@ -11,6 +11,7 @@
 # IMPORTS
 #======================================================================
 import wx
+import os
 
 from uiGlobals import *
 
@@ -30,7 +31,9 @@ class AboutWindow(wx.Window):
 
         self.top = top
 
-        bmp = wx.Image("./icons/mcci_logo.png").ConvertToBitmap()
+        base = os.path.abspath(os.path.dirname(__file__))
+        bmp = wx.Image(base+"/icons/"+IMG_LOGO).ConvertToBitmap()
+        
         self.image = wx.StaticBitmap(self, ID_ABOUT_IMAGE, bmp,
                                      wx.DefaultPosition, wx.DefaultSize)
 

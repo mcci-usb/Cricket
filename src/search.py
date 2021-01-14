@@ -30,8 +30,7 @@ def check_port():
     port_name = []
     
     for port, desc, hwid in sorted(comlist):
-        if(hwid.find('USB VID:PID=045E:0646')!= -1):
-            port_name.append(port)
+        port_name.append(port)
     dlist = d2101.scan_2101()
     for dev in dlist:
         port_name.append(dev)
@@ -47,8 +46,7 @@ def search_port():
     dev_list = []
 
     for port, desc, hwid in sorted(comlist):
-        if(hwid.find('USB VID:PID=045E:0646')!= -1):
-            port_name.append(port)
+        port_name.append(port)
     
     for i in range(len(port_name)):
         try:
