@@ -34,8 +34,15 @@ import xml.dom.minidom
 ##############################################################################
 # Utilities
 ##############################################################################
-# Scan the USB bus for the list of plugged devices
-# Required for device tree view changes
+"""
+Scan the USB bus for the list of plugged devices
+Required for device tree view changes
+Args:
+    No arguments
+        
+Returns:
+    return None
+"""
 def scan_usb():
     # list of Host controllers
     hc_list = []
