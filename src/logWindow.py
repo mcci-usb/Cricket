@@ -54,36 +54,45 @@ class LogWindow(wx.Window):
         self.SetBackgroundColour("White")
 
         self.top = top
-        # create static box with naming of Auto Mode
+        # create static box with naming of Log Window
         sb = wx.StaticBox(self, -1,"Log Window")
 
         # create StaticBoxSizer as vertical
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
         self.chk_box = wx.CheckBox(self, -1, label='Show Timestamp')  
-        self.chk_usb = wx.CheckBox(self, -1, label='Show USB Tree View Changes')  
-        self.btn_save = wx.Button(self, ID_BTN_AUTO, "Save", size=(60, -1))  
-        self.btn_clear = wx.Button(self, ID_BTN_CLEAR, "Clear", size=(60, -1))     
+        self.chk_usb = wx.CheckBox(self, -1,
+                                  label='Show USB Tree View Changes')  
+        self.btn_save = wx.Button(self, ID_BTN_AUTO, "Save",
+                                        size=(60, -1))  
+        self.btn_clear = wx.Button(self, ID_BTN_CLEAR, "Clear",
+                                         size=(60, -1))     
 
-        self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, size=(-1,-1))
+        self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
+                                         size=(-1,-1))
         self.scb.SetEditable(False)
         self.scb.SetBackgroundColour((255,255,255))
         #self.SetMinSize((600,360))
 
         #Tooltips display text over an widget elements
         #set tooltip for switching interval and auto buttons.
-        self.btn_save.SetToolTip(wx.ToolTip("Save Log content into a text file"))
+        self.btn_save.SetToolTip(wx.
+                      ToolTip("Save Log content into a text file"))
 
         # create BoxSizer as horizontal
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         
-        self.hbox.Add(self.chk_box, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        self.hbox.Add(self.chk_box, 0, wx.ALIGN_LEFT | 
+                                       wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.chk_usb, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        self.hbox.Add(self.chk_usb, 0, wx.ALIGN_LEFT | 
+                                       wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(120,0,0)
-        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
+        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | 
+                                         wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , border = 10)
+        self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , 
+                                         border = 10)
         
         # bind the button event to handler
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearLogWindow)
