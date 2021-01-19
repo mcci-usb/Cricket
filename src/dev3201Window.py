@@ -101,12 +101,15 @@ class Dev3201Window(wx.Window):
         
         #self.st_si   = wx.StaticText(self, -1, "Interval")
 
-        self.stlbl_volts = wx.StaticText(self, -1, "Bus Voltage :", size=(-1,-1))
+        self.stlbl_volts = wx.StaticText(self, -1, "Bus Voltage :", 
+                                                   size=(-1,-1))
         self.st_volts   = wx.StaticText(self, -1, " --- ", 
                                         style = wx.ALIGN_CENTER_VERTICAL)
-        self.stlbl_amps = wx.StaticText(self, -1, "Bus Current:", size=(-1,-1))
+        self.stlbl_amps = wx.StaticText(self, -1, "Bus Current:",
+                                                   size=(-1,-1))
         self.st_amps   = wx.StaticText(self, -1, " --- ", 
-                                       style = wx.ALIGN_CENTER_VERTICAL, size=(-1,-1))
+                                       style = wx.ALIGN_CENTER_VERTICAL, 
+                                       size=(-1,-1))
         # BoxSizer fixed with Horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -153,9 +156,11 @@ class Dev3201Window(wx.Window):
         #self.hbox1.Add(self.hboxs2, flag=wx.LEFT, border=20 )
         #self.hboxs2.Add(0,10,0)
         
-        self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 
+        self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT 
+                       | wx.ALIGN_CENTER_VERTICAL, 
                        border=20 )
-        self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border = 20)
+        self.hbox3.Add(self.rbtn_ss1, flag=wx.ALIGN_CENTER_VERTICAL | 
+                                                 wx.LEFT, border = 20)
         self.hbox3.Add(self.rbtn_ss0, flag=wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
                        border=18)
 
@@ -163,7 +168,8 @@ class Dev3201Window(wx.Window):
                        wx.LEFT, border=20 )
         self.hbox5.Add(self.st_volts, flag=wx.LEFT |
                        wx.ALIGN_CENTER_VERTICAL)
-        self.hbox5.Add(self.stlbl_amps, flag=wx.LEFT | wx.ALIGN_CENTER_VERTICAL |
+        self.hbox5.Add(self.stlbl_amps, flag=wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL |
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
@@ -675,7 +681,8 @@ class Dev3201Window(wx.Window):
                 self.enable_controls(True)
                 self.top.set_port_list(PORTS)
             else:
-                self.top.print_on_log("No response from 3201, please connect again!\n")
+                self.top.print_on_log("No response from 3201,\
+                                     please connect again!\n")
                 self.enable_controls(False)
     """
      Called by Com Window When Device get DisConnected
