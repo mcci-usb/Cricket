@@ -1,30 +1,60 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI Application
-# File    : dev3141Window.py
-#----------------------------------------------------------------------
-# Device specific functions and UI for interfacing 3141 with GUI
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: dev3201Window.py
+#
+# Description:
+#     Device specific functions and UI for interfacing Model 3201 with GUI
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#       Module created
+##############################################################################
+# Lip imports
 import wx
+
+# Built-in imports
 import os
 
+# Own modules
 import serialDev
 import usbDev
-
 from uiGlobals import *
 
 PORTS = 4
 
-#======================================================================
-# COMPONENTS
-#======================================================================
+##############################################################################
+# Utilities
+##############################################################################
+"""
+A class dev3201Window with init method
 
+the dev3201Window navigate to Super speed and High speed enable 
+or disable options.
+"""
 class Dev3201Window(wx.Window):
+    """
+    Device specific functions and UI for interfacing Model 3201 with GUI 
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        parent: Pointer to a parent window.
+        top: create a object
+    Returns:
+        return None
+    """
     def __init__(self, parent, top):
         wx.Window.__init__(self, parent)
         self.SetBackgroundColour("White")
@@ -43,11 +73,11 @@ class Dev3201Window(wx.Window):
         self.pulse_flg = False
 
         self.usb_flg = False
-
+        # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         self.timer_va = wx.Timer(self)
-        
+        # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
         
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
@@ -77,7 +107,7 @@ class Dev3201Window(wx.Window):
         self.stlbl_amps = wx.StaticText(self, -1, "Bus Current:", size=(-1,-1))
         self.st_amps   = wx.StaticText(self, -1, " --- ", 
                                        style = wx.ALIGN_CENTER_VERTICAL, size=(-1,-1))
-        
+        # BoxSizer fixed with Horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
@@ -149,16 +179,16 @@ class Dev3201Window(wx.Window):
             (self.hbox3, 1, wx.EXPAND),
             (self.hbox5, 1, wx.EXPAND)
             ])
-       
+        # set size of frame
         self.SetSizer(self.vbox)
         self.SetAutoLayout(True)
         self.vbox.Fit(self)
         self.Layout()
 
-        
+        # bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
-        
+        # bind the button event to handler
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p1)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p2)
@@ -175,15 +205,37 @@ class Dev3201Window(wx.Window):
         
         self.enable_controls(False)
 
+    """
+    Event Handler for 4 Port Switches
 
-    # Event Handler for 4 Port Switches
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:The event parameter in the dev3201Window method is an 
+        object specific to a particular event type.
+        event hanlder for OnOffPort switch
+    Returns:
+        return None
+    """
     def OnOffPort (self, e):
         co = e.GetEventObject()
         cbi = co.GetId()
         if self.top.mode == MODE_MANUAL and not self.usb_flg:
             self.port_on_manual(cbi)
-    
-    # Event Handler for Volts Button
+    """
+    Event Handler for Volts Button
+
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        evt:The event parameter in the dev3201Window method is an 
+        object specific to a particular event type.
+        Event Handler for Volts Button
+    Returns:
+        return None
+    """
     def VoltsCmd(self, evt):
         self.get_voltage()
 
@@ -200,11 +252,32 @@ class Dev3201Window(wx.Window):
             outstr = str(fv) + "V"
             self.update_volts(outstr)
         self.top.print_on_log("Volts : "+outstr+"\n")
+    """
+    Event Handler for Amps Button
 
-    # Event Handler for Amps Button
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        evt:The event parameter in the dev3201Window method is an 
+        object specific to a particular event type.
+        Event Handler for Amps Button
+    Returns:
+        return None
+    """
     def AmpsCmd(self, evt):
         self.get_amps()
+    
+    """
+    Event Handler for Amps Button and update amps 
 
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def get_amps(self):
         strin = "--"
         res, outstr = serialDev.send_amps_cmd(self.top.devHand)
@@ -224,33 +297,86 @@ class Dev3201Window(wx.Window):
 
             self.update_amps(outstr)
         self.top.print_on_log("Amps : "+outstr+"\n")
-
-    # Event handler for Speed change Radio buttons
+    """
+    Event handler for Speed change Radio buttons
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:The event parameter in the dev3201Window method is an 
+        object specific to a particular event type.
+        Event Handler for Port Speed Change
+    Returns:
+        return None
+    """
     def PortSpeedChanged(self, e):
+        # Returns the object (usually a window) associated
+        # with the event, if any
         rb = e.GetEventObject()
+        # Returns the identifier associated with, 
+        # this event, such as a button command id.
         id = rb.GetId()
 
         if id == ID_RBTN_SS1:
+            # return superspeed
             self.speed_cmd(1)
         elif id == ID_RBTN_SS0:
+            # returs highspeed
             self.speed_cmd(0)
+    
+    """
+    Timer Event for USB Tree View Changes
 
-    # Timer Event for USB Tree View Changes
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:The event parameter in the dev3201 method is an 
+        object specific to a particular event type.
+        Timer Event for USB Tree View Changes
+    Returns:
+        return None
+    """
     def UsbTimer(self, e):
         self.timer_usb.Stop()
         try:
             usbDev.get_tree_change(self.top)
         except:
+            # to print on usb tree view change "USB Read Error!"
             self.top.print_on_usb("USB Read Error!")
         self.usb_flg = False
+    """
+    Timer Event for USB Tree View Changes
 
-    # Timer Event for USB Tree View Changes
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:The event parameter in the dev3201 method is an 
+        object specific to a particular event type.
+        event handler to orientation
+    Returns:
+        return None
+    """
     def VaTimer(self, e):
         self.timer_va.Stop()
+        # check voltage
         self.get_voltage()
+        # check amps
         self.get_amps()
+    """
+    Port ON in Manual Mode
 
-    # Port ON in Manual Mode
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port: manually controlling the ports.
+        control the porn On manually asfter 3sec status
+        updated for check orientation
+    Returns:
+        return None
+    """  
     def port_on_manual(self, port):
         for i in range (len (self.rbtn)):
             if(port == i):
@@ -262,13 +388,24 @@ class Dev3201Window(wx.Window):
                    self.timer_va.Stop()
             else:
                 self.btnStat[i] = False
-
-    # Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command received 
-    # from Loop Window
+    """
+    Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command received 
+    Command received from Loop Window
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port: ports update
+        stat: return status for port on cmd and port led update
+    Returns:
+        return None
+    """
     def port_on(self, port, stat):
         if(stat):
+            # here port on command
             self.port_on_cmd(port)
         else:
+            # here port off command
             self.port_off_cmd(port)
         self.port_led_update(port-1, stat)
 
@@ -277,8 +414,17 @@ class Dev3201Window(wx.Window):
                 self.keep_delay()
 
         self.enable_ss_controls(port, stat)
+    """
+    Port ON Command
 
-    # Port ON Command
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        pno: port number updated print in logwindow
+    Returns:
+        return None
+    """
     def port_on_cmd(self, pno):
         cmd = 'port'+' '+str(pno)+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -291,7 +437,17 @@ class Dev3201Window(wx.Window):
             outstr = outstr[:-2] + "; Other Ports are OFF\n"
             self.top.print_on_log(outstr)
         
-    # Port OFF Command   
+    """
+    Port OFF Command
+
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        pno: port number updated 
+    Returns:
+        return None
+    """  
     def port_off_cmd(self, pno):
         cmd = 'port'+' '+'0'+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -300,7 +456,18 @@ class Dev3201Window(wx.Window):
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
             self.top.print_on_log(outstr)
     
-    # Enable/Disable the Speed Button based on Ports
+    """
+    Enable/Disale Speed controls
+
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port:ports update
+        stat:updated the status for superspeed and highspeed  enable/disable
+    Returns:
+        return None
+    """
     def enable_ss_controls(self, port, stat):
         if self.top.mode == MODE_MANUAL:
             if stat:
@@ -313,13 +480,32 @@ class Dev3201Window(wx.Window):
             else:
                 self.rbtn_ss0.Enable()
                 self.rbtn_ss1.Enable()
+    """
+    Add Delay in Port ON/OFF based on USB option
 
-    # Add Delay in Port ON/OFF based on USB option
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def keep_delay(self):
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
 
-    # Update the Port Indication
+    """
+    Update the Port Indication
+
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port: port ON/OFF updated
+        stat: return status for port led status indication
+    Returns:
+        return None
+    """
     def port_led_update(self, port, stat):
         if(stat):
             for i in range(4):
@@ -330,23 +516,51 @@ class Dev3201Window(wx.Window):
         else:
             for i in range(4):
                 self.rbtn[i].SetBitmap(self.picf)
+    """
+    Called when changing the Mode - Called by set_mode
 
-    # Called when changing the Mode - Called by set_mode
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        mode: update mode controls
+    Returns:
+        return None
+    """
     def update_controls(self, mode):
         if mode == MODE_MANUAL:
             self.enable_controls(True)
         else:
             self.enable_controls(False)
 
-    # Enable/Disable All Widgets in UI3201
+    """
+    Enable/Disable All Widgets in UI3201
+
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        stat: updated the status for widgets enable/disable
+    Returns:
+        return None
+    """
     def enable_controls(self, stat):
         if not self.top.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-        self.enable_va_controls(stat)
-        
-    # Enable/Diasble 4 Port Switches
+        self.enable_va_controls(stat)   
+    """
+    Enable/Diasble 4 Port Switch
+
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        stat: updated the status port switch enable/disable
+    Returns:
+        return None
+    """
     def enable_port_controls(self, stat):
         stat = self.top.con_flg
         if(stat):
@@ -359,8 +573,17 @@ class Dev3201Window(wx.Window):
             self.btn_p2.Disable()
             self.btn_p3.Disable()
             self.btn_p4.Disable()
+    """
+    Enable/Disale Speed controls
 
-    # Enable/Disale Speed controls
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        stat: updated the status for superspeed enable/disable
+    Returns:
+        return None
+    """
     def enable_speed_controls(self, stat):
         if(stat):
             self.rbtn_ss0.Enable()
@@ -368,8 +591,18 @@ class Dev3201Window(wx.Window):
         else:
             self.rbtn_ss0.Disable()
             self.rbtn_ss1.Disable()
+    
+    """
+    Enable/Disable Volt/Amp Controls
 
-    # Enable/Disable Volt/Amp Controls
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        stat: updated the status for volts and amps
+    Returns:
+        return None
+    """
     def enable_va_controls(self, stat):
         pass
         '''if(stat):
@@ -378,16 +611,37 @@ class Dev3201Window(wx.Window):
         else:
             self.btn_amps.Disable()
             self.btn_volts.Disable()'''
+    
+    """
+    Print the Voltage level in Label
 
-    # Print the Voltage level in Label
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        str: update in Volts
+    Returns:
+        return None
+    """
     def update_volts(self, str):
+        # SetLabel as volts
         self.st_volts.SetLabel(str)
+    """
+    Print the Amps level in Label
 
-    # Print the Amps level in Label
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        str: updated in Amps
+    Returns:
+        return None
+    """
     def update_amps(self, str):
+        # SetLabel as Amps
         self.st_amps.SetLabel(str)
 
-    # Speed change command to 3141 Device
+    # Speed change command to 3201 Device
     def speed_cmd(self,val):
         cmd = 'superspeed'+' '+str(val)+'\r\n'
         print("\nSpeedCmd: ",cmd)
@@ -397,9 +651,18 @@ class Dev3201Window(wx.Window):
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
             outstr = outstr.replace('0', 'Disabled')
+            # print on logwindow SuperSpeed Enabled or superspeed Disabled
         self.top.print_on_log(outstr)
-    
-    # Called by Com Window When Device Connected
+    """
+    Called by Com Window When Device Connected
+
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def device_connected(self):
         if(self.top.con_flg):
             res, outstr = serialDev.read_port_cmd(self.top.devHand)
@@ -414,14 +677,30 @@ class Dev3201Window(wx.Window):
             else:
                 self.top.print_on_log("No response from 3201, please connect again!\n")
                 self.enable_controls(False)
-
+    """
+     Called by Com Window When Device get DisConnected
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def device_disconnected(self):
         if self.auto_flg:
             self.auto_flg = False
             self.btn_auto.SetLabel("Start")
             self.timer.Stop()
-
-    # During connect map the indication to the device status
+    """
+     During connect map the indication to the device status
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port: update the port led 
+    Returns:
+        return None
+    """
     def init_ports(self, port):
         if(port == 0):
             self.port_led_update(port, False)
