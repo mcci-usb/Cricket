@@ -3,7 +3,8 @@
 # Module: comWindow.py
 #
 # Description:
-#     Dialog to display copyright information
+#     UI for device search and interface of 3141 and 3201 switches
+#     Interact with search script and serial device script
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
