@@ -1,22 +1,42 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI Application
-# File    : main.py
-#----------------------------------------------------------------------
-# Main program entry point
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: main.py
+#
+# Description:
+#     Main program entry point
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#       Module created
+##############################################################################
+# Built-in imports
 import os
 
+# Own modules
 import uiMainApp
 
-#======================================================================
-# MAIN PROGRAM
-#======================================================================
+##############################################################################
+# Utilities
+##############################################################################
+"""
+Main program entry point
+Args:
+    No argument
+Return:
+    No return
+"""
 def main ():
     # Determine the base directory path
     base = os.path.abspath(os.path.dirname(__file__))
@@ -31,6 +51,7 @@ def main ():
     # Run the application
     uiMainApp.run()
 
-
+# python program to use
+# main for function call.
 if __name__ == '__main__':
     main()
