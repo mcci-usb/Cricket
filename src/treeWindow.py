@@ -1,42 +1,72 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI application
-# File    : treeWindow.py
-#----------------------------------------------------------------------
-# Tree Window - Show the list of USB devices connected/disconnected
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: treeWindow.py
+#
+# Description:
+#     Tree Window - Show the list of USB devices connected/disconnected
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#       Module created
+##############################################################################
+# Lib imports
 import wx
-
 import threading
 from datetime import datetime
 
+# Own modules
 import usbDev
 from uiGlobals import *
 
-#======================================================================
-# COMPONENTS
-#======================================================================
-
+##############################################################################
+# Utilities
+##############################################################################
+"""
+A class UsbTreeWindow with init method
+wxWindow is the base class for all windows and 
+represents any visible object on screen.
+"""
 class UsbTreeWindow(wx.Window):
+    """
+    Tree Window - Show the list of USB devices connected/disconnected
+    also show the list of usb informatio 
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        parent: Pointer to a parent window.
+        top: create a object
+    Returns:
+        return None
+    """
     def __init__(self, parent, top):
         wx.Window.__init__(self, parent)
+
+        # set background colour white
         self.SetBackgroundColour("White")
 
         self.top = top
-
+        # creating Horizontal box sizer
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.wait_flg = False
-
+        # creating staticbox with naming as " USB Device Tree View Changes"
         sb = wx.StaticBox(self, -1,"USB Device Tree View Changes")
-        
+        # creating Vertical box sizer
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
         self.chk_box = wx.CheckBox(self, -1, label='Enable')
@@ -77,10 +107,12 @@ class UsbTreeWindow(wx.Window):
         
         self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
                                size=(-1,-1))
-
+        # Makes the text item editable or read-only
         self.scb.SetEditable(False)
         self.scb.SetBackgroundColour((255,255,255))
         
+        #Tooltips display text over an widget elements
+        #set tooltip for switching interval and auto buttons.
         self.tc_delay.SetToolTip(wx.ToolTip("USB device scan delay. Min:"
                                              "100 msec, Max: 60 sec"))
         self.btn_save.SetToolTip(wx.ToolTip("Save USB device Log into"
@@ -112,12 +144,17 @@ class UsbTreeWindow(wx.Window):
         self.hbox3.Add(34,0,0)
         self.hbox3.Add(self.btn_save,0, flag=wx.RIGHT, border=10)
         
+        # bind the button event to handler
         self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshUsbBus)
+        # bind the button event to handler
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearUsbWindow)
+        # bind the button event to handler
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveUsbLog)
         #self.tc_delay.Bind(wx.EVT_TEXT_ENTER, self.OnEnterDelay)
         self.chk_box.Bind(wx.EVT_CHECKBOX, self.OnCheckBox)
-
+        
+        #This function sets the maximum number of characters
+        # the user can enter into the control.
         self.tc_delay.SetMaxLength(5)
 
         self.szr_top = wx.BoxSizer(wx.VERTICAL)
@@ -135,59 +172,128 @@ class UsbTreeWindow(wx.Window):
             (10, 0, 0),
             (self.szr_top, 1, wx.ALIGN_LEFT | wx.ALIGN_BOTTOM | wx.EXPAND)
             ])
-
+        
+        # hide the vertical box sizer
         self.vbox.Hide(self.hbox2)
-
+        # set size of frame
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
 
-
-    #Export usbWindow content to a File 
+    """
+    Export usbWindow content to a File
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:event handler to Getvalue
+    Returns:
+        return None
+    """
     def SaveUsbLog(self, e):
         content = self.scb.GetValue()
         self.top.save_file(content, "*.txt")
-
-    # Refresh USB Device Tree View Changes
+    
+    """
+    Refresh USB Device Tree View Changes
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:event handler to Refreshbutton
+    Returns:
+        return None
+    """
     def RefreshUsbBus(self, e):
         if(self.wait_flg == False):
             self.btn_ref.Disable()
             self.wait_flg = True
             threading.Thread(target=self.UsbThread).run()
-
-    # Clear USB Device Tree Changes View Log Window
+    """
+    Clear USB Device Tree Changes View Log Window
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:event handler to Setvalue.
+    Returns:
+        return None
+    """
     def ClearUsbWindow(self, e):
         self.scb.SetValue("")
-
-    # Thread for USB Timr
+    
+    """
+    Thread for USB Time
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        e:event handler to tree change
+    Returns:
+        return None
+    """
     def UsbThread(self):
         try:
             usbDev.get_tree_change(self.top)
         except:
+            # print message
             self.print_on_usb("USB Read Error!")
         self.wait_flg = False
         self.btn_ref.Enable()
-
-    # Event hanler for USB selection 
+    """
+    Event hanler for USB selection
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        evt:event handler to interval, period
+    Returns:
+        return None
+    """
     def OnCheckBox(self, evt):
         self.update_interval_period()
-
+    
+    """
+    Get System Time stamp for data log
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     # Get System Time stamp for data log
     def get_time_stamp(self):
         ct = datetime.now()
         dtstr = ct.strftime("%Y-%m-%d  %H:%M:%S.%f")
         cstr = "[" + dtstr[:-3] + "]  "
         return cstr
-
-    # Show the USB Device Tree View Changes
+    """
+    Get System Time stamp for data log
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        strin:show the usb tree changes in string format.
+    Returns:
+        return None
+    """
     def print_on_usb(self, strin):
         ctstr = "\n"
+        # Gets the state of a state checkbox.
         if(self.chk_ts.GetValue() == True):
             ctstr = ctstr + self.get_time_stamp()
         ctstr = ctstr + strin
         self.scb.AppendText(ctstr)
-
-    # Get USB device Enumeration delay
+    """
+    Get USB device Enumeration delay
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def get_enum_delay(self):
         edly = self.tc_delay.GetValue()
         
@@ -199,24 +305,46 @@ class UsbTreeWindow(wx.Window):
             dval = 100
         elif(dval > 60000):
             dval = 60000
-
-        self.tc_delay.SetValue(str(dval))
         
+        # Sets the new text control value.
+        self.tc_delay.SetValue(str(dval))
+        # Gets the contents of the control.
         return self.tc_delay.GetValue()
-
-    # Check for USB Enumeration delay selection
+    """
+    Check for USB Enumeration delay selection
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def get_delay_status(self):
         if(self.chk_box.GetValue() == True):
             return True
         else:
             return False
-
-    # Disble USB scan option selection
-    # Called when USB delay is greater than the Port Switching delay
+    """
+    Disble USB scan option selection
+    Called when USB delay is greater than the Port Switching delay
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def disable_usb_scan(self):
         self.chk_box.SetValue(False)
-
-    # Override the Switching Interval period based on USB delay
+    """
+    Override the Switching Interval period based on USB delay
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns:
+        return None
+    """
     def update_interval_period(self):
         if(self.get_delay_status()):
             onTime, offTime, duty = self.top.get_loop_param()
@@ -243,8 +371,17 @@ class UsbTreeWindow(wx.Window):
             
             '''if(int(self.top.get_interval()) < int(self.get_enum_delay())):
                 self.top.set_interval(self.get_enum_delay())'''
-
-    # Enable/Disble USB selection option widgets
+    
+    """
+    Enable/Disble USB selection option widgets
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        mode: check the mode
+    Returns:
+        return None
+    """
     def update_controls(self, mode):
         if(mode == MODE_MANUAL):
             self.chk_box.Enable()
