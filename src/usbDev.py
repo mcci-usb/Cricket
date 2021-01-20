@@ -1,30 +1,46 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI Application
-# File    : usbDev.py
-#----------------------------------------------------------------------
-# USB Device Tree changes implementation
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
-
+##############################################################################
+# 
+# Module: usbDev.py
+#
+# Description:
+#     USB Device Tree changes implementation
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#       Module created
+##############################################################################
+# Own modules
 import getusb
-
 from uiGlobals import *
 
-
-#======================================================================
-# COMPONENTS
-#======================================================================
-
-# Get USB Device Tree changes list
+##############################################################################
+# Utilities
+##############################################################################
+"""
+Get USB Device Tree changes list 
+Args:
+    top: create a object
+Returns:
+    return None
+"""
 def get_tree_change(top):
+    # usb scanning 
     dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
+    # save usb data list
     top.save_usb_list(newlist)
     strchg = None
 
@@ -34,19 +50,27 @@ def get_tree_change(top):
     strout = ""
     
     if(len(adlist) == 0 and len(rmlist) == 0):
+        # no device added removed from port print "No change"
         strout = ("No Change\n")
     
     if(len(rmlist)):
+        # Usb removed from the port print "Removed"
         strout = strout + "Removed\n"
         strout = strout + get_usb_device_info(rmlist)
 
     if(len(adlist)):   
+        # Usb Added from the port print "Added"
         strout = strout + "Added\n"
         strout = strout + get_usb_device_info(adlist)
 
     top.print_on_usb(strout)
-
-# Show VID, PID and Speed info of added/removed USB devices
+"""
+Show VID, PID and Speed info of added/removed USB devices 
+Args:
+    udlist: usb device list
+Returns:
+    return None
+"""
 def get_usb_device_info(udlist):
     dlist = get_usb_class(udlist)
     cnt = 0
@@ -68,8 +92,13 @@ def get_usb_device_info(udlist):
             strdev = strdev + str(cnt)+ ". " + vpid + " Device Error\n"
     
     return strdev
-
-# Get USB class        
+"""
+Get USB class 
+Args:
+    clist:usb class list
+Returns:
+    return None
+"""        
 def get_usb_class(clist):
     nlist = []
     for i in range(len(clist)):
