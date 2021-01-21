@@ -82,7 +82,7 @@ class ComWindow(wx.Panel):
             (self.btn_connect, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
             (10,50,0)
             ])
-        
+        # creates a boxsizer as vertical
         self.vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.vbox.AddMany([
