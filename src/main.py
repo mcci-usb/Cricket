@@ -27,6 +27,13 @@ import os
 # Own modules
 import uiMainApp
 
+__author__ = 'Seenivasan V'
+__contact__ = 'seenivasanv@mcci.com'
+__credits__ = ['Terry Moore', 'Velmurugan Selvaraj']
+__date__ = '2021/01/14'
+__maintainer__ = ['Seenivasan V', 'Vinay N']
+__status__ = 'Production'
+__version__ = '2.0.0'
 ##############################################################################
 # Utilities
 ##############################################################################
