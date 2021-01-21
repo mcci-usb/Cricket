@@ -3,7 +3,7 @@
 # Module: autoWindow.py
 #
 # Description:
-#     Dialog to display copyright information
+#     autoWindow for Switch Model 3201,Model 3141 and Model 2101
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -126,9 +126,9 @@ class AutoWindow(wx.Window):
                                             "for a interval until stop"))
         # create static box with naming of Auto Mode
         sb = wx.StaticBox(self, -1, "Auto Mode")
-        
+        # creates a boxsizer is vertical
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
-
+        # creates a boxsizer is horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -185,10 +185,9 @@ class AutoWindow(wx.Window):
             self.stop_auto()
         else:
             if(self.usb_dly_warning() and self.onoff_dly_warning()):
-                self.start_auto()
-    
+                self.start_auto() 
     """
-    Start Auto Mode
+    Start Auto Mode until stopped
 
     Args:
         self: The self parameter is a reference to the current 
@@ -206,7 +205,6 @@ class AutoWindow(wx.Window):
         self.Auto_strat_msg()
         if(self.timer.IsRunning() == False):
             self.timer.Start(int(self.get_interval()))
-
     """
     Stop Auto Mode
 
@@ -230,7 +228,6 @@ class AutoWindow(wx.Window):
     
     """
     Timer Event for Port ON/OFF in Auto Mode
-
     Args:
         self: The self parameter is a reference to the current 
         instance of the class,and is used to access variables
@@ -262,7 +259,6 @@ class AutoWindow(wx.Window):
     
     """
     Port ON/OFF command send to Connected Device Module
-
     Args:
         self: The self parameter is a reference to the current 
         instance of the class,and is used to access variables
@@ -278,7 +274,6 @@ class AutoWindow(wx.Window):
             self.keep_delay()
     """
     USB delay Timer start
-
     Args:
         self: The self parameter is a reference to the current 
         instance of the class,and is used to access variables
@@ -306,8 +301,7 @@ class AutoWindow(wx.Window):
                 format(d1=int(self.OnTime)) + \
                 " OFF-Time = {d2} ms\n".\
                 format(d2=int(self.OffTime)) 
-        self.top.print_on_log(lmstr)
-    
+        self.top.print_on_log(lmstr)   
     """
     Calculate Port ON Time and OFF Time from Interval and Duty
 
@@ -360,8 +354,10 @@ class AutoWindow(wx.Window):
             ival = 1000
         elif(ival > 60000):
             ival = 60000
-
+        # SetValue() method sets the interval as true()
         self.tc_ival.SetValue(str(ival))
+        # GetValue() function is used to returns True,
+        # if the interval is checked, False otherwise. 
         return self.tc_ival.GetValue()
     
     """
@@ -371,11 +367,12 @@ class AutoWindow(wx.Window):
         self: The self parameter is a reference to the current 
         instance of the class,and is used to access variables
         that belongs to the class.
-        strval:
+        strval:srting format 
     Returns:
         return None
     """
     def set_interval(self, strval):
+       # SetValue() method sets the strval as true()
        self.tc_ival.SetValue(strval)
     
     """
@@ -396,7 +393,7 @@ class AutoWindow(wx.Window):
         ival = int(duty)
         if(ival == 0):
             ival = 1
-        
+        # SetValue() method sets the interval value as true()
         self.tc_duty.SetValue(str(ival))
         return self.tc_duty.GetValue()
     
