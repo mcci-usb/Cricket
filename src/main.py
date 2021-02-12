@@ -37,14 +37,14 @@ __version__ = '2.0.0'
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-Main program entry point
-Args:
-    No argument
-Return:
-    No return
-"""
 def main ():
+    """
+    Main program entry point
+    Args:
+        No argument
+    Return:
+        No return
+    """
     # Determine the base directory path
     base = os.path.abspath(os.path.dirname(__file__))
 

@@ -34,21 +34,21 @@ import xml.dom.minidom
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-Scan the USB bus for the list of plugged devices
-Required for device tree view changes
-Args:
-    No arguments
-        
-Returns:
-    return None
-"""
 def scan_usb():
-    # list of Host controllers
+    """
+    Scan the USB bus for the list of plugged devices
+    Required for device tree view changes
+    Args:
+        No arguments
+        
+    Returns:
+        return None
+    """
+    # List of Host controllers
     hc_list = []
-    # list connected hub
+    # List connected hub
     hub_list = []
-    #list connected peripheral
+    #List connected peripheral
     per_list = []
     master_list = []
     
@@ -56,23 +56,23 @@ def scan_usb():
 
     masterDict = {} 
     
-    # create path and executable path
+    # Create path and executable path
     path = sys.executable
 
     path = path.replace("python.exe", "")
 
     backend = None
-    # running Python-application on Windows
+    # Running Python-application on Windows
     if sys.platform == 'windows':
         backend = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
                    path + "Lib/site-packages/libusb/_platform/_windows/x86"+
                    "/libusb-1.0.dll")
 
-    # generator object
+    # Generator object
     usb_devices = usb.core.find(find_all=True, backend=backend) 
 
-    # here attached a list of Host controlloers, list of Hub,
-    # list of periperals info with specific vid, pid.
+    # Here attached a list of Host controlloers, list of Hub,
+    # List of periperals info with specific vid, pid.
     for d in usb_devices:  # Device object
         if(d.bDeviceClass == 9 and d.port_number == 0):
             tempDict = {}
@@ -108,7 +108,7 @@ def scan_usb():
 
     for items in hdata:
         try:
-            # find our device 
+            # Find our device 
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
                                backend=backend)
@@ -118,14 +118,14 @@ def scan_usb():
                     sclist[i.bInterfaceNumber] = i.bInterfaceClass
                 items["ifc"] = sclist
         except:
-            # print message
+            # Print message
             print("Error")
 
     pdata = masterDict.get("peri")
     
     for items in pdata:
         try:
-            # find our device 
+            # Find our device 
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
                                backend=backend)
@@ -135,7 +135,7 @@ def scan_usb():
                     sclist[i.bInterfaceNumber] = i.bInterfaceClass
                 items["ifc"] = sclist
         except:
-            # print message
+            # Print message
             print("Error")
 
     for i in range(len(hc_list)):
@@ -144,10 +144,10 @@ def scan_usb():
         master_list.append(hub_list[i])
     for i in range(len(per_list)):
         master_list.append(per_list[i])
-    # # running Python-application on darwin (MacOS)
+    # Running Python-application on darwin (MacOS)
     if sys.platform == 'darwin':
         xmldoc = os.popen("system_profiler -xml SPUSBDataType")
-        # use the parse() function to load and parse an XML file
+        # Use the parse() function to load and parse an XML file
         domobj = xml.dom.minidom.parseString(xmldoc.read())
         keynode = domobj.getElementsByTagName("key")
         cn = []

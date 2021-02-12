@@ -32,27 +32,28 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-A  class autoWindow with init method
-
-the autoWindow navigate to Interval with time, Duty and Auto button.
-the Auto Mode is used to switching between 
-the available Port(s) of the selected devices.
-"""
 class AutoWindow(wx.Window):
     """
-    autoWindow that contains the about dialog elements.
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-        top: create a object
+    A  class autoWindow with init method
 
-    Returns:
-        return None
+    the autoWindow navigate to Interval with time, Duty and Auto button.
+    the Auto Mode is used to switching between 
+    the available Port(s) of the selected devices.
     """
+
     def __init__(self, parent, top):
+        """
+        autoWindow that contains the about dialog elements.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: create a object
+
+        Returns:
+            return None
+        """
         wx.Window.__init__(self, parent)
         
         # SET BACKGROUND COLOUR TO White
@@ -102,10 +103,11 @@ class AutoWindow(wx.Window):
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
         self.st_duty   = wx.StaticText(self, -1, "Duty", 
-                                       style = wx.ALIGN_CENTER_VERTICAL  | 
+                                       style = wx.ALIGN_CENTER_VERTICAL | 
                                        wx.ALIGN_RIGHT, size=(60,-1))
         self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
-                                     style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
+                                     style = wx.TE_CENTRE |
+                                     wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
@@ -113,22 +115,22 @@ class AutoWindow(wx.Window):
 
         self.btn_auto = wx.Button(self, ID_BTN_AUTO, "Auto", size=(60,25))
 
-        # the wx.TextCtrl interval value length limit entering upto '5' Digits
+        # The wx.TextCtrl interval value length limit entering upto '5' Digits
         self.tc_ival.SetMaxLength(5)
-        # the wx.TextCtrl duty value length limit entering upto '2' Digits
+        # The wx.TextCtrl duty value length limit entering upto '2' Digits
         self.tc_duty.SetMaxLength(2)
         
-        #Tooltips display text over an widget elements
-        #set tooltip for switching interval and auto buttons.
+        # Tooltips display text over an widget elements
+        # Set tooltip for switching interval and auto buttons.
         self.tc_ival.SetToolTip(wx.ToolTip("Switching Interval. Min: 1 sec, "
                                            "Max: 60 sec"))
         self.btn_auto.SetToolTip(wx.ToolTip("On/Off each Port "
                                             "for a interval until stop"))
-        # create static box with naming of Auto Mode
+        # Create static box with naming of Auto Mode
         sb = wx.StaticBox(self, -1, "Auto Mode")
-        # creates a boxsizer is vertical
+        # Creates a boxsizer is vertical
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
-        # creates a boxsizer is horizontal
+        # Creates a boxsizer is horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -153,91 +155,92 @@ class AutoWindow(wx.Window):
             (self.hbox2, 1, wx.EXPAND),
             (0,10,0)
             ])
-        # set size of frame
+        # Set size of frame
         self.SetSizer(self.bs_vbox)
-        # set size of frame
+        # Set size of frame
         self.bs_vbox.Fit(self)
         self.Layout()
         
-        # bind the button event to handler
+        # Bind the button event to handler
         self.btn_auto.Bind(wx.EVT_BUTTON, self.OprAuto)
-        # bind the timer event to handler
+        # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
-        # bind the usbtimer event to handler
+        # Bind the usbtimer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
 
         self.enable_controls(True)
-    
-    """
-    Event Handler for Auto Button..
 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        evt: The event parameter in the AutoButton() method is an 
-        object specific to a particular event type.
-    Returns:
-        return None
-    """
     def OprAuto(self, evt):
+        """
+        Event Handler for Auto Button..
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the AutoButton() method is an 
+            object specific to a particular event type.
+        Returns:
+            return None
+        """
         if(self.auto_flg):
             self.stop_auto()
         else:
             if(self.usb_dly_warning() and self.onoff_dly_warning()):
                 self.start_auto() 
-    """
-    Start Auto Mode until stopped
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def start_auto(self):
+        """
+        Start Auto Mode until stopped
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.auto_flg = True
         # The Lablel to set name as Stop
         self.btn_auto.SetLabel("Stop")
         self.top.set_mode(MODE_AUTO)
-        # this function to dispaly the auto start message 
+        # This function to dispaly the auto start message 
         self.Auto_strat_msg()
         if(self.timer.IsRunning() == False):
             self.timer.Start(int(self.get_interval()))
-    """
-    Stop Auto Mode
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+        
     def stop_auto(self):
+        """
+        Stop Auto Mode
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.auto_flg = False
         # The Lablel to set name as Auto
         self.btn_auto.SetLabel("Auto")
         # The mode set as Manual Mode.
         self.top.set_mode(MODE_MANUAL)
 
-        #print the string in logwindow
+        # Print the string in logwindow
         self.top.print_on_log("Auto Mode Stopped!\n")
         self.timer.Start(1)
     
-    """
-    Timer Event for Port ON/OFF in Auto Mode
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        evt: The event parameter in the TimerServ() method is an 
-        object specific to a particular event type.
-    Returns:
-        return None
-    """
     def TimerServ(self, evt):
+        """
+        Timer Event for Port ON/OFF in Auto Mode
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the TimerServ() method is an 
+            object specific to a particular event type.
+        Returns:
+            return None
+        """
         if self.top.con_flg:
             self.pulse_flg = True
             if(self.usb_flg == False):
@@ -257,95 +260,97 @@ class AutoWindow(wx.Window):
                         self.timer.Start(self.OnTime)
                         self.On_flg = True
     
-    """
-    Port ON/OFF command send to Connected Device Module
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        portno:indicates the variable is a int data type.
-        stat:indicates the variable is a boolean data type it returns status of port True and False.
-    Returns:
-        return None
-    """
     def port_on(self, portno, stat):
+        """
+        Port ON/OFF command send to Connected Device Module
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            portno:indicates the variable is a int data type.
+            stat:indicates the variable is a boolean data type
+            it returns status of port True and False.
+        Returns:
+            return None
+        """
         self.top.port_on(portno, stat)
         if(self.top.get_delay_status()):
             self.keep_delay()
-    """
-    USB delay Timer start
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def keep_delay(self):
+        """
+        USB delay Timer start
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """ 
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
     
-    """
-    Startup Message for Auto Mode
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def Auto_strat_msg(self):
+        """
+        Startup Message for Auto Mode
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+             return None
+        """
         self.get_all_three()
         lmstr = "Auto Mode start : ON-Time = {d1} ms,".\
                 format(d1=int(self.OnTime)) + \
                 " OFF-Time = {d2} ms\n".\
                 format(d2=int(self.OffTime)) 
         self.top.print_on_log(lmstr)   
-    """
-    Calculate Port ON Time and OFF Time from Interval and Duty
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def get_all_three(self):
+        """
+        Calculate Port ON Time and OFF Time from Interval and Duty
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.interval = int(self.get_interval())
         self.duty = int(self.get_duty())
 
         self.OnTime = self.interval* (self.duty/100)
         self.OffTime = self.interval - self.OnTime
     
-    """
-    Send ON, OFF Time and Duty to USB Tree Window for USB delay validation
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_auto_param(self):
-        # its get all three parametrs 
+        """
+        Send ON, OFF Time and Duty to USB Tree Window for USB delay validation
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
+        # Its get all three parametrs 
         self.get_all_three()
         return self.OnTime, self.OffTime, self.duty
     
-    """
-    Retrieves the get_interval
-    Read Interval from Input text
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_interval(self):
+        """
+        Retrieves the get_interval
+        Read Interval from Input text
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         tival = self.tc_ival.GetValue()
         if(tival == ""):
             tival = "1000"
@@ -357,36 +362,37 @@ class AutoWindow(wx.Window):
         # SetValue() method sets the interval as true()
         self.tc_ival.SetValue(str(ival))
         # GetValue() function is used to returns True,
-        # if the interval is checked, False otherwise. 
+        # If the interval is checked, False otherwise. 
         return self.tc_ival.GetValue()
     
-    """
-    Interval override by USB Tree View Changes Delay
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strval:srting format 
-    Returns:
-        return None
-    """
     def set_interval(self, strval):
-       # SetValue() method sets the strval as true()
-       self.tc_ival.SetValue(strval)
-    
-    """
-    Retrives the get_duty function
-    Read Duty from Input text
+        """
+        Interval override by USB Tree View Changes Delay
 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strval:srting format 
+        Returns:
+            return None
+        """
+        # SetValue() method sets the strval as true()
+        self.tc_ival.SetValue(strval)
+    
     def get_duty(self):
+        """
+        Retrives the get_duty function
+        Read Duty from Input text
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
+
         duty = self.tc_duty.GetValue()
         if (duty == ""):
             duty = "50"
@@ -397,33 +403,32 @@ class AutoWindow(wx.Window):
         self.tc_duty.SetValue(str(ival))
         return self.tc_duty.GetValue()
     
-    """
-    Set Port list to Combo box when Device gets connected
-
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        port: the port is int type holding the ports
-    Returns:
-        return int
-    """
     def set_port_count(self, port):
-        self.total_ports = port
-    
-    """
-    USB Tree View Changes Timer Service
+        """
+        Set Port list to Combo box when Device gets connected
 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        e: The event parameter in the UsbTimer() method is an 
-        object specific to a particular event type.
-    Returns:
-        return None
-    """
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            port: the port is int type holding the ports
+        Returns:
+            return int
+        """
+        self.total_ports = port
     def UsbTimer(self, e):
+        """
+        USB Tree View Changes Timer Service
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: The event parameter in the UsbTimer() method is an 
+            object specific to a particular event type.
+        Returns:
+            return None
+        """
         self.timer_usb.Stop()
         try:
             usbDev.get_tree_change(self.top)
@@ -434,16 +439,16 @@ class AutoWindow(wx.Window):
         if(self.auto_flg == True & self.pulse_flg == True):
             self.timer.Start(1)
     
-    """
-    Check USB delay while starting Auto Mode
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
-    def usb_dly_warning(self):
+    def usb_dly_warning(self):        
+        """
+        Check USB delay while starting Auto Mode
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         if(int(self.get_interval()) < int(self.top.get_enum_delay())):
             if(self.top.get_delay_status()):
                 title = ("USB device tree delay warning!")
@@ -459,16 +464,17 @@ class AutoWindow(wx.Window):
                 else:
                     return False
         return True
-    """
-    Check ON/OFF Time interval if it is < 500 msec popup a warning message
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def onoff_dly_warning(self):
+        """
+        Check ON/OFF Time interval if it is < 500 msec popup a warning message
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """ 
         self.get_all_three()
         if (self.OnTime < 500 or self.OffTime < 500):
             title = ("Port ON/OFF time warning!")
@@ -482,61 +488,64 @@ class AutoWindow(wx.Window):
             else:
                 return False
         return True
-    """
-    Enable/Disable widgets when mode changed
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        mode: the port controls manual mode for btn_auto disable
-    Returns:
-        return int
-    """
+    
     def update_controls(self, mode):
+        """
+        Enable/Disable widgets when mode changed
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            mode: the port controls manual mode for btn_auto disable
+        Returns:
+            return int
+        """
         if mode == MODE_MANUAL:
             self.enable_controls(True)
         else:
             self.enable_controls(False)
-    """
-    Enable/Disable Auto Controls
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        stat:status updated while Auto button enable.
-    Returns:
-        return bool
-    """
+    
     def enable_controls(self, stat):
+        """
+        Enable/Disable Auto Controls
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            stat:status updated while Auto button enable.
+        Returns:
+            return bool
+        """
         if(stat):
-            #auto Button is enable
+            # Auto Button is enable
             self.btn_auto.Enable()
-            # text control interval is enable
+            # Text control interval is enable
             self.tc_ival.Enable()
-            # text control duty is enable
+            # Text control duty is enable
             self.tc_duty.Enable()
         else:
             if self.top.mode != MODE_AUTO:
                 self.btn_auto.Disable()
             # Set focus to TextCtrl with id
             self.tc_ival.SetFocus()
-            # text control interval is Disable
+            # Text control interval is Disable
             self.tc_ival.Disable()
-            # text control duty is Disable
+            # Text control duty is Disable
             self.tc_duty.Disable()
         if not self.top.con_flg:
-            # auto Button is Disable
+            # Auto Button is Disable
             self.btn_auto.Disable()
-    """
-    Called when device get disconnected
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+   
     def device_disconnected(self):
+        """
+        Called when device get disconnected
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         if self.auto_flg:
-            # the device is disconnected auto mode will stop
+            # The device is disconnected auto mode will stop
             self.stop_auto()

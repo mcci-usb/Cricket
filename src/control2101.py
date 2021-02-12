@@ -46,39 +46,40 @@ import time
 VID_2101 = 0x040e
 PID_2101 = 0xf413
 
-"""
-Called by check_port() in search.py, to monitor the 
-device unplug from the bus
-Scan list of 2101 in the USB bus, returns a list with 
-Serial number of 2101
-Args:
-    No arguments
-Returns:
-    No return
-"""
 def scan_2101():
+    """
+    Called by check_port() in search.py, to monitor the 
+    device unplug from the bus
+    Scan list of 2101 in the USB bus, returns a list with 
+    Serial number of 2101
+    Args:
+        No arguments
+    Returns:
+        No return
+    """
     dlist = []
     if sys.platform == 'darwin':
         for d in hid.enumerate(VID_2101):
             dlist.append(d['serial_number'])
     else:
         # find our devic
-        for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101, find_all=1): 
+        for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101, 
+                                 find_all=1): 
             dlist.append(get_serial_number(dev))
     return dlist
-"""
-Get Serial number for the 2101
-Args:
-    dev: serial number of device 2101
-Returns:
-    return serial number
-"""
 def get_serial_number(dev):
+    """
+    Get Serial number for the 2101
+    Args:
+        dev: serial number of device 2101
+    Returns:
+        return serial number
+    """
     ret = dev.ctrl_transfer(0x80, 0x06, 0x303, 0x409, 0x1a)
 
     # Create data buffers
     intarr = []
-    # length of array in integer
+    # Length of array in integer
     alen = int(len(ret)/2) - 1
     k = 2
         
@@ -90,15 +91,16 @@ def get_serial_number(dev):
         
     slno = "".join(map(chr, intarr))
     return slno
-"""
-Get Device path for the selected serial number of 2101
-Only for hid in Mac
-Args:
-    serialno: serial number of device 2101
-Returns:
-    return serial number
-"""
+
 def get_path(serialno):
+    """
+    Get Device path for the selected serial number of 2101
+    Only for hid in Mac
+    Args:
+        serialno: serial number of device 2101
+    Returns:
+        return serial number
+    """
     path = None
     # Real device
     for d in hid.enumerate(VID_2101):
@@ -107,30 +109,33 @@ def get_path(serialno):
             break
     return path
 
-"""
-Get Device object for the selected serial number of 2101
-for Windows and Linux   
-Args:
-    serialno: serial number of device 2101
-Returns:
-    return serial number
-"""     
 def get_device(serialno):
+    """
+    Get Device object for the selected serial number of 2101
+    for Windows and Linux   
+    Args:
+        serialno: serial number of device 2101
+    Returns:
+        return serial number
+    """     
+
     dev2101 = None
     # will return Device object with device VendorID, ProductID
-    for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101, find_all=1): 
-        #if(serialno == usb.util.get_string(dev, 3)):
+    for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101,
+                             find_all=1): 
+        # if(serialno == usb.util.get_string(dev, 3)):
         if(serialno == get_serial_number(dev)):
             dev2101 = dev
             break
     return dev2101
-"""
-Controlling 2101 port for 2101 operations 
-Args:
-    serialno: serial number of device 2101
-    portdata: portdata return device highspeed and superspeed
-"""      
+      
 def control_port(serialno, portdata):
+    """
+    Controlling 2101 port for 2101 operations 
+    Args:
+        serialno: serial number of device 2101
+        portdata: portdata return device highspeed and superspeed
+    """
     result = None
     # run in Darwin or Mac OS
     if sys.platform == 'darwin':

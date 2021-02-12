@@ -36,14 +36,14 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-Check the connected device is unplugged
-Args:
-    No argument
-Return:
-    No return
-"""
 def check_port():
+    """
+    Check the connected device is unplugged
+    Args:
+        No argument
+    Return:
+        No return
+    """
     comlist = serial.tools.list_ports.comports()
     port_name = []
     
@@ -53,17 +53,18 @@ def check_port():
     for dev in dlist:
         port_name.append(dev)
     return port_name
-"""
-Search USB port for list of Plugged devices
-Filtered the devices using VID and PID
-Required by comWindow.py for device search
-Args:
-    No argument
-Return:
-    No return
-"""
+
 def search_port():
-    # it will print a list of available ports
+    """
+    Search USB port for list of Plugged devices
+    Filtered the devices using VID and PID
+    Required by comWindow.py for device search
+    Args:
+        No argument
+    Return:
+        No return
+    """
+    # It will print a list of available ports
     comlist = serial.tools.list_ports.comports()
     port_name = []
     rev_list = []
@@ -74,19 +75,19 @@ def search_port():
     
     for i in range(len(port_name)):
         try:
-            # open serial port
+            # Open serial port
             ser = serial.Serial(port=port_name[i], baudrate=115200, 
                                 bytesize=serial.EIGHTBITS,
                                 parity=serial.PARITY_NONE, timeout=1, 
                                 stopbits=serial.STOPBITS_ONE)
-            # delay execution for a given number of seconds
-            # let's wait one second before reading output
+            # Delay execution for a given number of seconds
+            # Let's wait one second before reading output
             time.sleep(1)
     
             cmd = 'version\r\n'
     
             ser.write(cmd.encode())
-            # printing the decoded string
+            # Printing the decoded string
             strout = ser.readline().decode('utf-8')
             nstr = strout[2:]
             if(nstr.find('01') != -1):
@@ -95,9 +96,9 @@ def search_port():
             elif(nstr.find('12') != -1):
                 rev_list.append(port_name[i])
                 dev_list.append(DEVICES[DEV_3201])
-            # close serial port
+            # Close serial port
             ser.close()
-        #There is no new data from serial port
+        # There is no new data from serial port
         except serial.SerialException as e:
             pass
     rdict = dict(zip(rev_list, dev_list))

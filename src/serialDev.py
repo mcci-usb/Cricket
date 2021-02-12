@@ -28,14 +28,14 @@ import serial
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-Open Serial Port of the selected device (3141/3201/2101)
-Args:
-    top: create a object
-Returns:
-    return True, False
-"""
 def open_serial_device(top):
+    """
+    Open Serial Port of the selected device (3141/3201/2101)
+    Args:
+        top: create a object
+    Returns:
+        return True, False
+    """
 
     top.devHand.port = top.selPort
     top.devHand.baudrate = 115200
@@ -51,15 +51,16 @@ def open_serial_device(top):
     except serial.SerialException as e:
         wx.MessageBox(""+str(e), "Com Port Error", wx.OK, top)
         return False
-"""
-Send Port Control Command
-Args:
-    phnad:send Serial port
-    cmd:cmd with string
-Returns:
-    return res, rstr
-"""
+
 def send_port_cmd(phand,cmd):
+    """
+    Send Port Control Command
+    Args:
+        phnad:send Serial port
+        cmd:cmd with string
+    Returns:
+        return res, rstr
+    """
     res = write_serial(phand, cmd)
     if res == 0:
         res, rstr = read_serial(phand)
@@ -67,14 +68,15 @@ def send_port_cmd(phand,cmd):
             return res, rstr
     rstr = "Comm Error\n"
     return res, rstr
-"""
-Send Status Command to check Orientation
-Args:
-       phnad:send the serial cmd for check orientation
-Returns:
-    return res, strin
-"""
+
 def send_status_cmd(phand):
+    """
+    Send Status Command to check Orientation
+    Args:
+        phnad:send the serial cmd for check orientation
+    Returns:
+        return res, strin
+    """
     cnt = 0
     strin = ""
     cmd = 'status\r\n'
@@ -92,14 +94,15 @@ def send_status_cmd(phand):
     else:
         srrin = "Comm Error\n"
         return res, strin
-"""
-Send Volts Command
-Args:
-    phnad:volts command
-Returns:
-    return res, rstr
-"""
+
 def send_volts_cmd(phand):
+    """
+    Send Volts Command
+    Args:
+        phnad:volts command
+    Returns:
+        return res, rstr
+    """
     cmd = 'volts\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -108,14 +111,15 @@ def send_volts_cmd(phand):
             return res, rstr
     rstr = "Comm Error\n"
     return res, rstr
-"""
-Send Amps Command
-Args:
-    phnad:argument for send Amps command
-Returns:
-    return res, rstr
-"""
+
 def send_amps_cmd(phand):
+    """
+    Send Amps Command
+    Args:
+        phnad:argument for send Amps command
+    Returns:
+        return res, rstr
+    """
     cmd = 'amps\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -124,14 +128,15 @@ def send_amps_cmd(phand):
             return res, rstr
     rstr = "Comm Error\n"
     return res, rstr 
-"""
-Send Serial Number Command
-Args:
-    phnad:argument for device serial number
-Returns:
-    return res, rstr
-"""
+
 def send_sn_cmd(phand):
+    """
+    Send Serial Number Command
+    Args:
+        phnad:argument for device serial number
+    Returns:
+        return res, rstr
+    """
     cmd = 'sn\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -140,13 +145,15 @@ def send_sn_cmd(phand):
             return res, rstr
     rstr = "Comm Error\n"
     return res, rstr
-"""
-Read Port Command, to check port status of the 3141/3201/2101
-    phnad:read serial port
-Returns:
-    return res, str
-"""
+
 def read_port_cmd(phand):
+    """
+    Read Port Command, to check port status of the 3141/3201/2101
+    Args:
+        phnad:read serial port
+    Returns:
+        return res, str
+    """
     cmd = 'port\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -155,28 +162,30 @@ def read_port_cmd(phand):
             return res, rstr
     rstr = "Comm Error\n"
     return res, rstr
-"""
-Send data over the Serial Port
-Args:
-    phnad:argument for sending the serial data
-    cmd:cmd for serial data with string format
-Returns:
-    return -1
-"""
+
 def write_serial(phand, cmd):
+    """
+    Send data over the Serial Port
+    Args:
+        phnad:argument for sending the serial data
+        cmd:cmd for serial data with string format
+    Returns:
+        return -1
+    """
     try:
         phand.write(cmd.encode())
         return 0
     except:
         return -1
-"""
+
+def read_serial(phand):
+    """
     Read data from the Serial Port
     Args:
        phnad:argument for read data from serail port 
     Returns:
         return None
-"""
-def read_serial(phand):
+    """
     try:
         return  0, phand.readline().decode('utf-8')
     except:

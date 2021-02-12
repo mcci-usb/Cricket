@@ -149,64 +149,67 @@ VERSION_STR = "Version "+APP_VERSION
 ##############################################################################
 # GLOBAL FUNCTIONS
 ##############################################################################
-"""
-Validator associated NumericValidator Control.
-"""
 class NumericValidator(wx.Validator):
     """
-    Only digits are allowed in the address.
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
+    Validator associated NumericValidator Control.
     """
     def __init__(self):
+        """
+        Only digits are allowed in the address.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         wx.Validator.__init__(self)
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
         #wx.EVT_CHAR(self, self.OnChar)
-    """
-    clone Only digits are allowed in the address. 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return NumericValidator()
-    """
+    
     def Clone(self, arg=None):
+        """
+        clone Only digits are allowed in the address. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return NumericValidator()
+        """
         return NumericValidator()
-    """
-    Only digits are allowed in the address. 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-        top: create a object
-    Returns:
-        return NumericValidator()
-    """
+   
     def Validate(self, win):
+        """
+        Only digits are allowed in the address. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: create a object
+        Returns:
+            return NumericValidator()
+        """
         # Returns the window associated with the validator.
         tc  = self.GetWindow()
         val = tc.GetValue()
         return val.isdigit()
-    """
-    Only charachters 
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-        top: create a object
-        evt:evt handler to display the characters
-    Returns:
-        return NumericValidator()
-    """
+   
     def OnChar(self, evt):
+        """
+        Only charachters 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: create a object
+            evt:evt handler to display the characters
+        Returns:
+            return NumericValidator()
+        """
         # Returns the window associated with the validator.
         tc = self.GetWindow()
         key = evt.GetKeyCode()

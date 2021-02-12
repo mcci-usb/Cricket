@@ -52,44 +52,46 @@ from aboutDialog import *
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-A class Multistatus with init method
-This code pattern is run common in all Python files that
-to be executed as a script imported in another modules.
-"""
 class MultiStatus (wx.StatusBar):
     """
-    Associates a status bar with the frame.
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-    Returns:
-        return None
+    A class Multistatus with init method
+    This code pattern is run common in all Python files that
+    to be executed as a script imported in another modules.
     """
     def __init__ (self, parent):
+        """
+        Associates a status bar with the frame.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            return None
+        """
+
         wx.StatusBar.__init__(self, parent, -1)
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
         self.SetStatusWidths([-1, -1, -3, -2, -8])
-"""
-A class UiPanel with init method
-the UiPanel navigate to UIApp name
-"""
+
 class UiPanel(wx.Panel):
     """
-    Uipanel created
-    Args:
-        self: The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-    Returns:
-        return None
-    """
+    A class UiPanel with init method
+    the UiPanel navigate to UIApp name
+    """ 
     def __init__(self, parent):
+        """
+        Uipanel created
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            return None
+        """
         super(UiPanel, self).__init__(parent)
 
         wx.GetApp().SetAppName("Cricket")
@@ -104,7 +106,7 @@ class UiPanel(wx.Panel):
         if platform == "darwin":
             self.font_size = MAC_FONT_SIZE
         # Stes the font for this window
-        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,\
+        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,
                              False,'MS Shell Dlg 2'))
 
         self.logPan = logWindow.LogWindow(self, parent)
@@ -118,7 +120,7 @@ class UiPanel(wx.Panel):
         self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
 
         self.devObj = []
-        # device panel added
+        # Device panel added
         self.devObj.append(self.dev3141Pan)
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
@@ -161,192 +163,194 @@ class UiPanel(wx.Panel):
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
-        # set size of frame
+        # Set size of frame
         self.SetSizer(self.hboxm)
         # Setting Layouts
         self.SetAutoLayout(True)
         self.hboxm.Fit(self)
         self.Layout()
-
-    """
-    print on logwindow data 
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strin: string format
-    Returns:
-        return None
-    """ 
+ 
     def PrintLog(self, strin):
+        """
+        print on logwindow data 
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: string format
+        Returns:
+            return None
+        """
         self.logPan.print_on_log(strin)
     
-    """
-    print on treewindow usb info 
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strin: string format
-    Returns:
-        return None
-    """
     def print_on_usb(self, strin):
+        """
+        print on treewindow usb info 
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: string format
+        Returns:
+            return None
+        """
         self.treePan.print_on_usb(strin)
         if(self.logPan.is_usb_enabled()):
             self.logPan.print_on_log(strin+"\n")
     
-    """
-    enumaration delay 
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_enum_delay(self):
+        """
+        enumaration delay 
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.treePan.get_enum_delay()
-    
-    """
-    delay status
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """  
+      
     def get_delay_status(self):
+        """
+        delay status
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.treePan.get_delay_status()
     
-    """
-    get interval is a function or evalutes an auto panel
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_interval(self):
+        """
+        get interval is a function or evalutes an auto panel
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.autoPan.get_interval()
-    """
-    The setInterval () method calls a function or 
-    evaluates an expression at specified intervals 
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strval: string value
-    Returns:
-        return None
-    """
+    
     def set_interval(self, strval):
+        """
+        The setInterval () method calls a function or 
+        evaluates an expression at specified intervals 
+        Args: 
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strval: string value
+        Returns:
+            return None
+        """
         self.autoPan.set_interval(strval)
-    """
-    disable for usb scanning
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def disable_usb_scan(self):
+        """
+        disable for usb scanning
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            return None
+        """
         self.treePan.disable_usb_scan()
     
-    """
-    this function calls getting the loop window prameters
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_loop_param(self):
+        """
+        this function calls getting the loop window prameters
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.loopPan.get_loop_param()
     
-    """
-    this function calls getting the auto window prameters
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_auto_param(self):
+        """
+        this function calls getting the auto window prameters
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            return None
+        """
         return self.autoPan.get_auto_param()
     
-    """
-    set the period
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strval: string value
-    Returns:
-        return None
-    """
     def set_period(self, strval):
+        """
+        set the period
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strval: string value
+        Returns:
+            return None
+        """
         self.loopPan.set_period(strval)
 
-    """
-    set the ports list for loopPan and autoPan
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        ports: upated the ports list
-    Returns:
-        return None
-    """
     def set_port_list(self, ports):
+        """
+        set the ports list for loopPan and autoPan
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            ports: upated the ports list
+        Returns:
+            return None
+        """
         self.loopPan.set_port_list(ports)
         self.autoPan.set_port_count(ports)
     
-    """
-    to select a device and switching the port
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        port: port number
-        stat: port on status will updated 
-    Returns:
-        return None
-    """
     def port_on(self, port, stat):
+        """
+        to select a device and switching the port
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            port: port number
+            stat: port on status will updated 
+        Returns:
+            return None
+        """
         self.devObj[self.parent.selDevice].port_on(port, stat)
     
-    """
-    update the controls for selecting device
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        mode: mode controls
-    Returns:
-        return None
-    """
     def update_controls(self, mode):
+        """
+        update the controls for selecting device
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            mode: mode controls
+        Returns:
+            return None
+        """
         self.devObj[self.parent.selDevice].update_controls(mode)
         self.loopPan.update_controls(mode)
         self.autoPan.update_controls(mode)
         self.treePan.update_controls(mode)
     
-    """
-    Model device connected
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def device_connected(self):
+        """
+        Model device connected
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         for dev in range(len(DEVICES)):
             if dev == self.parent.selDevice:
                 self.vboxdl.Show(self.devObj[self.parent.selDevice])
@@ -355,49 +359,49 @@ class UiPanel(wx.Panel):
         self.Layout()
         self.devObj[self.parent.selDevice].device_connected()
     
-    """
-    model device disconnected
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def device_disconnected(self):
+        """
+        model device disconnected
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.devObj[self.parent.selDevice].device_disconnected()
         self.loopPan.device_disconnected()
         self.autoPan.device_disconnected()
     
-    """
-    device auto connect
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def auto_connect(self):
+        """
+        device auto connect
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.comPan.auto_connect()
 
-"""
-A UiMainFrame is a window of size and position usually changed by user
-"""
 class UiMainFrame (wx.Frame):
     """
-    device auto connect
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        parent: Pointer to a parent window.
-        title: Ui title 
-    Returns:
-        return None
+    A UiMainFrame is a window of size and position usually changed by user
     """
     def __init__ (self, parent, title):
-        #super(UiMainFrame, self).__init__(parent, title=title)
+        """
+        device auto connect
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            title: Ui title 
+        Returns:
+            return None
+        """
+        # super(UiMainFrame, self).__init__(parent, title=title)
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
@@ -431,14 +435,14 @@ class UiMainFrame (wx.Frame):
         
         self.menuBar = wx.MenuBar()
         
-        # if its not darwin or MAC OS
+        # If its not darwin or MAC OS
         if sys.platform != 'darwin':
            # Setting up the menu.
            self.fileMenu = wx.Menu()
            # fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
            self.fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
 
-        # creating the help menu
+        # Creating the help menu
         self.helpMenu = wx.Menu()
         self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
@@ -460,7 +464,7 @@ class UiMainFrame (wx.Frame):
             self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW,
                                        "&Cricket\tAlt+Ctrl+1")
             self.winMenu.Check(ID_MENU_WIN_SHOW, True) 
-        # create menubar
+        # Create menubar
         if sys.platform != 'darwin':
             self.menuBar.Append(self.fileMenu,    "&File")
         else:
@@ -469,7 +473,7 @@ class UiMainFrame (wx.Frame):
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
 
-        # create the statusbar
+        # Create the statusbar
         self.statusbar = MultiStatus(self)
         
         self.SetStatusBar(self.statusbar)
@@ -477,7 +481,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateAll(["Port", "", ""])
         
          # Set events to Menu
-        #self.Bind(wx.EVT_MENU, self.MenuHandler)
+        # Self.Bind(wx.EVT_MENU, self.MenuHandler)
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
@@ -507,17 +511,17 @@ class UiMainFrame (wx.Frame):
         except:
             pass
     
-    """
-    Virtual event handlers, overide them in your derived class
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event: event handler for helpmenu
-    Returns:
-        return None
-    """
     def OnClickHelp(self, event):
+        """
+        Virtual event handlers, overide them in your derived class
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handler for helpmenu
+        Returns:
+            return None
+        """
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
             webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
@@ -538,395 +542,401 @@ class UiMainFrame (wx.Frame):
         elif(id == ID_MENU_HELP_ABOUT):
             self.OnAboutWindow(event)
     
-    """
-    device details update in status bar
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def UpdateStatusBar (self):
+        """
+        device details update in status bar
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.statusbar.Refresh()
         self.statusbar.Update()
     
-    """
-    Status bar update - All fields
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        textList: set the status bar
-    Returns:
-        return None
-    """
     def UpdateAll (self, textList):
+        """
+        Status bar update - All fields
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            textList: set the status bar
+        Returns:
+            return None
+        """
         for i in range(len(textList)):
             self.SetStatusText(textList[i], i)
         self.UpdateStatusBar()
     
-    """
-    Status bar update - Port
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def UpdatePort (self):
+        """
+        Status bar update - Port
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         if self.selDevice == DEV_2101:
             self.SetStatusText("USB", SB_PORT_ID)
         else:
             self.SetStatusText(self.selPort, SB_PORT_ID)
         self.UpdateStatusBar()
     
-    """
-    Status bar update - Device
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def UpdateDevice (self):
+        """
+        Status bar update - Device
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.SetStatusText(DEVICES[self.selDevice], SB_DEV_ID)
         self.UpdateStatusBar()  
-    """
-    Status bar update - Any of One field
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        newStr: status updated in strings
-        idx: update id
-    Returns:
-        return None
-    """
+    
     def UpdateSingle(self, newStr, idx):
+        """
+        Status bar update - Any of One field
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            newStr: status updated in strings
+            idx: update id
+        Returns:
+            return None
+        """
         self.SetStatusText(newStr, idx)
         self.UpdateStatusBar()
     
-    """
-    Virtual event handlers, overide them in your derived class
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event:event handler for about menu
-    Returns:
-        return None
-    """
     def OnAboutWindow(self, event):
+        """
+        Virtual event handlers, overide them in your derived class
+        Args:
+           self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:event handler for about menu
+        Returns:
+            return None
+        """
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
     
-    """
-    Virtual event handlers, overide them in your derived class
-    for Window Close
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event:event handler for window close
-    Returns:
-        return None
-    """
     def OnCloseWindow (self, event):
+        """
+        Virtual event handlers, overide them in your derived class
+        for Window Close
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:event handler for window close
+        Returns:
+            return None
+        """ 
         # Close this window
         self.Close(True)
     
-    """
-    Virtual event handlers, overide them in your derived classmenu
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event: Event Handler for Menu
-    Returns:
-        return None
-    """
     def OnIconize (self, event):
+        """
+        Virtual event handlers, overide them in your derived classmenu
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: Event Handler for Menu
+        Returns:
+            return None
+        """
         # Close this window
         if self.IsIconized():
             self.winMenu.Check(ID_MENU_WIN_SHOW, False)
         else:
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         event.Skip()
-    
-    """
-    Event Handler hide the window
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event:hide the win menu
-    Returns:
-        return None
-    """
+
     # Event Handler
     def OnHideWindow (self, event):
+        """
+        Event Handler hide the window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:hide the win menu
+        Returns:
+            return None
+        """
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, False)
         self.Iconize(True)
     
-    """
-    Event Handler for show window
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        event:show window
-    Returns:
-        return None
-    """
     def OnShowWindow (self, event):
+        """
+        Event Handler for show window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:show window
+        Returns:
+            return None
+        """
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         self.Iconize(False)
-    """
-    Keep USB device list in a list
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        mlist:save the us list of file
-    Returns:
-        return None
-    """
+    
     def save_usb_list(self, mlist):
+        """
+        Keep USB device list in a list
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            mlist:save the us list of file
+        Returns:
+            return None
+        """
         self.masterList = mlist[:]  
-    """
-    Get usb device list
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def get_usb_list(self):
+        """
+        Get usb device list
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.masterList
-    """
-    Show content in Log Window
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strin: update string format
-    Returns:
-        return None
-    """
+    
     def print_on_log(self, strin):
+        """
+        Show content in Log Window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: update string format
+        Returns:
+            return None
+        """
         self.panel.PrintLog(strin)
-    """
-    Show content in USB Device Tree View
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strin: update string format
-    Returns:
-        return None
-    """
+    
     def print_on_usb(self, strin):
+        """
+        Show content in USB Device Tree View
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: update string format
+        Returns:
+            return None
+        """
         self.panel.print_on_usb(strin)
     
-    """
-    Get USB device Enumeration delay
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_enum_delay(self):
+        """
+        Get USB device Enumeration delay
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.panel.get_enum_delay()
-    """
-    Checkbox status of USB Enumeration delay option
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def get_delay_status(self):
+        """
+        Checkbox status of USB Enumeration delay option
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.panel.get_delay_status()
     
-    """
-    Get Loop Window delay parameters
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_loop_param(self):
+        """
+        Get Loop Window delay parameters
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.panel.get_loop_param()
     
-    """
-    Get Auto Window delay parameters
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_auto_param(self):
+        """
+        Get Auto Window delay parameters
+        Args  
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.panel.get_auto_param()
     
-    """
-    Set Loop Mode period
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        strin:string format update field
-    Returns:
-        return None
-    """
     def set_period(self, strval):
+        """
+        Set Loop Mode period
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin:string format update field
+        Returns:
+            return None
+        """
         self.panel.set_period(strval)
     
-    """
-    Set Port list for loop Window port selection
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        ports: port list
-    Returns:
-        return None
-    """
     def set_port_list(self, ports):
+        """
+        Set Port list for loop Window port selection
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            ports: port list
+        Returns:
+            return None
+        """
         self.panel.set_port_list(ports)
     
-    """
-    Get Auto mode time interval
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def get_interval(self):
+        """
+        Get Auto mode time interval
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return self.panel.get_interval()
     
-    """
-    Set Auto mode time interval when override by USB delay warning
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def set_interval(self, strval):
+        """
+        Set Auto mode time interval when override by USB delay warning
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.panel.set_interval(strval)
-    
-    """
-    Called by Loop Window, Device Window and COM Window
-    When Normal-Auto-Loop trasition
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+
     def set_mode(self, mode):
+        """
+        Called by Loop Window, Device Window and COM Window
+        When Normal-Auto-Loop trasition
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.mode = mode
         self.panel.update_controls(mode)
     
-    """
-    Called by device window based on USB delay warning selection
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def disable_usb_scan(self):
+        """
+        Called by device window based on USB delay warning selection
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.panel.disable_usb_scan()
 
-    """
-    Port ON/OFF command from Loop Window
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        stat:port status update
-    Returns:
-        return None
-    """
     def port_on(self, port, stat):
+        """
+        Port ON/OFF command from Loop Window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            stat:port status update
+        Returns:
+            return None
+        """
         self.panel.port_on(port, stat)
     
-    """
-    intervalCalled by COM Window when devide get connected
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def device_connected(self):
+        """
+        intervalCalled by COM Window when devide get connected
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.panel.device_connected()
         self.StoreDevice()
     
-    """
-    Called by COM Window when the device get disconnected
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def device_disconnected(self):
+        """
+        Called by COM Window when the device get disconnected
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.panel.device_disconnected()
     
-    """
-    Update plugged USB device list in Status bar.
-    Called by usbDev.py
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-        d1:list updated
-    Returns:
-        return None
-    """
     def update_usb_status(self, dl):
+        """
+        Update plugged USB device list in Status bar.
+        Called by usbDev.py
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            d1:list updated
+        Returns:
+            return None
+        """
         strUsb = " USB Devices     Host Controller: {d1}     ".\
                  format(d1=str(dl[0])) + \
                  "Hub: {d2}     ".format(d2=str(dl[1])) + \
                  "Peripheral: {d3}".format(d3=str(dl[2]))
         
         self.UpdateSingle(strUsb, 4)
-    
-    """
-    Export the LogWindow/USBTreeWindow content to a file
-    Called by LogWindow and USB Tree View Window
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+
     def save_file (self, contents, extension):
-        # save a file
+        """
+        Export the LogWindow/USBTreeWindow content to a file
+        Called by LogWindow and USB Tree View Window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            return None
+        """
+        # Save a file
         self.dirname=""
         dlg = wx.FileDialog(self, "Save as", self.dirname, "", extension, 
                             wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -958,16 +968,17 @@ class UiMainFrame (wx.Frame):
             wx.EndBusyCursor()
 
         return
-    """
-    store the device configarartion
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
+    
     def StoreDevice(self):
+        """
+        store the device configarartion
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         # This is also a base class of shelve and it accepts
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
@@ -977,16 +988,16 @@ class UiMainFrame (wx.Frame):
         ds['device'] = self.selDevice
         ds.close()
     
-    """
-    load the device list for last device disconnect 
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def LoadDevice(self):
+        """
+        load the device list for last device disconnect 
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         # This is also a base class of shelve and it accepts
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
@@ -995,34 +1006,36 @@ class UiMainFrame (wx.Frame):
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
         ds.close()  
-"""
-UiApp wx.App object has been created in order to ensure 
-that the gui platform and wx Widgets have been fully initialized.
-"""
+
 class UiApp(wx.App):
     """
-    override OnInit to do applicaition initialization
-    to ensure that the system, toolkit and wxWidgets are fully initialized.
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
+    UiApp wx.App object has been created in order to ensure 
+    that the gui platform and wx Widgets have been fully initialized.
     """
     def OnInit (self):
+        """
+        override OnInit to do applicaition initialization
+        to ensure that the system, toolkit and wxWidgets are fully 
+        initialized.
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         return True
     
-    """
-    showing the title on UI frame with UI title name
-    Args:
-        self:The self parameter is a reference to the current 
-        instance of the class,and is used to access variables
-        that belongs to the class.
-    Returns:
-        return None
-    """
     def CustInit(self):
+        """
+        showing the title on UI frame with UI title name
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return None
+        """
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
 

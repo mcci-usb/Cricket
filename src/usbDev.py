@@ -28,19 +28,19 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-"""
-Get USB Device Tree changes list 
-Args:
-    top: create a object
-Returns:
-    return None
-"""
 def get_tree_change(top):
-    # usb scanning 
+    """
+    Get USB Device Tree changes list 
+    Args:
+        top: create a object
+    Returns:
+        return None
+    """
+    # Usb scanning 
     dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
-    # save usb data list
+    # Save usb data list
     top.save_usb_list(newlist)
     strchg = None
 
@@ -50,7 +50,7 @@ def get_tree_change(top):
     strout = ""
     
     if(len(adlist) == 0 and len(rmlist) == 0):
-        # no device added removed from port print "No change"
+        # No device added removed from port print "No change"
         strout = ("No Change\n")
     
     if(len(rmlist)):
@@ -64,14 +64,15 @@ def get_tree_change(top):
         strout = strout + get_usb_device_info(adlist)
 
     top.print_on_usb(strout)
-"""
-Show VID, PID and Speed info of added/removed USB devices 
-Args:
-    udlist: usb device list
-Returns:
-    return None
-"""
+
 def get_usb_device_info(udlist):
+    """
+    Show VID, PID and Speed info of added/removed USB devices 
+    Args:
+        udlist: usb device list
+    Returns:
+        return None
+    """
     dlist = get_usb_class(udlist)
     cnt = 0
     strdev = ""
@@ -82,7 +83,8 @@ def get_usb_device_info(udlist):
             cnt = cnt + 1
             hvid = ("%X"%int(dev.get('vid'))).zfill(4)
             hpid = ("%X"%int(dev.get('pid'))).zfill(4)
-            vpid = " (VID_"+hvid+"; PID_"+hpid+"; "+usbSpeed.get(dev.get('speed')-1)+")"
+            vpid = " (VID_"+hvid+"; PID_"+hpid+"; "+usbSpeed.get(
+                      dev.get('speed')-1)+")"
             strdev = strdev + str(cnt)+ ". " + strin + vpid + "\n"
         except:
             cnt = cnt + 1
@@ -91,15 +93,15 @@ def get_usb_device_info(udlist):
             vpid = " (VID_"+hvid+"; PID_"+hpid+")"
             strdev = strdev + str(cnt)+ ". " + vpid + " Device Error\n"
     
-    return strdev
-"""
-Get USB class 
-Args:
-    clist:usb class list
-Returns:
-    return None
-"""        
+    return strdev       
 def get_usb_class(clist):
+    """
+    Get USB class 
+    Args:
+        clist:usb class list
+    Returns:
+        return None
+    """ 
     nlist = []
     for i in range(len(clist)):
         try:
