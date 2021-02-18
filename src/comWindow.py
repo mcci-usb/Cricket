@@ -44,7 +44,7 @@ class ComWindow(wx.Panel):
     def __init__(self, parent, top):
         """
         comWindow that contains the about scan device and 
-        connect device elements.
+        connect device(s).
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -52,9 +52,8 @@ class ComWindow(wx.Panel):
             parent: Pointer to a parent window.
             top: create a object
         Returns:
-            return None
+            None
         """
-
         wx.Panel.__init__(self, parent)
         # Self.SetBackgroundColour("white")
 
@@ -114,8 +113,7 @@ class ComWindow(wx.Panel):
 
     def ScanDevice(self, evt):
         """
-        Event Handler for Device Search Button.
-        Scan the list Switches(3141, 3201 & 2101) over the USB bus
+        Scan the list of connected devices over the USB bus
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -123,20 +121,20 @@ class ComWindow(wx.Panel):
             evt: The event parameter in the AutoButton() method is an 
             object specific to a particular event type.
         Returns:
-            return None
+            None
         """
         self.search_device()
 
     def search_device(self):
         """
         Event Handler for Device Search Button.
-        search the device(s) its displays the statusbar 
+        search the device(s) its displays the statusbar and dropdown box 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
@@ -166,14 +164,15 @@ class ComWindow(wx.Panel):
    
     def ConnectDevice(self, evt):
         """
-        Event Handler for Device Connect/Disconnect
-        connect and disconnect the device(s) its displays the statusbar 
+        Event Handler for Connect the device
+        once connect the device(s) its displays the statusbar 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
+            evt: handling the event for connect the device
         Returns:
-            return None
+            None
         """
         self.btn_connect.Disable()
         if(self.top.con_flg):
@@ -190,8 +189,9 @@ class ComWindow(wx.Panel):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
+            e:message updated in Popup window with model disconnected 
         Returns:
-            return None
+            None
         """
         if self.top.con_flg:
             self.timer_lp.Stop()
@@ -206,13 +206,13 @@ class ComWindow(wx.Panel):
     
     def disconnect_device(self):
         """
-        Called when device discoonect required
+        click on disconnect button the selecting is disconnected from device
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.top.device_disconnected()
         self.top.selPort = None
@@ -240,7 +240,7 @@ class ComWindow(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         # Set label button name as Disconnect
         self.btn_connect.SetLabel("Disconnect")
@@ -257,13 +257,13 @@ class ComWindow(wx.Panel):
     
     def get_selected_com(self):
         """
-        Get the selected switch through the index of Combobox
+        select the device with comport string 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            it return device id and com number in int format
         """
         self.cval = self.cb_device.GetValue()
         txt = self.cval.split("(")
@@ -277,7 +277,7 @@ class ComWindow(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         # Combo box, device list is disable
         self.cb_device.Disable()
@@ -298,7 +298,7 @@ class ComWindow(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if(self.top.ldata['port'] != '' and self.top.ldata['device'] != ''):
             instr = ""+self.top.ldata['port']+"("+DEVICES[

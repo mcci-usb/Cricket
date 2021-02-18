@@ -42,7 +42,7 @@ def check_port():
     Args:
         No argument
     Return:
-        No return
+        port_name -  open serial port name      
     """
     comlist = serial.tools.list_ports.comports()
     port_name = []
@@ -62,7 +62,7 @@ def search_port():
     Args:
         No argument
     Return:
-        No return
+        rdict - A list of the serial ports available on the system
     """
     # It will print a list of available ports
     comlist = serial.tools.list_ports.comports()
@@ -82,6 +82,8 @@ def search_port():
                                 stopbits=serial.STOPBITS_ONE)
             # Delay execution for a given number of seconds
             # Let's wait one second before reading output
+            # give the serial port sometime to receive the data
+
             time.sleep(1)
     
             cmd = 'version\r\n'

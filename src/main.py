@@ -43,7 +43,7 @@ def main ():
     Args:
         No argument
     Return:
-        No return
+        None
     """
     # Determine the base directory path
     base = os.path.abspath(os.path.dirname(__file__))

@@ -67,9 +67,8 @@ class MultiStatus (wx.StatusBar):
             that belongs to the class.
             parent: Pointer to a parent window.
         Returns:
-            return None
+            None
         """
-
         wx.StatusBar.__init__(self, parent, -1)
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
@@ -90,7 +89,7 @@ class UiPanel(wx.Panel):
             that belongs to the class.
             parent: Pointer to a parent window.
         Returns:
-            return None
+            None
         """
         super(UiPanel, self).__init__(parent)
 
@@ -105,7 +104,7 @@ class UiPanel(wx.Panel):
         # MAC OS X
         if platform == "darwin":
             self.font_size = MAC_FONT_SIZE
-        # Stes the font for this window
+        # Sets the font for this window
         self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,
                              False,'MS Shell Dlg 2'))
 
@@ -120,10 +119,12 @@ class UiPanel(wx.Panel):
         self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
 
         self.devObj = []
+        
         # Device panel added
         self.devObj.append(self.dev3141Pan)
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
+        
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
         self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
@@ -137,7 +138,7 @@ class UiPanel(wx.Panel):
         self.hboxdl.Add((20,0), 0, wx.EXPAND)
         self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
         
-        # Hide the dev3201Window and dev3141Window
+        # Hide the dev3201Window and dev2101Window
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev2101Pan)
 
@@ -155,9 +156,9 @@ class UiPanel(wx.Panel):
         self.vboxr.Add((0,10), 0, 0)
         self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
+        
         # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
-
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
@@ -172,27 +173,28 @@ class UiPanel(wx.Panel):
  
     def PrintLog(self, strin):
         """
-        print on logwindow data 
+        print data/status on logwindow 
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strin: string format
+            strin: data in String format
         Returns:
-            return None
+            None
         """
         self.logPan.print_on_log(strin)
     
     def print_on_usb(self, strin):
         """
-        print on treewindow usb info 
+        print usb device info on treewindow and Logwindow.
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strin: string format
+            strin: String which contains list of devices with VID, PID and 
+            Speed info
         Returns:
-            return None
+            None
         """
         self.treePan.print_on_usb(strin)
         if(self.logPan.is_usb_enabled()):
@@ -200,63 +202,62 @@ class UiPanel(wx.Panel):
     
     def get_enum_delay(self):
         """
-        enumaration delay 
+        Get the USB Enumaration delay 
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            String - USB Enumeration delay 
         """
         return self.treePan.get_enum_delay()
       
     def get_delay_status(self):
         """
-        delay status
+        Get the status of USB device Enumeration delay check box
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            Boolean - Status of the delay check box
         """
         return self.treePan.get_delay_status()
     
     def get_interval(self):
         """
-        get interval is a function or evalutes an auto panel
+        Get the interval parameter of Auto Mode
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            String - Auto Mode interval
         """
         return self.autoPan.get_interval()
     
     def set_interval(self, strval):
         """
-        The setInterval () method calls a function or 
-        evaluates an expression at specified intervals 
+        Update/Set the Auto Mode interval
         Args: 
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strval: string value
+            strval: interval value in Sting format
         Returns:
-            return None
+            None
         """
         self.autoPan.set_interval(strval)
     
     def disable_usb_scan(self):
         """
-        disable for usb scanning
+        Disable the USB device scan by uncheck the check box
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns: 
-            return None
+            None
         """
         self.treePan.disable_usb_scan()
     
@@ -318,10 +319,10 @@ class UiPanel(wx.Panel):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            port: port number
+            port: device port number
             stat: port on status will updated 
         Returns:
-            return None
+            None
         """
         self.devObj[self.parent.selDevice].port_on(port, stat)
     
@@ -334,7 +335,7 @@ class UiPanel(wx.Panel):
             that belongs to the class.
             mode: mode controls
         Returns:
-            return None
+            None
         """
         self.devObj[self.parent.selDevice].update_controls(mode)
         self.loopPan.update_controls(mode)
@@ -349,7 +350,7 @@ class UiPanel(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         for dev in range(len(DEVICES)):
             if dev == self.parent.selDevice:
@@ -367,7 +368,7 @@ class UiPanel(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.devObj[self.parent.selDevice].device_disconnected()
         self.loopPan.device_disconnected()
@@ -375,13 +376,13 @@ class UiPanel(wx.Panel):
     
     def auto_connect(self):
         """
-        device auto connect
+        device auto connect for disable last connected device
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.comPan.auto_connect()
 
@@ -397,9 +398,9 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            title: Ui title 
+            title: Ui title name uodate
         Returns:
-            return None
+            None
         """
         # super(UiMainFrame, self).__init__(parent, title=title)
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
@@ -480,7 +481,7 @@ class UiMainFrame (wx.Frame):
 
         self.UpdateAll(["Port", "", ""])
         
-         # Set events to Menu
+        # Set events to Menu
         # Self.Bind(wx.EVT_MENU, self.MenuHandler)
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
@@ -520,7 +521,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             event: event handler for helpmenu
         Returns:
-            return None
+            None
         """
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
@@ -550,7 +551,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.statusbar.Refresh()
         self.statusbar.Update()
@@ -564,7 +565,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             textList: set the status bar
         Returns:
-            return None
+            None
         """
         for i in range(len(textList)):
             self.SetStatusText(textList[i], i)
@@ -578,7 +579,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if self.selDevice == DEV_2101:
             self.SetStatusText("USB", SB_PORT_ID)
@@ -594,7 +595,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.SetStatusText(DEVICES[self.selDevice], SB_DEV_ID)
         self.UpdateStatusBar()  
@@ -609,7 +610,7 @@ class UiMainFrame (wx.Frame):
             newStr: status updated in strings
             idx: update id
         Returns:
-            return None
+            None
         """
         self.SetStatusText(newStr, idx)
         self.UpdateStatusBar()
@@ -621,9 +622,9 @@ class UiMainFrame (wx.Frame):
            self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            event:event handler for about menu
+            event:event handler for about menu window
         Returns:
-            return None
+            None
         """
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
@@ -639,7 +640,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             event:event handler for window close
         Returns:
-            return None
+            None
         """ 
         # Close this window
         self.Close(True)
@@ -653,7 +654,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             event: Event Handler for Menu
         Returns:
-            return None
+            None
         """
         # Close this window
         if self.IsIconized():
@@ -672,7 +673,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             event:hide the win menu
         Returns:
-            return None
+            None
         """
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, False)
@@ -687,7 +688,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             event:show window
         Returns:
-            return None
+            None
         """
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, True)
@@ -700,9 +701,9 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            mlist:save the us list of file
+            mlist:save the list of file
         Returns:
-            return None
+            None
         """
         self.masterList = mlist[:]  
     
@@ -714,7 +715,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            masterList- list updated device added or removed
         """
         return self.masterList
     
@@ -740,7 +741,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             strin: update string format
         Returns:
-            return None
+            None
         """
         self.panel.print_on_usb(strin)
     
@@ -752,7 +753,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            get_enum_delay- device enumaration
         """
         return self.panel.get_enum_delay()
     
@@ -764,7 +765,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            get_delay_status- gettig the status between switching device 
         """
         return self.panel.get_delay_status()
     
@@ -776,7 +777,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            get_loop_param - return the loop param
         """
         return self.panel.get_loop_param()
     
@@ -788,7 +789,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            get_auto_param- return the auto mode param
         """
         return self.panel.get_auto_param()
     
@@ -799,9 +800,9 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strin:string format update field
+            strval:string format update field
         Returns:
-            return None
+            None
         """
         self.panel.set_period(strval)
     
@@ -812,9 +813,9 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            ports: port list
+            ports: port list updated
         Returns:
-            return None
+            None
         """
         self.panel.set_port_list(ports)
     
@@ -826,7 +827,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            panel.get_interval- return the interval switching 
         """
         return self.panel.get_interval()
     
@@ -837,8 +838,9 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
+            strval:update the interval i string format
         Returns:
-            return None
+            None
         """
         self.panel.set_interval(strval)
 
@@ -850,8 +852,9 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
+            mode: set the mode in Modle device
         Returns:
-            return None
+            None
         """
         self.mode = mode
         self.panel.update_controls(mode)
@@ -864,7 +867,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.panel.disable_usb_scan()
 
@@ -875,9 +878,10 @@ class UiMainFrame (wx.Frame):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
+            port:selecting the port
             stat:port status update
         Returns:
-            return None
+            None
         """
         self.panel.port_on(port, stat)
     
@@ -889,7 +893,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.panel.device_connected()
         self.StoreDevice()
@@ -902,7 +906,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.panel.device_disconnected()
     
@@ -916,7 +920,7 @@ class UiMainFrame (wx.Frame):
             that belongs to the class.
             d1:list updated
         Returns:
-            return None
+            None
         """
         strUsb = " USB Devices     Host Controller: {d1}     ".\
                  format(d1=str(dl[0])) + \
@@ -934,7 +938,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns: 
-            return None
+            return- success for file save in directiry
         """
         # Save a file
         self.dirname=""
@@ -977,7 +981,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         # This is also a base class of shelve and it accepts
         # the filename as it’s parameter not a dict object like others. 
@@ -996,7 +1000,7 @@ class UiMainFrame (wx.Frame):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         # This is also a base class of shelve and it accepts
         # the filename as it’s parameter not a dict object like others. 
@@ -1022,7 +1026,7 @@ class UiApp(wx.App):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            True - appilcation initialization
         """
         return True
     
@@ -1034,17 +1038,18 @@ class UiApp(wx.App):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
 
-        
 
-##############################################################################
-# MainLoop RunProgram 
-##############################################################################
 def run():
+    """
+    Enty point of the application which initialise the UiApp Class
+    Args: None
+    Returns: None
+    """
     app = UiApp()
     app.CustInit()
     app.MainLoop()

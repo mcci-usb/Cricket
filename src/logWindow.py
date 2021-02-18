@@ -47,7 +47,7 @@ class LogWindow(wx.Window):
             parent: Pointer to a parent window.
             top: create a object
         Returns:
-            return None
+            None
         """
         wx.Window.__init__(self, parent)
         # SET BACKGROUND COLOUR TO White
@@ -118,7 +118,7 @@ class LogWindow(wx.Window):
 
     def ClearLogWindow(self, e):
         """
-        Clear a Log Window
+        Clear a Log Window data
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -126,20 +126,20 @@ class LogWindow(wx.Window):
             e: event handler for clear log window.
             set the new text control value  
         Returns:
-            return None
+            None
         """
         self.scb.SetValue("")
     
     def SaveLogWindow(self, e):
         """
-        Export LogWindow content to a file
+        save the Logwindow data
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
             e: event handler for save the content of logwindow.  
         Returns:
-            return None
+            None
         """
         # Get the content of the control
         content = self.scb.GetValue()
@@ -147,13 +147,13 @@ class LogWindow(wx.Window):
     
     def get_time_stamp(self):
         """
-        Get System Time stamp
+        if check the time stamp update with time series.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class. 
         Returns:
-            return None
+            cstr - return the time with years
         """
         ct = datetime.now()
         # Format using strftime 
@@ -163,14 +163,14 @@ class LogWindow(wx.Window):
      
     def print_on_log(self, strin):
         """
-        Shows the Content in LogWindow
+        it contains Shows the Content or data on LogWindow with time stamp
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class. 
             strin: print with string
         Returns:
-            return None
+            None
         """
         ctstr = ""
         # Print values of checkbox buttons True
@@ -187,6 +187,6 @@ class LogWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class. 
         Returns:
-            return None
+            self.chk_usb.GetValue(): check the usb tree view is enable
         """
         return self.chk_usb.GetValue()

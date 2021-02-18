@@ -48,8 +48,6 @@ PID_2101 = 0xf413
 
 def scan_2101():
     """
-    Called by check_port() in search.py, to monitor the 
-    device unplug from the bus
     Scan list of 2101 in the USB bus, returns a list with 
     Serial number of 2101
     Args:
@@ -69,11 +67,11 @@ def scan_2101():
     return dlist
 def get_serial_number(dev):
     """
-    Get Serial number for the 2101
+    Get Serial number of the model 2101 device
     Args:
-        dev: serial number of device 2101
+        dev:found the attached device 2101
     Returns:
-        return serial number
+        return the device serial number
     """
     ret = dev.ctrl_transfer(0x80, 0x06, 0x303, 0x409, 0x1a)
 
@@ -99,7 +97,7 @@ def get_path(serialno):
     Args:
         serialno: serial number of device 2101
     Returns:
-        return serial number
+        path: device serial number path
     """
     path = None
     # Real device
@@ -116,7 +114,7 @@ def get_device(serialno):
     Args:
         serialno: serial number of device 2101
     Returns:
-        return serial number
+        dev2101:return the device VID, PID
     """     
 
     dev2101 = None
@@ -131,10 +129,13 @@ def get_device(serialno):
       
 def control_port(serialno, portdata):
     """
-    Controlling 2101 port for 2101 operations 
+    Controlling Model2101 port for 2101 operations 
     Args:
         serialno: serial number of device 2101
         portdata: portdata return device highspeed and superspeed
+    Return:
+        result: It is used both for OUT and IN transfers
+        
     """
     result = None
     # run in Darwin or Mac OS

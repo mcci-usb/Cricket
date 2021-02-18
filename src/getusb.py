@@ -42,7 +42,7 @@ def scan_usb():
         No arguments
         
     Returns:
-        return None
+        None
     """
     # List of Host controllers
     hc_list = []

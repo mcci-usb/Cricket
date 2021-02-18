@@ -54,7 +54,7 @@ class Dev3141Window(wx.Panel):
             parent: Pointer to a parent window.
             top: create a object
         Returns:
-            return None
+            None
         """
         wx.Panel.__init__(self, parent)
         
@@ -169,7 +169,7 @@ class Dev3141Window(wx.Panel):
     
     def OnOffPort (self, e):
         """
-        Event Handler for 2 Port Switches
+        Event Handler for 2 Port Switches port On and Off
 
         Args:
             self:The self parameter is a reference to the current 
@@ -179,7 +179,7 @@ class Dev3141Window(wx.Panel):
             object specific to a particular event type.
             event hanlder for OnOffPort switch
         Returns:
-            return None
+            None
         """
         # Returns the object (usually a window) associated,
         # With the event, if any.
@@ -192,7 +192,8 @@ class Dev3141Window(wx.Panel):
     
     def PortSpeedChanged(self, e):
         """
-        Event handler for Speed change Radio buttons
+        Event handler for Speed change Radio buttons select port speed
+        it contains superspeed and highspeed.
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -201,7 +202,7 @@ class Dev3141Window(wx.Panel):
             object specific to a particular event type.
             Event Handler for Port Speed Change
         Returns:
-            return None
+            None
         """
         # Returns the object (usually a window) associated
         # With the event, if any
@@ -218,8 +219,8 @@ class Dev3141Window(wx.Panel):
             self.speed_cmd(0)
     def UsbTimer(self, e):
         """
+        Usb timer set to the switching a ports On and Off
         Timer Event for USB Tree View Changes
-
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -228,7 +229,7 @@ class Dev3141Window(wx.Panel):
             object specific to a particular event type.
             Timer Event for USB Tree View Changes
         Returns:
-            return None
+            None
         """
         self.timer_usb.Stop()
         try:
@@ -240,7 +241,7 @@ class Dev3141Window(wx.Panel):
   
     def DoTimer(self, e):
         """
-        Timer Event for USB Tree View Changes
+        once the port in on after 3sec orientation is check flip or normal  
 
         Args:
             self:The self parameter is a reference to the current 
@@ -250,7 +251,7 @@ class Dev3141Window(wx.Panel):
             object specific to a particular event type.
             event handler to orientation
         Returns:
-            return None
+            None
         """
         self.timer_do.Stop()
         # Check orientation
@@ -267,7 +268,7 @@ class Dev3141Window(wx.Panel):
             control the porn On manually asfter 3sec status
             updated for check orientation
         Returns:
-            return None
+            None
         """
         for i in range (len (self.rbtn)):
             if(port == i):
@@ -282,8 +283,7 @@ class Dev3141Window(wx.Panel):
       
     def port_on(self, port, stat):
         """
-        Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command received 
-        Command received from Loop Window
+        port button is on button state could change
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -291,7 +291,7 @@ class Dev3141Window(wx.Panel):
             port: ports update
             stat: return status for port on cmd and port led update
         Returns:
-            return None
+            None
         """
         if(stat):
             self.port_on_cmd(port)
@@ -305,7 +305,7 @@ class Dev3141Window(wx.Panel):
     
     def port_on_cmd(self, pno):
         """
-        Port ON Command
+        receive the command for Port ON Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -313,7 +313,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             pno: port number updated print in logwindow
         Returns:
-            return None
+            None
         """
         cmd = 'port'+' '+str(pno)+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -328,7 +328,7 @@ class Dev3141Window(wx.Panel):
        
     def port_off_cmd(self, pno):
         """
-        Port OFF Command
+        receive the command for Port OFF Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -336,7 +336,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             pno: port number updated 
         Returns:
-            return None
+            None
         """
         cmd = 'port'+' '+'0'+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
@@ -355,14 +355,14 @@ class Dev3141Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
           
     def port_led_update(self, pno, stat):
         """
-        Update the Port Indication
+        Update the Port led Indication
 
         Args:
             self: The self parameter is a reference to the current 
@@ -371,7 +371,7 @@ class Dev3141Window(wx.Panel):
             port: port ON/OFF updated
             stat: return status for port led status indication
         Returns:
-            return None
+            None
         """
         if(stat):
             for i in range(2):
@@ -393,7 +393,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             mode: update mode controls
         Returns:
-            return None
+            None
         """
         if mode == MODE_MANUAL:
             self.enable_controls(True)
@@ -402,7 +402,7 @@ class Dev3141Window(wx.Panel):
             
     def enable_controls(self, stat):
         """
-        Enable/Disable All Widgets in UI3141
+        Enable/Disable All Widgets in UI3141, disbale for all widgets
 
         Args:
             self: The self parameter is a reference to the current 
@@ -410,7 +410,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             stat: updated the status for widgets enable/disable
         Returns:
-            return None
+            None
         """
         if not self.top.con_flg:
             stat = False
@@ -420,7 +420,7 @@ class Dev3141Window(wx.Panel):
        
     def enable_port_controls(self, stat):
         """
-        Enable/Diasble 2 Port Switch
+        button widgets Enable/Diasble 2 Port Switch
 
         Args:
             self: The self parameter is a reference to the current 
@@ -428,7 +428,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             stat: updated the status port switch enable/disable
         Returns:
-            return None
+            None
         """
         stat = self.top.con_flg
         if(stat):
@@ -440,7 +440,7 @@ class Dev3141Window(wx.Panel):
     
     def enable_speed_controls(self, stat):
         """
-        Enable/Disale Speed controls
+        Enable/Disale superspeed and highspeed controls
 
         Args:
             self: The self parameter is a reference to the current 
@@ -448,7 +448,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             stat: updated the status for superspeed enable/disable
         Returns:
-            return None
+            None
         """
         if(stat):
             self.rbtn_ss0.Enable()
@@ -468,20 +468,20 @@ class Dev3141Window(wx.Panel):
             stat: updated the status for enable/disable 
             device orientation controls
         Returns:
-            return None
+            None
         """
         pass
     
     def speed_cmd(self,val):
         """
-        Speed change command to 3141 Device
+        Speed change command to Model3141 Device
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables
             that belongs to the class.
             val: port command update based on Speed Selection. 
         Returns:
-            return None
+            None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
         res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
@@ -493,13 +493,13 @@ class Dev3141Window(wx.Panel):
     
     def get_orientation(self):    
         """
-        Get Device Orientation from the Status 
+        Get Device Orientation from the Status device flip or normal
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         strin = "--"
         res, outstr = serialDev.send_status_cmd(self.top.devHand)
@@ -531,14 +531,14 @@ class Dev3141Window(wx.Panel):
     
     def update_carrier(self, str):
         """
-        Display the Carrier direction in UI
+        Display the Device Orientation in UI
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables
             that belongs to the class.
             str: display the string for update carrier 
         Returns:
-            return None
+            None
         """
         self.st_do.SetLabel(str)
     
@@ -550,7 +550,7 @@ class Dev3141Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if(self.top.con_flg):
             res, outstr = serialDev.read_port_cmd(self.top.devHand)
@@ -575,7 +575,7 @@ class Dev3141Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if self.auto_flg:
             self.auto_flg = False
@@ -591,7 +591,7 @@ class Dev3141Window(wx.Panel):
             that belongs to the class.
             port: update the port led 
         Returns:
-            return None
+            None
         """
         if(port == 0):
             self.port_led_update(port, False)

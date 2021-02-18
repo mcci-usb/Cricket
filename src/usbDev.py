@@ -30,18 +30,21 @@ from uiGlobals import *
 ##############################################################################
 def get_tree_change(top):
     """
-    Get USB Device Tree changes list 
+    Get USB Device Tree changes list and print the list in USB Device Tree
+    View Changes Window
     Args:
         top: create a object
     Returns:
-        return None
+        None
     """
-    # Usb scanning 
+    # Usb device scanning 
     dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
-    # Save usb data list
+    
+    # Save usb device list
     top.save_usb_list(newlist)
+    
     strchg = None
 
     adlist = [i for i in newlist if i not in oldlist]
@@ -50,28 +53,30 @@ def get_tree_change(top):
     strout = ""
     
     if(len(adlist) == 0 and len(rmlist) == 0):
-        # No device added removed from port print "No change"
+        # No device added removed from port, then print "No change"
         strout = ("No Change\n")
     
     if(len(rmlist)):
-        # Usb removed from the port print "Removed"
+        # Usb removed from the port, then print "Removed"
         strout = strout + "Removed\n"
         strout = strout + get_usb_device_info(rmlist)
 
     if(len(adlist)):   
-        # Usb Added from the port print "Added"
+        # Usb Added from the port, then print "Added"
         strout = strout + "Added\n"
         strout = strout + get_usb_device_info(adlist)
-
+    
+    # Print the device list USB Device Tree Window
     top.print_on_usb(strout)
 
 def get_usb_device_info(udlist):
     """
     Show VID, PID and Speed info of added/removed USB devices 
     Args:
-        udlist: usb device list
+        udlist: usb device list which are removed/added recently
     Returns:
-        return None
+        strdev: String which contains the VID, PID and Speed info of the USB 
+        device list
     """
     dlist = get_usb_class(udlist)
     cnt = 0
@@ -93,14 +98,15 @@ def get_usb_device_info(udlist):
             vpid = " (VID_"+hvid+"; PID_"+hpid+")"
             strdev = strdev + str(cnt)+ ". " + vpid + " Device Error\n"
     
-    return strdev       
+    return strdev
+     
 def get_usb_class(clist):
     """
-    Get USB class 
+    Get class of the USB device  
     Args:
-        clist:usb class list
+        clist: List contains the USB devices
     Returns:
-        return None
+        flist: Contains the class of the given USB devices
     """ 
     nlist = []
     for i in range(len(clist)):

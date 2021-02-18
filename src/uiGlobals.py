@@ -161,7 +161,7 @@ class NumericValidator(wx.Validator):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         wx.Validator.__init__(self)
         self.Bind(wx.EVT_CHAR, self.OnChar)
@@ -176,7 +176,9 @@ class NumericValidator(wx.Validator):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return NumericValidator()
+            NumericValidator(): return True if all characters in the string are
+            numaric charecters    
+
         """
         return NumericValidator()
    
@@ -187,10 +189,9 @@ class NumericValidator(wx.Validator):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
+            win: window object is created.
         Returns:
-            return NumericValidator()
+           val.isdigit - "True" if all characters in the string are digits.
         """
         # Returns the window associated with the validator.
         tc  = self.GetWindow()
@@ -199,16 +200,14 @@ class NumericValidator(wx.Validator):
    
     def OnChar(self, evt):
         """
-        Only charachters 
+        all key names and charachters dirctly can use. 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
             evt:evt handler to display the characters
         Returns:
-            return NumericValidator()
+            None
         """
         # Returns the window associated with the validator.
         tc = self.GetWindow()

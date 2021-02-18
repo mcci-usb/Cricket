@@ -50,11 +50,9 @@ class AboutWindow(wx.Window):
             that belongs to the class.
             parent: Pointer to a parent window.
             top: create a object
-
         Returns:
-             return None
+            None
         """
-
         wx.Window.__init__(self, parent, -1,
                            size=wx.Size(100,100),
                            style=wx.CLIP_CHILDREN,
@@ -118,7 +116,7 @@ class AboutWindow(wx.Window):
             evt: The event parameter in the OnClick() method is an 
             object specific to a particular event type.
         Returns:
-            return None        
+            None        
         """
         self.GetParent().OnOK(evt)
    
@@ -132,7 +130,7 @@ class AboutWindow(wx.Window):
             evt: The event parameter in the OnClick() method is an 
             object specific to a particular event type.
         Returns:
-            return None        
+            None        
         """
         self.Layout()
 
@@ -151,7 +149,7 @@ class AboutDialog(wx.Dialog):
             parent: Pointer to a parent window.
             top: create a object
         Returns:
-            return None
+            None
         """
         wx.Dialog.__init__(self, parent, -1, "About",
                            size=wx.Size(100, 100),
@@ -176,10 +174,10 @@ class AboutDialog(wx.Dialog):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
+            evt: The event parameter in the OnOK() method is an 
             object specific to a particular event type.
         Returns:
-            return None        
+            None        
         """
     # Returns numeric code to caller
         self.EndModal(wx.ID_OK)
@@ -191,9 +189,9 @@ class AboutDialog(wx.Dialog):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
+            evt: The event parameter in the OnSize() method is an 
             object specific to a particular event type.
         Returns:
-            return None        
+            None        
         """ 
         self.Layout()

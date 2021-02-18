@@ -59,7 +59,7 @@ class Dev2101Window(wx.Panel):
     """
     def __init__(self, parent, top):
         """
-        Device specific functions and UI for interfacing Model 2101 with GUI 
+        Device specific functions and UI for interfacing Model 2101 with GUI
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -67,7 +67,7 @@ class Dev2101Window(wx.Panel):
             parent: Pointer to a parent window.
             top: create a object
         Returns:
-            return None
+            None
         """
         wx.Panel.__init__(self, parent)
         
@@ -156,7 +156,7 @@ class Dev2101Window(wx.Panel):
         self.Layout()
     def OnOffPort (self, e):
         """
-        Event Handler for single Port Switches
+        Event Handler for single Port Switches On and Off
 
         Args:
             self:The self parameter is a reference to the current 
@@ -166,7 +166,7 @@ class Dev2101Window(wx.Panel):
             object specific to a particular event type.
             event hanlder for OnOffPort switch
         Returns:
-            return None
+            None
         """
         # Returns the object (usually a window) associated,
         # With the event, if any.
@@ -178,7 +178,7 @@ class Dev2101Window(wx.Panel):
             self.port_on_manual(cbi)
     def PortSpeedChanged(self, e):
         """
-        Event Handler for Port Speed Change
+        Event Handler for Port Speed Change for Highspeed and Superspeed
 
         Args:
             self:The self parameter is a reference to the current 
@@ -188,7 +188,7 @@ class Dev2101Window(wx.Panel):
             object specific to a particular event type.
             Event Handler for Port Speed Change
         Returns:
-            return None
+            None
         """
         # Returns the object (usually a window) associated
         # with the event, if any
@@ -203,6 +203,7 @@ class Dev2101Window(wx.Panel):
       
     def UsbTimer(self, e):
         """
+        Usb timer set to the switching a ports On and Off
         Timer Event for USB Tree View Changes
 
         Args:
@@ -213,7 +214,7 @@ class Dev2101Window(wx.Panel):
             object specific to a particular event type.
             Timer Event for USB Tree View Changes
         Returns:
-            return None
+            None
         """
         self.timer_usb.Stop()
         try:
@@ -233,7 +234,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             port: manually controlling the ports.
         Returns:
-            return None
+            None
         """
         for i in range (len (self.rbtn)):
             if(port == i):
@@ -245,7 +246,7 @@ class Dev2101Window(wx.Panel):
     def port_on(self, port, stat):
         """
         Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command 
-        received from Loop Window
+        received from Loop Window, also button state change.
 
         Args:
             self: The self parameter is a reference to the current 
@@ -254,7 +255,7 @@ class Dev2101Window(wx.Panel):
             port: ports update
             stat: return status for port on cmd and port led update
         Returns:
-            return None
+            None
         """  
         if(stat):
             self.port_on_cmd(port)
@@ -268,7 +269,7 @@ class Dev2101Window(wx.Panel):
      
     def port_on_cmd(self, port):
         """
-        Port ON Command
+        send the Port ON Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -277,7 +278,7 @@ class Dev2101Window(wx.Panel):
             port: to select the port in Loop mode,
             print Port ON in log windwo
         Returns:
-            return None
+            None
         """ 
         d2101.control_port(self.top.selPort, self.portcmd)
         # print port ON 
@@ -286,7 +287,7 @@ class Dev2101Window(wx.Panel):
        
     def port_off_cmd(self, port):
         """
-        Port OFF Command
+        send the Port OFF Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -295,7 +296,7 @@ class Dev2101Window(wx.Panel):
             port: to select the port in Loop mode,
             print Port OFF in Log window
         Returns:
-            return None
+            None
         """
         d2101.control_port(self.top.selPort, DEV_DISCONNECT)
         self.top.print_on_log("Port OFF\n")
@@ -310,14 +311,14 @@ class Dev2101Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
          
     def port_led_update(self, port, stat):
         """
-        Update the Port Indication
+        Update the Port led On/Off Indication
 
         Args:
             self: The self parameter is a reference to the current 
@@ -326,7 +327,7 @@ class Dev2101Window(wx.Panel):
             port: port ON/OFF updated
             stat: return status for port led status updated 
         Returns:
-            return None
+            None
         """
         if(stat):
             self.rbtn[0].SetBitmap(self.picn)
@@ -343,7 +344,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             mode: update mode controls
         Returns:
-            return None
+            None
         """         
         if mode == MODE_MANUAL:
             self.enable_controls(True)
@@ -360,7 +361,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             stat: updated the status for widgets enable/disable
         Returns:
-            return None
+            None
         """
         if not self.top.con_flg:
             stat = False
@@ -378,7 +379,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             stat: updated the status port switch enable/disable
         Returns:
-            return None
+            None
         """              
 
         stat = self.top.con_flg
@@ -397,7 +398,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             stat: updated the status for superspeed enable/disable
         Returns:
-            return None
+            None
         """
         if(stat):
             self.rbtn_ss0.Enable()
@@ -415,7 +416,7 @@ class Dev2101Window(wx.Panel):
             that belongs to the class.
             val: port command update based on Speed Selection. 
         Returns:
-            return None
+            None
         """
         if(val == 1):
             self.top.print_on_log("Super Speed Enabled\n")
@@ -432,7 +433,7 @@ class Dev2101Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if self.top.con_flg:
             self.enable_controls(True)
@@ -446,7 +447,7 @@ class Dev2101Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return None
+            None
         """
         if self.auto_flg:
             self.auto_flg = False
