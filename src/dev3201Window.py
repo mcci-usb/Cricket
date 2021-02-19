@@ -41,7 +41,7 @@ class Dev3201Window(wx.Window):
     """
     A class dev3201Window with init method
 
-    the dev3201Window navigate to Super speed and High speed enable 
+    The dev3201Window navigate to Super speed and High speed enable 
     or disable options.
     """
     def __init__(self, parent, top):
@@ -52,7 +52,7 @@ class Dev3201Window(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """
@@ -213,7 +213,7 @@ class Dev3201Window(wx.Window):
 
     def OnOffPort (self, e):
         """
-        Event Handler for 4 Switches port On/Off method 
+        Event Handler for port On/Off method 
 
         Args:
             self:The self parameter is a reference to the current 
@@ -232,7 +232,7 @@ class Dev3201Window(wx.Window):
     
     def VoltsCmd(self, evt):
         """
-        send the device voltage command
+        Send the device voltage command
 
         Args:
             self:The self parameter is a reference to the current 
@@ -248,7 +248,7 @@ class Dev3201Window(wx.Window):
 
     def get_voltage(self):
         """
-        getting the device voltage 
+        Get device voltage and display 
 
         Args:
             self:The self parameter is a reference to the current 
@@ -272,7 +272,7 @@ class Dev3201Window(wx.Window):
 
     def AmpsCmd(self, evt):
         """
-        sending the device amps command
+        Send the device amps command
 
         Args:
             self:The self parameter is a reference to the current 
@@ -288,7 +288,7 @@ class Dev3201Window(wx.Window):
     
     def get_amps(self):
         """
-        getting the amp in device 3201model 
+        Get device amps and display 
 
         Args:
             self:The self parameter is a reference to the current 
@@ -318,8 +318,8 @@ class Dev3201Window(wx.Window):
     
     def PortSpeedChanged(self, e):
         """
-        updated the port speed chang select in 
-        superspeed and highspeed radio buttons.
+        Event handler, port speed change update
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -346,7 +346,6 @@ class Dev3201Window(wx.Window):
     
     def UsbTimer(self, e):
         """
-        Usb timer set to the switching a ports On and Off
         Timer Event for USB Tree View Changes
 
         Args:
@@ -369,7 +368,7 @@ class Dev3201Window(wx.Window):
     
     def VaTimer(self, e):
         """
-        Timer Event could update in volts and amps
+        Timer Event to update volts and amps of 3201
 
         Args:
             self:The self parameter is a reference to the current 
@@ -389,7 +388,7 @@ class Dev3201Window(wx.Window):
       
     def port_on_manual(self, port):
         """
-        device Port ON in Manual Mode
+        Port ON in Manual Mode
 
         Args:
             self: The self parameter is a reference to the current 
@@ -414,7 +413,7 @@ class Dev3201Window(wx.Window):
     
     def port_on(self, port, stat):
         """
-        Port ON/OFF in Auto and Loop Mode, while in Loop Mode Command received 
+        Port ON/OFF in Auto and Loop Mode, while in Loop Mode
         Command received from Loop Window
         Args:
             self: The self parameter is a reference to the current 
@@ -441,7 +440,7 @@ class Dev3201Window(wx.Window):
     
     def port_on_cmd(self, pno):
         """
-        sending the device Port ON Command
+        Sending the device Port ON Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -464,7 +463,7 @@ class Dev3201Window(wx.Window):
           
     def port_off_cmd(self, pno):
         """
-        sendng the Port OFF Command
+        Sendng the Port OFF Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -563,7 +562,7 @@ class Dev3201Window(wx.Window):
 
     def enable_controls(self, stat):
         """
-        Enable/Disable All Widgets in UI3201,
+        Enable/Disable All Widgets of 3201,
         usb device speed and update volts,amps.
 
         Args:
@@ -582,7 +581,7 @@ class Dev3201Window(wx.Window):
     
     def enable_port_controls(self, stat):
         """
-        Enable/Diasble 4 Port Switch 
+        Enable/Diasble Port controls 
 
         Args:
             self: The self parameter is a reference to the current 
@@ -645,7 +644,7 @@ class Dev3201Window(wx.Window):
     
     def update_volts(self, str):
         """
-        update the voltage level in string
+        update the voltage level of Port
 
         Args:
             self: The self parameter is a reference to the current 
@@ -660,7 +659,7 @@ class Dev3201Window(wx.Window):
     
     def update_amps(self, str):
         """
-        update the Amps level in Label
+        update the Amps level of Port
 
         Args:
             self: The self parameter is a reference to the current 
@@ -676,8 +675,7 @@ class Dev3201Window(wx.Window):
     # Speed change command to 3201 Device
     def speed_cmd(self,val):
         """
-        sending the device Speed command
-
+        Send device Speed command to 3201
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -740,7 +738,7 @@ class Dev3201Window(wx.Window):
     
     def init_ports(self, port):
         """
-        During connect map the indication to the device status
+        During device connect, map the indication to the device status
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables

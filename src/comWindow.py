@@ -50,7 +50,7 @@ class ComWindow(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """
@@ -164,7 +164,7 @@ class ComWindow(wx.Panel):
    
     def ConnectDevice(self, evt):
         """
-        Event Handler for Connect the device
+        Event Handler for Connect Button, to connect device
         Connect status will be displayed in the statusbar 
         Args:
             self: The self parameter is a reference to the current 

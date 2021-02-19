@@ -3,7 +3,7 @@
 # Module: control2101.py
 #
 # Description:
-#     Scan the USB bus and get the list of Model2101 devices attached
+#     Scan the USB bus and get the list of Model 2101 devices attached
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -34,6 +34,7 @@ import usb.util
 from usb.backend import libusb1
 import xml.dom.minidom
 
+# platform dependent imports
 if sys.platform == 'darwin':
     import hid
     
@@ -53,7 +54,7 @@ def scan_2101():
     Args:
         No arguments
     Returns:
-        No return
+        None
     """
     dlist = []
     if sys.platform == 'darwin':
@@ -65,13 +66,14 @@ def scan_2101():
                                  find_all=1): 
             dlist.append(get_serial_number(dev))
     return dlist
+
 def get_serial_number(dev):
     """
     Get Serial number of the model 2101 device
     Args:
-        dev:found the attached device 2101
+        dev: 2101 device found in the USB bus 
     Returns:
-        return the device serial number
+        serial number of the device in String format
     """
     ret = dev.ctrl_transfer(0x80, 0x06, 0x303, 0x409, 0x1a)
 
@@ -97,7 +99,7 @@ def get_path(serialno):
     Args:
         serialno: serial number of device 2101
     Returns:
-        path: device serial number path
+        Object - path of the device 2101
     """
     path = None
     # Real device
@@ -114,9 +116,8 @@ def get_device(serialno):
     Args:
         serialno: serial number of device 2101
     Returns:
-        dev2101:return the device VID, PID
+        Device object of 2101
     """     
-
     dev2101 = None
     # will return Device object with device VendorID, ProductID
     for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101,
@@ -129,12 +130,12 @@ def get_device(serialno):
       
 def control_port(serialno, portdata):
     """
-    Controlling Model2101 port for 2101 operations 
+    Controlling Model 2101 speed change and Port On/Off 
     Args:
         serialno: serial number of device 2101
         portdata: portdata return device highspeed and superspeed
     Return:
-        result: It is used both for OUT and IN transfers
+        Number of bytes pushed to 2101
         
     """
     result = None

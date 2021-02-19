@@ -32,8 +32,9 @@ def get_tree_change(top):
     """
     Get USB Device Tree changes list and print the list in USB Device Tree
     View Changes Window
+
     Args:
-        top: create a object
+        top: creates an object
     Returns:
         None
     """
@@ -72,8 +73,9 @@ def get_tree_change(top):
 def get_usb_device_info(udlist):
     """
     Show VID, PID and Speed info of added/removed USB devices 
+
     Args:
-        udlist: usb device list which are removed/added recently
+        udlist: USB device list which are removed/added recently
     Returns:
         strdev: String which contains the VID, PID and Speed info of the USB 
         device list
@@ -103,10 +105,11 @@ def get_usb_device_info(udlist):
 def get_usb_class(clist):
     """
     Get class of the USB device  
+
     Args:
         clist: List contains the USB devices
     Returns:
-        flist: Contains the class of the given USB devices
+        flist: List contains the class of the given USB devices
     """ 
     nlist = []
     for i in range(len(clist)):

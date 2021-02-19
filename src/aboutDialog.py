@@ -49,7 +49,7 @@ class AboutWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """

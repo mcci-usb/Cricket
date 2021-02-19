@@ -38,11 +38,12 @@ from uiGlobals import *
 ##############################################################################
 def check_port():
     """
-    Check the connected device is unplugged
+    Scan the USB port and collect all the device under a list
     Args:
         No argument
     Return:
-        port_name -  open serial port name      
+        port_name -  list of availablable port numbers and serial number of 
+        the 2101     
     """
     comlist = serial.tools.list_ports.comports()
     port_name = []
@@ -57,12 +58,12 @@ def check_port():
 def search_port():
     """
     Search USB port for list of Plugged devices
-    Filtered the devices using VID and PID
-    Required by comWindow.py for device search
+    Filter 3141, 3201 and 2101 from the list
     Args:
         No argument
     Return:
-        rdict - A list of the serial ports available on the system
+        rdict - A dictionary of two lists, one for port number and another for
+        Model number
     """
     # It will print a list of available ports
     comlist = serial.tools.list_ports.comports()

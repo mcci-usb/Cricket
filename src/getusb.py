@@ -38,6 +38,7 @@ def scan_usb():
     """
     Scan the USB bus for the list of plugged devices
     Required for device tree view changes
+    
     Args:
         No arguments
         

@@ -48,7 +48,7 @@ class AutoWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """
@@ -340,17 +340,14 @@ class AutoWindow(wx.Window):
     
     def get_interval(self):
         """
-        Retrieves the get_interval
-        Read Interval from Input text
+        Read Interval of Auto mode
 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            self.tc_ival.GetValue():it return contains string format
-            GetValue() function is used to returns True,
-            If the interval is checked, False otherwise. 
+            Auto mode interval in String format. 
         """
         tival = self.tc_ival.GetValue()
         if(tival == ""):
@@ -360,21 +357,20 @@ class AutoWindow(wx.Window):
             ival = 1000
         elif(ival > 60000):
             ival = 60000
-        # SetValue() method sets the interval as true()
+        
         self.tc_ival.SetValue(str(ival))
-        # GetValue() function is used to returns True,
-        # If the interval is checked, False otherwise. 
+        
         return self.tc_ival.GetValue()
     
     def set_interval(self, strval):
         """
-        set interval for On, Off , duty ports 
+        Set interval of Auto mode 
 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strval:srting format 
+            strval: Interval value in String format 
         Returns:
             None
         """
@@ -383,15 +379,14 @@ class AutoWindow(wx.Window):
     
     def get_duty(self):
         """
-        get duty is the ratio of On and Off time to the period
+        Read the Duty % of Auto mode
         
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return self.tc_duty.GetValue(): it returns the string format
-            text control duty modified it returns true
+            Duty value in String format
         """
 
         duty = self.tc_duty.GetValue()
@@ -406,7 +401,7 @@ class AutoWindow(wx.Window):
     
     def set_port_count(self, port):
         """
-        Set the toal ports are count list
+        Set number of ports based on selected Switch Model
 
         Args:
             self: The self parameter is a reference to the current 
@@ -417,9 +412,10 @@ class AutoWindow(wx.Window):
             None
         """
         self.total_ports = port
+
     def UsbTimer(self, e):
         """
-        Usb timer set to the switching a ports On and Off
+        Timer handler for USB device scan.
 
         Args:
             self: The self parameter is a reference to the current 
@@ -442,15 +438,16 @@ class AutoWindow(wx.Window):
     
     def usb_dly_warning(self):        
         """
-        USB device tr delay warning on popup window, the delay 
-        should be higher than the interval
-        Check USB delay while starting Auto Mode
+        Show warning message when the USB delay is greater than Auto
+        mode interval.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            it retuen boolean
+            Boolean: True- when wish to continue the auto mode, 
+            False - when wish to exit the auto mode
         """
         if(int(self.get_interval()) < int(self.top.get_enum_delay())):
             if(self.top.get_delay_status()):
@@ -476,7 +473,8 @@ class AutoWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            it returns string format
+            Boolean: True - when wish to continue the Auto mode
+            False - when wish to exit the Auto mode
         """ 
         self.get_all_three()
         if (self.OnTime < 500 or self.OffTime < 500):
@@ -494,7 +492,7 @@ class AutoWindow(wx.Window):
     
     def update_controls(self, mode):
         """
-        Enable/Disable widgets when mode changed
+        Enable/Disable Auto window widgets when mode changed
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables

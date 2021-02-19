@@ -37,7 +37,6 @@ PORTS = 1
 ##############################################################################
 # 2101 Control Words
 ##############################################################################
-
 CHECK_STATUS    = 0x00
 DEV_RESET       = 0x01
 DEV_VERSION     = 0x02
@@ -154,9 +153,10 @@ class Dev2101Window(wx.Panel):
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
+
     def OnOffPort (self, e):
         """
-        Event Handler for single Port Switches On and Off
+        Event Handler for Port On and Off
 
         Args:
             self:The self parameter is a reference to the current 
@@ -176,9 +176,10 @@ class Dev2101Window(wx.Panel):
         cbi = co.GetId()
         if self.top.mode == MODE_MANUAL and not self.usb_flg:
             self.port_on_manual(cbi)
+
     def PortSpeedChanged(self, e):
         """
-        Event Handler for Port Speed Change for Highspeed and Superspeed
+        Event Handler for Port Speed Changing Radio button
 
         Args:
             self:The self parameter is a reference to the current 
@@ -203,7 +204,6 @@ class Dev2101Window(wx.Panel):
       
     def UsbTimer(self, e):
         """
-        Usb timer set to the switching a ports On and Off
         Timer Event for USB Tree View Changes
 
         Args:
@@ -226,7 +226,7 @@ class Dev2101Window(wx.Panel):
       
     def port_on_manual(self, port):
         """
-        Port ON in Manual Mode
+        Port ON/OFF in Manual Mode
 
         Args:
             self: The self parameter is a reference to the current 
@@ -269,7 +269,7 @@ class Dev2101Window(wx.Panel):
      
     def port_on_cmd(self, port):
         """
-        send the Port ON Command
+        Send the Port ON Command to 2101
 
         Args:
             self: The self parameter is a reference to the current 
@@ -287,7 +287,7 @@ class Dev2101Window(wx.Panel):
        
     def port_off_cmd(self, port):
         """
-        send the Port OFF Command
+        Send the Port OFF Command 2101
 
         Args:
             self: The self parameter is a reference to the current 

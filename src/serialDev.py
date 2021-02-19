@@ -30,10 +30,10 @@ import serial
 ##############################################################################
 def open_serial_device(top):
     """
-    Open Serial Port of the selected device (3141/3201/2101)
-    lists of serial port names
+    Open Serial Port of the selected device (3141/3201)
+    
     Args:
-        top: create a object
+        top: creates an object
     Returns:
         True: A list of the serial ports available on the system     
     """
@@ -55,13 +55,13 @@ def open_serial_device(top):
 def send_port_cmd(phand,cmd):
     """
     Send Port Control Command
+
     Args:
         phnad:send Serial port
-        cmd:cmd with string
+        cmd:cmd in String format
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     res = write_serial(phand, cmd)
     if res == 0:
@@ -73,13 +73,13 @@ def send_port_cmd(phand,cmd):
 
 def send_status_cmd(phand):
     """
-    Send Status Command for usb write and read serial cmd
+    Send status command to read the status of the connected Model
+
     Args:
-        phnad:send the serial cmd for check orientation
+        phnad: status command in String format
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     cnt = 0
     strin = ""
@@ -101,13 +101,13 @@ def send_status_cmd(phand):
 
 def send_volts_cmd(phand):
     """
-    Sending  the  Volts Command for usb device model3201
+    Send command to read the Volt parameter from the model 3201
+
     Args:
-        phnad: volts in serial command
+        phnad: Volt read command in String format
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     cmd = 'volts\r\n'
     res = write_serial(phand, cmd)
@@ -120,13 +120,13 @@ def send_volts_cmd(phand):
 
 def send_amps_cmd(phand):
     """
-    Sending the Amps Command for device model3201
+    Send command to read the Ampere parameter from the model 3201
+
     Args:
-        phnad:argument for send Amps command
+        phnad: Amp read command in String format 
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     cmd = 'amps\r\n'
     res = write_serial(phand, cmd)
@@ -139,13 +139,13 @@ def send_amps_cmd(phand):
 
 def send_sn_cmd(phand):
     """
-    Send Serial Number Command for attached device
+    Send Serial Number Command for the attached Model (3141/3201)
+    
     Args:
-        phnad:argument for device serial number
+        phnad: Serial number read command in String format 
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     cmd = 'sn\r\n'
     res = write_serial(phand, cmd)
@@ -158,13 +158,13 @@ def send_sn_cmd(phand):
 
 def read_port_cmd(phand):
     """
-    Read Port Command, to check port status of the 3141/3201/2101
+    Read Port Command, to check port status of the Port in 3141/3201
+
     Args:
-        phnad:read serial port
+        phnad: Serial port handler
     Returns:
-        res: int which contains the result of read serial cmd 
-        or write serial 
-        rstr: which is contains string format
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
     """
     cmd = 'port\r\n'
     res = write_serial(phand, cmd)
@@ -177,12 +177,14 @@ def read_port_cmd(phand):
 
 def write_serial(phand, cmd):
     """
-    Send data over the Serial Port
+    Send data over the Serial Port to the connected model
+
     Args:
-        phnad:argument for sending the serial data
-        cmd:cmd for serial data with string format
+        phnad: Serial port handler
+        cmd: Data to be written in string format
     Returns:
-        which contains returns int
+        0  - When write success
+        -1 - When write failed 
     """
     try:
         phand.write(cmd.encode())
@@ -193,10 +195,12 @@ def write_serial(phand, cmd):
 def read_serial(phand):
     """
     Read data from the Serial Port
+
     Args:
-       phnad:argument for read data from serail port 
+       phnad: Serial port handler
     Returns:
-        which contains returns int
+        0  - When read success
+        -1 - When read  failed
     """
     try:
         return  0, phand.readline().decode('utf-8')

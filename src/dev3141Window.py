@@ -52,7 +52,7 @@ class Dev3141Window(wx.Panel):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """
@@ -169,7 +169,7 @@ class Dev3141Window(wx.Panel):
     
     def OnOffPort (self, e):
         """
-        Event Handler for 2 Port Switches port On and Off
+        Event Handler for Port On and Off
 
         Args:
             self:The self parameter is a reference to the current 
@@ -192,8 +192,8 @@ class Dev3141Window(wx.Panel):
     
     def PortSpeedChanged(self, e):
         """
-        Event handler for Speed change Radio buttons select port speed
-        it contains superspeed and highspeed.
+        Event handler for Speed change Radio buttons.
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -217,9 +217,9 @@ class Dev3141Window(wx.Panel):
         elif id == ID_RBTN_SS0:
             # Returs highspeed 
             self.speed_cmd(0)
+
     def UsbTimer(self, e):
         """
-        Usb timer set to the switching a ports On and Off
         Timer Event for USB Tree View Changes
         Args:
             self:The self parameter is a reference to the current 
@@ -241,8 +241,8 @@ class Dev3141Window(wx.Panel):
   
     def DoTimer(self, e):
         """
-        once the port in on after 3sec orientation is check flip or normal  
-
+        Timer event to get device orientation after port On/Off
+        
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -283,7 +283,7 @@ class Dev3141Window(wx.Panel):
       
     def port_on(self, port, stat):
         """
-        port button is on button state could change
+        Port On/Off and update the status
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -305,7 +305,7 @@ class Dev3141Window(wx.Panel):
     
     def port_on_cmd(self, pno):
         """
-        receive the command for Port ON Command
+        Send Port ON Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -328,7 +328,7 @@ class Dev3141Window(wx.Panel):
        
     def port_off_cmd(self, pno):
         """
-        receive the command for Port OFF Command
+        Send Port OFF Command
 
         Args:
             self: The self parameter is a reference to the current 
@@ -402,7 +402,7 @@ class Dev3141Window(wx.Panel):
             
     def enable_controls(self, stat):
         """
-        Enable/Disable All Widgets in UI3141, disbale for all widgets
+        Enable/Disable All Widgets based on stat
 
         Args:
             self: The self parameter is a reference to the current 
@@ -420,7 +420,7 @@ class Dev3141Window(wx.Panel):
        
     def enable_port_controls(self, stat):
         """
-        button widgets Enable/Diasble 2 Port Switch
+        Enable/Diasble Port Switch widgets
 
         Args:
             self: The self parameter is a reference to the current 
@@ -440,7 +440,7 @@ class Dev3141Window(wx.Panel):
     
     def enable_speed_controls(self, stat):
         """
-        Enable/Disale superspeed and highspeed controls
+        Enable/Disale speed controls
 
         Args:
             self: The self parameter is a reference to the current 
@@ -493,7 +493,7 @@ class Dev3141Window(wx.Panel):
     
     def get_orientation(self):    
         """
-        Get Device Orientation from the Status device flip or normal
+        Get Device Orientation from the device status
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables
@@ -531,7 +531,7 @@ class Dev3141Window(wx.Panel):
     
     def update_carrier(self, str):
         """
-        Display the Device Orientation in UI
+        Display the Device Orientation status in UI
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables

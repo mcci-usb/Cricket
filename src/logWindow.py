@@ -35,7 +35,7 @@ class LogWindow(wx.Window):
     """
     A class logWindow with init method
 
-    the logWindow navigate to displayed the scrollable list of strings 
+    To show the all actions while handling ports of devices 
     """ 
     def __init__(self, parent, top):
         """
@@ -45,7 +45,7 @@ class LogWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
             parent: Pointer to a parent window.
-            top: create a object
+            top: creates an object
         Returns:
             None
         """
@@ -118,7 +118,7 @@ class LogWindow(wx.Window):
 
     def ClearLogWindow(self, e):
         """
-        Clear a Log Window data
+        Clear the Log Window.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -132,7 +132,7 @@ class LogWindow(wx.Window):
     
     def SaveLogWindow(self, e):
         """
-        save the Logwindow data
+        Save the Logwindow data
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -147,13 +147,13 @@ class LogWindow(wx.Window):
     
     def get_time_stamp(self):
         """
-        if check the time stamp update with time series.
+        Get system time stamp.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class. 
         Returns:
-            cstr - return the time with years
+            cstr - Time stamp
         """
         ct = datetime.now()
         # Format using strftime 
@@ -163,7 +163,7 @@ class LogWindow(wx.Window):
      
     def print_on_log(self, strin):
         """
-        it contains Shows the Content or data on LogWindow with time stamp
+        Update the data in Log Window
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -181,12 +181,12 @@ class LogWindow(wx.Window):
      
     def is_usb_enabled(self):
         """
-        Get the status of USB Scan selection option
+        Get the status of USB Device Tree View Enable option
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class. 
         Returns:
-            self.chk_usb.GetValue(): check the usb tree view is enable
+            Boolean: True - Enabled, False - Disabled
         """
         return self.chk_usb.GetValue()

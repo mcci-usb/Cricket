@@ -156,6 +156,7 @@ class NumericValidator(wx.Validator):
     def __init__(self):
         """
         Only digits are allowed in the address.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -170,7 +171,8 @@ class NumericValidator(wx.Validator):
     
     def Clone(self, arg=None):
         """
-        clone Only digits are allowed in the address. 
+        Only digits are allowed in the address. 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -184,7 +186,8 @@ class NumericValidator(wx.Validator):
    
     def Validate(self, win):
         """
-        Only digits are allowed in the address. 
+        Only digits are allowed in the textcontrol. 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -201,6 +204,7 @@ class NumericValidator(wx.Validator):
     def OnChar(self, evt):
         """
         all key names and charachters dirctly can use. 
+        
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables

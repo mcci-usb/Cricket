@@ -61,6 +61,7 @@ class MultiStatus (wx.StatusBar):
     def __init__ (self, parent):
         """
         Associates a status bar with the frame.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -174,6 +175,7 @@ class UiPanel(wx.Panel):
     def PrintLog(self, strin):
         """
         print data/status on logwindow 
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -187,6 +189,7 @@ class UiPanel(wx.Panel):
     def print_on_usb(self, strin):
         """
         print usb device info on treewindow and Logwindow.
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -203,6 +206,7 @@ class UiPanel(wx.Panel):
     def get_enum_delay(self):
         """
         Get the USB Enumaration delay 
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -215,6 +219,7 @@ class UiPanel(wx.Panel):
     def get_delay_status(self):
         """
         Get the status of USB device Enumeration delay check box
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -227,6 +232,7 @@ class UiPanel(wx.Panel):
     def get_interval(self):
         """
         Get the interval parameter of Auto Mode
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -239,6 +245,7 @@ class UiPanel(wx.Panel):
     def set_interval(self, strval):
         """
         Update/Set the Auto Mode interval
+
         Args: 
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -252,6 +259,7 @@ class UiPanel(wx.Panel):
     def disable_usb_scan(self):
         """
         Disable the USB device scan by uncheck the check box
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -263,7 +271,8 @@ class UiPanel(wx.Panel):
     
     def get_loop_param(self):
         """
-        this function calls getting the loop window prameters
+        Get the Loop Window prameters
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -275,7 +284,8 @@ class UiPanel(wx.Panel):
     
     def get_auto_param(self):
         """
-        this function calls getting the auto window prameters
+        Get the Auto Window prameters
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -287,12 +297,13 @@ class UiPanel(wx.Panel):
     
     def set_period(self, strval):
         """
-        set the period
+        Set the period for Loop Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strval: string value
+            strval: Period value in String format
         Returns:
             return None
         """
@@ -300,7 +311,8 @@ class UiPanel(wx.Panel):
 
     def set_port_list(self, ports):
         """
-        set the ports list for loopPan and autoPan
+        Set the ports list for Loop Window and Auto Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -314,7 +326,8 @@ class UiPanel(wx.Panel):
     
     def port_on(self, port, stat):
         """
-        to select a device and switching the port
+        Port On/Off command from Loop and Auto Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -328,7 +341,8 @@ class UiPanel(wx.Panel):
     
     def update_controls(self, mode):
         """
-        update the controls for selecting device
+        Update the controls based on the mode
+        
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -344,7 +358,8 @@ class UiPanel(wx.Panel):
     
     def device_connected(self):
         """
-        Model device connected
+        Once device connected, Model Window get updated with selected Model
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -362,7 +377,9 @@ class UiPanel(wx.Panel):
     
     def device_disconnected(self):
         """
-        model device disconnected
+        Once device disconnected, disable all controls in Model, Loop 
+        and Auto Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -376,7 +393,7 @@ class UiPanel(wx.Panel):
     
     def auto_connect(self):
         """
-        device auto connect for disable last connected device
+        Once application loaded, initiate the auto connect 
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -392,7 +409,8 @@ class UiMainFrame (wx.Frame):
     """
     def __init__ (self, parent, title):
         """
-        device auto connect
+        MainFrame initialization
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -465,6 +483,7 @@ class UiMainFrame (wx.Frame):
             self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW,
                                        "&Cricket\tAlt+Ctrl+1")
             self.winMenu.Check(ID_MENU_WIN_SHOW, True) 
+
         # Create menubar
         if sys.platform != 'darwin':
             self.menuBar.Append(self.fileMenu,    "&File")
@@ -545,7 +564,8 @@ class UiMainFrame (wx.Frame):
     
     def UpdateStatusBar (self):
         """
-        device details update in status bar
+        Update the device status in status bar, when connect/disconnect
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -559,6 +579,7 @@ class UiMainFrame (wx.Frame):
     def UpdateAll (self, textList):
         """
         Status bar update - All fields
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -573,7 +594,8 @@ class UiMainFrame (wx.Frame):
     
     def UpdatePort (self):
         """
-        Status bar update - Port
+        Status bar update - Port number
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -589,7 +611,8 @@ class UiMainFrame (wx.Frame):
     
     def UpdateDevice (self):
         """
-        Status bar update - Device
+        Status bar update - Device(Model) Name
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -603,6 +626,7 @@ class UiMainFrame (wx.Frame):
     def UpdateSingle(self, newStr, idx):
         """
         Status bar update - Any of One field
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -618,6 +642,8 @@ class UiMainFrame (wx.Frame):
     def OnAboutWindow(self, event):
         """
         Virtual event handlers, overide them in your derived class
+        About UI Software
+
         Args:
            self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -634,6 +660,7 @@ class UiMainFrame (wx.Frame):
         """
         Virtual event handlers, overide them in your derived class
         for Window Close
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -648,6 +675,7 @@ class UiMainFrame (wx.Frame):
     def OnIconize (self, event):
         """
         Virtual event handlers, overide them in your derived classmenu
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -667,6 +695,7 @@ class UiMainFrame (wx.Frame):
     def OnHideWindow (self, event):
         """
         Event Handler hide the window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -681,7 +710,8 @@ class UiMainFrame (wx.Frame):
     
     def OnShowWindow (self, event):
         """
-        Event Handler for show window
+        Event Handler for showing window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -696,7 +726,8 @@ class UiMainFrame (wx.Frame):
     
     def save_usb_list(self, mlist):
         """
-        Keep USB device list in a list
+        Keep USB device list in a list - reference list
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -710,23 +741,25 @@ class UiMainFrame (wx.Frame):
     def get_usb_list(self):
         """
         Get usb device list
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            masterList- list updated device added or removed
+            masterList- Added or removed device list
         """
         return self.masterList
     
     def print_on_log(self, strin):
         """
-        Show content in Log Window
+        Show data in Log Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strin: update string format
+            strin: data in String format
         Returns:
             return None
         """
@@ -734,12 +767,13 @@ class UiMainFrame (wx.Frame):
     
     def print_on_usb(self, strin):
         """
-        Show content in USB Device Tree View
+        Show data in USB Device Tree View
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            strin: update string format
+            strin: data in String format
         Returns:
             None
         """
@@ -748,54 +782,59 @@ class UiMainFrame (wx.Frame):
     def get_enum_delay(self):
         """
         Get USB device Enumeration delay
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            get_enum_delay- device enumaration
+            Enumeration delay in String format
         """
         return self.panel.get_enum_delay()
     
     def get_delay_status(self):
         """
-        Checkbox status of USB Enumeration delay option
+        Get Checkbox status of USB Enumeration delay option
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            get_delay_status- gettig the status between switching device 
+            Boolean: True - if Checked, False - if unchecked
         """
         return self.panel.get_delay_status()
     
     def get_loop_param(self):
         """
         Get Loop Window delay parameters
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            get_loop_param - return the loop param
+            Loop delay in String format
         """
         return self.panel.get_loop_param()
     
     def get_auto_param(self):
         """
         Get Auto Window delay parameters
+
         Args  
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            get_auto_param- return the auto mode param
+            Auto Window paramaeter in String format
         """
         return self.panel.get_auto_param()
     
     def set_period(self, strval):
         """
         Set Loop Mode period
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -809,6 +848,7 @@ class UiMainFrame (wx.Frame):
     def set_port_list(self, ports):
         """
         Set Port list for loop Window port selection
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -822,18 +862,20 @@ class UiMainFrame (wx.Frame):
     def get_interval(self):
         """
         Get Auto mode time interval
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            panel.get_interval- return the interval switching 
+            Auto mode interval in String format
         """
         return self.panel.get_interval()
     
     def set_interval(self, strval):
         """
         Set Auto mode time interval when override by USB delay warning
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -848,6 +890,7 @@ class UiMainFrame (wx.Frame):
         """
         Called by Loop Window, Device Window and COM Window
         When Normal-Auto-Loop trasition
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -862,6 +905,7 @@ class UiMainFrame (wx.Frame):
     def disable_usb_scan(self):
         """
         Called by device window based on USB delay warning selection
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -874,6 +918,7 @@ class UiMainFrame (wx.Frame):
     def port_on(self, port, stat):
         """
         Port ON/OFF command from Loop Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -888,6 +933,7 @@ class UiMainFrame (wx.Frame):
     def device_connected(self):
         """
         intervalCalled by COM Window when devide get connected
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -901,6 +947,7 @@ class UiMainFrame (wx.Frame):
     def device_disconnected(self):
         """
         Called by COM Window when the device get disconnected
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -914,6 +961,7 @@ class UiMainFrame (wx.Frame):
         """
         Update plugged USB device list in Status bar.
         Called by usbDev.py
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -933,6 +981,7 @@ class UiMainFrame (wx.Frame):
         """
         Export the LogWindow/USBTreeWindow content to a file
         Called by LogWindow and USB Tree View Window
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -975,7 +1024,8 @@ class UiMainFrame (wx.Frame):
     
     def StoreDevice(self):
         """
-        store the device configarartion
+        Store the device configuration
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1018,9 +1068,10 @@ class UiApp(wx.App):
     """
     def OnInit (self):
         """
-        override OnInit to do applicaition initialization
+        Override OnInit to do applicaition initialization
         to ensure that the system, toolkit and wxWidgets are fully 
         initialized.
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1032,7 +1083,8 @@ class UiApp(wx.App):
     
     def CustInit(self):
         """
-        showing the title on UI frame with UI title name
+        Showing the title on UI frame with UI title name
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1047,6 +1099,7 @@ class UiApp(wx.App):
 def run():
     """
     Enty point of the application which initialise the UiApp Class
+    
     Args: None
     Returns: None
     """
