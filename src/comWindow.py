@@ -45,6 +45,7 @@ class ComWindow(wx.Panel):
         """
         comWindow that contains the about scan device and 
         connect device(s).
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -114,6 +115,7 @@ class ComWindow(wx.Panel):
     def ScanDevice(self, evt):
         """
         Scan the list of connected devices over the USB bus
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -129,6 +131,7 @@ class ComWindow(wx.Panel):
         """
         Event Handler for Device Search Button.
         search the device(s) its displays in the statusbar and dropdown box 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -166,6 +169,7 @@ class ComWindow(wx.Panel):
         """
         Event Handler for Connect Button, to connect device
         Connect status will be displayed in the statusbar 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -185,6 +189,7 @@ class ComWindow(wx.Panel):
     def ComServ(self, e):
         """
         Scan the USB/COM port to check the status of the connected device
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -207,6 +212,7 @@ class ComWindow(wx.Panel):
     def disconnect_device(self):
         """
         Disconnect the connected device
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -235,6 +241,7 @@ class ComWindow(wx.Panel):
     def device_connected(self):
         """
         Connect the selected device
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -257,7 +264,8 @@ class ComWindow(wx.Panel):
     
     def get_selected_com(self):
         """
-        Get the selected Com port and Switch Model  
+        Get the selected Com port and Switch Model
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -272,6 +280,7 @@ class ComWindow(wx.Panel):
     def connect_device(self):    
         """
         Establish the connection with selected Model
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -292,7 +301,9 @@ class ComWindow(wx.Panel):
             self.device_connected() 
     def auto_connect(self):
         """
-        Do connect device automatically if last connected device is available
+        Do connect device automatically if the last connected device is 
+        available
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables

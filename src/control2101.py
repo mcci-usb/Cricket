@@ -51,6 +51,7 @@ def scan_2101():
     """
     Scan list of 2101 in the USB bus, returns a list with 
     Serial number of 2101
+
     Args:
         No arguments
     Returns:
@@ -70,6 +71,7 @@ def scan_2101():
 def get_serial_number(dev):
     """
     Get Serial number of the model 2101 device
+
     Args:
         dev: 2101 device found in the USB bus 
     Returns:
@@ -96,6 +98,7 @@ def get_path(serialno):
     """
     Get Device path for the selected serial number of 2101
     Only for hid in Mac
+
     Args:
         serialno: serial number of device 2101
     Returns:
@@ -112,7 +115,8 @@ def get_path(serialno):
 def get_device(serialno):
     """
     Get Device object for the selected serial number of 2101
-    for Windows and Linux   
+    for Windows and Linux
+
     Args:
         serialno: serial number of device 2101
     Returns:
@@ -130,7 +134,8 @@ def get_device(serialno):
       
 def control_port(serialno, portdata):
     """
-    Controlling Model 2101 speed change and Port On/Off 
+    Controlling Model 2101 speed change and Port On/Off
+     
     Args:
         serialno: serial number of device 2101
         portdata: portdata return device highspeed and superspeed

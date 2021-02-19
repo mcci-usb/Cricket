@@ -43,6 +43,7 @@ class AutoWindow(wx.Window):
     def __init__(self, parent, top):
         """
         autoWindow that contains the about dialog elements.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -231,6 +232,7 @@ class AutoWindow(wx.Window):
     def TimerServ(self, evt):
         """
         Timer Event for Port ON/OFF in Auto Mode
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -262,6 +264,7 @@ class AutoWindow(wx.Window):
     def port_on(self, portno, stat):
         """
         Port ON/OFF command send to Connected Device Module
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -309,7 +312,8 @@ class AutoWindow(wx.Window):
     def get_all_three(self):
         """
         Calculate Port ON Time and OFF Time from Interval and Duty
-        get three time periods(On, Off) in auto mode
+        get three time periods(On, Off) in Auto mode
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -468,6 +472,7 @@ class AutoWindow(wx.Window):
     def onoff_dly_warning(self):
         """
         Check ON/OFF Time interval if it is < 500 msec popup a warning message
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -493,6 +498,7 @@ class AutoWindow(wx.Window):
     def update_controls(self, mode):
         """
         Enable/Disable Auto window widgets when mode changed
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -509,6 +515,7 @@ class AutoWindow(wx.Window):
     def enable_controls(self, stat):
         """
         Enable/Disable Auto mode Controls
+
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -540,6 +547,7 @@ class AutoWindow(wx.Window):
     def device_disconnected(self):
         """
         Called when device get disconnected show Popup messgage
+        
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables

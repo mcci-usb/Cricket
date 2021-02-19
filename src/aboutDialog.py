@@ -109,6 +109,7 @@ class AboutWindow(wx.Window):
         OnClick() event handler function retrieves the label of 
         source button, which caused the click event. 
         That label is printed on the console.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -123,6 +124,7 @@ class AboutWindow(wx.Window):
     def OnSize (self, evt):
         """
         OnSize() event handler function retrieves the about window size. 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -142,6 +144,7 @@ class AboutDialog(wx.Dialog):
         """
         A AboutDialog is Window an application creates to 
         retrieve Cricket UI Application input.
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -170,6 +173,7 @@ class AboutDialog(wx.Dialog):
         """
         OnOK() event handler function retrieves the label of 
         source button, which caused the click event. 
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -185,6 +189,7 @@ class AboutDialog(wx.Dialog):
     def OnSize (self, evt):
         """
         OnSize() event handler function retrieves the about window size. 
+        
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
