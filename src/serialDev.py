@@ -1,27 +1,42 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI Application
-# File    : serialDev.py
-#----------------------------------------------------------------------
-# Handle serial comm script for 3141 and 3201 USB switch
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
-
+##############################################################################
+# 
+# Module: serialDev.py
+#
+# Description:
+#     Handle serial comm script for 3141 and 3201 USB switch
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#       Module created
+##############################################################################
+# Lib imports
 import wx
 import serial
 
-
-#======================================================================
-# COMPONENTS
-#======================================================================
-
-# Open Serial Port of the selected device (3141/3201)
+##############################################################################
+# Utilities
+##############################################################################
 def open_serial_device(top):
-
+    """
+    Open Serial Port of the selected device (3141/3201)
+    
+    Args:
+        top: creates an object
+    Returns:
+        True: A list of the serial ports available on the system     
+    """
     top.devHand.port = top.selPort
     top.devHand.baudrate = 115200
     top.devHand.bytesize = serial.EIGHTBITS
@@ -37,8 +52,17 @@ def open_serial_device(top):
         wx.MessageBox(""+str(e), "Com Port Error", wx.OK, top)
         return False
 
-# Send Port Control Command
 def send_port_cmd(phand,cmd):
+    """
+    Send Port Control Command
+
+    Args:
+        phnad:send Serial port
+        cmd:cmd in String format
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     res = write_serial(phand, cmd)
     if res == 0:
         res, rstr = read_serial(phand)
@@ -47,8 +71,16 @@ def send_port_cmd(phand,cmd):
     rstr = "Comm Error\n"
     return res, rstr
 
-# Send Status Command to check Orientation
 def send_status_cmd(phand):
+    """
+    Send status command to read the status of the connected Model
+
+    Args:
+        phnad: status command in String format
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     cnt = 0
     strin = ""
     cmd = 'status\r\n'
@@ -67,8 +99,16 @@ def send_status_cmd(phand):
         srrin = "Comm Error\n"
         return res, strin
 
-# Send Volts Command
 def send_volts_cmd(phand):
+    """
+    Send command to read the Volt parameter from the model 3201
+
+    Args:
+        phnad: Volt read command in String format
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     cmd = 'volts\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -78,8 +118,16 @@ def send_volts_cmd(phand):
     rstr = "Comm Error\n"
     return res, rstr
 
-# Send Amps Command
 def send_amps_cmd(phand):
+    """
+    Send command to read the Ampere parameter from the model 3201
+
+    Args:
+        phnad: Amp read command in String format 
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     cmd = 'amps\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -89,8 +137,16 @@ def send_amps_cmd(phand):
     rstr = "Comm Error\n"
     return res, rstr 
 
-# Send Serial Number Command
 def send_sn_cmd(phand):
+    """
+    Send Serial Number Command for the attached Model (3141/3201)
+    
+    Args:
+        phnad: Serial number read command in String format 
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     cmd = 'sn\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -100,8 +156,16 @@ def send_sn_cmd(phand):
     rstr = "Comm Error\n"
     return res, rstr
 
-# Read Port Command, to check port status of the 3141/3201
 def read_port_cmd(phand):
+    """
+    Read Port Command, to check port status of the Port in 3141/3201
+
+    Args:
+        phnad: Serial port handler
+    Returns:
+        res: interger - length of data read from or write to serial
+        rstr: data read from the serial port in String format
+    """
     cmd = 'port\r\n'
     res = write_serial(phand, cmd)
     if res == 0:
@@ -111,16 +175,33 @@ def read_port_cmd(phand):
     rstr = "Comm Error\n"
     return res, rstr
 
-# Send data over the Serial Port
 def write_serial(phand, cmd):
+    """
+    Send data over the Serial Port to the connected model
+
+    Args:
+        phnad: Serial port handler
+        cmd: Data to be written in string format
+    Returns:
+        0  - When write success
+        -1 - When write failed 
+    """
     try:
         phand.write(cmd.encode())
         return 0
     except:
         return -1
 
-# Read data from the Serial Port
 def read_serial(phand):
+    """
+    Read data from the Serial Port
+
+    Args:
+       phnad: Serial port handler
+    Returns:
+        0  - When read success
+        -1 - When read  failed
+    """
     try:
         return  0, phand.readline().decode('utf-8')
     except:

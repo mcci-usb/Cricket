@@ -77,6 +77,33 @@ Note:
 * If the installation of wxpython is not success, perform `sudo apt-get install build-essential libgtk-3-dev`
 * Some times the installation of wxpython takes longer time (>30 minutes).
 
+<strong>On RaspberryPI:</strong>
+
+Development environment
+
+* Raspberry Pi OS - aarch64 in Ubuntu 20.04 bit
+* Python - 3.6.9
+* wxgtk-4.0
+* pyserial - 3.5
+* pyusb - 1.1.1
+* libusb - 1.0.23b7
+* libusb1 - 1.9
+* pyinstaller - 4.2
+
+```shell
+sudo add-apt-repository ppa:swt-techie/wxpython4
+sudo apt-get update
+sudo apt-get install python3-wxgtk4.0
+sudo pip3 install pyserial
+sudo pip3 install pyusb
+sudo pip3 install libusb
+sudo pip3 install libusb1
+sudo pip3 install pyinstaller
+```
+
+Note:
+* If the installation of wxpython is not success, perform `sudo apt-get install build-essential libgtk-3-dev`
+
 ## Interpret python source
 
 Move to the directory `destdir/src/`
@@ -89,6 +116,11 @@ python main.py
 ```
 
 For Linux and Mac
+```shell
+python3 main.py
+```
+
+For RaspberryPi
 ```shell
 python3 main.py
 ```
