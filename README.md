@@ -11,6 +11,7 @@
 - [GUI Preview](#gui-preview)
 - [MCCI Home Page](#To-visit-MCCI-Better-Connection) 
 - [MCCI Model 3201 Enhanced Type-C Connection Exerciser](#To-know-about-MCCI-USB-Model3201)
+- [MCCI Model 3141 USB Switch](#To-know-about-MCCI-USB-Model3141)
 
 <!-- /TOC -->
 
