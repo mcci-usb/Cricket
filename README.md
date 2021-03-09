@@ -138,7 +138,7 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To know about MCCI usb Model3201
+## To know about MCCI USB Model3201
 
 MCCI Model 3201 Enhanced Type-C Connection Exerciser 
 
@@ -156,6 +156,17 @@ MCCI Model 3141 USB Switch
 The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
  **Link:** For more information, see the product home page at :([MCCI Model 3141 USB Switch](https://mcci.com/usb/dev-tools/model-3141/))
+ 
+  ![Model3141-typeC](assets/TypeC3141.PNG)
+  
+## To know about MCCI USB Model2101
+
+MCCI Model 2101 USB Connection Exerciser
+
+* The MCCI USB 3.0 Connection Exerciser Model 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.  
+The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
+
+ **Link:** For more information, see the product home page at :([MCCI Model 2101 USB Connection Exerciser](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/))
  
   ![Model3141-typeC](assets/TypeC3141.PNG)
   
