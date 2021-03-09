@@ -138,3 +138,5 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
+## Model2101 Connection Exerciser
+![Model2101](assets/Model2101.png)
