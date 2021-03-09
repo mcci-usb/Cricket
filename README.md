@@ -147,5 +147,16 @@ MCCI Model 3201 Enhanced Type-C Connection Exerciser
  **Link:** For more information, see the product home page at :([MCCI Model 3201 Enhanced Type-C Connection Exerciser ](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/))
  
    ![Model3201-typeC](assets/Model3201.png)
+   
+ ## To know about MCCI USB Model3141
+
+MCCI Model 3141 USB Switch
+
+* The MCCI® Model 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
+The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
+
+ **Link:** For more information, see the product home page at :([MCCI Model 3141 USB Switch](https://mcci.com/usb/dev-tools/model-3141/))
+ 
+   ![Model3201-typeC](assets/Model3141.png)
  
   
