@@ -168,5 +168,5 @@ The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to
 
  **Link:** For more information, see the product home page at :([MCCI Model 2101 USB Connection Exerciser](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/))
  
-  ![Model3141-typeC](assets/Model3201.PNG)
+  ![Model3201](assets/Model3201.png)
   
