@@ -138,6 +138,10 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
+## To visit MCCI Better Connection 
+
+**Link:** see the MCCI Product home page at :([MCCI Home](https://mcci.com/))
+
 ## To know about MCCI USB Model3201
 
 MCCI Model 3201 Enhanced Type-C Connection Exerciser 
