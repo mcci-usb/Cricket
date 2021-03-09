@@ -138,3 +138,13 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
+## To know about MCCI usb 3201Model
+
+MCCI Model 3201 Enhanced Type-C Connection Exerciser 
+
+* The MCCI Model 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+
+ **Link:** For more information, see the product home page at :<https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/>
+ ![3201Model-typeC](assets/Model3201.png)
+ 
+  
