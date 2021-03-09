@@ -138,7 +138,7 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To know about MCCI usb 3201Model
+## To know about MCCI usb Model3201
 
 MCCI Model 3201 Enhanced Type-C Connection Exerciser 
 
@@ -146,6 +146,6 @@ MCCI Model 3201 Enhanced Type-C Connection Exerciser
 
  **Link:** For more information, see the product home page at :<https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/>
  
-                     ![3201Model-typeC](assets/Model3201.png)
+   ![Model3201-typeC](assets/Model3201.png)
  
   
