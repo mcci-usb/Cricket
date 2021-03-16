@@ -9,7 +9,7 @@
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [mcci.com](#To-visit-MCCI-Better-Connection) 
+- [mcci.com](#mcci product page) 
 - [3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
 - [model 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
 - [model 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
@@ -142,12 +142,11 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To visit MCCI Better Connection 
+### Support Open Source Hardware and Software
 
-MCCI Home Page
+MCCI invests time and resources providing this open source code, please support MCCI and open-source hardware by purchasing products from MCCI, Adafruit and other open-source hardware/software vendors!
 
-**Link:** see the MCCI Product home page at [mcci.com](https://mcci.com/).
- For information about MCCI's products, please visit [store.mcci.com](https://store.mcci.com/).
+For information about MCCI's products, please visit [store.mcci.com](https://store.mcci.com/).
 
 
 ## To know about MCCI USB Model3201
