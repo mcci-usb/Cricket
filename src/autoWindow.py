@@ -3,7 +3,7 @@
 # Module: autoWindow.py
 #
 # Description:
-#     autoWindow for Switch Model 3201,Model 3141 and Model 2101
+#     autoWindow for Switch Model 3201,Model 3141 and Model 2101, Model 2301
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by

@@ -90,6 +90,15 @@ def scan_usb():
             tempDict["bus"] = str(d.bus)
             tempDict["speed"]= d.speed
             hub_list.append(tempDict)
+        #--------------------- device3101 ------------------
+        elif(d.bDeviceClass == 9 and d.port_number != 0):
+            tempDict = {}
+            tempDict["vid"] = str(d.idVendor)
+            tempDict["pid"] = str(d.idProduct)
+            tempDict["bus"] = str(d.bus)
+            tempDict["speed"]= d.speed
+            hub_list.append(tempDict)
+        #----------------------------------------------------
         else:
             tempDict = {}
             tempDict["vid"] = str(d.idVendor)

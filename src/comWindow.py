@@ -3,7 +3,7 @@
 # Module: comWindow.py
 #
 # Description:
-#     UI for device search and interface of 3141 and 3201 switches
+#     UI for device search and interface of 3141 and 3201, 2101, 2301 switches
 #     Interact with search script and serial device script
 #
 # Copyright notice:
@@ -100,7 +100,7 @@ class ComWindow(wx.Panel):
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
         self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
-                                            "Models (3141, 3201, 2101)"))  
+                                            "Models (3141, 3201, 2101,2301)"))  
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
@@ -237,7 +237,7 @@ class ComWindow(wx.Panel):
         # Print on logwindow
         self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
                               +" Disconnected!\n")
-    
+        
     def device_connected(self):
         """
         Connect the selected device
@@ -291,6 +291,10 @@ class ComWindow(wx.Panel):
         # Combo box, device list is disable
         self.cb_device.Disable()
         self.top.selPort, devname = self.get_selected_com()
+        if devname == DEVICES[DEV_2301]:
+            self.top.selBaud = 9600
+        else:
+            self.top.selBaud = 115200
         for i in range(len(DEVICES)):
             if devname == DEVICES[i]:
                 self.top.selDevice = i

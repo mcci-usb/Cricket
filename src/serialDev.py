@@ -3,7 +3,7 @@
 # Module: serialDev.py
 #
 # Description:
-#     Handle serial comm script for 3141 and 3201 USB switch
+#     Handle serial comm script for 3141 and 3201 , 2301 USB switch
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -38,7 +38,8 @@ def open_serial_device(top):
         True: A list of the serial ports available on the system     
     """
     top.devHand.port = top.selPort
-    top.devHand.baudrate = 115200
+    top.devHand.baudrate = top.selBaud
+    
     top.devHand.bytesize = serial.EIGHTBITS
     top.devHand.parity = serial.PARITY_NONE
     top.devHand.timeout = 1

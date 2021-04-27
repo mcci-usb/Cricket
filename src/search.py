@@ -55,10 +55,14 @@ def check_port():
         port_name.append(dev)
     return port_name
 
+def search_port1():
+    search_port()
+
+
 def search_port():
     """
     Search USB port for list of Plugged devices
-    Filter 3141, 3201 and 2101 from the list
+    Filter 3141, 3201 and 2101 ,2301 from the list
     Args:
         No argument
     Return:
@@ -99,7 +103,23 @@ def search_port():
             elif(nstr.find('12') != -1):
                 rev_list.append(port_name[i])
                 dev_list.append(DEVICES[DEV_3201])
-            # Close serial port
+            ser.close()
+
+            ser = serial.Serial(port=port_name[i], baudrate=9600, 
+                                bytesize=serial.EIGHTBITS,
+                                parity=serial.PARITY_NONE, timeout=1, 
+                                stopbits=serial.STOPBITS_ONE)
+            time.sleep(1)
+    
+            cmd = 'version\r\n'
+    
+            ser.write(cmd.encode())
+            strout = ser.readline().decode('utf-8')
+            nstr = strout[2:]
+            if(nstr.find('08') != -1):
+                rev_list.append(port_name[i])
+                dev_list.append(DEVICES[DEV_2301])
+
             ser.close()
         # There is no new data from serial port
         except serial.SerialException as e:
