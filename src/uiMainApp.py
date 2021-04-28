@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
 #       Module created
 ##############################################################################
 # Lib imports
@@ -133,10 +133,9 @@ class UiPanel(wx.Panel):
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
         self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
         self.vboxdl.Add(self.dev3201Pan, 0, wx.EXPAND)
-        #------------------------------------------------
         self.vboxdl.Add(self.dev2301Pan, 0, wx.EXPAND)
-        #------------------------------------------------
         self.vboxdl.Add(self.dev2101Pan, 0, wx.EXPAND)
+
         self.vboxdl.Add(0, 10, 0)
         self.vboxdl.Add(self.autoPan, 1, wx.EXPAND)
 
@@ -148,7 +147,7 @@ class UiPanel(wx.Panel):
         # Hide the dev3201Window and dev2101Window
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev2101Pan)
-        self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxdl.Hide(self.dev2301Pan)
 
         self.vboxl = wx.BoxSizer(wx.VERTICAL)
         self.vboxl.Add((0,20), 0, wx.EXPAND)
