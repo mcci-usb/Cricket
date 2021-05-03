@@ -9,10 +9,11 @@
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [mcci.com](#mcci product page) 
+- [mcci.com](#mcci-product-page) 
 - [3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
 - [model 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
 - [model 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
+- [model 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
 
 <!-- /TOC -->
 
@@ -181,3 +182,12 @@ The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to
  
   ![Model3201](assets/Model2101.png)
   
+  ## To know about MCCI USB Model2301
+
+MCCI Model 2301 Type-A USB 3.2 Gen2 Connection Exerciser
+
+* The MCCI Model 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
+
+ **Link:** For more information, see the product home page at [model 2301 usb connection exerciser](https://mcci.com/usb/dev-tools/model-2301/).
+
+ ![Model2301](assets/Model2301.png)
