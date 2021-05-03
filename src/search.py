@@ -55,10 +55,6 @@ def check_port():
         port_name.append(dev)
     return port_name
 
-def search_port1():
-    search_port()
-
-
 def search_port():
     """
     Search USB port for list of Plugged devices
