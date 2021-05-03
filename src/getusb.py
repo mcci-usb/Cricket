@@ -1,53 +1,79 @@
-#======================================================================
-# (c) 2020  MCCI Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI Application
-# File    : getusb.py
-#----------------------------------------------------------------------
-#  Scan the USB bus and get the list of devices attached
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: getusb.py
+#
+# Description:
+#     Scan the USB bus and get the list of devices attached
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#       Module created
+##############################################################################
+# Built-in imports
 import sys
 import os
 
+# Own modules
 import usb.util
 from usb.backend import libusb1
 
 import xml.dom.minidom
 
-#======================================================================
-# COMPONENTS
-#======================================================================
-
-# Scan the USB bus for the list of plugged devices
-# Required for device tree view changes
+##############################################################################
+# Utilities
+##############################################################################
 def scan_usb():
+    """
+    Scan the USB bus for the list of plugged devices
+    Required for device tree view changes
+    
+    Args:
+        No arguments
+        
+    Returns:
+        None
+    """
+    # List of Host controllers
     hc_list = []
+    # List connected hub
     hub_list = []
+    #List connected peripheral
     per_list = []
     master_list = []
     
     tot_list = []
 
     masterDict = {} 
-
+    
+    # Create path and executable path
     path = sys.executable
 
     path = path.replace("python.exe", "")
 
     backend = None
-
+    # Running Python-application on Windows
     if sys.platform == 'windows':
         backend = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
                    path + "Lib/site-packages/libusb/_platform/_windows/x86"+
                    "/libusb-1.0.dll")
 
-    #generator object
-    usb_devices = usb.core.find(find_all=True, backend=backend)   
+    # Generator object
+    usb_devices = usb.core.find(find_all=True, backend=backend) 
 
+    # Here attached a list of Host controlloers, list of Hub,
+    # List of periperals info with specific vid, pid.
     for d in usb_devices:  # Device object
         if(d.bDeviceClass == 9 and d.port_number == 0):
             tempDict = {}
@@ -83,6 +109,7 @@ def scan_usb():
 
     for items in hdata:
         try:
+            # Find our device 
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
                                backend=backend)
@@ -92,12 +119,14 @@ def scan_usb():
                     sclist[i.bInterfaceNumber] = i.bInterfaceClass
                 items["ifc"] = sclist
         except:
+            # Print message
             print("Error")
 
     pdata = masterDict.get("peri")
     
     for items in pdata:
         try:
+            # Find our device 
             dl = usb.core.find(idVendor=int(items.get("vid")), 
                                idProduct=int(items.get("pid")), 
                                backend=backend)
@@ -107,6 +136,7 @@ def scan_usb():
                     sclist[i.bInterfaceNumber] = i.bInterfaceClass
                 items["ifc"] = sclist
         except:
+            # Print message
             print("Error")
 
     for i in range(len(hc_list)):
@@ -115,9 +145,10 @@ def scan_usb():
         master_list.append(hub_list[i])
     for i in range(len(per_list)):
         master_list.append(per_list[i])
-
+    # Running Python-application on darwin (MacOS)
     if sys.platform == 'darwin':
         xmldoc = os.popen("system_profiler -xml SPUSBDataType")
+        # Use the parse() function to load and parse an XML file
         domobj = xml.dom.minidom.parseString(xmldoc.read())
         keynode = domobj.getElementsByTagName("key")
         cn = []

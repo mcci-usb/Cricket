@@ -1,22 +1,34 @@
-#======================================================================
-# (c) 2020  MCCI Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 GUI application
-# File    : uiGlobals.py
-#----------------------------------------------------------------------
-# Define all global variables for the entire UI 3141/3201 App.
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: uiGlobal.py
+#
+# Description:
+#     Define all global variables for the entire UI Cricket App.
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#       Module created
+##############################################################################
+# Lib imports
 import wx
 
-#======================================================================
+##############################################################################
 # GLOBAL VARIABLES
-#======================================================================
+##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.3.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -31,8 +43,9 @@ MODE_LOOP   = 2
 DEV_3141    = 0
 DEV_3201    = 1
 DEV_2101    = 2
+DEV_2301    = 3
 
-DEVICES    = ["3141", "3201", "2101"]
+DEVICES    = ["3141", "3201", "2101", "2301"]
 
 IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
@@ -75,6 +88,7 @@ ID_MENU_SCRIPT_NEW = 1014
 ID_MENU_HELP_3141 = 1015
 ID_MENU_HELP_3201 = 1016
 ID_MENU_HELP_2101 = 1017
+ID_MENU_HELP_2301 = 1051
 ID_MENU_HELP_WEB = 1018
 ID_MENU_HELP_PORT = 1019
 ID_MENU_HELP_ABOUT = 1020
@@ -125,38 +139,83 @@ usbClass = {1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 
 
-#======================================================================
+##############################################################################
 # GLOBAL STRINGS
-#======================================================================
+##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
 VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 
-#======================================================================
+##############################################################################
 # GLOBAL FUNCTIONS
-#======================================================================
-
+##############################################################################
 class NumericValidator(wx.Validator):
+    """
+    Validator associated NumericValidator Control.
+    """
     def __init__(self):
         """
         Only digits are allowed in the address.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
         """
         wx.Validator.__init__(self)
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
         #wx.EVT_CHAR(self, self.OnChar)
-
+    
     def Clone(self, arg=None):
-        return NumericValidator()
+        """
+        Only digits are allowed in the address. 
 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            NumericValidator(): return True if all characters in the string are
+            numaric charecters    
+
+        """
+        return NumericValidator()
+   
     def Validate(self, win):
+        """
+        Only digits are allowed in the textcontrol. 
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            win: window object is created.
+        Returns:
+           val.isdigit - "True" if all characters in the string are digits.
+        """
+        # Returns the window associated with the validator.
         tc  = self.GetWindow()
         val = tc.GetValue()
         return val.isdigit()
-
+   
     def OnChar(self, evt):
+        """
+        all key names and charachters dirctly can use. 
+        
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:evt handler to display the characters
+        Returns:
+            None
+        """
+        # Returns the window associated with the validator.
         tc = self.GetWindow()
         key = evt.GetKeyCode()
 

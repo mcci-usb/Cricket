@@ -1,35 +1,61 @@
-#======================================================================
-# (c) 2020  MCCI, Inc.
-#----------------------------------------------------------------------
-# Project : UI3141/3201 Application
-# File    : loopWindow.py
-#----------------------------------------------------------------------
-# Loop Window for Switch 3141 and 3201
-#======================================================================
-
-#======================================================================
-# IMPORTS
-#======================================================================
+##############################################################################
+# 
+# Module: loopWindow.py
+#
+# Description:
+#     Loop Window for Switch Model3201,Model3141, Model2101
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#       Module created
+##############################################################################
+# Lib imports
 import wx
 
+# Own modules
 import serialDev
 import usbDev
 
 from uiGlobals import *
 import control2101 as d2101
-
-
-#======================================================================
-# COMPONENTS
-#======================================================================
-
+##############################################################################
+# Utilities
+##############################################################################
 class LoopWindow(wx.Window):
+    """
+    A class loopWindow with init method
+    Switching Ports of Slected Model in a Loop
+    """
     def __init__(self, parent, top):
+        """
+        Loop Window for Switch Model3201,Model3141, Model2101 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: creates an object
+        Returns:
+            None
+        """
         wx.Window.__init__(self, parent)
 
+        # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
 
-        #self.SetMinSize((200,200))
+        # Self.SetMinSize((200,200))
 
         self.parent = parent
         self.top = top
@@ -64,7 +90,8 @@ class LoopWindow(wx.Window):
         self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
                                       style = wx.ALIGN_RIGHT)
         self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "2000", size=(50,-1), 
-                                    style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
+                                    style = wx.TE_CENTRE |
+                                    wx.TE_PROCESS_ENTER,
                                     validator=NumericValidator(), 
                                     name="ON/OFF period")
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
@@ -73,7 +100,8 @@ class LoopWindow(wx.Window):
         self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
                                        style = wx.ALIGN_RIGHT)
         self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
-                                     style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
+                                     style = wx.TE_CENTRE | 
+                                     wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
         self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
@@ -82,7 +110,8 @@ class LoopWindow(wx.Window):
         self.st_cycle   = wx.StaticText(self, -1, "Repeat ", size=(50,15), 
                                         style = wx.ALIGN_RIGHT)
         self.tc_cycle   = wx.TextCtrl(self, ID_TC_CYCLE, "20", size=(50,-1), 
-                                      style = wx.TE_CENTRE | wx.TE_PROCESS_ENTER,
+                                      style = wx.TE_CENTRE |
+                                      wx.TE_PROCESS_ENTER,
                                       validator=NumericValidator(), 
                                       name="ON/OFF period")
         self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
@@ -94,13 +123,18 @@ class LoopWindow(wx.Window):
         self.tc_per.SetToolTip(wx.ToolTip("ON/OFF Interval. Min: 1 sec, "
                                           "Max: 60 sec"))
         self.btn_start.SetToolTip(wx.ToolTip("ON/OFF a selected port for a "
-                                             "interval until cycle completed"))
+                                            "interval until cycle completed"))
         
+        # The wx.TextCtrl period entering upto '5' Digits
         self.tc_per.SetMaxLength(5)
+        # The wx.TextCtrl duty entering upto '2' Digits
         self.tc_duty.SetMaxLength(2)
+        # The wx.TextCtrl Repeat entering upto '3' Digits
         self.tc_cycle.SetMaxLength(3)
+        # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
-
+        
+        # Creates BoxSizer in horizontal
         self.bs_psel = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
@@ -140,17 +174,21 @@ class LoopWindow(wx.Window):
 
         self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
         self.bs_cycle.Add(10,0,0)
-        self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL,
+        self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | 
+                                            wx.ALIGN_CENTER_VERTICAL,
                                             border = 0)
         self.bs_cycle.Add(5,10,0)
 
-        
+        # Create static box with naming of Loop Mode
         sb = wx.StaticBox(self, -1, "Loop Mode")
         
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
-
+        
+        # The Timer class allows you to execute 
+        # Code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+
         self.bs_vbox.AddMany([
             (self.bs_psel,1, wx.EXPAND),
             (self.bs_pers, 1, wx.EXPAND),
@@ -160,32 +198,61 @@ class LoopWindow(wx.Window):
             (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
             (0,10,0)
             ])
+        # Bind the button event to handler
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
+        # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         
+        # Set size of frame
         self.SetSizer(self.bs_vbox)
         self.bs_vbox.Fit(self)
         self.Layout()
 
         self.enable_controls(True)
 
-
-    # Loop button click event
     def StartAuto(self, evt):
+        """
+        Event handler for Loop Window Start/Stop
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:The event parameter in the loopwindow method is an 
+            object specific to a particular event type.
+            event hanlder for startAuto
+        Returns:
+            None
+        """
         if(self.start_flg):
+            # print status on Logwindow
             self.top.print_on_log("Loop Mode Interrupted\n")
+            # function of loop stop
             self.stop_loop()
         else:
+            # get the values for three controls
             self.get_all_three()
             if(self.usb_dly_warning() and self.onoff_dly_warning()):
+                #function of start loop
                 self.start_loop()
 
-    # Loop mode Timer service
     def TimerServ(self, evt):
+        """
+        Timer event handling device On/Off in Loop Window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:The event parameter in the loopwindow method is an 
+            object specific to a particular event type.
+        Returns:
+            None
+        """
         if self.top.con_flg:
             self.pulse_flg = True
             if(self.usb_flg == False):
+                # timerstop
                 self.timer.Stop()
                 self.pulse_flg = False
                 if(self.On_flg):
@@ -193,9 +260,12 @@ class LoopWindow(wx.Window):
                     self.On_flg = False
                     self.cycleCnt = self.cycleCnt + 1
                     if(self.cb_cycle.GetValue() != True):
-                        self.tc_cycle.SetValue(str(self.cycle - self.cycleCnt))
+                        self.tc_cycle.SetValue(str(self.cycle - 
+                                                   self.cycleCnt))
                         if(self.cycleCnt >= self.cycle):
                             self.tc_cycle.SetValue(str(self.cycle))
+                            # print message for loop Mode completed 
+                            # once duty cycle is over
                             self.top.print_on_log("Loop Mode Completed\n")
                             self.stop_loop()
                         else:    
@@ -206,9 +276,20 @@ class LoopWindow(wx.Window):
                     self.port_on(self.portno, True)
                     self.timer.Start(self.OnTime)
                     self.On_flg = True
-
-    # USB Tree View Changes Timer Service
+    
     def UsbTimer(self, e):
+        """
+        Timer Service for USB Device Tree View Changes 
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e:The event parameter in loopwindow method is an 
+            object specific to a particular event type.
+            event hanlder for UsbTimer
+        Returns:
+            None
+        """ 
         self.timer_usb.Stop()
         try:
             usbDev.get_tree_change(self.top)
@@ -218,9 +299,19 @@ class LoopWindow(wx.Window):
         
         if(self.start_flg == True & self.pulse_flg == True):
             self.timer.Start(1)
-
-    # Throws USB delay warning message, when the user wants to initiate loop mode
+    
     def usb_dly_warning(self):
+        """
+        Show warning message when the USB delay is greater than Loop
+        mode interval.
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            Boolean: True- when wish to continue the Loop mode, 
+            False - when wish to exit the Loop mode           
+        """
         if(self.top.get_delay_status()):
             if((int(self.OnTime) < int(self.top.get_enum_delay())) |
                (int(self.OffTime) < int(self.top.get_enum_delay()))):
@@ -237,9 +328,20 @@ class LoopWindow(wx.Window):
                 else:
                     return False
         return True
-
-    # Check ON/OFF Time interval if it is < 500 msec popup a warning message
+    
     def onoff_dly_warning(self):
+        """
+        Check ON/OFF Time interval if it is < 500 msec 
+        popup a warning message
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            Boolean: True - when wish to continue the Loop mode
+            False - when wish to exit the Loop mode
+        """ 
         self.get_all_three()
         if (self.OnTime < 500 or self.OffTime < 500):
             title = ("Port ON/OFF time warning!")
@@ -253,9 +355,17 @@ class LoopWindow(wx.Window):
             else:
                 return False
         return True
-
-    # Get ONOFF period
+    
     def get_period(self):
+        """
+        Read the period of Loop Mode
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            Loop mode period in String format. 
+        """
         dper = self.tc_per.GetValue()
         if(dper == ""):
             dper = "1000"
@@ -267,26 +377,53 @@ class LoopWindow(wx.Window):
 
         self.tc_per.SetValue(str(pval))
         return self.tc_per.GetValue()
-
-    # Set Period Called by USB Tree Window when there is a need to override the period
+  
     def set_period(self, strval):
+        """
+        Set Period Called by USB Tree Window when
+        there is a need to override the period
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strval: values in strings
+        Returns:
+            None
+        """
+        # Set the  value of str to True
         self.tc_per.SetValue(strval)
-
-    # Get Duty value
+     
     def get_duty(self):
+        """
+        Get Duty value of loop mode
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            Duty value in String format
+        """
+        # Print values of text control duty buttons True
         duty = self.tc_duty.GetValue()
         if (duty == ""):
             duty = "50"
         ival = int(duty)
         if(ival == 0):
             ival = 1
-        
+        # Set the value of duty "50"
         self.tc_duty.SetValue(str(ival))
         return self.tc_duty.GetValue()
-
-
-    # Get Cycle value
+    
     def get_cycle(self):
+        """
+        Get Cycle value of loop mode
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            Cycle value in String format
+        """
         cycle = self.tc_cycle.GetValue()
         if (cycle == ""):
             cycle = "20"
@@ -297,37 +434,73 @@ class LoopWindow(wx.Window):
         self.tc_cycle.SetValue(str(cval))
         return self.tc_cycle.GetValue()
 
-    # Get Period, Duty and Cycle values then calculate ON Time and OFF Time
     def get_all_three(self):
+        """
+        Get Period, Duty and Cycle values then
+        calculate ON Time and OFF Time
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.period = int(self.get_period())
         self.duty = int(self.get_duty())
         self.cycle = int(self.get_cycle())
 
         self.OnTime = self.period * (self.duty/100)
         self.OffTime = self.period - self.OnTime
-
-    # Send ON, OFF Time and Duty to USB Tree Window for USB delay validation
+    
     def get_loop_param(self):
+        """
+        Get the loop mode parameters
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            OnTime, OffTime, and Duty in String format
+        """
         self.get_all_three()
         return self.OnTime, self.OffTime, self.duty
 
-    # Start Loop Mode
     def start_loop(self):
+        """
+        Start Loop Mode
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.cval = self.cb_psel.GetValue()
         self.portno = int(self.cval)
         self.start_flg = True
         self.top.set_mode(MODE_LOOP)
+        # Command for loop start message
         self.loop_start_msg()
+        # Button Label name as Stop
         self.btn_start.SetLabel("Stop")
-        #self.stop_loop_mode()
+        # self.stop_loop_mode()
         if(self.timer.IsRunning() == False):
             self.cycleCnt = 0
             self.On_flg = True
             self.port_on(self.portno, True)
+            # Start the timer
             self.timer.Start(self.OnTime)
     
-    # Loop Mode start message log send to the Log Window
-    def loop_start_msg(self):
+    def loop_start_msg(self): 
+        """
+        Loop Mode start message print on the Log Window
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.get_all_three()
         lmstr = "Loop Mode start : ON-Time = {d1} ms,".\
                 format(d1=int(self.OnTime)) + \
@@ -338,35 +511,83 @@ class LoopWindow(wx.Window):
         else:
             lmstr = lmstr +" Cycle = {d3}\n".format(d3=self.cycle)
         self.top.print_on_log(lmstr)
-
-    # Stop Loop Mode - 1. When click stop 2. When cycle completed
+    
     def stop_loop(self):
+        """
+        Stop Loop Mode - 1. When click stop 2. When cycle completed
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.start_flg = False
         self.btn_start.SetLabel("Start")
         self.top.set_mode(MODE_MANUAL)
+        # Print the message if Loop Mode Stopped
         self.top.print_on_log("Loop Mode Stopped!\n")
+        # Timer stop
         self.timer.Stop()
-     
-    # Port ON/OFF command send to Connected Device Module
+    
     def port_on(self, portno, stat):
+        """
+        Port ON/OFF command send to Connected Device Module
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            portno: port number of the Model
+            stat: to update the status of Port in UI
+        Returns:
+            None
+        """
         self.top.port_on(portno, stat)
+        # Getting delay status
         if(self.top.get_delay_status()):
             self.keep_delay()
 
-    # USB delay Timer start
     def keep_delay(self):
+        """
+        Start the USB delay Timer
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.usb_flg = True
         self.timer_usb.Start(int(self.top.get_enum_delay()))
 
-    # Enable/Disable widgets when mode changed
     def update_controls(self, mode):
+        """
+        Enable/Disable widgets when mode changed
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            mode: Manual Mode/Auto Mode/Loop Mode
+        Returns:
+            None
+        """
         if mode == MODE_MANUAL:
             self.enable_controls(True)
         else:
             self.enable_controls(False)
-
-    # Widgets Disable/Enable
+    
     def enable_controls(self, stat):
+        """
+        Enable control widgets
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            stat:enable for all loop mode widgets else disable
+        Returns:
+            None
+        """
         if(stat):
             self.cb_psel.Enable()
             self.tc_per.Enable()
@@ -384,15 +605,34 @@ class LoopWindow(wx.Window):
                 self.btn_start.Disable()
         if not self.top.con_flg:
             self.btn_start.Disable()
-
-    # Set Port list to Combo box when Device gets connected
+    
     def set_port_list(self, port):
+        """
+        Set Port list to in Dropdown Control, when Device gets connected
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            port: Number of ports available in the selected Model
+        Returns:
+            None
+        """
         self.cb_psel.Clear()
         for i in range(port):
             self.cb_psel.Append(str(i+1))
         self.cb_psel.SetSelection(0)
-
-    # Called when device get disconnected
+    
     def device_disconnected(self):
+        """
+        Stop the Loop mode, when device get disconnected
+        
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         if self.start_flg:
             self.stop_loop()

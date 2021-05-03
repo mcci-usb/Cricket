@@ -1,9 +1,9 @@
 ##############################################################################
 # 
-# Module: dev3201Window.py
+# Module: dev2301Window.py
 #
 # Description:
-#     Device specific functions and UI for interfacing Model 3201 with GUI
+#     Device specific functions and UI for interfacing Model 2301 with GUI
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -37,16 +37,16 @@ PORTS = 4
 ##############################################################################
 # Utilities
 ##############################################################################
-class Dev3201Window(wx.Window):
+class Dev2301Window(wx.Window):
     """
-    A class dev3201Window with init method
+    A class dev2301Window with init method
 
-    The dev3201Window navigate to Super speed and High speed enable 
+    The dev2301Window navigate to Super speed and High speed enable 
     or disable options.
     """
     def __init__(self, parent, top):
         """
-        Device specific functions and UI for interfacing Model 3201 with GUI 
+        Device specific functions and UI for interfacing Model 2301 with GUI 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -173,7 +173,7 @@ class Dev3201Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
-        sb = wx.StaticBox(self, -1, "Model 3201")
+        sb = wx.StaticBox(self, -1, "Model 2301")
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
         self.vbox.AddMany([
@@ -219,7 +219,7 @@ class Dev3201Window(wx.Window):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3201Window method is an 
+            e:The event parameter in the dev2301Window method is an 
             object specific to a particular event type.
             event hanlder for OnOffPort switch
         Returns:
@@ -238,7 +238,7 @@ class Dev3201Window(wx.Window):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            evt:The event parameter in the dev3201Window method is an 
+            evt:The event parameter in the dev2301Window method is an 
             object specific to a particular event type.
             Event Handler for Volts Button
         Returns:
@@ -278,7 +278,7 @@ class Dev3201Window(wx.Window):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            evt:The event parameter in the dev3201Window method is an 
+            evt:The event parameter in the dev2301Window method is an 
             object specific to a particular event type.
             Event Handler for Amps Button
         Returns:
@@ -324,7 +324,7 @@ class Dev3201Window(wx.Window):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3201Window method is an 
+            e:The event parameter in the dev2301Window method is an 
             object specific to a particular event type.
             Event Handler for Port Speed Change
         Returns:
@@ -352,7 +352,7 @@ class Dev3201Window(wx.Window):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3201 method is an 
+            e:The event parameter in the dev2301 method is an 
             object specific to a particular event type.
             Timer Event for USB Tree View Changes
         Returns:
@@ -368,13 +368,13 @@ class Dev3201Window(wx.Window):
     
     def VaTimer(self, e):
         """
-        Timer Event to update volts and amps of 3201
+        Timer Event to update volts and amps of 2301
 
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3201 method is an 
+            e:The event parameter in the dev2301 method is an 
             object specific to a particular event type.
             event handler to orientation
         Returns:
@@ -562,7 +562,7 @@ class Dev3201Window(wx.Window):
 
     def enable_controls(self, stat):
         """
-        Enable/Disable All Widgets of 3201,
+        Enable/Disable All Widgets of 2301,
         usb device speed and update volts,amps.
 
         Args:
@@ -672,10 +672,10 @@ class Dev3201Window(wx.Window):
         # SetLabel as Amps
         self.st_amps.SetLabel(str)
 
-    # Speed change command to 3201 Device
+    # Speed change command to 2301 Device
     def speed_cmd(self,val):
         """
-        Send device Speed command to 3201
+        Send device Speed command to 2301
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -685,13 +685,12 @@ class Dev3201Window(wx.Window):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        print("\nSpeedCmd: ",cmd)
         res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
-        print("\nSpeed Result: ", res, outstr)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
             outstr = outstr.replace('0', 'Disabled')
+
         # Print on logwindow SuperSpeed Enabled or superspeed Disabled
         self.top.print_on_log(outstr)
     
@@ -717,7 +716,7 @@ class Dev3201Window(wx.Window):
                 self.enable_controls(True)
                 self.top.set_port_list(PORTS)
             else:
-                self.top.print_on_log("No response from 3201,\
+                self.top.print_on_log("No response from 2301,\
                                      please connect again!\n")
                 self.enable_controls(False)
     
