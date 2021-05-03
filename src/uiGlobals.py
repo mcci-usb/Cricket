@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -43,8 +43,9 @@ MODE_LOOP   = 2
 DEV_3141    = 0
 DEV_3201    = 1
 DEV_2101    = 2
+DEV_2301    = 3
 
-DEVICES    = ["3141", "3201", "2101"]
+DEVICES    = ["3141", "3201", "2101", "2301"]
 
 IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
@@ -87,6 +88,7 @@ ID_MENU_SCRIPT_NEW = 1014
 ID_MENU_HELP_3141 = 1015
 ID_MENU_HELP_3201 = 1016
 ID_MENU_HELP_2101 = 1017
+ID_MENU_HELP_2301 = 1051
 ID_MENU_HELP_WEB = 1018
 ID_MENU_HELP_PORT = 1019
 ID_MENU_HELP_ABOUT = 1020

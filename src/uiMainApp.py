@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
 #       Module created
 ##############################################################################
 # Lib imports
@@ -38,6 +38,7 @@ from uiGlobals import *
 import dev3141Window
 import dev3201Window
 import dev2101Window
+import dev2301Window
 import loopWindow
 import comWindow
 import logWindow
@@ -118,6 +119,7 @@ class UiPanel(wx.Panel):
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
         self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
+        self.dev2301Pan = dev2301Window.Dev2301Window(self, parent)
 
         self.devObj = []
         
@@ -125,12 +127,15 @@ class UiPanel(wx.Panel):
         self.devObj.append(self.dev3141Pan)
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
+        self.devObj.append(self.dev2301Pan)
         
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
         self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
         self.vboxdl.Add(self.dev3201Pan, 0, wx.EXPAND)
+        self.vboxdl.Add(self.dev2301Pan, 0, wx.EXPAND)
         self.vboxdl.Add(self.dev2101Pan, 0, wx.EXPAND)
+
         self.vboxdl.Add(0, 10, 0)
         self.vboxdl.Add(self.autoPan, 1, wx.EXPAND)
 
@@ -142,9 +147,9 @@ class UiPanel(wx.Panel):
         # Hide the dev3201Window and dev2101Window
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev2101Pan)
+        self.vboxdl.Hide(self.dev2301Pan)
 
         self.vboxl = wx.BoxSizer(wx.VERTICAL)
-
         self.vboxl.Add((0,20), 0, wx.EXPAND)
         self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
         self.vboxl.Add((0,10), 0, 0)
@@ -439,6 +444,7 @@ class UiMainFrame (wx.Frame):
         self.ldata = {}
 
         self.selPort = None
+        self.selBaud = None
 
         self.selDevice = None
 
@@ -466,6 +472,7 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit Model 2101")
+        self.helpMenu.Append(ID_MENU_HELP_2301, "Visit Model 2301")
         self.helpMenu.AppendSeparator()
         self.helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
         self.helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
@@ -506,6 +513,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_WEB)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_PORT)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
@@ -554,6 +562,9 @@ class UiMainFrame (wx.Frame):
             webbrowser.open(
             "https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/",
                             new=0, autoraise=True)
+        elif(id == ID_MENU_HELP_2301):
+            webbrowser.open("https://mcci.com/usb/dev-tools/model-2301/",
+                            new=0, autoraise=True)       
         elif(id == ID_MENU_HELP_WEB):
             webbrowser.open("https://mcci.com/", new=0, autoraise=True)
         elif(id == ID_MENU_HELP_PORT):

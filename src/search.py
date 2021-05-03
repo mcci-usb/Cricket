@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.0.0 Fri Jan 15 2021 18:50:59 seenivasan
+#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
 #       Module created
 ##############################################################################
 # Lib imports
@@ -55,10 +55,14 @@ def check_port():
         port_name.append(dev)
     return port_name
 
+def search_port1():
+    search_port()
+
+
 def search_port():
     """
     Search USB port for list of Plugged devices
-    Filter 3141, 3201 and 2101 from the list
+    Filter 3141, 3201,  2101 and 2301 from the list
     Args:
         No argument
     Return:
@@ -77,6 +81,7 @@ def search_port():
     for i in range(len(port_name)):
         try:
             # Open serial port
+            # Here the baudrate 115200 as support Model 3141 and Model 3201
             ser = serial.Serial(port=port_name[i], baudrate=115200, 
                                 bytesize=serial.EIGHTBITS,
                                 parity=serial.PARITY_NONE, timeout=1, 
@@ -90,6 +95,7 @@ def search_port():
             cmd = 'version\r\n'
     
             ser.write(cmd.encode())
+
             # Printing the decoded string
             strout = ser.readline().decode('utf-8')
             nstr = strout[2:]
@@ -99,7 +105,24 @@ def search_port():
             elif(nstr.find('12') != -1):
                 rev_list.append(port_name[i])
                 dev_list.append(DEVICES[DEV_3201])
-            # Close serial port
+            # close the serial
+            ser.close()
+            # Here the baudrate as fixed the 9600 
+            # baudrate supports Model 2301 device
+            ser = serial.Serial(port=port_name[i], baudrate=9600, 
+                                bytesize=serial.EIGHTBITS,
+                                parity=serial.PARITY_NONE, timeout=1, 
+                                stopbits=serial.STOPBITS_ONE)
+            time.sleep(1)
+    
+            cmd = 'version\r\n'
+    
+            ser.write(cmd.encode())
+            strout = ser.readline().decode('utf-8')
+            nstr = strout[2:]
+            if(nstr.find('08') != -1):
+                rev_list.append(port_name[i])
+                dev_list.append(DEVICES[DEV_2301])
             ser.close()
         # There is no new data from serial port
         except serial.SerialException as e:
