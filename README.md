@@ -19,7 +19,7 @@
 
 ## About Application
 
-This application is designed to create simple User Interface for USB Switch 3141 3201, 2101, 2301 to make the user's interaction as simple and efficient as possible.
+This application is designed to create simple User Interface for USB Switch 3141 3201, 2101 and 2301 to make the user's interaction as simple and efficient as possible.
 
 It is a cross platform GUI application developed by using WxPython.
 
