@@ -16,7 +16,7 @@
 - [model 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
 
 <!-- /TOC -->
-[![Git-release](https://img.shields.io/badge/release-v2.3.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases)
+[![Git-release](https://img.shields.io/badge/release-v2.3.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases) [![gGit-commits](https://img.shields.io/badge/commits%20since%20v2.3.0-6-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.3.0...master)
 <!-- markdown-shield -->
 
 ## About Application
