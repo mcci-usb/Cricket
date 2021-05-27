@@ -685,9 +685,7 @@ class Dev3201Window(wx.Window):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        print("\nSpeedCmd: ",cmd)
         res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
-        print("\nSpeed Result: ", res, outstr)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
