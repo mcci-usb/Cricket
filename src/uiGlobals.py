@@ -119,6 +119,9 @@ ID_BTN_UCLEAR = 1048
 ID_MENU_WIN_MIN = 1049
 ID_MENU_WIN_SHOW = 1050
 
+ID_MENU_MODEL_CONNECT = 1100
+ID_MENU_MODEL_DISCONNECT = 1101
+
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",

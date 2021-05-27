@@ -49,6 +49,7 @@ import serialDev
 import getusb
 
 from aboutDialog import *
+from comDialog import *
 
 ##############################################################################
 # Utilities
@@ -121,8 +122,7 @@ class UiPanel(wx.Panel):
         self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
         self.dev2301Pan = dev2301Window.Dev2301Window(self, parent)
 
-        self.devObj = []
-        
+        self.devObj = []  
         # Device panel added
         self.devObj.append(self.dev3141Pan)
         self.devObj.append(self.dev3201Pan)
@@ -159,9 +159,11 @@ class UiPanel(wx.Panel):
         self.vboxr = wx.BoxSizer(wx.VERTICAL)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
         self.vboxr.Add(self.comPan, 0 ,wx.ALIGN_RIGHT | wx.EXPAND)
-        self.vboxr.Add((0,10), 0, 0)
+        #self.vboxr.Add((0,10), 0, 0)
         self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
+
+        self.vboxr.Hide(self.comPan)
         
         # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
@@ -445,7 +447,6 @@ class UiMainFrame (wx.Frame):
 
         self.selPort = None
         self.selBaud = None
-
         self.selDevice = None
 
         self.devHand = serial.Serial()
@@ -466,6 +467,10 @@ class UiMainFrame (wx.Frame):
            self.fileMenu = wx.Menu()
            # fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
            self.fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
+
+        self.comMenu = wx.Menu()
+        self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
+        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")       
 
         # Creating the help menu
         self.helpMenu = wx.Menu()
@@ -495,16 +500,19 @@ class UiMainFrame (wx.Frame):
         if sys.platform != 'darwin':
             self.menuBar.Append(self.fileMenu,    "&File")
         else:
-            self.menuBar.Append(self.winMenu,    "&Window")
+            self.menuBar.Append(self.winMenu,    "&Window")  
+        self.menuBar.Append(self.comMenu,     "&Manage Model")
         self.menuBar.Append(self.helpMenu,    "&Help")
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
 
+        # set menubar
+        self.menuBar = self.GetMenuBar()
+        self.update_connect_menu(True)
+
         # Create the statusbar
         self.statusbar = MultiStatus(self)
-        
         self.SetStatusBar(self.statusbar)
-
         self.UpdateAll(["Port", "", ""])
         
         # Set events to Menu
@@ -519,6 +527,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
         self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
+        self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
+        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
 
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
@@ -526,7 +536,6 @@ class UiMainFrame (wx.Frame):
 
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
-
         self.Show()
         
         td, usbList = getusb.scan_usb()
@@ -701,8 +710,7 @@ class UiMainFrame (wx.Frame):
         else:
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         event.Skip()
-
-    # Event Handler
+ 
     def OnHideWindow (self, event):
         """
         Event Handler hide the window
@@ -734,6 +742,29 @@ class UiMainFrame (wx.Frame):
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         self.Iconize(False)
+
+    def OnConnect (self, event):
+        dlg = ComDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def OnDisconnect (self, event):
+        self.device_disconnected()
+        self.selPort = None
+        self.con_flg = False
+        self.devHand.close()
+        # Set label button name as Connect
+        srlist = []
+        srlist.append("Port")
+        srlist.append("")
+        srlist.append("")
+        srlist.append("Disconnected")
+        self.UpdateAll(srlist)
+        # Print on logwindow
+        self.print_on_log("Model "+DEVICES[self.selDevice]
+                              +" Disconnected!\n")
+        self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
+        self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)    
     
     def save_usb_list(self, mlist):
         """
@@ -954,7 +985,16 @@ class UiMainFrame (wx.Frame):
         """
         self.panel.device_connected()
         self.StoreDevice()
-    
+        self.update_connect_menu(False)
+
+    def update_connect_menu(self, status):
+        if status:
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
+        else:
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+
     def device_disconnected(self):
         """
         Called by COM Window when the device get disconnected
@@ -967,6 +1007,7 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.panel.device_disconnected()
+        self.update_connect_menu(True)
     
     def update_usb_status(self, dl):
         """
@@ -1030,7 +1071,6 @@ class UiMainFrame (wx.Frame):
 
         if (wx.IsBusy()):
             wx.EndBusyCursor()
-
         return
     
     def StoreDevice(self):
