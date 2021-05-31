@@ -33,6 +33,8 @@ import os
 import sys
 from sys import platform
 
+from wx.core import ITEM_CHECK
+
 # Own modules
 from uiGlobals import *
 import dev3141Window
@@ -50,6 +52,7 @@ import getusb
 
 from aboutDialog import *
 from comDialog import *
+from setDialog import *
 
 ##############################################################################
 # Utilities
@@ -113,7 +116,7 @@ class UiPanel(wx.Panel):
 
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
-        self.comPan = comWindow.ComWindow(self, parent)
+        #self.comPan = comWindow.ComWindow(self, parent)
         self.treePan = treeWindow.UsbTreeWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
         
@@ -128,6 +131,7 @@ class UiPanel(wx.Panel):
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
         self.devObj.append(self.dev2301Pan)
+
         
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
@@ -144,11 +148,6 @@ class UiPanel(wx.Panel):
         self.hboxdl.Add((20,0), 0, wx.EXPAND)
         self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
         
-        # Hide the dev3201Window and dev2101Window
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev2101Pan)
-        self.vboxdl.Hide(self.dev2301Pan)
-
         self.vboxl = wx.BoxSizer(wx.VERTICAL)
         self.vboxl.Add((0,20), 0, wx.EXPAND)
         self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
@@ -158,27 +157,54 @@ class UiPanel(wx.Panel):
 
         self.vboxr = wx.BoxSizer(wx.VERTICAL)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
-        self.vboxr.Add(self.comPan, 0 ,wx.ALIGN_RIGHT | wx.EXPAND)
-        #self.vboxr.Add((0,10), 0, 0)
         self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
 
-        self.vboxr.Hide(self.comPan)
-        
-        # BoxSizer fixed with Horizontal
+       # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
+        
         # Set size of frame
         self.SetSizer(self.hboxm)
+        
         # Setting Layouts
         self.SetAutoLayout(True)
         self.hboxm.Fit(self)
         self.Layout()
- 
+
+    def update_uc_panels(self):
+        self.vboxl.Show(self.vboxl)
+        self.vboxl.Show(self.hboxdl)
+        self.hboxm.Show(self.vboxr)
+        self.vboxdl.Hide(self.dev2301Pan)
+        self.vboxdl.Hide(self.dev3201Pan)
+        self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxl.Show(self.logPan)
+        self.Layout()
+        pass
+
+    def update_cc_panels(self):
+        self.hboxm.Hide(self.vboxr)
+        self.vboxl.Show(self.logPan)
+        self.hboxm.Show(self.vboxl)
+        self.vboxl.Hide(self.hboxdl)
+        self.Layout()
+    
+    def update_hc_panels(self): 
+        self.vboxl.Hide(self.hboxdl)
+        self.hboxm.Show(self.vboxr)
+        self.vboxl.Show(self.logPan)
+        self.Layout()
+    
+    def remove_all_panels(self):
+        self.hboxm.Hide(self.vboxl)
+        self.hboxm.Hide(self.vboxr)
+        self.Layout()
+
     def PrintLog(self, strin):
         """
         print data/status on logwindow 
@@ -445,7 +471,8 @@ class UiMainFrame (wx.Frame):
 
         self.ldata = {}
 
-        self.selPort = None
+        self.selPort = {}
+
         self.selBaud = None
         self.selDevice = None
 
@@ -470,11 +497,22 @@ class UiMainFrame (wx.Frame):
 
         self.comMenu = wx.Menu()
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
-        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")       
+        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
+
+        # config menu
+        self.configMenu = wx.Menu()        
+        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, "User Computer", kind = ITEM_CHECK)
+        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, "Switch Control Computer", kind = ITEM_CHECK)
+        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC, "Test Host Computer", kind = ITEM_CHECK)
+
+        # Set Menu   
+        self.setMenu = wx.Menu()
+        self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
+        self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
 
         # Creating the help menu
         self.helpMenu = wx.Menu()
-        self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
+        self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit Model 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit Model 2301")
@@ -500,12 +538,17 @@ class UiMainFrame (wx.Frame):
         if sys.platform != 'darwin':
             self.menuBar.Append(self.fileMenu,    "&File")
         else:
-            self.menuBar.Append(self.winMenu,    "&Window")  
+            self.menuBar.Append(self.winMenu,    "&Window")
+       
+        self.menuBar.Append(self.configMenu, "&Config System")
+        self.menuBar.Append(self.setMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&Manage Model")
         self.menuBar.Append(self.helpMenu,    "&Help")
+
+        
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
-
+        
         # set menubar
         self.menuBar = self.GetMenuBar()
         self.update_connect_menu(True)
@@ -518,6 +561,13 @@ class UiMainFrame (wx.Frame):
         # Set events to Menu
         # Self.Bind(wx.EVT_MENU, self.MenuHandler)
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
+        self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
+        self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+
+        self.Bind(wx.EVT_MENU, self.SelectUC, self.ucmenu)
+        self.Bind(wx.EVT_MENU, self.SelectCC, self.ccmenu)
+        self.Bind(wx.EVT_MENU, self.SelectHC, self.hcmenu)
+
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
@@ -544,9 +594,38 @@ class UiMainFrame (wx.Frame):
 
         try:
             self.LoadDevice()
-            self.panel.auto_connect()
+            
         except:
-            pass
+            self.ldata['uc'] = True
+            self.ldata['cc'] = True
+            self.ldata['hc'] = True
+            self.ldata['scc'] = False
+            self.ldata['sccip'] = "No host"
+            self.ldata['thc'] = False
+            self.ldata['thcip'] = "No host"
+        
+        self.PrintParams()
+
+        self.update_config_menu()
+        self.update_settings_menu()
+           
+    def update_config_menu(self):
+        print("Update Config Menu")
+
+        if self.ldata['uc']:
+            self.ucmenu.Check(True)
+        else:
+            self.ucmenu.Check(False)
+
+        if self.ldata['cc']:
+            self.ccmenu.Check(True)
+        else:
+            self.ccmenu.Check(False)
+
+        if self.ldata['hc']:
+            self.hcmenu.Check(True)
+        else:
+            self.hcmenu.Check(False)
     
     def OnClickHelp(self, event):
         """
@@ -763,9 +842,8 @@ class UiMainFrame (wx.Frame):
         # Print on logwindow
         self.print_on_log("Model "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
-        self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-        self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)    
-    
+        self.update_connect_menu(True)
+            
     def save_usb_list(self, mlist):
         """
         Keep USB device list in a list - reference list
@@ -1088,11 +1166,113 @@ class UiMainFrame (wx.Frame):
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
         # in dict objects and string objects as key.
-        ds = shelve.open('config.txt')
+        ds = shelve.open('CricketSettings.txt')
         ds['port'] = self.selPort
         ds['device'] = self.selDevice
         ds.close()
+
+        ds = shelve.open('CricketSettings.txt')
+        ds['scc'] = self.ldata['scc']
+        ds['sccip'] = self.ldata['sccip']
+        #ds['sccip'] = "192.168.0.5"
+        ds.close()
+
+        ds = shelve.open('CricketSettings.txt')
+        ds['thc'] = self.ldata['thc']
+        ds['thcip'] = self.ldata['thcip']
+        ds.close()
+
+        ds = shelve.open('CricketSettings.txt')
+        ds['uc'] = self.ldata['uc']
+        ds.close()
+
+        ds = shelve.open('CricketSettings.txt')
+        ds['cc'] = self.ldata['cc']
+        ds.close()
+
+        ds = shelve.open('CricketSettings.txt')
+        ds['hc'] = self.ldata['hc']
+        ds.close()
+ 
+    def OnSelectScc (self, event):
+        dlg = SetDialog(self, self, "scc")
+        dlg.ShowModal()
+        dlg.Destroy()
+        self.StoreDevice()
+
+    def OnSelectThc (self, event):
+        dlg = SetDialog(self, self, "thc")
+        dlg.ShowModal()
+        dlg.Destroy()
+        self.StoreDevice()
+
+    def SelectUC(self, event):
+        print("Select User Comp event")
+        if self.ucmenu.IsChecked():
+            self.ldata['uc'] = True
+        else:
+            self.ldata['uc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
+
+    def SelectCC(self, event):
+        print("Select Control Comp event")
+        if self.ccmenu.IsChecked():
+            self.ldata['cc'] = True
+        else:
+            self.ldata['cc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
+
+    def SelectHC(self, event):
+        print("Select Host Comp event")
+        if self.hcmenu.IsChecked():
+            self.ldata['hc'] = True
+        else:
+            self.ldata['hc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
     
+    def update_settings_menu(self):
+        if self.ucmenu.IsChecked() and not self.ccmenu.IsChecked():
+            self.update_scc_menu(True)
+        else:
+            self.update_scc_menu(False)
+
+        if self.ucmenu.IsChecked() and not self.hcmenu.IsChecked():
+            self.update_thc_menu(True)
+        else:
+            self.update_thc_menu(False)
+
+        self.update_manage_model(self.ucmenu.IsChecked())
+
+        if self.ucmenu.IsChecked():
+            self.panel.update_uc_panels()
+        elif self.hcmenu.IsChecked():
+            self.panel.update_hc_panels()
+        elif self.ccmenu.IsChecked():
+            self.panel.update_cc_panels()
+        else:
+            self.panel.remove_all_panels()
+
+    def update_scc_menu(self, status):
+        if status:
+            self.menuBar.Enable(ID_MENU_SET_SCC, True)
+        else:
+            self.menuBar.Enable(ID_MENU_SET_SCC, False)
+
+    def update_thc_menu(self, status):
+        if status:
+            self.menuBar.Enable(ID_MENU_SET_THC, True)
+        else:
+            self.menuBar.Enable(ID_MENU_SET_THC, False)
+        
+    def update_manage_model(self, status):
+        if status:
+            self.menuBar.EnableTop(3, True)
+        else:
+            self.menuBar.EnableTop(3, False)
+
     def LoadDevice(self):
         """
         load the device list for last device disconnect 
@@ -1103,15 +1283,32 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        # This is also a base class of shelve and it accepts
-        # the filename as it’s parameter not a dict object like others. 
-        # This is the base class of shelve which stores pickled object values 
-        # in dict objects and string objects as key.
-        ds = shelve.open('config.txt')
+        ds = shelve.open('CricketSettings.txt')
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
-        ds.close()  
+        
+        self.ldata['uc'] = ds['uc']
+        self.ldata['cc'] = ds['cc']
+        self.ldata['hc'] = ds['hc']
+        
+        self.ldata['scc'] = ds['scc']
+        self.ldata['sccip'] = ds['sccip']
 
+        self.ldata['thc'] = ds['thc']
+        self.ldata['thcip'] = ds['thcip']
+        ds.close()
+
+    def PrintParams(self):
+        #print("Port: ", self.ldata['port'])
+        #print("Device: ",self.ldata['device'])
+        print("UC: ",self.ldata['uc'])
+        print("CC: ",self.ldata['cc'])
+        print("HC: ",self.ldata['hc'])
+        print("SCC: ",self.ldata['scc'])
+        print("SCC-IP: ",self.ldata['sccip'])
+        print("THC:", self.ldata['thc'])
+        print("THC-IP: ",self.ldata['thcip'])
+        
 class UiApp(wx.App):
     """
     UiApp wx.App object has been created in order to ensure 
@@ -1145,7 +1342,6 @@ class UiApp(wx.App):
         """
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
-
 
 def run():
     """
