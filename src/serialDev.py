@@ -15,10 +15,10 @@
 #     Released under the MCCI Corporation.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0-1 Wed April 28 2021 18:50:10 seenivasan
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,182 +28,192 @@ import serial
 ##############################################################################
 # Utilities
 ##############################################################################
-def open_serial_device(top):
-    """
-    Open Serial Port of the selected device (3141/3201/2301)
-    
-    Args:
-        top: creates an object
-    Returns:
-        True: A list of the serial ports available on the system     
-    """
-    top.devHand.port = top.selPort
-    top.devHand.baudrate = top.selBaud
-    
-    top.devHand.bytesize = serial.EIGHTBITS
-    top.devHand.parity = serial.PARITY_NONE
-    top.devHand.timeout = 1
-    top.devHand.stopbits =serial. STOPBITS_ONE
 
-    try:
-        top.devHand.open()
-        return True
-            
-    except serial.SerialException as e:
-        wx.MessageBox(""+str(e), "Com Port Error", wx.OK, top)
+class SerialDev:
+    def __init__(self, top):
+        self.devHand = serial.Serial()
+        self.devHand.port = None
+        self.devHand.baudrate = 9600
+        self.devHand.bytesize = serial.EIGHTBITS
+        self.devHand.parity = serial.PARITY_NONE
+        self.devHand.timeout = 1
+        self.devHand.stopbits = serial. STOPBITS_ONE
+        self.top = top
+
+
+    def open_serial_device(self, port, baud):
+        if self.devHand.is_open:
+            self.devHand.close() 
+        self.devHand.port = port
+        self.devHand.baudrate = baud
+        try:
+            self.devHand.open()
+            return True
+        except serial.SerialException as e:
+            wx.MessageBox(""+str(e), "Com Port Error", wx.OK, self.top)
         return False
 
-def send_port_cmd(phand,cmd):
-    """
-    Send Port Control Command
+    def close(self):
+        if self.devHand.is_open:
+            self.devHand.close()
+        return True
 
-    Args:
-        phnad:send Serial port
-        cmd:cmd in String format
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    res = write_serial(phand, cmd)
-    if res == 0:
-        res, rstr = read_serial(phand)
-        if res == 0:
-            return res, rstr
-    rstr = "Comm Error\n"
-    return res, rstr
+    def send_port_cmd(self, cmd):
+        """
+        Send Port Control Command
 
-def send_status_cmd(phand):
-    """
-    Send status command to read the status of the connected Model
-
-    Args:
-        phnad: status command in String format
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    cnt = 0
-    strin = ""
-    cmd = 'status\r\n'
-    res = write_serial(phand, cmd)
-    if res == 0:
-        while(cnt < 14):
-            res, rstr = read_serial(phand)
-            if res == 0:
-                strin = strin + rstr
-                cnt = cnt + 1
-            else:
-                strin = "Com Error"
-                cnt = 14
-        return res, strin
-    else:
-        srrin = "Comm Error\n"
-        return res, strin
-
-def send_volts_cmd(phand):
-    """
-    Send command to read the Volt parameter from the model 3201
-
-    Args:
-        phnad: Volt read command in String format
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    cmd = 'volts\r\n'
-    res = write_serial(phand, cmd)
-    if res == 0:
-        res, rstr = read_serial(phand)
-        if res == 0:
-            return res, rstr
-    rstr = "Comm Error\n"
-    return res, rstr
-
-def send_amps_cmd(phand):
-    """
-    Send command to read the Ampere parameter from the model 3201
-
-    Args:
-        phnad: Amp read command in String format 
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    cmd = 'amps\r\n'
-    res = write_serial(phand, cmd)
-    if res == 0:
-        res, rstr = read_serial(phand)
-        if res == 0:
-            return res, rstr
-    rstr = "Comm Error\n"
-    return res, rstr 
-
-def send_sn_cmd(phand):
-    """
-    Send Serial Number Command for the attached Model (3141/3201)
+        Args:
+            phnad:send Serial port
+            cmd:cmd in String format
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
     
-    Args:
-        phnad: Serial number read command in String format 
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    cmd = 'sn\r\n'
-    res = write_serial(phand, cmd)
-    if res == 0:
-        res, rstr = read_serial(phand)
+        res = self.write_serial(cmd)
+        if res == 0:
+            res, rstr = self.read_serial()
         if res == 0:
             return res, rstr
-    rstr = "Comm Error\n"
-    return res, rstr
+        rstr = "Comm Error\n"
+        return res, rstr
 
-def read_port_cmd(phand):
-    """
-    Read Port Command, to check port status of the Port in 3141/3201
 
-    Args:
-        phnad: Serial port handler
-    Returns:
-        res: interger - length of data read from or write to serial
-        rstr: data read from the serial port in String format
-    """
-    cmd = 'port\r\n'
-    res = write_serial(phand, cmd)
-    if res == 0:
-        res, rstr = read_serial(phand)
+    def write_serial(self, cmd):
+        """
+        Send data over the Serial Port to the connected model
+
+        Args:
+            phnad: Serial port handler
+            cmd: Data to be written in string format
+        Returns:
+            0  - When write success
+            -1 - When write failed 
+        """
+        try:
+            self.devHand.write(cmd.encode())
+            return 0
+        except:
+            return -1
+
+  
+    def read_serial(self):
+        """
+        Read data from the Serial Port
+
+        Args:
+            phnad: Serial port handler
+        Returns:
+            0  - When read success
+            -1 - When read  failed
+        """
+        try:
+            return  0, self.devHand.readline().decode('utf-8')
+        except:
+            return -1
+
+
+    def send_status_cmd(self):
+        """
+        Send status command to read the status of the connected Model
+
+        Args:
+            phnad: status command in String format
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
+        cnt = 0
+        strin = ""
+        cmd = 'status\r\n'
+        res = self.write_serial(cmd)
         if res == 0:
-            return res, rstr
-    rstr = "Comm Error\n"
-    return res, rstr
+            while(cnt < 14):
+                res, rstr = self.read_serial()
+                if res == 0:
+                    strin = strin + rstr
+                    cnt = cnt + 1
+                else:
+                    strin = "Com Error"
+                    cnt = 14
+            return res, strin
+        else:
+            srrin = "Comm Error\n"
+            return res, strin
 
-def write_serial(phand, cmd):
-    """
-    Send data over the Serial Port to the connected model
+    
+    def send_volts_cmd(self):
+        """
+        Send command to read the Volt parameter from the model 3201
 
-    Args:
-        phnad: Serial port handler
-        cmd: Data to be written in string format
-    Returns:
-        0  - When write success
-        -1 - When write failed 
-    """
-    try:
-        phand.write(cmd.encode())
-        return 0
-    except:
-        return -1
+        Args:
+            phnad: Volt read command in String format
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
+        cmd = 'volts\r\n'
+        res = self.write_serial(cmd)
+        if res == 0:
+            res, rstr = self.read_serial()
+            if res == 0:
+                return res, rstr
+        rstr = "Comm Error\n"
+        return res, rstr
 
-def read_serial(phand):
-    """
-    Read data from the Serial Port
+    def send_amps_cmd(self):
+        """
+        Send command to read the Ampere parameter from the model 3201
 
-    Args:
-       phnad: Serial port handler
-    Returns:
-        0  - When read success
-        -1 - When read  failed
-    """
-    try:
-        return  0, phand.readline().decode('utf-8')
-    except:
-        return -1
+        Args:
+            phnad: Amp read command in String format 
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
+        cmd = 'amps\r\n'
+        res = self.write_serial(cmd)
+        if res == 0:
+            res, rstr = self.read_serial()
+            if res == 0:
+                return res, rstr
+        rstr = "Comm Error\n"
+        return res, rstr 
+
+    def send_sn_cmd(self):
+        """
+        Send Serial Number Command for the attached Model (3141/3201)
+    
+        Args:
+            phnad: Serial number read command in String format 
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
+        cmd = 'sn\r\n'
+        res = self.write_serial(cmd)
+        if res == 0:
+            res, rstr = self.read_serial()
+            if res == 0:
+                return res, rstr
+        rstr = "Comm Error\n"
+        return res, rstr
+
+    def read_port_cmd(self):
+        """
+        Read Port Command, to check port status of the Port in 3141/3201
+
+        Args:
+            phnad: Serial port handler
+        Returns:
+            res: interger - length of data read from or write to serial
+            rstr: data read from the serial port in String format
+        """
+        cmd = 'port\r\n'
+        res = self.write_serial(cmd)
+        if res == 0:
+            res, rstr = self.read_serial()
+            if res == 0:
+                return res, rstr
+        rstr = "Comm Error\n"
+        return res, rstr

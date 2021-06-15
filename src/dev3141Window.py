@@ -28,7 +28,7 @@ import wx
 import os
 
 # Own modules
-import serialDev
+import devControl as model
 import usbDev
 from uiGlobals import *
 
@@ -316,7 +316,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -339,7 +339,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -484,7 +484,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
@@ -502,7 +502,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_status_cmd(self.top.devHand)
+        res, outstr = model.send_status_cmd(self.top)
         if res == 0:
             restr = outstr.split('\n')
             cc1detect = None
@@ -553,9 +553,9 @@ class Dev3141Window(wx.Panel):
             None
         """
         if(self.top.con_flg):
-            res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':
-                res, outstr = serialDev.read_port_cmd(self.top.devHand)
+                res, outstr = model.read_port_cmd(self.top)
             if res == 0:
                 if(outstr != ''):
                     self.init_ports(int(outstr))

@@ -42,17 +42,20 @@ import dev3201Window
 import dev2101Window
 import dev2301Window
 import loopWindow
-import comWindow
 import logWindow
 import treeWindow
 import autoWindow
 
-import serialDev
 import getusb
 
 from aboutDialog import *
 from comDialog import *
 from setDialog import *
+#from ccServer import *
+
+import devControl
+import serialDev
+import devServer
 
 ##############################################################################
 # Utilities
@@ -185,16 +188,20 @@ class UiPanel(wx.Panel):
         self.vboxdl.Hide(self.dev3141Pan)
         self.vboxl.Show(self.logPan)
         self.Layout()
-        pass
+        self.parent.terminateCcServer()
 
+        
     def update_cc_panels(self):
         self.hboxm.Hide(self.vboxr)
         self.vboxl.Show(self.logPan)
         self.hboxm.Show(self.vboxl)
         self.vboxl.Hide(self.hboxdl)
         self.Layout()
+        self.parent.startCcServer()
+        
+        
     
-    def update_hc_panels(self): 
+    def update_hc_panels(self):
         self.vboxl.Hide(self.hboxdl)
         self.hboxm.Show(self.vboxr)
         self.vboxl.Show(self.logPan)
@@ -204,6 +211,15 @@ class UiPanel(wx.Panel):
         self.hboxm.Hide(self.vboxl)
         self.hboxm.Hide(self.vboxr)
         self.Layout()
+
+
+    def remove_dev_panels(self):
+        self.vboxdl.Hide(self.dev2301Pan)
+        self.vboxdl.Hide(self.dev3201Pan)
+        self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxdl.Hide(self.dev2101Pan)
+
+
 
     def PrintLog(self, strin):
         """
@@ -471,12 +487,24 @@ class UiMainFrame (wx.Frame):
 
         self.ldata = {}
 
-        self.selPort = {}
+        self.devCtrl = None
 
+        self.ccflag = False
+
+        self.selPort = {}
+        
         self.selBaud = None
         self.selDevice = None
 
-        self.devHand = serial.Serial()
+        self.ccserver = None
+        self.ccconfig = None
+
+        self.ccclient = None
+        self.listenc = None
+
+        #self.devHand = serial.Serial()
+
+        self.devHand = serialDev.SerialDev(self)
 
         self.mode = MODE_MANUAL
 
@@ -596,19 +624,59 @@ class UiMainFrame (wx.Frame):
             self.LoadDevice()
             
         except:
+            self.ldata['port'] = None
+            self.ldata['device'] = None
             self.ldata['uc'] = True
             self.ldata['cc'] = True
             self.ldata['hc'] = True
-            self.ldata['scc'] = False
-            self.ldata['sccip'] = "No host"
-            self.ldata['thc'] = False
-            self.ldata['thcip'] = "No host"
+            self.ldata['sccif'] = "network"
+            self.ldata['sccid'] = "No host"
+            self.ldata['thcif'] = "network"
+            self.ldata['thcid'] = "No host"
         
-        self.PrintParams()
+        #self.PrintParams()
 
         self.update_config_menu()
         self.update_settings_menu()
-           
+        devControl.SetDeviceControl(self)
+        if self.ldata['uc']:
+            self.auto_connect()
+
+
+    def auto_connect(self):
+        if(self.ldata['port'] != None and self.ldata['device'] != None):
+            self.selPort = self.ldata['port']
+            self.selDevice = self.ldata['device']
+            if(self.selDevice !=  DEV_2101):
+                if devControl.connect_device(self):
+                    self.device_connected()
+            else:
+                self.device_connected()
+    
+    
+    def auto_connect2(self):
+        """
+        Do connect device automatically if the last connected device is 
+        available
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        if(self.ldata['port'] != '' and self.ldata['device'] != ''):
+            plist = devControl.search_device(self.top)
+            dev_list = plist["devices"]
+
+            for i in range(len(dev_list)):
+                if dev_list[i]['port'] == self.ldata['port'] and dev_list[i]['model'] == self.ldata['device']:
+                   self.selPort = dev_list[i]['port']
+                   devControl.connect_device(self, dev_list[i]['model'])
+                   break
+        
+          
     def update_config_menu(self):
         print("Update Config Menu")
 
@@ -626,6 +694,7 @@ class UiMainFrame (wx.Frame):
             self.hcmenu.Check(True)
         else:
             self.hcmenu.Check(False)
+
     
     def OnClickHelp(self, event):
         """
@@ -828,10 +897,14 @@ class UiMainFrame (wx.Frame):
         dlg.Destroy()
 
     def OnDisconnect (self, event):
+        self.device_no_response()
+        
+    def device_no_response(self):
         self.device_disconnected()
         self.selPort = None
         self.con_flg = False
-        self.devHand.close()
+        #self.devHand.close()
+        devControl.disconnect_device(self)
         # Set label button name as Connect
         srlist = []
         srlist.append("Port")
@@ -843,6 +916,7 @@ class UiMainFrame (wx.Frame):
         self.print_on_log("Model "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
         self.update_connect_menu(True)
+        self.set_mode(MODE_MANUAL)
             
     def save_usb_list(self, mlist):
         """
@@ -1061,9 +1135,19 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        self.con_flg = True
+        self.UpdatePort()
+        # Device update info
+        self.UpdateDevice()
+        self.UpdateSingle("Connected", 3)
+        # Print on logwindow
+        self.print_on_log("Model "+DEVICES[self.selDevice]
+                                              +" Connected!\n")
+       
         self.panel.device_connected()
         self.StoreDevice()
         self.update_connect_menu(False)
+        self.set_mode(MODE_MANUAL)
 
     def update_connect_menu(self, status):
         if status:
@@ -1172,14 +1256,14 @@ class UiMainFrame (wx.Frame):
         ds.close()
 
         ds = shelve.open('CricketSettings.txt')
-        ds['scc'] = self.ldata['scc']
-        ds['sccip'] = self.ldata['sccip']
+        ds['sccif'] = self.ldata['sccif']
+        ds['sccid'] = self.ldata['sccid']
         #ds['sccip'] = "192.168.0.5"
         ds.close()
 
         ds = shelve.open('CricketSettings.txt')
-        ds['thc'] = self.ldata['thc']
-        ds['thcip'] = self.ldata['thcip']
+        ds['thcif'] = self.ldata['thcif']
+        ds['thcid'] = self.ldata['thcid']
         ds.close()
 
         ds = shelve.open('CricketSettings.txt')
@@ -1207,7 +1291,6 @@ class UiMainFrame (wx.Frame):
         self.StoreDevice()
 
     def SelectUC(self, event):
-        print("Select User Comp event")
         if self.ucmenu.IsChecked():
             self.ldata['uc'] = True
         else:
@@ -1216,7 +1299,6 @@ class UiMainFrame (wx.Frame):
         self.update_settings_menu()
 
     def SelectCC(self, event):
-        print("Select Control Comp event")
         if self.ccmenu.IsChecked():
             self.ldata['cc'] = True
         else:
@@ -1225,7 +1307,6 @@ class UiMainFrame (wx.Frame):
         self.update_settings_menu()
 
     def SelectHC(self, event):
-        print("Select Host Comp event")
         if self.hcmenu.IsChecked():
             self.ldata['hc'] = True
         else:
@@ -1291,23 +1372,43 @@ class UiMainFrame (wx.Frame):
         self.ldata['cc'] = ds['cc']
         self.ldata['hc'] = ds['hc']
         
-        self.ldata['scc'] = ds['scc']
-        self.ldata['sccip'] = ds['sccip']
+        self.ldata['sccif'] = ds['sccif']
+        self.ldata['sccid'] = ds['sccid']
 
-        self.ldata['thc'] = ds['thc']
-        self.ldata['thcip'] = ds['thcip']
+        self.ldata['thcif'] = ds['thcif']
+        self.ldata['thcid'] = ds['thcid']
         ds.close()
 
     def PrintParams(self):
-        #print("Port: ", self.ldata['port'])
-        #print("Device: ",self.ldata['device'])
+        print("Port: ", self.ldata['port'])
+        print("Device: ",self.ldata['device'])
         print("UC: ",self.ldata['uc'])
         print("CC: ",self.ldata['cc'])
         print("HC: ",self.ldata['hc'])
-        print("SCC: ",self.ldata['scc'])
-        print("SCC-IP: ",self.ldata['sccip'])
-        print("THC:", self.ldata['thc'])
-        print("THC-IP: ",self.ldata['thcip'])
+        print("SCC-IF: ",self.ldata['sccif'])
+        print("SCC-ID: ",self.ldata['sccid'])
+        print("THC-IF", self.ldata['thcif'])
+        print("THC-ID: ",self.ldata['thcid'])
+
+
+    def startCcServer(self):
+        if self.ccserver == None:
+            self.ccserver = devServer.ServerCc()
+            strin = "Control Computer Listening: "+self.ccserver.bind_addr
+            self.panel.PrintLog(strin+"\n")
+            
+            self.listenc = devServer.StayAccept(self)
+            self.listenc.start()
+
+    def terminateCcServer(self):
+        if self.ccserver != None:  
+            self.listenc.close_connection()
+            del self.listenc
+            self.listenc = None
+            self.ccserver.close()
+            del self.ccserver
+            self.ccserver = None
+
         
 class UiApp(wx.App):
     """

@@ -163,4 +163,5 @@ def control_port(serialno, portdata):
             usbd.append(0x00)
             # ctrl_transfer method. It is used both for OUT and IN transfers
             result = dev.ctrl_transfer(0x21, 0x09, 0x200, 0x00, usbd)
+    print("Result of 2101: ", result)
     return result

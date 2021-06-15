@@ -29,7 +29,8 @@ import os
 
 # Own modules
 import usbDev
-import control2101 as d2101
+#import control2101 as d2101
+import devControl as model
 from uiGlobals import *
 
 PORTS = 1
@@ -280,7 +281,7 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """ 
-        d2101.control_port(self.top.selPort, self.portcmd)
+        model.control_port(self.top, self.portcmd)
         # print port ON 
         self.top.print_on_log("Port ON\n")
         self.port_led_update(port, True)
@@ -298,7 +299,7 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        d2101.control_port(self.top.selPort, DEV_DISCONNECT)
+        model.control_port(self.top, DEV_DISCONNECT)
         self.top.print_on_log("Port OFF\n")
         self.port_led_update(port, False)
            

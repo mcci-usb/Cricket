@@ -16,10 +16,10 @@
 #     Released under the MCCI Corporation.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan 
+#     V2.4.0-2 Wed April 28 2021 18:50:10 seenivasan 
 #       Module created
 ##############################################################################
 
@@ -32,6 +32,10 @@ import wx
 
 # Own modules
 from uiGlobals import *
+import devControl
+
+CC_PORT = 5566
+HC_PORT = 5567
 
 ##############################################################################
 # Utilities
@@ -82,8 +86,8 @@ class SetWindow(wx.Window):
 
         self.btn_save = wx.Button(self, -1, 'save', size = (60,25))
 
-        #self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanNetwork)
-        self.btn_save.Bind(wx.EVT_BUTTON, self.SaveNetwork)
+        self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanNetwork)
+        self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
 
 
         self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
@@ -125,59 +129,68 @@ class SetWindow(wx.Window):
 
     def initDialog(self):
         if self.type == "scc":
-            if self.top.ldata['scc']:
+            if self.top.ldata['sccif'] == "network":
                 self.rb_nwc.SetValue(True)
             else:
                 self.rb_tc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['sccip'])
+            self.tc_nwcip.SetValue(self.top.ldata['sccid'])
         else:
-            if(self.top.ldata['thc'] == 0):
-                self.rb_tc.SetValue(True)
-            else:
+            if(self.top.ldata['thcif'] == "network"):
                 self.rb_nwc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['thcip'])
+            else:
+                self.rb_tc.SetValue(True)
+            self.tc_nwcip.SetValue(self.top.ldata['thcid'])
 
 
     def ScanNetwork(self, e):
+        devControl.ResetDeviceControl(self.top)
         self.tc_nwcip.SetValue("searching network")
-        port = 5566
+        
+        port = CC_PORT
         if self.type == "thc":
-            port = 5567
-        # elif self.type == "scc":
-        #     port = 5566
+            port = HC_PORT
+        
         self.nwip = self.scan_server(port)
         self.tc_nwcip.SetValue(self.nwip)
+    
 
-    def SaveNetwork(self, e):
+    def SaveSettings(self, e):
+        iftype = 'serial'
         rbval = self.rb_nwc.GetValue()
-        selip = self.tc_nwcip.GetValue()
+        if(rbval):
+            iftype = "network"
+        
+        devaddr = self.tc_nwcip.GetValue()
         if self.type == "scc":
-            self.top.ldata['scc'] = rbval
-            self.top.ldata['sccip'] = selip
+            self.top.ldata['sccif'] = iftype
+            self.top.ldata['sccid'] = devaddr
         else:
-            self.top.ldata['thc'] = rbval
-            self.top.ldata['thcip'] = selip
+            self.top.ldata['thcif'] = iftype
+            self.top.ldata['thcid'] = devaddr
         self.Destroy()
         self.parent.EndModal(True)
+    
+    def get_network_subnet(self):
+        return (socket.gethostbyname_ex(socket.gethostname())[2])
         
-
     def scan_server(self, port):
-        print("Scanning server for: ", port)
+        subnet = self.get_network_subnet()[0]
+        ips = str(subnet).split(".")
+        strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
         portip = "No Node found"
         for ip in range(1, 255):
-            host = "192.168.0."+str(ip)
+            host = strsn+"."+str(ip)
             try:
                 s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(0.3)
                 result = s.connect((host, port))
-                #ports.append(host)
                 portip = host
                 s.close()
                 break
             except:
                 s.close()
         return portip
-
+        
 
 class SetDialog(wx.Dialog):
     """

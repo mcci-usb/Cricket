@@ -123,5 +123,20 @@ def search_port():
         # There is no new data from serial port
         except serial.SerialException as e:
             pass
-    rdict = dict(zip(rev_list, dev_list))
+    dlist = d2101.scan_2101()
+
+    for dl in dlist:
+        rev_list.append(dl)
+        dev_list.append(DEVICES[DEV_2101])
+
+    rdict = {}
+    devlist = []
+    
+    for i in range(len(rev_list)):
+        tempdict = {}
+        tempdict["port"] = rev_list[i]
+        tempdict["model"] = dev_list[i]
+        devlist.append(tempdict)
+
+    rdict["devices"] = devlist
     return rdict

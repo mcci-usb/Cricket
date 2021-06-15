@@ -16,10 +16,10 @@
 #     Released under the MCCI Corporation.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.x Wed May 27 2021 21:35:41 seenivasan 
+#     V2.4.0-2 Wed May 27 2021 21:35:41 seenivasan 
 #       Module created
 ##############################################################################
 # Lib imports
@@ -27,9 +27,11 @@ import wx
 
 # Own modules
 import search
-import serialDev
 import control2101 as d2101
 from uiGlobals import *
+
+import devControl
+import json
 
 ##############################################################################
 # Utilities
@@ -144,15 +146,21 @@ class ComWindow(wx.Window):
         self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
-        
-        plist = search.search_port()
-        key_list = list(plist.keys())
-        val_list = list(plist.values())
-        dlist = d2101.scan_2101()
-        for dl in dlist:
-            key_list.append(dl)
-            val_list.append(DEVICES[DEV_2101])
 
+        print("\nSearch Device begin")
+
+        plist = devControl.search_device(self.top)
+        #flist = json.loads(plist)
+
+
+        dev_list = plist["devices"]
+        key_list = []
+        val_list = []
+
+        for i in range(len(dev_list)):
+            key_list.append(dev_list[i]["port"])
+            val_list.append(dev_list[i]["model"])
+        
         for i in range(len(key_list)):
             str1 = key_list[i]+"("+val_list[i]+")"
             self.cb_device.Append(str1)
@@ -209,7 +217,7 @@ class ComWindow(wx.Window):
                 break
         if self.top.selDevice == DEV_2101:
             self.device_connected()
-        elif(serialDev.open_serial_device(self.top)):
+        elif devControl.connect_device(self.top):
             self.device_connected()
 
     def get_selected_com(self):
@@ -226,8 +234,26 @@ class ComWindow(wx.Window):
         self.cval = self.cb_device.GetValue()
         txt = self.cval.split("(")
         return txt[0], txt[1].replace(")","")
-    
+
+
     def device_connected(self):
+        """
+        Connect the selected device
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        # Set label button name as Disconnect
+        self.btn_connect.SetLabel("Disconnect")
+        self.top.device_connected()
+        self.parent.EndModal(True)
+        
+    
+    def device_connected2(self):
         """
         Connect the selected device
 

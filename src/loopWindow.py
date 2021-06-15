@@ -25,7 +25,6 @@
 import wx
 
 # Own modules
-import serialDev
 import usbDev
 
 from uiGlobals import *

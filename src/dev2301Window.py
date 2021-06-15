@@ -28,7 +28,7 @@ import wx
 import os
 
 # Own modules
-import serialDev
+import devControl as model
 import usbDev
 from uiGlobals import *
 
@@ -258,7 +258,7 @@ class Dev2301Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_volts_cmd(self.top.devHand)
+        res, outstr = model.send_volts_cmd(self.top)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -298,7 +298,7 @@ class Dev2301Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_amps_cmd(self.top.devHand)
+        res, outstr = model.send_amps_cmd(self.top)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -451,7 +451,7 @@ class Dev2301Window(wx.Window):
             None
         """
         cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -474,7 +474,7 @@ class Dev2301Window(wx.Window):
             None
         """
         cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -685,7 +685,7 @@ class Dev2301Window(wx.Window):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
+        res, outstr = model.send_port_cmd(self.top,cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
@@ -706,9 +706,9 @@ class Dev2301Window(wx.Window):
             None
         """
         if(self.top.con_flg):
-            res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':
-                res, outstr = serialDev.read_port_cmd(self.top.devHand)
+                res, outstr = model.read_port_cmd(self.top)
             if res == 0:
                 if(outstr != ''):
                     self.init_ports(int(outstr))
