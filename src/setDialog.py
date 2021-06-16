@@ -80,7 +80,7 @@ class SetWindow(wx.Window):
 
         self.btn_scan = wx.Button(self, -1, 'scan network', size = (80,25))
         self.tc_nwcip = wx.ComboBox(self,
-                                     size=(100, -1),
+                                     size=(130, -1),
                                      style=wx.CB_DROPDOWN)
         self.tc_scan = wx.StaticText(self, -1, '', size = (40,25))
 

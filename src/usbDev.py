@@ -28,7 +28,14 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-def get_tree_change(top):
+
+
+def get_usb_tree():
+    dl, newlist = getusb.scan_usb()
+    return dl, newlist
+
+
+def get_tree_change(top, dl, newlist):
     """
     Get USB Device Tree changes list and print the list in USB Device Tree
     View Changes Window
@@ -39,7 +46,7 @@ def get_tree_change(top):
         None
     """
     # Usb device scanning 
-    dl, newlist = getusb.scan_usb()
+    #dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
     
@@ -68,7 +75,7 @@ def get_tree_change(top):
         strout = strout + get_usb_device_info(adlist)
     
     # Print the device list USB Device Tree Window
-    top.print_on_usb(strout)
+    top.print_on_usb(strout)   #removed check
 
 def get_usb_device_info(udlist):
     """

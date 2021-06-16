@@ -55,10 +55,6 @@ class ServerCc:
     def close(self):
         self.socket.close()
         
-keywords = {'Python',
-            'wxpython',
-            'SocketProgramming'
-            }
 
 class StayAccept(threading.Thread):
     def __init__(self, parent):

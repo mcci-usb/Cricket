@@ -28,7 +28,7 @@ import threading
 from datetime import datetime
 
 # Own modules
-import usbDev
+import thControl
 from uiGlobals import *
 
 ##############################################################################
@@ -247,8 +247,9 @@ class UsbTreeWindow(wx.Window):
         Returns:
             None
         """
+
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # print message
             self.print_on_usb("USB Read Error!")

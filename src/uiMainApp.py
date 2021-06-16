@@ -57,6 +57,9 @@ import devControl
 import serialDev
 import devServer
 
+import thControl
+import thServer
+
 ##############################################################################
 # Utilities
 ##############################################################################
@@ -189,23 +192,24 @@ class UiPanel(wx.Panel):
         self.vboxl.Show(self.logPan)
         self.Layout()
         self.parent.terminateCcServer()
+        self.parent.terminateHcServer()
 
         
-    def update_cc_panels(self):
+    def update_server_panel(self):
         self.hboxm.Hide(self.vboxr)
         self.vboxl.Show(self.logPan)
         self.hboxm.Show(self.vboxl)
         self.vboxl.Hide(self.hboxdl)
         self.Layout()
+
+
+    
+    def update_cc_panels(self):
         self.parent.startCcServer()
-        
         
     
     def update_hc_panels(self):
-        self.vboxl.Hide(self.hboxdl)
-        self.hboxm.Show(self.vboxr)
-        self.vboxl.Show(self.logPan)
-        self.Layout()
+        self.parent.startHcServer()
     
     def remove_all_panels(self):
         self.hboxm.Hide(self.vboxl)
@@ -488,6 +492,7 @@ class UiMainFrame (wx.Frame):
         self.ldata = {}
 
         self.devCtrl = None
+        self.thCtrl = None
 
         self.ccflag = False
 
@@ -497,10 +502,16 @@ class UiMainFrame (wx.Frame):
         self.selDevice = None
 
         self.ccserver = None
+        self.ccclient = None
+        self.listencc = None
+
         self.ccconfig = None
 
-        self.ccclient = None
-        self.listenc = None
+        self.hcserver = None
+        self.hcclient = None
+        self.listenhc = None
+
+        
 
         #self.devHand = serial.Serial()
 
@@ -639,6 +650,7 @@ class UiMainFrame (wx.Frame):
         self.update_config_menu()
         self.update_settings_menu()
         devControl.SetDeviceControl(self)
+        thControl.SetDeviceControl(self)
         if self.ldata['uc']:
             self.auto_connect()
 
@@ -1329,12 +1341,15 @@ class UiMainFrame (wx.Frame):
 
         if self.ucmenu.IsChecked():
             self.panel.update_uc_panels()
-        elif self.hcmenu.IsChecked():
-            self.panel.update_hc_panels()
-        elif self.ccmenu.IsChecked():
-            self.panel.update_cc_panels()
         else:
-            self.panel.remove_all_panels()
+            if self.ccmenu.IsChecked() or self.hcmenu.IsChecked():
+                self.panel.update_server_panel()
+                if self.ccmenu.IsChecked():
+                    self.panel.update_cc_panels()
+                if self.hcmenu.IsChecked():
+                    self.panel.update_hc_panels()
+            else:
+                self.panel.remove_all_panels()
 
     def update_scc_menu(self, status):
         if status:
@@ -1397,14 +1412,34 @@ class UiMainFrame (wx.Frame):
             strin = "Control Computer Listening: "+self.ccserver.bind_addr
             self.panel.PrintLog(strin+"\n")
             
-            self.listenc = devServer.StayAccept(self)
-            self.listenc.start()
+            self.listencc = devServer.StayAccept(self)
+            self.listencc.start()
+
+
+    def startHcServer(self):
+        if self.hcserver == None:
+            self.hcserver = thServer.ServerHc()
+            strin = "Host Computer Listening: "+self.hcserver.bind_addr
+            self.panel.PrintLog(strin+"\n")
+            
+            self.listenhc = thServer.StayAccept(self)
+            self.listenhc.start()
+
+    def terminateHcServer(self):
+        if self.hcserver != None:  
+            self.listenhc.close_connection()
+            del self.listenhc
+            self.listenhc = None
+            self.hcserver.close()
+            del self.hcserver
+            self.hcserver = None
+
 
     def terminateCcServer(self):
         if self.ccserver != None:  
-            self.listenc.close_connection()
-            del self.listenc
-            self.listenc = None
+            self.listencc.close_connection()
+            del self.listencc
+            self.listencc = None
             self.ccserver.close()
             del self.ccserver
             self.ccserver = None

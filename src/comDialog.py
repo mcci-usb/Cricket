@@ -69,7 +69,7 @@ class ComWindow(wx.Window):
                                   size=(55,25))
 
         self.cb_device = wx.ComboBox(self,
-                                     size=(128, -1),
+                                     size=(135, -1),
                                      choices=self.dlist,
                                      style=wx.CB_DROPDOWN)
         
