@@ -40,7 +40,7 @@ HC_PORT = 2022
 ##############################################################################
 # Utilities
 ##############################################################################
-class SetWindow(wx.Window):
+class PortWindow(wx.Window):
     """
     A  class AboutWindow with init method
     The AboutWindow navigate to MCCI Logo with naming of 
@@ -73,7 +73,7 @@ class SetWindow(wx.Window):
 
         self.hbox_rb = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_portip = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox_nw = wx.BoxSizer(wx.HORIZONTAL)
+        #self.hbox_nw = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_adrr = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_btn = wx.BoxSizer(wx.HORIZONTAL)
         
@@ -83,18 +83,11 @@ class SetWindow(wx.Window):
         self.st_port = wx.StaticText(self, -1, 'port address', size = (65, -1))
         self.tc_port = wx.TextCtrl(self, -1 , ' ', size = (70, 25))
 
-        self.btn_scan = wx.Button(self, -1, 'scan network', size = (83,25))
-        self.tc_nwcip = wx.ComboBox(self,
-                                     size=(130, -1),
-                                     style=wx.CB_DROPDOWN)
-        self.tc_scan = wx.StaticText(self, -1, '', size = (10,10))
-
         self.st_gaddr  = wx.StaticText (self, -1, 'System IP')
-        self.st_sysip = wx.StaticText(self, -1, '_ . _ . _ .  _', size = (130, -1))
+        self.st_sysip = wx.StaticText(self, -1, '_ . _ . _ . _', size = (130, -1))
 
         self.btn_save = wx.Button(self, -1, 'save', size = (60,25))
 
-        self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanNetwork)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
         
         self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
@@ -110,17 +103,10 @@ class SetWindow(wx.Window):
         self.hbox_portip.Add(self.tc_port, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 33)
 
-        self.hbox_nw.Add(self.btn_scan, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL, border=18)
-        self.hbox_nw.Add(self.tc_nwcip, 0,flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 20)
-        self.hbox_nw.Add(self.tc_scan, 0,flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 10)
         self.hbox_adrr.Add(self.st_gaddr, 0, flag = wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 20 )
         self.hbox_adrr.Add(self.st_sysip, 0, flag = wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 55)
-
         self.hbox_btn.Add(self.btn_save, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 120)
                        
@@ -132,8 +118,6 @@ class SetWindow(wx.Window):
             (0,20,0),
             (self.hbox_portip, 1, wx.EXPAND | wx.ALL),
             (0,20,0),
-            (self.hbox_nw, 1, wx.EXPAND | wx.ALL),
-            (0,20,0),
             (self.hbox_adrr, 1, wx.EXPAND | wx.ALL),
             (0,20,0),
             (self.hbox_btn, 1, wx.EXPAND | wx.ALL),
@@ -141,70 +125,43 @@ class SetWindow(wx.Window):
             ])
 
         self.initDialog()
-        #self.initDialog1()
 
-        #self.SetSizer(self.vbox)
         self.SetSizerAndFit(self.vbox)
         # Determines whether the Layout function will be called 
         # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
+
     def initDialog(self):
         if self.type == "scc":
-            if self.top.ldata['sccif'] == "network":
+            if self.top.ldata['ssccif'] == "network":
                 self.rb_nwc.SetValue(True)
             else:
                 self.rb_tc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['sccid'])
-            self.tc_port.SetValue(self.top.ldata['sccpn'])
+            self.tc_port.SetValue(self.top.ldata['ssccpn'])
         else:
-            if(self.top.ldata['thcif'] == "network"):
+            if(self.top.ldata['sthcif'] == "network"):
                 self.rb_nwc.SetValue(True)
             else:
                 self.rb_tc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['thcid'])
-            self.tc_port.SetValue(self.top.ldata['thcpn'])
+            self.tc_port.SetValue(self.top.ldata['sthcpn'])
 
         self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
 
-    def ScanNetwork(self, e):
-        devControl.ResetDeviceControl(self.top)
-
-        portstr = self.tc_port.GetValue()
-        
-        self.tc_nwcip.SetValue("searching network")
-        
-        if self.type == "thc":
-            port = HC_PORT
-        else:
-            port = CC_PORT
-
-        try:
-            port = int(portstr)
-        except:
-            self.tc_port.SetValue(str(port))
-        
-        self.nwip = self.scan_server(port)
-        
-        self.tc_nwcip.SetValue(self.nwip)
-    
     def SaveSettings(self, e):
         iftype = 'serial'
         rbval = self.rb_nwc.GetValue()
         if(rbval):
             iftype = "network"
-        
-        devaddr = self.tc_nwcip.GetValue()
+
         portno = self.tc_port.GetValue()
 
         if self.type == "scc":
-            self.top.ldata['sccif'] = iftype
-            self.top.ldata['sccid'] = devaddr
-            self.top.ldata['sccpn'] = portno
+            self.top.ldata['ssccif'] = iftype
+            self.top.ldata['ssccpn'] = portno
         else:
-            self.top.ldata['thcif'] = iftype
-            self.top.ldata['thcid'] = devaddr
-            self.top.ldata['thcpn'] = portno
+            self.top.ldata['sthcif'] = iftype
+            self.top.ldata['sthcpn'] = portno
 
         self.Destroy()
         self.parent.EndModal(True)
@@ -212,26 +169,8 @@ class SetWindow(wx.Window):
     def get_network_subnet(self):
         return (socket.gethostbyname_ex(socket.gethostname())[2])
         
-    def scan_server(self, port):
-        subnet = self.get_network_subnet()[0]
-        self.st_sysip.SetLabel(str(subnet))
-        ips = str(subnet).split(".")
-        strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
-        portip = "No Node found"
-        for ip in range(1, 255):
-            host = strsn+"."+str(ip)
-            try:
-                s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(0.3)
-                result = s.connect((host, port))
-                portip = host
-                s.close()
-                break
-            except:
-                s.close()
-        return portip
         
-class SetDialog(wx.Dialog):
+class PortDialog(wx.Dialog):
     """
     wxWindows application must have a class derived from wx.Dialog.
     """
@@ -249,9 +188,9 @@ class SetDialog(wx.Dialog):
         Returns:
             None
         """
-        title = "Switch Control Computer"
+        title = "Switch Control Computer - Port"
         if type == "thc":
-            title = "Test Host Computer"
+            title = "Test Host Computer - Port"
 
         wx.Dialog.__init__(self, parent, -1, title,
                            size=wx.Size(100, 100),
@@ -259,7 +198,7 @@ class SetDialog(wx.Dialog):
                            name="Config Dialog")
 
         self.top = top
-        self.win = SetWindow(self, top, type)
+        self.win = PortWindow(self, top, type)
 
         # Sizes the window to fit its best size.
         self.Fit()

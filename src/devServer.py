@@ -42,7 +42,7 @@ keywords = {'Python',
 class ServerCc:
     def __init__(self, host='', port: int = 5566):
         self.IP = ""
-        self.PORT = 5566
+        self.PORT = port
         self.ADDR = ((self.IP, self.PORT))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((host, port))

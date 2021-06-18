@@ -42,7 +42,6 @@ def SetDeviceControl(top):
             pass
         else:
             top.thCtrl = "network"
-            #OpenNetwork(top)
     else:
         top.thCtrl = "local"
 
@@ -56,7 +55,7 @@ def get_tree_change(top):
         dl, newlist = thlocal.get_usb_tree()
         thlocal.get_tree_change(top, dl, newlist)
     elif top.thCtrl == "network":
-        resdict = thnw.get_usb_tree(top.ldata['thcid'], PORT)
+        resdict = thnw.get_usb_tree(top.ldata['thcid'], int(top.ldata['sthcpn']))
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]["data"]
             if findict[0] == -1:
@@ -65,4 +64,4 @@ def get_tree_change(top):
             thlocal.get_tree_change(top, findict[0], findict[1])    
         else:
             top.print_on_log("TH Computer Connection Fail!\n")
-            top.device_no_response()
+            top.device_no_response()           

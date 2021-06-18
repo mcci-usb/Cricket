@@ -41,7 +41,7 @@ keywords = {'Python',
 class ServerHc:
     def __init__(self, host='', port: int = 5567):
         self.IP = ""
-        self.PORT = 5567
+        self.PORT = port
         self.ADDR = ((self.IP, self.PORT))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((host, port))
@@ -118,19 +118,15 @@ class RequestSync(threading.Thread):
                 self.window.hcserver.conn_socket.sendall(data.encode('utf-8'))
                 self.terminate()
                 
-    
     def verify_command(self, nwdata):
         nwd = nwdata.split(",")
         msg = nwd[0]
         if(msg == "usb"):
             print("Server Cmd Read USB")
             result = usbDev.get_usb_tree()
-            #print("USB Result: ", result)
             wx.CallAfter(self.window.panel.PrintLog, nwd[1])
             rdict = {}
             rdict["data"] = result
-            #print("\nDictionary: ")
-            #print(rdict)
             return rdict
         else:
             errMsg = "command not valid"
