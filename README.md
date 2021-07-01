@@ -198,17 +198,13 @@ MCCI Model 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
 Except as explicitly noted, content created by MCCI in this repository tree is copyright (C) 2021, MCCI Corporation.
 
-The bootloader and top-level wrappers are released under the terms of the attached [GNU General Public License, version 2](./LICENSE.md). `LICENSE.md` is taken directly from the [FSF website](http://www.gnu.org/licenses/old-licenses/gpl-2.0.md).
-
 Commercial licenses and commercial support are available from MCCI Corporation.
-
-Because it might need separate distribution, the bootloader image tool is released under its own instance of the [GNU General Public License, version 2](tools/mccibootloader_image/LICENSE.md).  
 
 Git submodules are subject to their own copyrights and licenses; however overall collection is a combined work, and is copyrighted and subject to the overall license.
 
 ### Support Open Source Hardware and Software
 
-MCCI invests time and resources providing this open source code, please support MCCI and open-source hardware by purchasing products from MCCI, Adafruit and other open-source hardware/software vendors!
+MCCI invests time and resources providing this open source code, please support MCCI and open-source hardware by purchasing products from MCCI and other open-source hardware/software vendors!
 
 For information about MCCI's products, please visit [store.mcci.com](https://store.mcci.com/).
 
