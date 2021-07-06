@@ -49,7 +49,9 @@ def get_tree_change(top, dl, newlist):
     #dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
-    
+    if len(oldlist) == 0:
+        oldlist = newlist
+            
     # Save usb device list
     top.save_usb_list(newlist)
     

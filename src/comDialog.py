@@ -27,7 +27,6 @@ import wx
 
 # Own modules
 import search
-import control2101 as d2101
 from uiGlobals import *
 
 import devControl
@@ -146,9 +145,6 @@ class ComWindow(wx.Window):
         self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
-
-        print("\nSearch Device begin")
-
         plist = devControl.search_device(self.top)
         #flist = json.loads(plist)
 
@@ -215,9 +211,7 @@ class ComWindow(wx.Window):
             if devname == DEVICES[i]:
                 self.top.selDevice = i
                 break
-        if self.top.selDevice == DEV_2101:
-            self.device_connected()
-        elif devControl.connect_device(self.top):
+        if devControl.connect_device(self.top):
             self.device_connected()
 
     def get_selected_com(self):

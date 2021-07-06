@@ -30,7 +30,22 @@ import serial
 ##############################################################################
 
 class SerialDev:
+    """
+    A class SerialDev with init method.
+    here serial device uses port, baudrate, bysize.
+    """
     def __init__(self, top):
+        """
+        open serial comport device
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            top: creates the object
+        Returns:
+            None
+        """
         self.devHand = serial.Serial()
         self.devHand.port = None
         self.devHand.baudrate = 9600
@@ -42,6 +57,20 @@ class SerialDev:
 
 
     def open_serial_device(self, port, baud):
+        """
+        open serial comport device
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            port: serial port 
+            baud:Bit rate is the transmission of number of bits per second
+            here transferring the baudrate 9600, 115200.
+        Returns:
+            True: device open with comport
+            False: device comport error which is device not found
+        """
         if self.devHand.is_open:
             self.devHand.close() 
         self.devHand.port = port
@@ -54,6 +83,16 @@ class SerialDev:
         return False
 
     def close(self):
+        """
+        close the serial comport device
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            True: close the serial device
+        """
         if self.devHand.is_open:
             self.devHand.close()
         return True

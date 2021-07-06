@@ -29,7 +29,7 @@ import os
 
 # Own modules
 import devControl as model
-import usbDev
+import thControl
 from uiGlobals import *
 
 PORTS = 2
@@ -233,7 +233,7 @@ class Dev3141Window(wx.Panel):
         """
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # To print on usb tree view change "USB Read Error!"
             self.top.print_on_usb("USB Read Error!")

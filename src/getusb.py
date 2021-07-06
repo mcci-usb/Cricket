@@ -46,6 +46,7 @@ def scan_usb():
     Returns:
         None
     """
+
     # List of Host controllers
     hc_list = []
     # List connected hub
@@ -139,7 +140,6 @@ def scan_usb():
         except:
             # Print message
             print("Error")
-
     for i in range(len(hc_list)):
         master_list.append(hc_list[i])
     for i in range(len(hub_list)):

@@ -55,7 +55,7 @@ def check_port():
         port_name.append(dev)
     return port_name
 
-def search_port():
+def search_port(usbHand):
     """
     Search USB port for list of Plugged devices
     Filter 3141, 3201,  2101 and 2301 from the list
@@ -123,7 +123,7 @@ def search_port():
         # There is no new data from serial port
         except serial.SerialException as e:
             pass
-    dlist = d2101.scan_2101()
+    dlist = usbHand.scan_2101()
 
     for dl in dlist:
         rev_list.append(dl)

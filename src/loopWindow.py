@@ -25,7 +25,7 @@
 import wx
 
 # Own modules
-import usbDev
+import thControl
 
 from uiGlobals import *
 import control2101 as d2101
@@ -291,7 +291,7 @@ class LoopWindow(wx.Window):
         """ 
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             self.top.print_on_usb("USB Read Error!")
         self.usb_flg = False

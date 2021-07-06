@@ -26,7 +26,6 @@
 # Built-in imports
 
 import devClient as devnw
-import control2101 as d2101
 import search
 import socket
 import json
@@ -54,7 +53,7 @@ def ResetDeviceControl(top):
             
 def search_device(top):
     if top.devCtrl == "local":
-        dev_dict = search.search_port()
+        dev_dict = search.search_port(top.usbHand)
         return dev_dict
     elif top.devCtrl == "network":
         resdict = devnw.get_device_list(top.ldata['sccid'], int(top.ldata['ssccpn']))
@@ -72,11 +71,19 @@ def search_device(top):
 
 def connect_device(top):
     if top.devCtrl == "local":
-        if top.devHand.open_serial_device(top.selPort, BAUDRATE[top.selDevice]):
-            return True
-            #top.device_connected()
+        if top.selDevice == DEV_2101:
+            return top.usbHand.select_usb_device(top.selPort)
+        else:
+            return top.devHand.open_serial_device(top.selPort, BAUDRATE[top.selDevice])
+        top.device_connected()
     elif top.devCtrl == "network":
-        resdict = devnw.open_serial_device(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort, BAUDRATE[top.selDevice])
+        resdict = None
+        
+        if top.selDevice == DEV_2101:
+            resdict = devnw.select_usb_device(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort)
+        else:
+            resdict = devnw.open_serial_device(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort, BAUDRATE[top.selDevice])
+        
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             if resdict["result"][1]["data"] == "success":
@@ -85,8 +92,10 @@ def connect_device(top):
                 return False
         else:
             top.print_on_log("Control Computer Connection Fail!\n")
+            top.device_no_response()
             top.ccflag = False
-    return False
+            return-1, "No CC"
+   # return False
 
 def disconnect_device(top):
     if top.devCtrl == "local":
@@ -181,9 +190,9 @@ def send_amps_cmd(top):
 
 def control_port(top, cmd):
     if top.devCtrl == "local":
-        d2101.control_port(top.selPort, cmd)
+        top.usbHand.control_port(cmd)
     elif top.devCtrl == "network":
-        resdict = devnw.control_port(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort, cmd)
+        resdict = devnw.control_port(top.ldata['sccid'], int(top.ldata['ssccpn']), cmd)
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]

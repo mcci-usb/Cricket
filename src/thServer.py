@@ -38,6 +38,13 @@ keywords = {'Python',
             'SocketProgramming'
             }
 
+class ServerEvent(wx.PyEvent):
+    def __init__(self, data):
+        """Init Result Event."""
+        wx.PyEvent.__init__(self)
+        self.SetEventType(EVT_RESULT_ID)
+        self.data = data
+
 class ServerHc:
     def __init__(self, host='', port: int = 5567):
         self.IP = ""
@@ -46,7 +53,7 @@ class ServerHc:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((host, port))
         self.socket.listen(5)
-        print('Test Host Server Listeneing port: ' + host + ':' + str(port))
+        #print('Test Host Server Listeneing port: ' + host + ':' + str(port))
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None
@@ -63,7 +70,6 @@ class StayAccept(threading.Thread):
         self.rs = None
     
     def run(self) -> None:
-        print("\nTHC Server waiting for connections")
         while self.wait:
             try:
                 self.window.hcserver.conn_socket, self.window.hcserver.addr = self.window.hcserver.socket.accept()
@@ -74,7 +80,6 @@ class StayAccept(threading.Thread):
                 pass
 
     def close_connection(self):
-        print("\nTHC Server close connections")
         self.wait = False
 
    
@@ -85,49 +90,37 @@ class RequestSync(threading.Thread):
         self._running = True
     
     def terminate(self):
-        print("THC Server closing a client")
         self._running = False
 
     def run(self) -> None:
         # This message sent to client, when it gets connected with this server
-        print("THC Server accepting a client")
         while self._running:
             try:
-                data = self.window.hcserver.conn_socket.recv(1024).decode('utf-8')
+                #data = self.window.hcserver.conn_socket.recv(1024).decode('utf-8')
+                creq = self.window.hcserver.conn_socket.recv(1024)
+                data = json.loads(creq.decode())
             except ConnectionResetError:
                 self.window.hcserver.conn_socket.close()
                 disconnect_info = str(self.window.hcserver.addr) + ' socket\n'
                 wx.CallAfter(self.window.panel.PrintLog, "\n P2: "+disconnect_info)
                 break
-            if data == 'exit':
-                self.window.hcserver.conn_socket.sendall('exit'.encode('utf-8'))
-                self.window.hcserver.conn_socket.close()
-                disconnect_info = str(self.window.hcserver.addr) + ' ipadd\n'
-                wx.CallAfter(self.window.panel.PrintLog, "\n"+disconnect_info)
-                break
-            if data == 'force_exit':
-                self.window.hcserver.conn_socket.close()
-                disconnect_info = str(self.window.hcserver.addr) + ' ipadd\n'
-                wx.CallAfter(self.window.panel.PrintLog, "\n P4: "+disconnect_info)
-                break
             if data:
-                msg = 'ClientIPAddr '+str(self.window.hcserver.addr)+' '+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())+' Time: '+data
-                print("THC Command received: ", data)
                 result = self.verify_command(data)
                 data= json.dumps(result)
                 self.window.hcserver.conn_socket.sendall(data.encode('utf-8'))
                 self.terminate()
                 
-    def verify_command(self, nwdata):
-        nwd = nwdata.split(",")
-        msg = nwd[0]
-        if(msg == "usb"):
-            print("Server Cmd Read USB")
-            result = usbDev.get_usb_tree()
-            wx.CallAfter(self.window.panel.PrintLog, nwd[1])
-            rdict = {}
-            rdict["data"] = result
-            return rdict
+    
+    def verify_command(self, reqdict):
+        ctype = reqdict["ctype"]
+        cmd = reqdict["cmd"]
+        if(ctype == "usb"):
+            if (cmd == "lsusb"):
+                result = usbDev.get_usb_tree()
+                rdict = {}
+                rdict["data"] = list(result)
+                return rdict
         else:
-            errMsg = "command not valid"
-            return errMsg
+            rdict = {}
+            rdict["data"] = "Invalid command"
+            return rdict

@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.4.0-8"
+APP_VERSION = "2.4.0-24"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -132,6 +132,7 @@ ID_MENU_CONFIG_THC = 1104
 ID_MENU_SET_SCC = 1105
 ID_MENU_SET_THC = 1106
 
+EVT_RESULT_ID = 1100
 
 
 

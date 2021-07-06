@@ -28,22 +28,34 @@
 import socket
 import json
 
-def send_request(host, port, cmd):
-    cs =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cs.settimeout(20)
+def send_request(host, port, reqdict):
+    """
+    sending the host computer request from client
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+        port: when added the port in to the test host side.
+        reqdict: sending the request command.
+    Return:
+        return: sending the request with command "lsusb" in dictionary form
+
+    """
+    hs =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    hs.settimeout(20)
     rdict = {}
     rlist = []
     sdict = {}
     try:
-        result = cs.connect((host, port))
+        result = hs.connect((host, port))
         #rcvdata = cs.recv(1024)
-        cs.send(cmd.encode())
-        rcvdata = cs.recv(1024)
-        nwdata = json.loads(rcvdata.decode())
-        #return json.loads(rcvdata.decode())
+        data = json.dumps(reqdict)
+        hs.send(data.encode('utf-8'))
+        rcvdata = hs.recv(1024)
+        rcvdict = json.loads(rcvdata.decode())
         sdict["status"] = "OK"
         rlist.append(sdict)
-        rlist.append(nwdata)
+        rlist.append(rcvdict)
     except:
         sdict["status"] = "fail"
         rlist.append(sdict)
@@ -51,5 +63,17 @@ def send_request(host, port, cmd):
     return rdict
 
 def get_usb_tree(host, port):
-    cmd = "usb,lsusb"
-    return send_request(host, port, cmd)
+    """
+    getting usb device info from host computer server with the command lsusb.
+
+    Args:
+        host: hostcmputer allows only new device info
+        port: when added the port in to the test host side.
+        return: sending the request with command "lsusb" in dictionary form
+    Returns:
+        None
+        """
+    reqdict = {}
+    reqdict["ctype"] = "usb"
+    reqdict["cmd"] = "lsusb"
+    return send_request(host, port, reqdict)

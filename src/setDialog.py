@@ -29,6 +29,8 @@ import socket
 
 # Lib imports
 import wx
+import threading
+import time
 
 # Own modules
 from uiGlobals import *
@@ -40,6 +42,93 @@ HC_PORT = 2022
 ##############################################################################
 # Utilities
 ##############################################################################
+class ScanNwThread(threading.Thread):
+    """
+    A class ScannNwThread with init method.
+    using Threading in Scanning the network from client and server.
+    """
+    def __init__(self, port, txtsysip, txtctrl,  name="NwScanThread"):
+        """
+        adding event with threading.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            port: network port number.
+            txtsysip: system listening own system ip
+            txtctrl: maually enter ipaddress in network,
+            name: name as NwScanThread. 
+        Returns:
+            None:
+        """
+        self._stopevent = threading.Event()
+
+        self.port = port
+        self.txtctrl = txtctrl
+        self.txtsysip = txtsysip
+        
+        threading.Thread.__init__(self, name=name)
+ 
+    def run(self):
+        """
+        thread running
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+
+        """
+        subnet = self.get_network_subnet()[0]
+        self.txtsysip.SetLabel(str(subnet))
+        ips = str(subnet).split(".")
+        strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
+        portip = "No Node found"
+        for ip in range(1, 255):
+            if self._stopevent.isSet( ):
+                break
+            host = strsn+"."+str(ip)
+            try:
+                s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.settimeout(0.3)
+                result = s.connect((host, self.port))
+                portip = host
+                s.close()
+                break
+            except:
+                s.close()
+        self.txtctrl.SetValue(portip)        
+
+    def join(self, timeout = None):
+        """
+        join the thread event
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            timeout: timer is running between start and stop
+        Returns:
+            None
+        """
+        self._stopevent.set()
+
+    def get_network_subnet(self):
+        """
+        getting the hostcomputer network subnet with ipaddress.
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            hostcomputer ipaddress
+        """
+        return (socket.gethostbyname_ex(socket.gethostname())[2])
+
 class SetWindow(wx.Window):
     """
     A  class AboutWindow with init method
@@ -71,6 +160,9 @@ class SetWindow(wx.Window):
 
         self.nwip = None
 
+        self.scan_flg = False
+        self.searchthread = None
+
         self.hbox_rb = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_portip = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_nw = wx.BoxSizer(wx.HORIZONTAL)
@@ -90,20 +182,16 @@ class SetWindow(wx.Window):
         self.tc_scan = wx.StaticText(self, -1, '', size = (10,10))
 
         self.st_gaddr  = wx.StaticText (self, -1, 'System IP')
-        self.st_sysip = wx.StaticText(self, -1, '_ . _ . _ .  _', size = (130, -1))
+        self.st_sysip = wx.StaticText(self, -1, '_ _ _ _', size = (130, -1))
 
         self.btn_save = wx.Button(self, -1, 'save', size = (60,25))
 
-        self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanNetwork)
-        self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
-        
         self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
         self.hbox_rb.Add(self.rb_nwc, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 40)
         
-
         self.hbox_portip.Add(self.st_port, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
@@ -140,6 +228,9 @@ class SetWindow(wx.Window):
             (0,20,0)
             ])
 
+        self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanNetwork)
+        self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
+        
         self.initDialog()
         #self.initDialog1()
 
@@ -149,7 +240,18 @@ class SetWindow(wx.Window):
         # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
+
     def initDialog(self):
+        """
+        initiating the netowork dialog windows
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         if self.type == "scc":
             if self.top.ldata['sccif'] == "network":
                 self.rb_nwc.SetValue(True)
@@ -168,6 +270,37 @@ class SetWindow(wx.Window):
         self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
 
     def ScanNetwork(self, e):
+        """
+        Scanning the network from Client and Server.
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: event in scan network button
+        Returns:
+            None
+
+        """
+        if self.scan_flg == False:
+            self.StartNwScan()
+        else:
+            self.StopNwScan()
+
+    def StartNwScan(self):
+        """
+        start the server network scanning
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.scan_flg = True
+        self.btn_scan.SetLabel("stop scan")
+        
         devControl.ResetDeviceControl(self.top)
 
         portstr = self.tc_port.GetValue()
@@ -183,12 +316,39 @@ class SetWindow(wx.Window):
             port = int(portstr)
         except:
             self.tc_port.SetValue(str(port))
+
+        if self.searchthread != None:
+            del self.searchthread
+        self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip)
+        self.searchthread.start()
         
-        self.nwip = self.scan_server(port)
-        
-        self.tc_nwcip.SetValue(self.nwip)
+    def StopNwScan(self):
+        """
+        stop the scanning network
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.btn_scan.SetLabel("scan network")
+        self.scan_flg = False 
+        self.searchthread.join()  
     
     def SaveSettings(self, e):
+        """
+        save the Ipaddress and port number.
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: click on save button save the Dialog box window.
+        Returns:
+            None
+        """
         iftype = 'serial'
         rbval = self.rb_nwc.GetValue()
         if(rbval):
@@ -210,27 +370,18 @@ class SetWindow(wx.Window):
         self.parent.EndModal(True)
     
     def get_network_subnet(self):
+        """
+        getting the subnet mask hostcomputer ipaddress.
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         return (socket.gethostbyname_ex(socket.gethostname())[2])
-        
-    def scan_server(self, port):
-        subnet = self.get_network_subnet()[0]
-        self.st_sysip.SetLabel(str(subnet))
-        ips = str(subnet).split(".")
-        strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
-        portip = "No Node found"
-        for ip in range(1, 255):
-            host = strsn+"."+str(ip)
-            try:
-                s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(0.3)
-                result = s.connect((host, port))
-                portip = host
-                s.close()
-                break
-            except:
-                s.close()
-        return portip
-        
+                
 class SetDialog(wx.Dialog):
     """
     wxWindows application must have a class derived from wx.Dialog.
@@ -246,6 +397,7 @@ class SetDialog(wx.Dialog):
             that belongs to the class.
             parent: Pointer to a parent window.
             top: create a object
+            type: dialog box
         Returns:
             None
         """

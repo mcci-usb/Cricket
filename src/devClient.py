@@ -28,7 +28,7 @@
 import socket
 import json
 
-def send_request(host, port, cmd):
+def send_request(host, port, reqdict):
     cs =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.settimeout(20)
     rdict = {}
@@ -37,13 +37,13 @@ def send_request(host, port, cmd):
     try:
         result = cs.connect((host, port))
         #rcvdata = cs.recv(1024)
-        cs.send(cmd.encode())
+        data= json.dumps(reqdict)
+        cs.send(data.encode('utf-8'))
         rcvdata = cs.recv(1024)
-        nwdata = json.loads(rcvdata.decode())
-        #return json.loads(rcvdata.decode())
+        rcvdict = json.loads(rcvdata.decode())
         sdict["status"] = "OK"
         rlist.append(sdict)
-        rlist.append(nwdata)
+        rlist.append(rcvdict)
     except:
         sdict["status"] = "fail"
         rlist.append(sdict)
@@ -51,39 +51,73 @@ def send_request(host, port, cmd):
     return rdict
 
 def get_device_list(host, port):
-    cmd = "device"
-    return send_request(host, port, cmd)
-
+    reqdict = {}
+    reqdict["ctype"] = "device"
+    reqdict["cmd"] = "search"
+    return send_request(host, port, reqdict)
 
 def open_serial_device(host, port, sport, baud):
-    cmd = "open,"+sport+","+str(baud)
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "device"
+    reqdict["cmd"] = "open"
+    reqdict["itype"] = "serial"
+    reqdict["port"] = sport
+    reqdict["baud"] = str(baud)
+    return send_request(host, port, reqdict)
 
+def select_usb_device(host, port, sport):
+    reqdict = {}
+    reqdict["ctype"] = "device"
+    reqdict["cmd"] = "open"
+    reqdict["itype"] = "usb"
+    reqdict["port"] = sport
+    return send_request(host, port, reqdict)
 
 def close_serial_device(host, port):
-    cmd = "close"
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "device"
+    reqdict["cmd"] = "close"
+    return send_request(host, port, reqdict)
 
 def send_port_cmd(host, port, cmd):
-    ncmd = "port,"+cmd
-    return send_request(host, port, ncmd)
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "switch"
+    reqdict["stat"] = cmd
+    return send_request(host, port, reqdict)
 
 def read_port_cmd(host, port):
-    cmd = "read"
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "read"
+    return send_request(host, port, reqdict)
 
 def send_status_cmd(host, port):
-    cmd = "status"
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "status"
+    return send_request(host, port, reqdict)
 
 def send_volts_cmd(host, port):
-    cmd = "volts"
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "volts"
+    return send_request(host, port, reqdict)
 
 def send_amps_cmd(host, port):
-    cmd = "amps"
-    return send_request(host, port, cmd)
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "amps"
+    return send_request(host, port, reqdict)
 
-def control_port(host, port, dport, cmd):
-    ncmd = "c2101,"+dport+","+str(cmd)    
-    return send_request(host, port, ncmd)
+def control_port(host, port,cmd):
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "usb"
+    reqdict["cmd"] = str(cmd)
+    return send_request(host, port, reqdict)

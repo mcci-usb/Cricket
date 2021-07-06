@@ -56,10 +56,13 @@ from portDialog import *
 
 import devControl
 import serialDev
+import control2101
 import devServer
 
 import thControl
 import thServer
+
+import search
 
 ##############################################################################
 # Utilities
@@ -194,7 +197,8 @@ class UiPanel(wx.Panel):
         self.Layout()
         self.parent.terminateCcServer()
         self.parent.terminateHcServer()
-  
+
+        
     def update_server_panel(self):
         self.hboxm.Hide(self.vboxr)
         self.vboxl.Show(self.logPan)
@@ -202,9 +206,12 @@ class UiPanel(wx.Panel):
         self.vboxl.Hide(self.hboxdl)
         self.Layout()
 
+
+    
     def update_cc_panels(self):
         self.parent.startCcServer()
         
+    
     def update_hc_panels(self):
         self.parent.startHcServer()
     
@@ -213,11 +220,14 @@ class UiPanel(wx.Panel):
         self.hboxm.Hide(self.vboxr)
         self.Layout()
 
+
     def remove_dev_panels(self):
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
         self.vboxdl.Hide(self.dev2101Pan)
+
+
 
     def PrintLog(self, strin):
         """
@@ -505,12 +515,17 @@ class UiMainFrame (wx.Frame):
         self.hcclient = None
         self.listenhc = None
 
-        #self.devHand = serial.Serial()
+        
+
         self.devHand = serialDev.SerialDev(self)
+
+        self.usbHand = control2101.Dev2101(self)
 
         self.mode = MODE_MANUAL
 
         self.con_flg = False
+
+        self.dev_list = []
 
         self.masterList = []
         
@@ -575,6 +590,7 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.comMenu,     "&Manage Model")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
+        
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
         
@@ -608,6 +624,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+        EVT_RESULT(self, self.RunServerEvent)
 
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
@@ -639,13 +656,17 @@ class UiMainFrame (wx.Frame):
             self.ldata['thcif'] = "network"
             self.ldata['thcid'] = "No host"
             self.ldata['thcpn'] = "2022"
-
+            #-----------------------------------------
             self.ldata['ssccif'] = "network"
+            #self.ldata['sccid'] = "No host"
             self.ldata['ssccpn'] = "2021"
+            
             self.ldata['sthcif'] = "network"
+            #self.ldata['thcid'] = "No host"
             self.ldata['sthcpn'] = "2022"
-   
-        self.PrintParams()
+            #--------------------------------------------
+            
+        #self.PrintParams()
 
         self.update_config_menu()
         self.update_settings_menu()
@@ -654,17 +675,20 @@ class UiMainFrame (wx.Frame):
         if self.ldata['uc']:
             self.auto_connect()
 
-    def auto_connect(self):
-        if(self.ldata['port'] != None and self.ldata['device'] != None):
-            self.selPort = self.ldata['port']
-            self.selDevice = self.ldata['device']
-            if(self.selDevice !=  DEV_2101):
-                if devControl.connect_device(self):
-                    self.device_connected()
+
+    def RunServerEvent(self, event):
+        if event.data is None:
+            # Thread aborted (using our convention of None return)
+            self.print_on_log("\nNo Server Event")
+        else:
+            if event.data == "search":
+                self.print_on_log("\nSearch Event")
+                self.dev_list.clear()
+                self.dev_list = search.search_port(self.usbHand)
             else:
-                self.device_connected()
-        
-    def auto_connect2(self):
+                self.print_on_log("\nUnknown Server Event")
+
+    def auto_connect(self):
         """
         Do connect device automatically if the last connected device is 
         available
@@ -676,19 +700,14 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        if(self.ldata['port'] != '' and self.ldata['device'] != ''):
-            plist = devControl.search_device(self.top)
-            dev_list = plist["devices"]
-
-            for i in range(len(dev_list)):
-                if dev_list[i]['port'] == self.ldata['port'] and dev_list[i]['model'] == self.ldata['device']:
-                   self.selPort = dev_list[i]['port']
-                   devControl.connect_device(self, dev_list[i]['model'])
-                   break
-              
+        if(self.ldata['port'] != None and self.ldata['device'] != None):
+            self.selPort = self.ldata['port']
+            self.selDevice = self.ldata['device']
+            if devControl.connect_device(self):
+                self.device_connected()
+                
     def update_config_menu(self):
-        print("Update Config Menu")
-
+        test = 0x03
         if self.ldata['uc']:
             self.ucmenu.Check(True)
         else:
@@ -703,7 +722,7 @@ class UiMainFrame (wx.Frame):
             self.hcmenu.Check(True)
         else:
             self.hcmenu.Check(False)
-
+    
     def OnClickHelp(self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -911,6 +930,7 @@ class UiMainFrame (wx.Frame):
         self.device_disconnected()
         self.selPort = None
         self.con_flg = False
+        #self.devHand.close()
         devControl.disconnect_device(self)
         # Set label button name as Connect
         srlist = []
@@ -1260,25 +1280,31 @@ class UiMainFrame (wx.Frame):
         ds = shelve.open('CricketSettings.txt')
         ds['port'] = self.selPort
         ds['device'] = self.selDevice
+        #ds.close()
 
         ds['uc'] = self.ldata['uc']
         ds['cc'] = self.ldata['cc']
         ds['hc'] = self.ldata['hc']
- 
+
+        #ds = shelve.open('CricketSettings.txt')
         ds['sccif'] = self.ldata['sccif']
         ds['sccid'] = self.ldata['sccid']
         ds['sccpn'] = self.ldata['sccpn']
-        
+        #ds.close()
+
         ds['ssccif'] = self.ldata['ssccif']
         ds['ssccpn'] = self.ldata['ssccpn']
         ds['sthcif'] = self.ldata['sthcif']
         ds['sthcpn'] = self.ldata['sthcpn']
 
+        #ds = shelve.open('CricketSettings.txt')
         ds['thcif'] = self.ldata['thcif']
         ds['thcid'] = self.ldata['thcid']
         ds['thcpn'] = self.ldata['thcpn']
         ds.close()
 
+        
+ 
     def OnSelectScc (self, event):
         dlg = None
         if self.ucmenu.IsChecked():
@@ -1325,6 +1351,7 @@ class UiMainFrame (wx.Frame):
         self.StoreDevice()
         self.update_settings_menu()
 
+
     def update_settings_menu(self):
         if self.ucmenu.IsChecked():
             if self.ccmenu.IsChecked():
@@ -1358,6 +1385,7 @@ class UiMainFrame (wx.Frame):
                     self.panel.update_hc_panels()
             else:
                 self.panel.remove_all_panels()
+
     
     def update_settings_menu_old(self):
         if self.ucmenu.IsChecked() and not self.ccmenu.IsChecked():
@@ -1436,27 +1464,6 @@ class UiMainFrame (wx.Frame):
 
         ds.close()
 
-    def PrintParams(self):
-        print("Port: ", self.ldata['port'])
-        print("Device: ",self.ldata['device'])
-
-        print("UC: ",self.ldata['uc'])
-        print("CC: ",self.ldata['cc'])
-        print("HC: ",self.ldata['hc'])
-
-        print("SCC-IF: ",self.ldata['sccif'])
-        print("SCC-ID: ",self.ldata['sccid'])
-        print("SCC-PN: ",self.ldata['sccpn'])
-        
-        print("THC-IF", self.ldata['thcif'])
-        print("THC-ID: ",self.ldata['thcid'])
-        print("THC-PN: ",self.ldata['thcpn'])
-
-        print("SSCC-IF: ",self.ldata['ssccif'])
-        print("SSCC-PN: ",self.ldata['ssccpn'])
-        print("STHC-IF", self.ldata['sthcif'])
-        print("STHC-PN: ",self.ldata['sthcpn'])
-
     def startCcServer(self):
         if self.ccserver == None:
             self.ccserver = devServer.ServerCc("", int(self.ldata['ssccpn']))
@@ -1484,6 +1491,7 @@ class UiMainFrame (wx.Frame):
             del self.hcserver
             self.hcserver = None
 
+
     def terminateCcServer(self):
         if self.ccserver != None:  
             self.listencc.close_connection()
@@ -1492,6 +1500,11 @@ class UiMainFrame (wx.Frame):
             self.ccserver.close()
             del self.ccserver
             self.ccserver = None
+
+def EVT_RESULT(win, func):
+        """Define Result Event."""
+        win.Connect(-1, -1, EVT_RESULT_ID, func) 
+
         
 class UiApp(wx.App):
     """

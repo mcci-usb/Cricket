@@ -32,9 +32,16 @@ import json
 
 from uiGlobals import *
 
-PORT = 5567
-
 def SetDeviceControl(top):
+    """
+    set a device control through serial or Netwotk
+    Args:
+        top:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Return:
+       None
+    """  
     if not top.ldata['hc']:
         if top.ldata['thcif'] == 'serial':
             # serial not implemented
@@ -42,15 +49,35 @@ def SetDeviceControl(top):
             pass
         else:
             top.thCtrl = "network"
+            #OpenNetwork(top)
     else:
         top.thCtrl = "local"
 
 def ResetDeviceControl(top):
+    """
+    Reset the device
+    Args:
+        top:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Return:
+        None 
+    """
     if top.hcclient != None:
         top.clienthc.close()
         top.hcclient.close()
 
 def get_tree_change(top):
+    """
+    get the device tree change info throgh network
+    Args:
+        self:The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Return:
+        None
+
+    """
     if top.thCtrl == "local":
         dl, newlist = thlocal.get_usb_tree()
         thlocal.get_tree_change(top, dl, newlist)

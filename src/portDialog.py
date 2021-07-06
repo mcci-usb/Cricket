@@ -125,7 +125,9 @@ class PortWindow(wx.Window):
             ])
 
         self.initDialog()
+        #self.initDialog1()
 
+        #self.SetSizer(self.vbox)
         self.SetSizerAndFit(self.vbox)
         # Determines whether the Layout function will be called 
         # Automatically when the window is resized.
@@ -153,7 +155,8 @@ class PortWindow(wx.Window):
         rbval = self.rb_nwc.GetValue()
         if(rbval):
             iftype = "network"
-
+        
+        #devaddr = self.tc_nwcip.GetValue()
         portno = self.tc_port.GetValue()
 
         if self.type == "scc":
