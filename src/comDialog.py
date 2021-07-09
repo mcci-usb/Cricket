@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed May 27 2021 21:35:41 seenivasan 
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -229,7 +229,6 @@ class ComWindow(wx.Window):
         txt = self.cval.split("(")
         return txt[0], txt[1].replace(")","")
 
-
     def device_connected(self):
         """
         Connect the selected device
@@ -245,8 +244,7 @@ class ComWindow(wx.Window):
         self.btn_connect.SetLabel("Disconnect")
         self.top.device_connected()
         self.parent.EndModal(True)
-        
-    
+           
     def device_connected2(self):
         """
         Connect the selected device

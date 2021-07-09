@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-1 Wed April 28 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -54,7 +54,6 @@ class SerialDev:
         self.devHand.timeout = 1
         self.devHand.stopbits = serial. STOPBITS_ONE
         self.top = top
-
 
     def open_serial_device(self, port, baud):
         """
@@ -117,7 +116,6 @@ class SerialDev:
         rstr = "Comm Error\n"
         return res, rstr
 
-
     def write_serial(self, cmd):
         """
         Send data over the Serial Port to the connected model
@@ -134,7 +132,6 @@ class SerialDev:
             return 0
         except:
             return -1
-
   
     def read_serial(self):
         """
@@ -150,7 +147,6 @@ class SerialDev:
             return  0, self.devHand.readline().decode('utf-8')
         except:
             return -1
-
 
     def send_status_cmd(self):
         """
@@ -180,7 +176,6 @@ class SerialDev:
             srrin = "Comm Error\n"
             return res, strin
 
-    
     def send_volts_cmd(self):
         """
         Send command to read the Volt parameter from the model 3201

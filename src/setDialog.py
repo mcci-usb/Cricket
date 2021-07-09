@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed April 28 2021 18:50:10 seenivasan 
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -232,14 +232,10 @@ class SetWindow(wx.Window):
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
         
         self.initDialog()
-        #self.initDialog1()
-
-        #self.SetSizer(self.vbox)
         self.SetSizerAndFit(self.vbox)
         # Determines whether the Layout function will be called 
         # Automatically when the window is resized.
         self.SetAutoLayout(True)
-
 
     def initDialog(self):
         """

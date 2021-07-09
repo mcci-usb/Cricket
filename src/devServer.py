@@ -21,7 +21,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed June 14 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -41,6 +41,8 @@ keywords = {'Python',
             }
 
 class ServerEvent(wx.PyEvent):
+    """A class ServerEvent with init method"""
+
     def __init__(self, data):
         """Init Result Event."""
         wx.PyEvent.__init__(self)
@@ -48,7 +50,20 @@ class ServerEvent(wx.PyEvent):
         self.data = data
 
 class ServerCc:
+    """A class ServerCC with init method"""
+    
     def __init__(self, host='', port: int = 5566):
+        """
+        ServerCC having connetion control computer server
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            host:ipaddress of CC server
+            port: port number of CC server 
+        Returns:
+            None
+        """
         self.IP = ""
         self.PORT = port
         self.ADDR = ((self.IP, self.PORT))
@@ -61,17 +76,44 @@ class ServerCc:
         self.addr = None
 
     def close(self):
+        """
+        ServerCC connection is close
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """  
         self.socket.close()
         
-
 class StayAccept(threading.Thread):
+    """A class StayAccept with init method"""
     def __init__(self, parent):
+        """
+        ServerCC connection is wait until accept the connection
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         super(StayAccept, self).__init__()
         self.window = parent
         self.wait = True
         self.rs = None
     
     def run(self) -> None:
+        """
+        Server is run
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         while self.wait:
             try:
                 self.window.ccserver.conn_socket, self.window.ccserver.addr = self.window.ccserver.socket.accept()
@@ -82,23 +124,59 @@ class StayAccept(threading.Thread):
                 pass
 
     def close_connection(self):
+        """
+        ServerCC connection is close.
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self.wait = False
 
-   
 class RequestSync(threading.Thread):
+    """A class RequestSync with init method"""
     def __init__(self, parent):
+        """
+        ServerCC having connetion control computer server
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent:parent abject
+        Returns:
+            None
+        """
         super(RequestSync, self).__init__()
         self.window = parent
         self._running = True
     
     def terminate(self):
+        """
+        terminate the serverCC
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self._running = False
 
     def run(self) -> None:
+        """
+        This message sent to client, when it gets connected with this server
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         # This message sent to client, when it gets connected with this server
         while self._running:
             try:
-                #data = self.window.ccserver.conn_socket.recv(1024).decode('utf-8')
                 creq = self.window.ccserver.conn_socket.recv(1024)
                 data = json.loads(creq.decode())
             except ConnectionResetError:
@@ -113,6 +191,16 @@ class RequestSync(threading.Thread):
                 self.terminate()
     
     def verify_command(self, reqdict):
+        """
+        verify the command search and port
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            reqdict : request as dict
+        Returns:
+           return result : return searching the device.
+        """
         ctype = reqdict["ctype"]
         cmd = reqdict["cmd"]
         if(ctype == "device"):
@@ -128,7 +216,6 @@ class RequestSync(threading.Thread):
                 wx.CallAfter(self.window.panel.PrintLog, "\nDevice Search")
                 return result
             elif(cmd == "open"):
-                #print("Connect device")
                 itype = reqdict["itype"]
                 result = False
                 if(itype == "serial"):
@@ -137,7 +224,6 @@ class RequestSync(threading.Thread):
                     result = self.window.devHand.open_serial_device(port, int(baud))
                 elif(itype == "usb"):
                     port = reqdict["port"]
-                    #print("connect usb")
                     result = self.window.usbHand.select_usb_device(port)
                 rdict = {}
                 if result:

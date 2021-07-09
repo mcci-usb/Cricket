@@ -21,7 +21,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed June 14 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -39,14 +39,48 @@ keywords = {'Python',
             }
 
 class ServerEvent(wx.PyEvent):
+    """
+    A class ServerEvent with init method
+    wxWindow is the base class for all windows and 
+    represents any visible object on screen.
+    """
     def __init__(self, data):
+        
+        """
+        here the server sets the event type. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            data: creates an object
+        Returns:
+            None
+        """
         """Init Result Event."""
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_RESULT_ID)
         self.data = data
 
 class ServerHc:
+    """
+    A class ServerHc with init method
+    wxWindow is the base class for all windows and 
+    represents any visible object on screen.
+    """
     def __init__(self, host='', port: int = 5567):
+        """
+        here the server sets Ip address, port. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            host: host ip address ipaddress 
+            port : port number of that particular ipaddress.
+        Returns:
+            None
+        """
         self.IP = ""
         self.PORT = port
         self.ADDR = ((self.IP, self.PORT))
@@ -59,17 +93,53 @@ class ServerHc:
         self.addr = None
 
     def close(self):
+        """
+        Close the server connection
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            None
+        """
         self.socket.close()
         
 
 class StayAccept(threading.Thread):
+    """
+    A class StayAccept with init method
+    wxWindow is the base class for all windows and 
+    represents any visible object on screen.
+    """
     def __init__(self, parent):
+        """
+        here the server is wait the connection. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            None
+        """
         super(StayAccept, self).__init__()
         self.window = parent
         self.wait = True
         self.rs = None
     
     def run(self) -> None:
+        """
+        here the server is running connection establsihed to new connection info. 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            data: creates an object
+        Returns:
+            None
+        """
         while self.wait:
             try:
                 self.window.hcserver.conn_socket, self.window.hcserver.addr = self.window.hcserver.socket.accept()
@@ -80,19 +150,62 @@ class StayAccept(threading.Thread):
                 pass
 
     def close_connection(self):
+        """
+        here the server connection is close.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            None
+        """
         self.wait = False
 
    
 class RequestSync(threading.Thread):
+    """
+    A class RequestSync with init method
+    wxWindow is the base class for all windows and 
+    represents any visible object on screen.
+    """
     def __init__(self, parent):
+        """
+        here the server requesting using threading.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            None
+        """
         super(RequestSync, self).__init__()
         self.window = parent
         self._running = True
     
     def terminate(self):
+        """
+        here the server connection is terminate.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         self._running = False
 
     def run(self) -> None:
+        """
+        This message sent to client, when it gets connected with this server
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         # This message sent to client, when it gets connected with this server
         while self._running:
             try:
@@ -108,10 +221,20 @@ class RequestSync(threading.Thread):
                 result = self.verify_command(data)
                 data= json.dumps(result)
                 self.window.hcserver.conn_socket.sendall(data.encode('utf-8'))
-                self.terminate()
-                
+                self.terminate()          
     
     def verify_command(self, reqdict):
+        """
+        this function is verified USB Tree view command "usb", and "lsusb".
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            reqdict: request the command
+        Returns:
+            rdict: device info
+        """
+           
         ctype = reqdict["ctype"]
         cmd = reqdict["cmd"]
         if(ctype == "usb"):

@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 from __future__ import print_function
@@ -40,7 +40,21 @@ VID_2101 = 0x040e
 PID_2101 = 0xf413
 
 class Dev2101:
+    """
+    A  class Dev2101 with init method
+    """
     def __init__(self, top):
+        """
+        here the function init method is serial number list and device list, path list
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            top: creates an object
+        Returns:
+            None
+        """
         self.slno_list = []
         self.path_list = []
         self.dev_list = []
@@ -51,6 +65,16 @@ class Dev2101:
         self.ready = False
 
     def scan_2101(self):
+        """
+        scanning the device model 2101 device
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         dlist = []
         self.slno_list.clear()
         
@@ -107,20 +131,49 @@ class Dev2101:
         return slno
 
     def select_usb_device(self, serialno):
+        """
+        select usb device model 2101 in darwin and windows with serail number
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: creates an object
+        Returns:
+            True: serial is True
+        """
         self.slno = None
         self.path = None
-        for i in range(len(self.slno_list)):
-            if(self.slno_list[i] == serialno):
-                self.slno = serialno
-                self.path = self.path_list[i]
-                break
+        
+        if sys.platform == 'darwin':
+            for i in range(len(self.slno_list)):
+                if(self.slno_list[i] == serialno):
+                    self.slno = serialno
+                    self.path = self.path_list[i]
+                    break
+        else:
+            for i in range(len(self.slno_list)):
+                if(self.slno_list[i] == serialno):
+                    self.slno = serialno
+                    self.dev = self.dev_list[i]
+                    break
+            
         if self.slno == serialno:
             return True
         else:
             return False
 
-
     def control_port(self, cmd):
+        """
+        contrlling the ports in windows, Linux, darwin
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            cmd:device write  command sending to port
+        Returns:
+            result: is succes return ro control trasfer
+        """
         result = None
 
         # run in Darwin or Mac OS

@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed June 14 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -35,23 +35,43 @@ from uiGlobals import *
 PORT = 5566
 
 def SetDeviceControl(top):
+    """
+    set the serial device control
+    Args:
+        top: top creates the object
+    Returns:
+        None
+    """
     if not top.ldata['cc']:
         if top.ldata['sccif'] == 'serial':
-            # serial not implemented
             top.devCtrl = "serial"
             pass
         else:
             top.devCtrl = "network"
-            #OpenNetwork(top)
     else:
         top.devCtrl = "local"
 
 def ResetDeviceControl(top):
+    """
+    reset the serial device control
+    Args:
+        top: top creates the object
+    Returns:
+        None
+    """
     if top.ccclient != None:
         top.thread.close()
         top.ccclient.close()
             
 def search_device(top):
+    """
+    searching the devices
+    Args:
+        top: top creates the object
+    Returns:
+        findict: network device list
+        dev_dict: devices in dictionary
+    """
     if top.devCtrl == "local":
         dev_dict = search.search_port(top.usbHand)
         return dev_dict
@@ -70,6 +90,16 @@ def search_device(top):
        
 
 def connect_device(top):
+    """
+    connect the device
+    Args:
+        top: top creates the object
+    Returns:
+        usbHand.select_usb_device(top.selPort): select the device
+        devHand.open_serial_device(top.selPort, BAUDRATE[top.selDevice]): selport with baudrate
+        True: result of dictionay success
+        False: result of dictionary Fail
+    """
     if top.devCtrl == "local":
         if top.selDevice == DEV_2101:
             return top.usbHand.select_usb_device(top.selPort)
@@ -95,15 +125,31 @@ def connect_device(top):
             top.device_no_response()
             top.ccflag = False
             return-1, "No CC"
-   # return False
 
 def disconnect_device(top):
+    """
+    disconnect the devices
+    Args:
+        top: top creates the object
+    Returns:
+        return devHand.close() device close
+        return devnw.close() network device close()
+    """
     if top.devCtrl == "local":
         return top.devHand.close()
     elif top.devCtrl == "network":
         return devnw.close_serial_device(top.ldata['sccid'], int(top.ldata['ssccpn']))
 
 def send_port_cmd(top,cmd):
+    """
+    sending the port 
+    Args:
+        top: top creates the object
+        cmd: send the command.
+    Returns:
+        return top.devHand.send_port_cmd(cmd): return the sending port command.
+        return findict: status of port
+    """
     if top.devCtrl == "local":
         return top.devHand.send_port_cmd(cmd)
     elif top.devCtrl == "network":
@@ -121,6 +167,14 @@ def send_port_cmd(top,cmd):
             return-1, "No CC"
     
 def send_status_cmd(top):
+    """
+    sending the status coammand
+    Args:
+        top: top creates the object
+    Returns:
+        return top.devHand.send_status_cmd() return the devcie status.
+        return findict: status in dict
+    """
     if top.devCtrl == "local":
         return top.devHand.send_status_cmd()
     elif top.devCtrl == "network":
@@ -138,6 +192,14 @@ def send_status_cmd(top):
             return-1, "No CC"
 
 def read_port_cmd(top):
+    """
+    reading the port coammand
+    Args:
+        top: top creates the object
+    Returns:
+        return top.devHand.send_status_cmd() return the devcie status.
+        return findict: status in dict
+    """
     if top.devCtrl == "local":
         return top.devHand.read_port_cmd()
     elif top.devCtrl == "network":
@@ -155,6 +217,14 @@ def read_port_cmd(top):
             return-1, "No CC"
 
 def send_volts_cmd(top):
+    """
+    sending the volts coammand
+    Args:
+        top: top creates the object
+    Returns:
+        return top.devHand.send_status_cmd() return the devcie status.
+        return findict: status in dict
+    """
     if top.devCtrl == "local":
         return top.devHand.send_volts_cmd()
     elif top.devCtrl == "network":
@@ -172,6 +242,14 @@ def send_volts_cmd(top):
             return-1, "No CC"
 
 def send_amps_cmd(top):
+    """
+    sending the amps coammand
+    Args:
+        top: top creates the object
+    Returns:
+        return top.devHand.send_status_cmd() return the devcie status.
+        return findict: status in dict
+    """
     if top.devCtrl == "local":
         return top.devHand.send_amps_cmd()
     elif top.devCtrl == "network":
@@ -189,10 +267,19 @@ def send_amps_cmd(top):
             return-1, "No CC"
 
 def control_port(top, cmd):
+    """
+    controls the ports
+    Args:
+        top: top creates the object
+        cmd: throgh command
+    Returns:
+        return findict: status in dict
+    """
     if top.devCtrl == "local":
         top.usbHand.control_port(cmd)
     elif top.devCtrl == "network":
         resdict = devnw.control_port(top.ldata['sccid'], int(top.ldata['ssccpn']), cmd)
+        print(resdict)
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -210,7 +297,7 @@ def device_connected(top):
     Connect the selected device
 
     Args:
-        self: The self parameter is a reference to the current 
+        top: The self parameter is a reference to the current 
         instance of the class,and is used to access variables
         that belongs to the class.
     Returns:

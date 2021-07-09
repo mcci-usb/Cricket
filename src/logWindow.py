@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -72,8 +72,7 @@ class LogWindow(wx.Window):
                                          size=(-1,-1))
         self.scb.SetEditable(False)
         self.scb.SetBackgroundColour((255,255,255))
-        # self.SetMinSize((600,360))
-
+        
         # Tooltips display text over an widget elements
         # set tooltip for switching interval and auto buttons.
         self.btn_save.SetToolTip(wx.

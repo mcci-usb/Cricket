@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0-2 Wed June 14 2021 18:50:10 seenivasan
+#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -29,6 +29,16 @@ import socket
 import json
 
 def send_request(host, port, reqdict):
+    """
+    sending the request with same port number
+
+    Args:
+        host: host ipaddress.
+        port: send with port number
+        reqdict: request with dict
+    Returns:
+        rdict: its shows the status fail and Ok
+    """
     cs =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.settimeout(20)
     rdict = {}
@@ -51,12 +61,32 @@ def send_request(host, port, reqdict):
     return rdict
 
 def get_device_list(host, port):
+    """
+    get the device list with connecting server wit ipaddress and same port number
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "search"
     return send_request(host, port, reqdict)
 
 def open_serial_device(host, port, sport, baud):
+    """
+    once connecting the sevrer client search serial device list 
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+        sport: serial port command.
+        baud: baudrate of serial device.
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "open"
@@ -66,6 +96,16 @@ def open_serial_device(host, port, sport, baud):
     return send_request(host, port, reqdict)
 
 def select_usb_device(host, port, sport):
+    """
+    select the usb device and then open the port
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+        sport: serialport command
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "open"
@@ -74,12 +114,31 @@ def select_usb_device(host, port, sport):
     return send_request(host, port, reqdict)
 
 def close_serial_device(host, port):
+    """
+    closing the serial port device.
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "close"
     return send_request(host, port, reqdict)
 
 def send_port_cmd(host, port, cmd):
+    """
+    sending the port command
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+        cmd: cmd with send control , serial, switching.
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
@@ -88,6 +147,14 @@ def send_port_cmd(host, port, cmd):
     return send_request(host, port, reqdict)
 
 def read_port_cmd(host, port):
+    """
+    read the port command
+    Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
@@ -95,6 +162,14 @@ def read_port_cmd(host, port):
     return send_request(host, port, reqdict)
 
 def send_status_cmd(host, port):
+    """
+    sending the serial status command.
+    Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
@@ -102,6 +177,15 @@ def send_status_cmd(host, port):
     return send_request(host, port, reqdict)
 
 def send_volts_cmd(host, port):
+    """
+    send the volts command
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
@@ -109,6 +193,15 @@ def send_volts_cmd(host, port):
     return send_request(host, port, reqdict)
 
 def send_amps_cmd(host, port):
+    """
+    send the amps command
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
@@ -116,6 +209,15 @@ def send_amps_cmd(host, port):
     return send_request(host, port, reqdict)
 
 def control_port(host, port,cmd):
+    """
+    controlling the switching ports
+    Args:
+        Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "usb"
