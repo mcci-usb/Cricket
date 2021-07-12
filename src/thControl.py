@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -82,7 +82,8 @@ def get_tree_change(top):
         dl, newlist = thlocal.get_usb_tree()
         thlocal.get_tree_change(top, dl, newlist)
     elif top.thCtrl == "network":
-        resdict = thnw.get_usb_tree(top.ldata['thcid'],int(top.ldata['sthcpn']))
+        resdict = thnw.get_usb_tree(top.ldata['thcid'],
+                                int(top.ldata['sthcpn']))
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]["data"]
             if findict[0] == -1:

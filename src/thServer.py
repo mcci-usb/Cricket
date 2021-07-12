@@ -21,7 +21,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -130,7 +130,8 @@ class StayAccept(threading.Thread):
     
     def run(self) -> None:
         """
-        here the server is running connection establsihed to new connection info. 
+        here the server is running connection
+        establsihed to new connection info. 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -142,8 +143,10 @@ class StayAccept(threading.Thread):
         """
         while self.wait:
             try:
-                self.window.hcserver.conn_socket, self.window.hcserver.addr = self.window.hcserver.socket.accept()
-                new_conn_info = '\nnew connection: ' + str(self.window.hcserver.addr)
+                self.window.hcserver.conn_socket, self.window.hcserver.addr = \
+                        self.window.hcserver.socket.accept()
+                new_conn_info = '\nnew connection: ' + \
+                        str(self.window.hcserver.addr)
                 self.rs = RequestSync(self.window)
                 self.rs.start()
             except:
@@ -209,13 +212,13 @@ class RequestSync(threading.Thread):
         # This message sent to client, when it gets connected with this server
         while self._running:
             try:
-                #data = self.window.hcserver.conn_socket.recv(1024).decode('utf-8')
                 creq = self.window.hcserver.conn_socket.recv(1024)
                 data = json.loads(creq.decode())
             except ConnectionResetError:
                 self.window.hcserver.conn_socket.close()
                 disconnect_info = str(self.window.hcserver.addr) + ' socket\n'
-                wx.CallAfter(self.window.panel.PrintLog, "\n P2: "+disconnect_info)
+                wx.CallAfter(self.window.panel.PrintLog,
+                                        "\n P2: "+disconnect_info)
                 break
             if data:
                 result = self.verify_command(data)

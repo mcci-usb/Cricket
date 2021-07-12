@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -76,7 +76,8 @@ def search_device(top):
         dev_dict = search.search_port(top.usbHand)
         return dev_dict
     elif top.devCtrl == "network":
-        resdict = devnw.get_device_list(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        resdict = devnw.get_device_list(top.ldata['sccid'],
+                                    int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]
             top.ccflag = True
@@ -88,7 +89,6 @@ def search_device(top):
             findict["devices"] = []
             return findict
        
-
 def connect_device(top):
     """
     connect the device
@@ -96,7 +96,8 @@ def connect_device(top):
         top: top creates the object
     Returns:
         usbHand.select_usb_device(top.selPort): select the device
-        devHand.open_serial_device(top.selPort, BAUDRATE[top.selDevice]): selport with baudrate
+        devHand.open_serial_device(top.selPort, 
+        BAUDRATE[top.selDevice]): selport with baudrate
         True: result of dictionay success
         False: result of dictionary Fail
     """
@@ -104,15 +105,20 @@ def connect_device(top):
         if top.selDevice == DEV_2101:
             return top.usbHand.select_usb_device(top.selPort)
         else:
-            return top.devHand.open_serial_device(top.selPort, BAUDRATE[top.selDevice])
+            return top.devHand.open_serial_device(top.selPort,
+                                        BAUDRATE[top.selDevice])
         top.device_connected()
     elif top.devCtrl == "network":
         resdict = None
         
         if top.selDevice == DEV_2101:
-            resdict = devnw.select_usb_device(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort)
+            resdict = devnw.select_usb_device(top.ldata['sccid'],
+                                            int(top.ldata['ssccpn']), 
+                                            top.selPort)
         else:
-            resdict = devnw.open_serial_device(top.ldata['sccid'], int(top.ldata['ssccpn']), top.selPort, BAUDRATE[top.selDevice])
+            resdict = devnw.open_serial_device(top.ldata['sccid'],
+                        int(top.ldata['ssccpn']), top.selPort,
+                        BAUDRATE[top.selDevice])
         
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
@@ -138,7 +144,8 @@ def disconnect_device(top):
     if top.devCtrl == "local":
         return top.devHand.close()
     elif top.devCtrl == "network":
-        return devnw.close_serial_device(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        return devnw.close_serial_device(top.ldata['sccid'],
+                                    int(top.ldata['ssccpn']))
 
 def send_port_cmd(top,cmd):
     """
@@ -147,13 +154,15 @@ def send_port_cmd(top,cmd):
         top: top creates the object
         cmd: send the command.
     Returns:
-        return top.devHand.send_port_cmd(cmd): return the sending port command.
+        return top.devHand.send_port_cmd(cmd): 
+        return the sending port command.
         return findict: status of port
     """
     if top.devCtrl == "local":
         return top.devHand.send_port_cmd(cmd)
     elif top.devCtrl == "network":
-        resdict = devnw.send_port_cmd(top.ldata['sccid'], int(top.ldata['ssccpn']), cmd)
+        resdict = devnw.send_port_cmd(top.ldata['sccid'], 
+                            int(top.ldata['ssccpn']), cmd)
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -178,7 +187,8 @@ def send_status_cmd(top):
     if top.devCtrl == "local":
         return top.devHand.send_status_cmd()
     elif top.devCtrl == "network":
-        resdict = devnw.send_status_cmd(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        resdict = devnw.send_status_cmd(top.ldata['sccid'],
+                                    int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -203,7 +213,8 @@ def read_port_cmd(top):
     if top.devCtrl == "local":
         return top.devHand.read_port_cmd()
     elif top.devCtrl == "network":
-        resdict = devnw.read_port_cmd(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        resdict = devnw.read_port_cmd(top.ldata['sccid'],
+                                int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -228,7 +239,8 @@ def send_volts_cmd(top):
     if top.devCtrl == "local":
         return top.devHand.send_volts_cmd()
     elif top.devCtrl == "network":
-        resdict = devnw.send_volts_cmd(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        resdict = devnw.send_volts_cmd(top.ldata['sccid'],
+                                    int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -253,7 +265,8 @@ def send_amps_cmd(top):
     if top.devCtrl == "local":
         return top.devHand.send_amps_cmd()
     elif top.devCtrl == "network":
-        resdict = devnw.send_amps_cmd(top.ldata['sccid'], int(top.ldata['ssccpn']))
+        resdict = devnw.send_amps_cmd(top.ldata['sccid'], 
+                                int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]
@@ -278,8 +291,8 @@ def control_port(top, cmd):
     if top.devCtrl == "local":
         top.usbHand.control_port(cmd)
     elif top.devCtrl == "network":
-        resdict = devnw.control_port(top.ldata['sccid'], int(top.ldata['ssccpn']), cmd)
-        print(resdict)
+        resdict = devnw.control_port(top.ldata['sccid'], 
+                            int(top.ldata['ssccpn']), cmd)
         if resdict["result"][0]["status"] == "OK":
             top.ccflag = True
             findict = resdict["result"][1]["data"]

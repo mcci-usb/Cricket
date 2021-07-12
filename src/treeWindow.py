@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -396,9 +396,6 @@ class UsbTreeWindow(wx.Window):
                 if(int(onTime) < int(self.get_enum_delay())):
                     ndly = int((int(self.get_enum_delay())*100)/duty)
                     self.top.set_interval(str(ndly))
-            
-            '''if(int(self.top.get_interval()) < int(self.get_enum_delay())):
-                self.top.set_interval(self.get_enum_delay())'''
     
     def update_controls(self, mode):
         """

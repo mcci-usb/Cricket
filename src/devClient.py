@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -62,7 +62,8 @@ def send_request(host, port, reqdict):
 
 def get_device_list(host, port):
     """
-    get the device list with connecting server wit ipaddress and same port number
+    get the device list with connecting server 
+    with ipaddress and same port number
     Args:
         Args:
         host: host ipaddress.

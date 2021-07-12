@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -210,8 +210,7 @@ class UiPanel(wx.Panel):
         self.Layout()
         self.parent.terminateCcServer()
         self.parent.terminateHcServer()
-
-        
+ 
     def update_server_panel(self):
         """
         here USB tree window and Log window update the on selection server
@@ -570,8 +569,6 @@ class UiMainFrame (wx.Frame):
         self.hcclient = None
         self.listenhc = None
 
-        
-
         self.devHand = serialDev.SerialDev(self)
 
         self.usbHand = control2101.Dev2101(self)
@@ -601,9 +598,12 @@ class UiMainFrame (wx.Frame):
 
         # config menu
         self.configMenu = wx.Menu()        
-        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, "User Computer", kind = ITEM_CHECK)
-        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, "Switch Control Computer", kind = ITEM_CHECK)
-        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC, "Test Host Computer", kind = ITEM_CHECK)
+        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, 
+                            "User Computer", kind = ITEM_CHECK)
+        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, 
+                            "Switch Control Computer", kind = ITEM_CHECK)
+        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC,
+                            "Test Host Computer", kind = ITEM_CHECK)
 
         # Set Menu   
         self.setMenu = wx.Menu()
@@ -710,17 +710,12 @@ class UiMainFrame (wx.Frame):
             self.ldata['thcif'] = "network"
             self.ldata['thcid'] = "No host"
             self.ldata['thcpn'] = "2022"
-            #-----------------------------------------
+
             self.ldata['ssccif'] = "network"
-            #self.ldata['sccid'] = "No host"
             self.ldata['ssccpn'] = "2021"
             
             self.ldata['sthcif'] = "network"
-            #self.ldata['thcid'] = "No host"
             self.ldata['sthcpn'] = "2022"
-            #--------------------------------------------
-            
-        #self.PrintParams()
 
         self.update_config_menu()
         self.update_settings_menu()
@@ -728,7 +723,6 @@ class UiMainFrame (wx.Frame):
         thControl.SetDeviceControl(self)
         if self.ldata['uc']:
             self.auto_connect()
-
 
     def RunServerEvent(self, event):
         """
@@ -1285,13 +1279,15 @@ class UiMainFrame (wx.Frame):
     def update_connect_menu(self, status):
         """
         Enabled the  manage model menubar.
-        update the status first Connect menu in True state, Disconnect menu Disable state.
+        update the status first Connect menu in True state, 
+        Disconnect menu Disable state.
         update the status device connect then disconnect menu enabled.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            status: update the status connect and disconnect menu enable or disable state
+            status: update the status connect and 
+            disconnect menu enable or disable state
         Returns:
             None
         """
@@ -1419,7 +1415,8 @@ class UiMainFrame (wx.Frame):
 
     def OnSelectScc (self, event):
         """
-        if User computer menu ISCHECKED , Swicth control computer act as SCC server
+        if User computer menu ISCHECKED , Swicth control 
+        computer act as SCC server
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1521,10 +1518,14 @@ class UiMainFrame (wx.Frame):
 
     def update_settings_menu(self):
         """
-        if UC menu ISCHECKED and SCC menu ISCHECKED the Setting menu SCC is Disabled.
-        if UC menu ISCHECKED and SCC menu UNCHECKED  the Setting menu SCC is enabled.
-        if UC menu ISCHECKED and THC menu ISCHECKED the Setting menu THC is Disabled.
-        if UC menu ISCHECKED and THC menu UNCHECKED  the Setting menu THC is enabled.
+        if UC menu ISCHECKED and SCC menu ISCHECKED
+         the Setting menu SCC is Disabled.
+        if UC menu ISCHECKED and SCC menu UNCHECKED 
+         the Setting menu SCC is enabled.
+        if UC menu ISCHECKED and THC menu ISCHECKED
+         the Setting menu THC is Disabled.
+        if UC menu ISCHECKED and THC menu UNCHECKED 
+        the Setting menu THC is enabled.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1568,9 +1569,12 @@ class UiMainFrame (wx.Frame):
 
     def update_settings_menu_old(self):
         """
-        if UC menu checked  and SCC menu unchecked the scc menu not checked then update setting SCC enabled.
-        if UC menu ISCHECKED and THC menu ISCHECKED the Setting menu THC is Disabled.
-        if UC menu ISCHECKED and THC menu UNCHECKED  the Setting menu THC is enabled.
+        if UC menu checked  and SCC menu unchecked the
+         scc menu not checked then update setting SCC enabled.
+        if UC menu ISCHECKED and THC menu ISCHECKED 
+        the Setting menu THC is Disabled.
+        if UC menu ISCHECKED and THC menu UNCHECKED
+         the Setting menu THC is enabled.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1638,7 +1642,8 @@ class UiMainFrame (wx.Frame):
         
     def update_manage_model(self, status):
         """
-        update the manage model menu, if User computer is checked manage model enable.
+        update the manage model menu, if User 
+        computer is checked manage model enable.
         suppose UI run with server manage model is disable.
         Args:
             self: The self parameter is a reference to the current 
@@ -1728,7 +1733,8 @@ class UiMainFrame (wx.Frame):
 
     def terminateHcServer(self):
         """
-        suppose Clent is not listening HC server, host computer server is close the connection.
+        suppose Clent is not listening HC server,
+        host computer server is close the connection.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1746,7 +1752,8 @@ class UiMainFrame (wx.Frame):
 
     def terminateCcServer(self):
         """
-        suppose Clent is not listening CC server, control computer server is close the connection.
+        suppose Clent is not listening CC server, control
+        computer server is close the connection.
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables

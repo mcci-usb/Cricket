@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -146,9 +146,6 @@ class ComWindow(wx.Window):
         self.cb_device.Clear()
         self.cb_device.Enable()
         plist = devControl.search_device(self.top)
-        #flist = json.loads(plist)
-
-
         dev_list = plist["devices"]
         key_list = []
         val_list = []

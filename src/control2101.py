@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 from __future__ import print_function
@@ -45,8 +45,8 @@ class Dev2101:
     """
     def __init__(self, top):
         """
-        here the function init method is serial number list and device list, path list
-
+        here the function init method is serial number 
+        list and device list, path list
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -191,6 +191,6 @@ class Dev2101:
                 usbd = []
                 usbd.append(cmd)
                 usbd.append(0x00)
-                # ctrl_transfer method. It is used both for OUT and IN transfers
+                # ctrl_transfer method. It is used both for OUTandIN transfers
                 result = self.dev.ctrl_transfer(0x21, 0x09, 0x200, 0x00, usbd)
         return result

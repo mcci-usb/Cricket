@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lip imports
@@ -151,11 +151,6 @@ class Dev3201Window(wx.Window):
         self.hboxs2.Add((0,0), 1, wx.EXPAND)
         self.hboxs2.Add(self.hboxp4, flag=wx.RIGHT, border=20)
 
-        #self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
-        #self.hbox1.Add(0,1,0)
-        #self.hbox1.Add(self.hboxs2, flag=wx.LEFT, border=20 )
-        #self.hboxs2.Add(0,10,0)
-        
         self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT 
                        | wx.ALIGN_CENTER_VERTICAL, 
                        border=20 )

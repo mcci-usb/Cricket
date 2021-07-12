@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V 
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -80,11 +80,12 @@ class PortWindow(wx.Window):
         self.rb_tc = wx.RadioButton(self, -1, "Serial  ")
         self.rb_nwc = wx.RadioButton(self, -1, "Network (TCP)")
 
-        self.st_port = wx.StaticText(self, -1, 'port address', size = (65, -1))
+        self.st_port = wx.StaticText(self, -1, 'port address',size = (65, -1))
         self.tc_port = wx.TextCtrl(self, -1 , ' ', size = (70, 25))
 
         self.st_gaddr  = wx.StaticText (self, -1, 'System IP')
-        self.st_sysip = wx.StaticText(self, -1, '_ . _ . _ . _', size = (130, -1))
+        self.st_sysip = wx.StaticText(self, -1, '_ . _ . _ . _',
+                                    size = (130, -1))
 
         self.btn_save = wx.Button(self, -1, 'save', size = (60,25))
 
@@ -133,8 +134,17 @@ class PortWindow(wx.Window):
         # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
-
     def initDialog(self):
+        """
+        initiate the dialog box of both SCC and THC 
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
         if self.type == "scc":
             if self.top.ldata['ssccif'] == "network":
                 self.rb_nwc.SetValue(True)
@@ -151,6 +161,17 @@ class PortWindow(wx.Window):
         self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
 
     def SaveSettings(self, e):
+        """
+        save the scanning network address
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: save button event
+        Returns:
+            None
+        """
         iftype = 'serial'
         rbval = self.rb_nwc.GetValue()
         if(rbval):
@@ -170,6 +191,16 @@ class PortWindow(wx.Window):
         self.parent.EndModal(True)
     
     def get_network_subnet(self):
+        """
+        getting the local subnet address ethernet and LAN
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            return (socket.gethostbyname_ex(socket.gethostname())[2])
+        """
         return (socket.gethostbyname_ex(socket.gethostname())[2])
         
         

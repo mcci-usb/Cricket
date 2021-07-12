@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -522,8 +522,7 @@ class Dev3141Window(wx.Panel):
             
             self.update_carrier(strin)
             self.top.print_on_log("Device Orientation : "+strin+"\n")
-            #self.top.print_on_log("Device Orientation : "+str(cc1led)+",
-            #  "+str(cc1detect)+", "+strin+"\n")
+            
         else:
             self.update_carrier(strin)
             strin = "Device Error"

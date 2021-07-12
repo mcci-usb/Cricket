@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V 
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -172,7 +172,7 @@ class SetWindow(wx.Window):
         self.rb_tc = wx.RadioButton(self, -1, "Serial  ")
         self.rb_nwc = wx.RadioButton(self, -1, "Network (TCP)")
 
-        self.st_port = wx.StaticText(self, -1, 'port address', size = (65, -1))
+        self.st_port = wx.StaticText(self, -1, 'port address',size = (65, -1))
         self.tc_port = wx.TextCtrl(self, -1 , ' ', size = (70, 25))
 
         self.btn_scan = wx.Button(self, -1, 'scan network', size = (83,25))

@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.14 Wed July 12 2021 15:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.4.0-24b"
+APP_VERSION = "2.4.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -134,8 +134,6 @@ ID_MENU_SET_THC = 1106
 
 EVT_RESULT_ID = 1100
 
-
-
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
             "CDC-DATA", "Smart Card", "Content Security",
@@ -185,8 +183,6 @@ class NumericValidator(wx.Validator):
         wx.Validator.__init__(self)
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
-        #wx.EVT_CHAR(self, self.OnChar)
-    
     def Clone(self, arg=None):
         """
         Only digits are allowed in the address. 
@@ -196,7 +192,7 @@ class NumericValidator(wx.Validator):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            NumericValidator(): return True if all characters in the string are
+            NumericValidator():return True if all characters in the string are
             numaric charecters    
 
         """
