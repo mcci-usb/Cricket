@@ -158,7 +158,7 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-21 MCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 

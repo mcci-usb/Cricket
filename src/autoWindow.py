@@ -186,7 +186,8 @@ class AutoWindow(wx.Window):
             self.stop_auto()
         else:
             if(self.usb_dly_warning() and self.onoff_dly_warning()):
-                self.start_auto() 
+                self.start_auto()
+
     def start_auto(self):
         """
         Start Auto Mode for until stopped
@@ -277,6 +278,7 @@ class AutoWindow(wx.Window):
         self.top.port_on(portno, stat)
         if(self.top.get_delay_status()):
             self.keep_delay()
+            
     def keep_delay(self):
         """
         start the USB delay timer

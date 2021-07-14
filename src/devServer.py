@@ -134,6 +134,7 @@ class StayAccept(threading.Thread):
             None
         """
         self.wait = False
+        
 
 class RequestSync(threading.Thread):
     """A class RequestSync with init method"""

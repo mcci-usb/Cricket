@@ -61,6 +61,7 @@ class ServerEvent(wx.PyEvent):
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_RESULT_ID)
         self.data = data
+        
 
 class ServerHc:
     """

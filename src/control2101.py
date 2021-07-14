@@ -64,6 +64,29 @@ class Dev2101:
         self.top = top
         self.ready = False
 
+    def get_2101(self):
+        """
+        get the model2101 enumaration in darwin 
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            dlist: return same device model
+        """
+        dlist = []
+        if sys.platform == 'darwin':
+            dev = hid.enumerate(VID_2101, PID_2101)
+            if len(dev) != 0:
+                for dev in hid.enumerate(VID_2101, PID_2101):
+                    dlist.append(dev['serial_number'])
+        else:
+            for dev in usb.core.find(idVendor=VID_2101, idProduct=PID_2101, 
+                                     find_all=1):
+                slno =  self.get_serial_number(dev)
+                dlist.append(slno)
+        return dlist
+
     def scan_2101(self):
         """
         scanning the device model 2101 device
@@ -112,8 +135,12 @@ class Dev2101:
         Returns:
             serial number of the device in String format
         """
-        
-        ret = dev.ctrl_transfer(0x80, 0x06, 0x303, 0x409, 0x1a)
+        ret  = None
+
+        try:
+            ret = dev.ctrl_transfer(0x80, 0x06, 0x303, 0x409, 0x1a)
+        except:
+            ret = None
 
         # Create data buffers
         intarr = []
@@ -192,5 +219,8 @@ class Dev2101:
                 usbd.append(cmd)
                 usbd.append(0x00)
                 # ctrl_transfer method. It is used both for OUTandIN transfers
-                result = self.dev.ctrl_transfer(0x21, 0x09, 0x200, 0x00, usbd)
+                try:
+                    result = self.dev.ctrl_transfer(0x21, 0x09, 0x200, 0x00, usbd)
+                except:
+                    result = None
         return result

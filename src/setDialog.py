@@ -129,6 +129,7 @@ class ScanNwThread(threading.Thread):
         """
         return (socket.gethostbyname_ex(socket.gethostname())[2])
 
+
 class SetWindow(wx.Window):
     """
     A  class AboutWindow with init method
@@ -175,7 +176,7 @@ class SetWindow(wx.Window):
         self.st_port = wx.StaticText(self, -1, 'port address',size = (65, -1))
         self.tc_port = wx.TextCtrl(self, -1 , ' ', size = (70, 25))
 
-        self.btn_scan = wx.Button(self, -1, 'scan network', size = (83,25))
+        self.btn_scan = wx.Button(self, -1, 'scan network', size = (94,25))
         self.tc_nwcip = wx.ComboBox(self,
                                      size=(130, -1),
                                      style=wx.CB_DROPDOWN)
@@ -377,6 +378,7 @@ class SetWindow(wx.Window):
             None
         """
         return (socket.gethostbyname_ex(socket.gethostname())[2])
+        
                 
 class SetDialog(wx.Dialog):
     """

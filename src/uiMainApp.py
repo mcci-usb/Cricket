@@ -680,6 +680,11 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
         EVT_RESULT(self, self.RunServerEvent)
 
+        # Timer for monitor the connected devices
+        self.timer_lp = wx.Timer(self)
+        # Bind the timer event to handler
+        self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
+
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
             self.Bind(wx.EVT_ICONIZE, self.OnIconize)
@@ -1275,6 +1280,7 @@ class UiMainFrame (wx.Frame):
         self.StoreDevice()
         self.update_connect_menu(False)
         self.set_mode(MODE_MANUAL)
+        self.update_port_timer()
 
     def update_connect_menu(self, status):
         """
@@ -1768,6 +1774,46 @@ class UiMainFrame (wx.Frame):
             self.ccserver.close()
             del self.ccserver
             self.ccserver = None
+
+    def update_port_timer(self):
+        """
+        updating the Port timer in all switching model
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+
+        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
+            if(not self.timer_lp.IsRunning()):
+                self.timer_lp.Start(700)
+        else:
+            self.timer_lp.Stop()
+
+    def DeviceMonitor(self, e):
+        """
+        updating the Disconnect window when plug out the Device
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e:event assign with button
+        Returns: 
+            None
+        """
+        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
+            if self.con_flg:
+                self.timer_lp.Stop()
+                plist = search.check_port(self.usbHand)
+                if self.selPort in plist:
+                    self.timer_lp.Start(700)
+                else:
+                    self.con_flg = False
+                    # Print the message
+                    wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
+                    self.device_no_response()
 
 def EVT_RESULT(win, func):
     """

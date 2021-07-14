@@ -36,7 +36,7 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-def check_port():
+def check_port(usbHand):
     """
     Scan the USB port and collect all the device under a list
     Args:
@@ -50,7 +50,8 @@ def check_port():
     
     for port, desc, hwid in sorted(comlist):
         port_name.append(port)
-    dlist = d2101.scan_2101()
+    
+    dlist = usbHand.get_2101()
     for dev in dlist:
         port_name.append(dev)
     return port_name

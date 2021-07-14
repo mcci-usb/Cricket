@@ -65,7 +65,7 @@ class ComWindow(wx.Window):
         self.dlist = []
 
         self.btn_scan = wx.Button(self, ID_BTN_DEV_SCAN, "Search",
-                                  size=(55,25))
+                                  size=(57,25))
 
         self.cb_device = wx.ComboBox(self,
                                      size=(135, -1),
