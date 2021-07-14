@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lip imports
@@ -28,8 +28,8 @@ import wx
 import os
 
 # Own modules
-import serialDev
-import usbDev
+import devControl as model
+import thControl
 from uiGlobals import *
 
 PORTS = 4
@@ -151,11 +151,6 @@ class Dev3201Window(wx.Window):
         self.hboxs2.Add((0,0), 1, wx.EXPAND)
         self.hboxs2.Add(self.hboxp4, flag=wx.RIGHT, border=20)
 
-        #self.hbox1.Add(self.hboxs1, flag=wx.ALIGN_CENTER_VERTICAL )
-        #self.hbox1.Add(0,1,0)
-        #self.hbox1.Add(self.hboxs2, flag=wx.LEFT, border=20 )
-        #self.hboxs2.Add(0,10,0)
-        
         self.hbox3.Add(self.st_ss,0 , flag=wx.ALIGN_LEFT | wx.LEFT 
                        | wx.ALIGN_CENTER_VERTICAL, 
                        border=20 )
@@ -258,7 +253,7 @@ class Dev3201Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_volts_cmd(self.top.devHand)
+        res, outstr = model.send_volts_cmd(self.top)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -298,7 +293,7 @@ class Dev3201Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_amps_cmd(self.top.devHand)
+        res, outstr = model.send_amps_cmd(self.top)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -360,7 +355,7 @@ class Dev3201Window(wx.Window):
         """
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # to print on usb tree view change "USB Read Error!"
             self.top.print_on_usb("USB Read Error!")
@@ -451,7 +446,7 @@ class Dev3201Window(wx.Window):
             None
         """
         cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -474,7 +469,7 @@ class Dev3201Window(wx.Window):
             None
         """
         cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -685,9 +680,7 @@ class Dev3201Window(wx.Window):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        print("\nSpeedCmd: ",cmd)
-        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
-        print("\nSpeed Result: ", res, outstr)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
@@ -707,9 +700,9 @@ class Dev3201Window(wx.Window):
             None
         """
         if(self.top.con_flg):
-            res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':
-                res, outstr = serialDev.read_port_cmd(self.top.devHand)
+                res, outstr = model.read_port_cmd(self.top)
             if res == 0:
                 if(outstr != ''):
                     self.init_ports(int(outstr))

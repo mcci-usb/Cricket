@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import threading
 from datetime import datetime
 
 # Own modules
-import usbDev
+import thControl
 from uiGlobals import *
 
 ##############################################################################
@@ -247,8 +247,9 @@ class UsbTreeWindow(wx.Window):
         Returns:
             None
         """
+
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # print message
             self.print_on_usb("USB Read Error!")
@@ -335,7 +336,6 @@ class UsbTreeWindow(wx.Window):
     def get_delay_status(self):
         """
         Status of the USB Enumeration delay control selection
-
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -396,9 +396,6 @@ class UsbTreeWindow(wx.Window):
                 if(int(onTime) < int(self.get_enum_delay())):
                     ndly = int((int(self.get_enum_delay())*100)/duty)
                     self.top.set_interval(str(ndly))
-            
-            '''if(int(self.top.get_interval()) < int(self.get_enum_delay())):
-                self.top.set_interval(self.get_enum_delay())'''
     
     def update_controls(self, mode):
         """

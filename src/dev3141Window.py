@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,8 +28,8 @@ import wx
 import os
 
 # Own modules
-import serialDev
-import usbDev
+import devControl as model
+import thControl
 from uiGlobals import *
 
 PORTS = 2
@@ -233,7 +233,7 @@ class Dev3141Window(wx.Panel):
         """
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # To print on usb tree view change "USB Read Error!"
             self.top.print_on_usb("USB Read Error!")
@@ -316,7 +316,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -339,7 +339,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand, cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -484,7 +484,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = serialDev.send_port_cmd(self.top.devHand,cmd)
+        res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
@@ -502,7 +502,7 @@ class Dev3141Window(wx.Panel):
             None
         """
         strin = "--"
-        res, outstr = serialDev.send_status_cmd(self.top.devHand)
+        res, outstr = model.send_status_cmd(self.top)
         if res == 0:
             restr = outstr.split('\n')
             cc1detect = None
@@ -522,8 +522,7 @@ class Dev3141Window(wx.Panel):
             
             self.update_carrier(strin)
             self.top.print_on_log("Device Orientation : "+strin+"\n")
-            #self.top.print_on_log("Device Orientation : "+str(cc1led)+",
-            #  "+str(cc1detect)+", "+strin+"\n")
+            
         else:
             self.update_carrier(strin)
             strin = "Device Error"
@@ -553,9 +552,9 @@ class Dev3141Window(wx.Panel):
             None
         """
         if(self.top.con_flg):
-            res, outstr = serialDev.read_port_cmd(self.top.devHand)
+            res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':
-                res, outstr = serialDev.read_port_cmd(self.top.devHand)
+                res, outstr = model.read_port_cmd(self.top)
             if res == 0:
                 if(outstr != ''):
                     self.init_ports(int(outstr))

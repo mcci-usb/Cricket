@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Own modules
@@ -28,7 +28,19 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-def get_tree_change(top):
+
+def get_usb_tree():
+    """
+    get the information of USB Tree view window.
+    Args:
+        no argument
+    Returns:
+        None
+    """
+    dl, newlist = getusb.scan_usb()
+    return dl, newlist
+
+def get_tree_change(top, dl, newlist):
     """
     Get USB Device Tree changes list and print the list in USB Device Tree
     View Changes Window
@@ -39,10 +51,12 @@ def get_tree_change(top):
         None
     """
     # Usb device scanning 
-    dl, newlist = getusb.scan_usb()
+    #dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
-    
+    if len(oldlist) == 0:
+        oldlist = newlist
+            
     # Save usb device list
     top.save_usb_list(newlist)
     

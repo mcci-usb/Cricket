@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 #Lib imports
@@ -28,8 +28,8 @@ import wx
 import os
 
 # Own modules
-import usbDev
-import control2101 as d2101
+import thControl
+import devControl as model
 from uiGlobals import *
 
 PORTS = 1
@@ -218,7 +218,7 @@ class Dev2101Window(wx.Panel):
         """
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             # To print on usb tree view change "USB Read Error!"
             self.top.print_on_usb("USB Read Error!")
@@ -280,7 +280,7 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """ 
-        d2101.control_port(self.top.selPort, self.portcmd)
+        model.control_port(self.top, self.portcmd)
         # print port ON 
         self.top.print_on_log("Port ON\n")
         self.port_led_update(port, True)
@@ -298,7 +298,7 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        d2101.control_port(self.top.selPort, DEV_DISCONNECT)
+        model.control_port(self.top, DEV_DISCONNECT)
         self.top.print_on_log("Port OFF\n")
         self.port_led_update(port, False)
            

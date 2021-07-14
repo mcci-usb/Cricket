@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -36,7 +36,7 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
-def check_port():
+def check_port(usbHand):
     """
     Scan the USB port and collect all the device under a list
     Args:
@@ -50,12 +50,13 @@ def check_port():
     
     for port, desc, hwid in sorted(comlist):
         port_name.append(port)
-    dlist = d2101.scan_2101()
+    
+    dlist = usbHand.get_2101()
     for dev in dlist:
         port_name.append(dev)
     return port_name
 
-def search_port():
+def search_port(usbHand):
     """
     Search USB port for list of Plugged devices
     Filter 3141, 3201,  2101 and 2301 from the list
@@ -123,5 +124,20 @@ def search_port():
         # There is no new data from serial port
         except serial.SerialException as e:
             pass
-    rdict = dict(zip(rev_list, dev_list))
+    dlist = usbHand.scan_2101()
+
+    for dl in dlist:
+        rev_list.append(dl)
+        dev_list.append(DEVICES[DEV_2101])
+
+    rdict = {}
+    devlist = []
+    
+    for i in range(len(rev_list)):
+        tempdict = {}
+        tempdict["port"] = rev_list[i]
+        tempdict["model"] = dev_list[i]
+        devlist.append(tempdict)
+
+    rdict["devices"] = devlist
     return rdict

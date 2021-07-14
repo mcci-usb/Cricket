@@ -1,10 +1,10 @@
 ##############################################################################
 # 
-# Module: comWindow.py
+# Module: comDialog.py
 #
 # Description:
-#     UI for device search and interface of 3141 and 3201, 2101, 2301 switches
-#     Interact with search script and serial device script
+#     Dialog to show list of available Models (3141, 3201, 2101 and 2301)
+#     Search, view, select and connect module
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -16,10 +16,10 @@
 #     Released under the MCCI Corporation.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -27,24 +27,23 @@ import wx
 
 # Own modules
 import search
-import serialDev
-import control2101 as d2101
 from uiGlobals import *
+
+import devControl
+import json
 
 ##############################################################################
 # Utilities
 ##############################################################################
-class ComWindow(wx.Panel):
+class ComWindow(wx.Window):
     """
-    A  class comWindow with init method
-
-    the comWindow navigate to search and connect buttons in manage model.
-    click on search button the connecting device is listed in drop down box.
+    A  class AboutWindow with init method
+    The AboutWindow navigate to MCCI Logo with naming of 
+    application UI "Criket",Version and copyright info.  
     """
-    def __init__(self, parent, top):
+    def __init__ (self, parent, top):
         """
-        comWindow that contains the about scan device and 
-        connect device(s).
+        AboutWindow that contains the about dialog elements.
 
         Args:
             self: The self parameter is a reference to the current 
@@ -55,26 +54,31 @@ class ComWindow(wx.Panel):
         Returns:
             None
         """
-        wx.Panel.__init__(self, parent)
-        # Self.SetBackgroundColour("white")
+        wx.Window.__init__(self, parent, -1,
+                           size=wx.Size(100,100),
+                           style=wx.CLIP_CHILDREN,
+                           name="About")
 
         self.top = top
+        self.parent = parent
 
         self.dlist = []
 
         self.btn_scan = wx.Button(self, ID_BTN_DEV_SCAN, "Search",
-                                  size=(55,25))
+                                  size=(57,25))
 
         self.cb_device = wx.ComboBox(self,
-                                     size=(128, -1),
+                                     size=(135, -1),
                                      choices=self.dlist,
                                      style=wx.CB_DROPDOWN)
         
         self.btn_connect = wx.Button(self, ID_BTN_CONNECT, "Connect", 
                                      size=(80,-1))
 
-        sb = wx.StaticBox(self, -1,"Manage Model")
-        self.szr_top = wx.StaticBoxSizer(sb, wx.HORIZONTAL)
+        self.szr_top = wx.BoxSizer(wx.HORIZONTAL)
+        
+        wx.BoxSizer(wx.HORIZONTAL)
+        
         self.szr_top.AddMany([
             (10,50,0),
             (self.btn_scan, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER),
@@ -88,7 +92,9 @@ class ComWindow(wx.Panel):
         self.vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.vbox.AddMany([
+            (10,10,0),
             (self.szr_top, 0, wx.EXPAND | wx.ALL),
+            (10,10,0)
             ])
         
         # Set size of frame
@@ -105,12 +111,9 @@ class ComWindow(wx.Panel):
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
         self.btn_connect.Bind(wx.EVT_BUTTON, self.ConnectDevice)
-        self.btn_connect.Disable()
-        
+        self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
-        # Bind the timer event to handler
-        self.Bind(wx.EVT_TIMER, self.ComServ, self.timer_lp)
 
     def ScanDevice(self, evt):
         """
@@ -142,15 +145,15 @@ class ComWindow(wx.Panel):
         self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
-        
-        plist = search.search_port()
-        key_list = list(plist.keys())
-        val_list = list(plist.values())
-        dlist = d2101.scan_2101()
-        for dl in dlist:
-            key_list.append(dl)
-            val_list.append(DEVICES[DEV_2101])
+        plist = devControl.search_device(self.top)
+        dev_list = plist["devices"]
+        key_list = []
+        val_list = []
 
+        for i in range(len(dev_list)):
+            key_list.append(dev_list[i]["port"])
+            val_list.append(dev_list[i]["model"])
+        
         for i in range(len(key_list)):
             str1 = key_list[i]+"("+val_list[i]+")"
             self.cb_device.Append(str1)
@@ -179,103 +182,9 @@ class ComWindow(wx.Panel):
             None
         """
         self.btn_connect.Disable()
-        if(self.top.con_flg):
-            self.disconnect_device()
-        else:
-            self.connect_device()
-        self.btn_connect.Enable()
+        self.connect_device()
+        #self.btn_connect.Enable()
         self.top.set_mode(MODE_MANUAL)
-    
-    def ComServ(self, e):
-        """
-        Scan the USB/COM port to check the status of the connected device
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:message updated in Popup window with model disconnected 
-        Returns:
-            None
-        """
-        if self.top.con_flg:
-            self.timer_lp.Stop()
-            plist = search.check_port()
-            if self.top.selPort in plist:
-                self.timer_lp.Start(700)
-            else:
-                self.top.con_flg = False
-                # Print the message
-                wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
-                self.disconnect_device()
-    
-    def disconnect_device(self):
-        """
-        Disconnect the connected device
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.top.device_disconnected()
-        self.top.selPort = None
-        self.top.con_flg = False
-        self.btn_connect.Disable()
-        self.top.devHand.close()
-        # Set label button name as Connect
-        self.btn_connect.SetLabel("Connect")
-        self.timer_lp.Stop()
-        srlist = []
-        srlist.append("Port")
-        srlist.append("")
-        srlist.append("")
-        srlist.append("Disconnected")
-        self.top.UpdateAll(srlist)
-        # Print on logwindow
-        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
-                              +" Disconnected!\n")
-        
-    def device_connected(self):
-        """
-        Connect the selected device
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        # Set label button name as Disconnect
-        self.btn_connect.SetLabel("Disconnect")
-        self.top.con_flg = True
-        self.top.UpdatePort()
-        # Device update info
-        self.top.UpdateDevice()
-        self.top.UpdateSingle("Connected", 3)
-        self.timer_lp.Start(500)
-        # Print on logwindow
-        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
-                                              +" Connected!\n")
-        self.top.device_connected()
-    
-    def get_selected_com(self):
-        """
-        Get the selected Com port and Switch Model
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            it returns the Com Port and Model in String
-        """
-        self.cval = self.cb_device.GetValue()
-        txt = self.cval.split("(")
-        return txt[0], txt[1].replace(")","")
     
     def connect_device(self):    
         """
@@ -299,14 +208,27 @@ class ComWindow(wx.Panel):
             if devname == DEVICES[i]:
                 self.top.selDevice = i
                 break
-        if self.top.selDevice == DEV_2101:
+        if devControl.connect_device(self.top):
             self.device_connected()
-        elif(serialDev.open_serial_device(self.top)):
-            self.device_connected() 
-    def auto_connect(self):
+
+    def get_selected_com(self):
         """
-        Do connect device automatically if the last connected device is 
-        available
+        Get the selected Com port and Switch Model
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            it returns the Com Port and Model in String
+        """
+        self.cval = self.cb_device.GetValue()
+        txt = self.cval.split("(")
+        return txt[0], txt[1].replace(")","")
+
+    def device_connected(self):
+        """
+        Connect the selected device
 
         Args:
             self: The self parameter is a reference to the current 
@@ -315,14 +237,128 @@ class ComWindow(wx.Panel):
         Returns:
             None
         """
-        if(self.top.ldata['port'] != '' and self.top.ldata['device'] != ''):
-            instr = ""+self.top.ldata['port']+"("+DEVICES[
-                                self.top.ldata['device']]+")"
-            self.search_device()
-            if self.cb_device.FindString(instr) >= 0:
-                self.cb_device.SetValue(instr)
-                self.connect_device()
-                # Connect button is enable automatically 
-                # If last connected device is avalaible
-                self.btn_connect.Enable()
-                self.top.set_mode(MODE_MANUAL)
+        # Set label button name as Disconnect
+        self.btn_connect.SetLabel("Disconnect")
+        self.top.device_connected()
+        self.parent.EndModal(True)
+           
+    def device_connected2(self):
+        """
+        Connect the selected device
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        # Set label button name as Disconnect
+        self.btn_connect.SetLabel("Disconnect")
+        self.top.con_flg = True
+        self.top.UpdatePort()
+        # Device update info
+        self.top.UpdateDevice()
+        self.top.UpdateSingle("Connected", 3)
+        # Print on logwindow
+        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
+                                              +" Connected!\n")
+        self.top.device_connected()
+        self.parent.EndModal(True)
+
+    def OnClick (self, evt):
+        """
+        OnClick() event handler function retrieves the label of 
+        source button, which caused the click event. 
+        That label is printed on the console.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the OnClick() method is an 
+            object specific to a particular event type.
+        Returns:
+            None        
+        """
+        self.GetParent().OnOK(evt)
+   
+    def OnSize (self, evt):
+        """
+        OnSize() event handler function retrieves the about window size. 
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the OnClick() method is an 
+            object specific to a particular event type.
+        Returns:
+            None        
+        """
+        self.Layout()
+
+class ComDialog(wx.Dialog):
+    """
+    wxWindows application must have a class derived from wx.Dialog.
+    """
+    def __init__ (self, parent, top):
+        """
+        A AboutDialog is Window an application creates to 
+        retrieve Cricket UI Application input.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+            top: create a object
+        Returns:
+            None
+        """
+        wx.Dialog.__init__(self, parent, -1, "Manage Model",
+                           size=wx.Size(100, 100),
+                           style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
+                           name="Model Search Dialog")
+
+        self.top = top
+        self.win = ComWindow(self, top)
+
+        # Sizes the window to fit its best size.
+        self.Fit()
+        # Centre frame using CentreOnParent() function,
+        # Show window in the center of the screen.
+        # Centres the window on its parent.
+        self.CenterOnParent(wx.BOTH)
+    
+    def OnOK (self, evt):
+        """
+        OnOK() event handler function retrieves the label of 
+        source button, which caused the click event. 
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the OnOK() method is an 
+            object specific to a particular event type.
+        Returns:
+            None        
+        """
+    # Returns numeric code to caller
+        self.EndModal(wx.ID_OK)
+     
+    def OnSize (self, evt):
+        """
+        OnSize() event handler function retrieves the about window size. 
+        
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: The event parameter in the OnSize() method is an 
+            object specific to a particular event type.
+        Returns:
+            None        
+        """ 
+        self.Layout()

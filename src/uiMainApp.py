@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -33,6 +33,8 @@ import os
 import sys
 from sys import platform
 
+from wx.core import ITEM_CHECK
+
 # Own modules
 from uiGlobals import *
 import dev3141Window
@@ -40,15 +42,27 @@ import dev3201Window
 import dev2101Window
 import dev2301Window
 import loopWindow
-import comWindow
 import logWindow
 import treeWindow
 import autoWindow
 
-import serialDev
 import getusb
 
 from aboutDialog import *
+from comDialog import *
+from setDialog import *
+from portDialog import *
+#from ccServer import *
+
+import devControl
+import serialDev
+import control2101
+import devServer
+
+import thControl
+import thServer
+
+import search
 
 ##############################################################################
 # Utilities
@@ -112,7 +126,7 @@ class UiPanel(wx.Panel):
 
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
-        self.comPan = comWindow.ComWindow(self, parent)
+        #self.comPan = comWindow.ComWindow(self, parent)
         self.treePan = treeWindow.UsbTreeWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
         
@@ -121,13 +135,13 @@ class UiPanel(wx.Panel):
         self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
         self.dev2301Pan = dev2301Window.Dev2301Window(self, parent)
 
-        self.devObj = []
-        
+        self.devObj = []  
         # Device panel added
         self.devObj.append(self.dev3141Pan)
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
         self.devObj.append(self.dev2301Pan)
+
         
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
@@ -144,11 +158,6 @@ class UiPanel(wx.Panel):
         self.hboxdl.Add((20,0), 0, wx.EXPAND)
         self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
         
-        # Hide the dev3201Window and dev2101Window
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev2101Pan)
-        self.vboxdl.Hide(self.dev2301Pan)
-
         self.vboxl = wx.BoxSizer(wx.VERTICAL)
         self.vboxl.Add((0,20), 0, wx.EXPAND)
         self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
@@ -158,25 +167,122 @@ class UiPanel(wx.Panel):
 
         self.vboxr = wx.BoxSizer(wx.VERTICAL)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
-        self.vboxr.Add(self.comPan, 0 ,wx.ALIGN_RIGHT | wx.EXPAND)
-        self.vboxr.Add((0,10), 0, 0)
         self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
-        
-        # BoxSizer fixed with Horizontal
+
+       # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
+        
         # Set size of frame
         self.SetSizer(self.hboxm)
+        
         # Setting Layouts
         self.SetAutoLayout(True)
         self.hboxm.Fit(self)
         self.Layout()
+
+    def update_uc_panels(self):
+        """
+        Here updated the user computer panel depend on the connecting 
+        Model devices.
+        also termianate the switching Control Compter server,
+        and terminate the Test Host Computer server,
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            parent: Pointer to a parent window.
+        Returns:
+            None
+        """
+        self.vboxl.Show(self.vboxl)
+        self.vboxl.Show(self.hboxdl)
+        self.hboxm.Show(self.vboxr)
+        self.vboxdl.Hide(self.dev2301Pan)
+        self.vboxdl.Hide(self.dev3201Pan)
+        self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxl.Show(self.logPan)
+        self.Layout()
+        self.parent.terminateCcServer()
+        self.parent.terminateHcServer()
  
+    def update_server_panel(self):
+        """
+        here USB tree window and Log window update the on selection server
+        with SCC and THC servers.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.hboxm.Hide(self.vboxr)
+        self.vboxl.Show(self.logPan)
+        self.hboxm.Show(self.vboxl)
+        self.vboxl.Hide(self.hboxdl)
+        self.Layout()
+
+    def update_cc_panels(self):
+        """
+        when selecting Switching Control Computer server menu,
+        its starts the Siwting control computer server.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.parent.startCcServer()
+        
+    def update_hc_panels(self):
+        """
+        when selecting Test Host Computer server menu,
+        its starts the Test Host computer server.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.parent.startHcServer()
+    
+    def remove_all_panels(self):
+        """
+        Remove or Hide the the logwinodow and USB Tree view window.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.hboxm.Hide(self.vboxl)
+        self.hboxm.Hide(self.vboxr)
+        self.Layout()
+
+    def remove_dev_panels(self):
+        """
+        Remove or Hide the the all Model 3141, 3201, 2101, 2301 windows panels.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.vboxdl.Hide(self.dev2301Pan)
+        self.vboxdl.Hide(self.dev3201Pan)
+        self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxdl.Hide(self.dev2101Pan)
+
     def PrintLog(self, strin):
         """
         print data/status on logwindow 
@@ -443,16 +549,35 @@ class UiMainFrame (wx.Frame):
 
         self.ldata = {}
 
-        self.selPort = None
-        self.selBaud = None
+        self.devCtrl = None
+        self.thCtrl = None
 
+        self.ccflag = False
+
+        self.selPort = {}
+        
+        self.selBaud = None
         self.selDevice = None
 
-        self.devHand = serial.Serial()
+        self.ccserver = None
+        self.ccclient = None
+        self.listencc = None
+
+        self.ccconfig = None
+
+        self.hcserver = None
+        self.hcclient = None
+        self.listenhc = None
+
+        self.devHand = serialDev.SerialDev(self)
+
+        self.usbHand = control2101.Dev2101(self)
 
         self.mode = MODE_MANUAL
 
         self.con_flg = False
+
+        self.dev_list = []
 
         self.masterList = []
         
@@ -467,9 +592,27 @@ class UiMainFrame (wx.Frame):
            # fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
            self.fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
 
+        self.comMenu = wx.Menu()
+        self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
+        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
+
+        # config menu
+        self.configMenu = wx.Menu()        
+        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, 
+                            "User Computer", kind = ITEM_CHECK)
+        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, 
+                            "Switch Control Computer", kind = ITEM_CHECK)
+        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC,
+                            "Test Host Computer", kind = ITEM_CHECK)
+
+        # Set Menu   
+        self.setMenu = wx.Menu()
+        self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
+        self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
+
         # Creating the help menu
         self.helpMenu = wx.Menu()
-        self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
+        self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit Model 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit Model 2301")
@@ -496,20 +639,34 @@ class UiMainFrame (wx.Frame):
             self.menuBar.Append(self.fileMenu,    "&File")
         else:
             self.menuBar.Append(self.winMenu,    "&Window")
+       
+        self.menuBar.Append(self.configMenu, "&Config System")
+        self.menuBar.Append(self.setMenu, "&Settings")
+        self.menuBar.Append(self.comMenu,     "&Manage Model")
         self.menuBar.Append(self.helpMenu,    "&Help")
+
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
+        
+        # set menubar
+        self.menuBar = self.GetMenuBar()
+        self.update_connect_menu(True)
 
         # Create the statusbar
         self.statusbar = MultiStatus(self)
-        
         self.SetStatusBar(self.statusbar)
-
         self.UpdateAll(["Port", "", ""])
         
         # Set events to Menu
         # Self.Bind(wx.EVT_MENU, self.MenuHandler)
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
+        self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
+        self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+
+        self.Bind(wx.EVT_MENU, self.SelectUC, self.ucmenu)
+        self.Bind(wx.EVT_MENU, self.SelectCC, self.ccmenu)
+        self.Bind(wx.EVT_MENU, self.SelectHC, self.hcmenu)
+
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
@@ -519,6 +676,14 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
         self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
+        self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
+        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+        EVT_RESULT(self, self.RunServerEvent)
+
+        # Timer for monitor the connected devices
+        self.timer_lp = wx.Timer(self)
+        # Bind the timer event to handler
+        self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
 
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
@@ -526,7 +691,6 @@ class UiMainFrame (wx.Frame):
 
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
-
         self.Show()
         
         td, usbList = getusb.scan_usb()
@@ -535,9 +699,104 @@ class UiMainFrame (wx.Frame):
 
         try:
             self.LoadDevice()
-            self.panel.auto_connect()
+            
         except:
-            pass
+            self.ldata['port'] = None
+            self.ldata['device'] = None
+            
+            self.ldata['uc'] = True
+            self.ldata['cc'] = True
+            self.ldata['hc'] = True
+            
+            self.ldata['sccif'] = "network"
+            self.ldata['sccid'] = "No host"
+            self.ldata['sccpn'] = "2021"
+            
+            self.ldata['thcif'] = "network"
+            self.ldata['thcid'] = "No host"
+            self.ldata['thcpn'] = "2022"
+
+            self.ldata['ssccif'] = "network"
+            self.ldata['ssccpn'] = "2021"
+            
+            self.ldata['sthcif'] = "network"
+            self.ldata['sthcpn'] = "2022"
+
+        self.update_config_menu()
+        self.update_settings_menu()
+        devControl.SetDeviceControl(self)
+        thControl.SetDeviceControl(self)
+        if self.ldata['uc']:
+            self.auto_connect()
+
+    def RunServerEvent(self, event):
+        """
+        serching the port event handling indicates 
+        server is connecting that port
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: searching the event with server.
+        Returns:
+            None
+        """
+        if event.data is None:
+            self.print_on_log("\nNo Server Event")
+        else:
+            if event.data == "search":
+                self.print_on_log("\nSearch Event")
+                self.dev_list.clear()
+                self.dev_list = search.search_port(self.usbHand)
+            else:
+                self.print_on_log("\nUnknown Server Event")
+
+    def auto_connect(self):
+        """
+        Do connect device automatically if the last connected device is 
+        available
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        if(self.ldata['port'] != None and self.ldata['device'] != None):
+            self.selPort = self.ldata['port']
+            self.selDevice = self.ldata['device']
+            if devControl.connect_device(self):
+                self.device_connected()
+                
+    def update_config_menu(self):
+        """
+        update the Config system menu checked User compuer and 
+        unchecked user computer menu.
+        checked Control computer and uncheck control computer.
+        checked test host computer and uncheck test host computer
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        test = 0x03
+        if self.ldata['uc']:
+            self.ucmenu.Check(True)
+        else:
+            self.ucmenu.Check(False)
+
+        if self.ldata['cc']:
+            self.ccmenu.Check(True)
+        else:
+            self.ccmenu.Check(False)
+
+        if self.ldata['hc']:
+            self.hcmenu.Check(True)
+        else:
+            self.hcmenu.Check(False)
     
     def OnClickHelp(self, event):
         """
@@ -701,8 +960,7 @@ class UiMainFrame (wx.Frame):
         else:
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         event.Skip()
-
-    # Event Handler
+ 
     def OnHideWindow (self, event):
         """
         Event Handler hide the window
@@ -734,7 +992,64 @@ class UiMainFrame (wx.Frame):
         # Close this window
         self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         self.Iconize(False)
-    
+
+    def OnConnect (self, event):
+        """
+        click on Connect sub menu under the manage model menu, 
+        shows the dialog box with connecting device.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: search and connect event.
+        Returns:
+            None
+        """
+        dlg = ComDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
+    def OnDisconnect (self, event):
+        """
+        click on disconnect menu the connecting device is disconnect.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns:
+            None
+        """
+        self.device_no_response()
+        
+    def device_no_response(self):
+        """
+        once disconnect the device the connecting device is not responding.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.device_disconnected()
+        self.selPort = None
+        self.con_flg = False
+        #self.devHand.close()
+        devControl.disconnect_device(self)
+        # Set label button name as Connect
+        srlist = []
+        srlist.append("Port")
+        srlist.append("")
+        srlist.append("")
+        srlist.append("Disconnected")
+        self.UpdateAll(srlist)
+        # Print on logwindow
+        self.print_on_log("Model "+DEVICES[self.selDevice]
+                              +" Disconnected!\n")
+        self.update_connect_menu(True)
+        self.set_mode(MODE_MANUAL)
+            
     def save_usb_list(self, mlist):
         """
         Keep USB device list in a list - reference list
@@ -952,9 +1267,43 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        self.con_flg = True
+        self.UpdatePort()
+        # Device update info
+        self.UpdateDevice()
+        self.UpdateSingle("Connected", 3)
+        # Print on logwindow
+        self.print_on_log("Model "+DEVICES[self.selDevice]
+                                              +" Connected!\n")
+       
         self.panel.device_connected()
         self.StoreDevice()
-    
+        self.update_connect_menu(False)
+        self.set_mode(MODE_MANUAL)
+        self.update_port_timer()
+
+    def update_connect_menu(self, status):
+        """
+        Enabled the  manage model menubar.
+        update the status first Connect menu in True state, 
+        Disconnect menu Disable state.
+        update the status device connect then disconnect menu enabled.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: update the status connect and 
+            disconnect menu enable or disable state
+        Returns:
+            None
+        """
+        if status:
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
+        else:
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+
     def device_disconnected(self):
         """
         Called by COM Window when the device get disconnected
@@ -967,6 +1316,7 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.panel.device_disconnected()
+        self.update_connect_menu(True)
     
     def update_usb_status(self, dl):
         """
@@ -1030,7 +1380,6 @@ class UiMainFrame (wx.Frame):
 
         if (wx.IsBusy()):
             wx.EndBusyCursor()
-
         return
     
     def StoreDevice(self):
@@ -1048,11 +1397,274 @@ class UiMainFrame (wx.Frame):
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
         # in dict objects and string objects as key.
-        ds = shelve.open('config.txt')
+        ds = shelve.open('CricketSettings.txt')
         ds['port'] = self.selPort
         ds['device'] = self.selDevice
+
+        ds['uc'] = self.ldata['uc']
+        ds['cc'] = self.ldata['cc']
+        ds['hc'] = self.ldata['hc']
+
+        ds['sccif'] = self.ldata['sccif']
+        ds['sccid'] = self.ldata['sccid']
+        ds['sccpn'] = self.ldata['sccpn']
+ 
+        ds['ssccif'] = self.ldata['ssccif']
+        ds['ssccpn'] = self.ldata['ssccpn']
+        ds['sthcif'] = self.ldata['sthcif']
+        ds['sthcpn'] = self.ldata['sthcpn']
+
+        ds['thcif'] = self.ldata['thcif']
+        ds['thcid'] = self.ldata['thcid']
+        ds['thcpn'] = self.ldata['thcpn']
         ds.close()
-    
+
+    def OnSelectScc (self, event):
+        """
+        if User computer menu ISCHECKED , Swicth control 
+        computer act as SCC server
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng SCC menu
+            None
+        """
+        dlg = None
+        if self.ucmenu.IsChecked():
+            dlg = SetDialog(self, self, "scc")
+        else:
+            dlg = PortDialog(self, self, "scc")
+
+        dlg.ShowModal()
+        dlg.Destroy()
+        self.StoreDevice()
+
+    def OnSelectThc (self, event):
+        """
+        if User computer menu ISCHECKED , Test host computer act as THC server
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng THC menu
+            None
+        """
+        dlg = None
+        if self.ucmenu.IsChecked():
+            dlg = SetDialog(self, self, "thc")
+        else:
+            dlg = PortDialog(self, self, "thc")
+
+        dlg.ShowModal()
+        dlg.Destroy()
+        self.StoreDevice()
+
+    def SelectUC(self, event):
+        """
+        if select User computer menu ISCHECKED its act as User computer UI.
+        if UNCHECKED Switching control computer and Test host computer,
+        its automatically setting menu SCC, THC enabled.s
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng UC menu
+            None
+        """
+        if self.ucmenu.IsChecked():
+            self.ldata['uc'] = True
+        else:
+            self.ldata['uc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
+
+    def SelectCC(self, event):
+        """
+        if select Switch control computer menu ISCHECKED its act as SCC server.
+        if UNCHECKED User computer and Test host computer,
+        its automatically setting menu SCC is enable THC is Disable
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng SCC menu
+            None
+        """
+        if self.ccmenu.IsChecked():
+            self.ldata['cc'] = True
+        else:
+            self.ldata['cc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
+
+    def SelectHC(self, event):
+        """
+        if select Test host computer menu ISCHECKED its act as THC server.
+        if UNCHECKED User computer and SCC computer,
+        its automatically setting menu THC is enable SCC is Disable
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng THC menu
+            None
+        """
+        if self.hcmenu.IsChecked():
+            self.ldata['hc'] = True
+        else:
+            self.ldata['hc'] = False
+        self.StoreDevice()
+        self.update_settings_menu()
+
+    def update_settings_menu(self):
+        """
+        if UC menu ISCHECKED and SCC menu ISCHECKED
+         the Setting menu SCC is Disabled.
+        if UC menu ISCHECKED and SCC menu UNCHECKED 
+         the Setting menu SCC is enabled.
+        if UC menu ISCHECKED and THC menu ISCHECKED
+         the Setting menu THC is Disabled.
+        if UC menu ISCHECKED and THC menu UNCHECKED 
+        the Setting menu THC is enabled.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+        Returns: event hanlding connecitng SCC menu
+            None
+        """
+        if self.ucmenu.IsChecked():
+            if self.ccmenu.IsChecked():
+                self.update_scc_menu(False)
+            else:
+                self.update_scc_menu(True)
+            if self.hcmenu.IsChecked():
+                self.update_thc_menu(False)
+            else:
+                self.update_thc_menu(True)
+        else:
+            if self.ccmenu.IsChecked():
+                self.update_scc_menu(True)
+            else:
+                self.update_scc_menu(False)
+            if self.hcmenu.IsChecked():
+                self.update_thc_menu(True)
+            else:
+                self.update_thc_menu(False)
+
+        self.update_manage_model(self.ucmenu.IsChecked())
+
+        if self.ucmenu.IsChecked():
+            self.panel.update_uc_panels()
+        else:
+            if self.ccmenu.IsChecked() or self.hcmenu.IsChecked():
+                self.panel.update_server_panel()
+                if self.ccmenu.IsChecked():
+                    self.panel.update_cc_panels()
+                if self.hcmenu.IsChecked():
+                    self.panel.update_hc_panels()
+            else:
+                self.panel.remove_all_panels()
+
+    def update_settings_menu_old(self):
+        """
+        if UC menu checked  and SCC menu unchecked the
+         scc menu not checked then update setting SCC enabled.
+        if UC menu ISCHECKED and THC menu ISCHECKED 
+        the Setting menu THC is Disabled.
+        if UC menu ISCHECKED and THC menu UNCHECKED
+         the Setting menu THC is enabled.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+        if self.ucmenu.IsChecked() and not self.ccmenu.IsChecked():
+            self.update_scc_menu(True)
+        else:
+            self.update_scc_menu(False)
+
+        if self.ucmenu.IsChecked() and not self.hcmenu.IsChecked():
+            self.update_thc_menu(True)
+        else:
+            self.update_thc_menu(False)
+
+        self.update_manage_model(self.ucmenu.IsChecked())
+
+        if self.ucmenu.IsChecked():
+            self.panel.update_uc_panels()
+        else:
+            if self.ccmenu.IsChecked() or self.hcmenu.IsChecked():
+                self.panel.update_server_panel()
+                if self.ccmenu.IsChecked():
+                    self.panel.update_cc_panels()
+                if self.hcmenu.IsChecked():
+                    self.panel.update_hc_panels()
+            else:
+                self.panel.remove_all_panels()
+
+    def update_scc_menu(self, status):
+        """
+        update the SCC menu either depends on status enabled or disabled.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+            status: either scc enable or scc disable
+        Returns: 
+            None
+        """
+        if status:
+            self.menuBar.Enable(ID_MENU_SET_SCC, True)
+        else:
+            self.menuBar.Enable(ID_MENU_SET_SCC, False)
+
+    def update_thc_menu(self, status):
+        """
+        update the THC menu either depends on status enabled or disabled.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+            status: either THC enable or THC disable
+        Returns: 
+            None
+        """
+        if status:
+            self.menuBar.Enable(ID_MENU_SET_THC, True)
+        else:
+            self.menuBar.Enable(ID_MENU_SET_THC, False)
+        
+    def update_manage_model(self, status):
+        """
+        update the manage model menu, if User 
+        computer is checked manage model enable.
+        suppose UI run with server manage model is disable.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on disconnect menu.
+            status: either scc enable or scc disable
+        Returns: 
+            None
+        """
+        if status:
+            self.menuBar.EnableTop(3, True)
+        else:
+            self.menuBar.EnableTop(3, False)
+
     def LoadDevice(self):
         """
         load the device list for last device disconnect 
@@ -1063,14 +1675,158 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        # This is also a base class of shelve and it accepts
-        # the filename as it’s parameter not a dict object like others. 
-        # This is the base class of shelve which stores pickled object values 
-        # in dict objects and string objects as key.
-        ds = shelve.open('config.txt')
+        ds = shelve.open('CricketSettings.txt')
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
-        ds.close()  
+        
+        self.ldata['uc'] = ds['uc']
+        self.ldata['cc'] = ds['cc']
+        self.ldata['hc'] = ds['hc']
+        
+        self.ldata['sccif'] = ds['sccif']
+        self.ldata['sccid'] = ds['sccid']
+        self.ldata['sccpn'] = ds['sccpn']
+
+        self.ldata['thcif'] = ds['thcif']
+        self.ldata['thcid'] = ds['thcid']
+        self.ldata['thcpn'] = ds['thcpn']
+
+        self.ldata['ssccif'] = ds['ssccif']
+        self.ldata['ssccpn'] = ds['ssccpn']
+
+        self.ldata['sthcif'] = ds['sthcif']
+        self.ldata['sthcpn'] = ds['sthcpn']
+
+        ds.close()
+
+    def startCcServer(self):
+        """
+        when Unchecked UC and THC menu, the SCC controlling the server
+        once start the server control computer listening from UC client.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+        if self.ccserver == None:
+            self.ccserver = devServer.ServerCc("", int(self.ldata['ssccpn']))
+            strin = "Control Computer Listening: "+self.ccserver.bind_addr
+            self.panel.PrintLog(strin+"\n")
+            
+            self.listencc = devServer.StayAccept(self)
+            self.listencc.start()
+
+    def startHcServer(self):
+        """
+        when Unchecked UC and SCC menu, the THC controlling the server
+        once start the server Test Host computer listening from UC client.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+        if self.hcserver == None:
+            self.hcserver = thServer.ServerHc("", int(self.ldata['sthcpn']))
+            strin = "Host Computer Listening: "+self.hcserver.bind_addr
+            self.panel.PrintLog(strin+"\n")
+            
+            self.listenhc = thServer.StayAccept(self)
+            self.listenhc.start()
+
+    def terminateHcServer(self):
+        """
+        suppose Clent is not listening HC server,
+        host computer server is close the connection.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+        if self.hcserver != None:  
+            self.listenhc.close_connection()
+            del self.listenhc
+            self.listenhc = None
+            self.hcserver.close()
+            del self.hcserver
+            self.hcserver = None
+
+    def terminateCcServer(self):
+        """
+        suppose Clent is not listening CC server, control
+        computer server is close the connection.
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+        if self.ccserver != None:  
+            self.listencc.close_connection()
+            del self.listencc
+            self.listencc = None
+            self.ccserver.close()
+            del self.ccserver
+            self.ccserver = None
+
+    def update_port_timer(self):
+        """
+        updating the Port timer in all switching model
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            None
+        """
+
+        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
+            if(not self.timer_lp.IsRunning()):
+                self.timer_lp.Start(700)
+        else:
+            self.timer_lp.Stop()
+
+    def DeviceMonitor(self, e):
+        """
+        updating the Disconnect window when plug out the Device
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e:event assign with button
+        Returns: 
+            None
+        """
+        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
+            if self.con_flg:
+                self.timer_lp.Stop()
+                plist = search.check_port(self.usbHand)
+                if self.selPort in plist:
+                    self.timer_lp.Start(700)
+                else:
+                    self.con_flg = False
+                    # Print the message
+                    wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
+                    self.device_no_response()
+
+def EVT_RESULT(win, func):
+    """
+    event function window cant hang
+    Args:
+        self: The self parameter is a reference to the current 
+        instance of the class,and is used to access variables
+        that belongs to the class.
+    Returns: 
+        None
+    """
+    """Define Result Event."""
+    win.Connect(-1, -1, EVT_RESULT_ID, func) 
 
 class UiApp(wx.App):
     """
@@ -1105,7 +1861,6 @@ class UiApp(wx.App):
         """
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
-
 
 def run():
     """

@@ -18,15 +18,14 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
 import wx
 
 # Own modules
-import serialDev
-import usbDev
+import thControl
 
 from uiGlobals import *
 import control2101 as d2101
@@ -292,7 +291,7 @@ class LoopWindow(wx.Window):
         """ 
         self.timer_usb.Stop()
         try:
-            usbDev.get_tree_change(self.top)
+            thControl.get_tree_change(self.top)
         except:
             self.top.print_on_usb("USB Read Error!")
         self.usb_flg = False

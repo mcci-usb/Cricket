@@ -18,10 +18,11 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
+
 import sys
 import os
 
@@ -104,7 +105,6 @@ def scan_usb():
     masterDict["hub"] = hub_list
     masterDict["peri"] = per_list
 
-
     hdata = masterDict.get("hub")
 
     for items in hdata:
@@ -138,7 +138,6 @@ def scan_usb():
         except:
             # Print message
             print("Error")
-
     for i in range(len(hc_list)):
         master_list.append(hc_list[i])
     for i in range(len(hub_list)):

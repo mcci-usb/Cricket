@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -30,17 +30,16 @@ import uiMainApp
 __author__ = 'Seenivasan V'
 __contact__ = 'seenivasanv@mcci.com'
 __credits__ = ['Terry Moore', 'Velmurugan Selvaraj']
-__date__ = '2021/01/14'
+__date__ = '2021/07/12'
 __maintainer__ = ['Seenivasan V', 'Vinay N']
 __status__ = 'Production'
-__version__ = '2.0.0'
+__version__ = '2.3.14'
 ##############################################################################
 # Utilities
 ##############################################################################
 def main ():
     """
     Main program entry point
-    
     Args:
         No argument
     Return:

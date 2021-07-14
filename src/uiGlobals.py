@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.3.0 Wed April 28 2021 18:50:10 seenivasan
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.3.0"
+APP_VERSION = "2.4.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -44,6 +44,9 @@ DEV_3141    = 0
 DEV_3201    = 1
 DEV_2101    = 2
 DEV_2301    = 3
+
+
+BAUDRATE = [115200, 115200, 0, 9600]
 
 DEVICES    = ["3141", "3201", "2101", "2301"]
 
@@ -119,6 +122,17 @@ ID_BTN_UCLEAR = 1048
 ID_MENU_WIN_MIN = 1049
 ID_MENU_WIN_SHOW = 1050
 
+ID_MENU_MODEL_CONNECT = 1100
+ID_MENU_MODEL_DISCONNECT = 1101
+
+ID_MENU_CONFIG_UC = 1102
+ID_MENU_CONFIG_SCC = 1103
+ID_MENU_CONFIG_THC = 1104
+
+ID_MENU_SET_SCC = 1105
+ID_MENU_SET_THC = 1106
+
+EVT_RESULT_ID = 1100
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
@@ -144,7 +158,7 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020 MCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-21 MCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 
@@ -169,8 +183,6 @@ class NumericValidator(wx.Validator):
         wx.Validator.__init__(self)
         self.Bind(wx.EVT_CHAR, self.OnChar)
 
-        #wx.EVT_CHAR(self, self.OnChar)
-    
     def Clone(self, arg=None):
         """
         Only digits are allowed in the address. 
@@ -180,7 +192,7 @@ class NumericValidator(wx.Validator):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            NumericValidator(): return True if all characters in the string are
+            NumericValidator():return True if all characters in the string are
             numaric charecters    
 
         """
