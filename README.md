@@ -15,11 +15,15 @@ Simple standalone desktop application for handling MCCI USB Switches in a conven
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [mcci.com](#mcci-product-page) 
 - [3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
 - [model 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
 - [model 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
 - [model 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
+- [Release History](#release-history)
+- [Meta](#meta)
+  - [Copyright and License](#Copyright-and-License)
+  - [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
+  - [Trademarks](#trademarks)
 
 <!-- /TOC -->
 
@@ -149,13 +153,6 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-### Support Open Source Hardware and Software
-
-MCCI invests time and resources providing this open source code, please support MCCI and open-source hardware by purchasing products from MCCI, Adafruit and other open-source hardware/software vendors!
-
-For information about MCCI's products, please visit [store.mcci.com](https://store.mcci.com/).
-
-
 ## To know about MCCI USB Model3201
 
 MCCI Model 3201 Enhanced Type-C Connection Exerciser 
@@ -197,7 +194,25 @@ MCCI Model 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  **Link:** For more information, see the product home page at [model 2301 usb connection exerciser](https://mcci.com/usb/dev-tools/model-2301/).
 
  ![Model2301](assets/Model2301.png)
- 
+
+ ## Release History
+
+ - v1.0.0 Initial Release
+
+ - v1.0.2 Mac Menu Update
+
+ - v1.2.0 Host Controller issue and Delay override
+
+ - v2.0.0 Interface for USB Switch 2101 added, Radio buttons for Port switching replaced by  image added buttons, Duty parameter added in auto mode, Until stopped and Port selection option added to the Loop mode and separate panel for Auto mode added, adding USB speed info, increase port switching speed.
+
+ - v2.2.0 Python implemented to Pep8 coding standard.
+ Package release for Raspberry Pi OS ubuntu18.04
+
+ - v2.3.0 Add support for Model 2301 USB Connection Exerciser 
+
+ - v2.4.0 Add new feature support for Three computer System and Two Computer System
+
+
  ## Meta
 
 ### Copyright and License
