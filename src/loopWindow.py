@@ -116,6 +116,9 @@ class LoopWindow(wx.Window):
         self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
                                       style = wx.ALIGN_CENTER)
         self.cb_cycle = wx.CheckBox (self, -1, label = 'Until Stopped')
+        self.st_repeat_cnt   = wx.StaticText(self, -1, "Finished Count", size=(-1,-1))
+        self.st_cnt_port   = wx.StaticText(self, -1, "----", size=(-1, -1), 
+                                      style = wx.ALIGN_CENTER)
 
         self.btn_start = wx.Button(self, ID_BTN_START, "Start", size=(60,25))
         
@@ -138,6 +141,7 @@ class LoopWindow(wx.Window):
         self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_cycle = wx.BoxSizer(wx.HORIZONTAL)
+        self.bs_cnt = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
         
         self.bs_psel.Add(40,0,0)
@@ -171,6 +175,14 @@ class LoopWindow(wx.Window):
         self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
         self.bs_cycle.Add(1,0,0)
 
+        self.bs_cnt.Add(40, 0, 0)
+        self.bs_cnt.Add(self.st_repeat_cnt, 0,  flag=wx.LEFT | 
+                        wx.ALIGN_CENTER_VERTICAL, border=0)
+        self.bs_cnt.Add(25, 50, 0)
+        self.bs_cnt.Add(self.st_cnt_port,0, wx.ALIGN_CENTER | 
+                       wx.LEFT, border = 0)
+        self.bs_cnt.Add(1,0,0)
+
         self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
         self.bs_cycle.Add(10,0,0)
         self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | 
@@ -193,6 +205,7 @@ class LoopWindow(wx.Window):
             (self.bs_pers, 1, wx.EXPAND),
             (self.bs_duty, 1, wx.EXPAND),
             (self.bs_cycle, 1, wx.EXPAND),
+            (self.bs_cnt, 1, wx.EXPAND),
             (0,10,0),
             (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
             (0,10,0)
@@ -258,9 +271,9 @@ class LoopWindow(wx.Window):
                     self.port_on(self.portno, False)
                     self.On_flg = False
                     self.cycleCnt = self.cycleCnt + 1
+                    self.st_cnt_port.SetLabel(str(self.cycleCnt))
                     if(self.cb_cycle.GetValue() != True):
-                        self.tc_cycle.SetValue(str(self.cycle - 
-                                                   self.cycleCnt))
+                        self.tc_cycle.SetValue(str(self.cycle))
                         if(self.cycleCnt >= self.cycle):
                             self.tc_cycle.SetValue(str(self.cycle))
                             # print message for loop Mode completed 
@@ -574,6 +587,7 @@ class LoopWindow(wx.Window):
             self.enable_controls(True)
         else:
             self.enable_controls(False)
+            self.st_cnt_port.SetLabel("")
     
     def enable_controls(self, stat):
         """
