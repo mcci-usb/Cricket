@@ -572,12 +572,12 @@ class Dev3201Window(wx.Window):
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-        self.enable_va_controls(stat)   
+        self.enable_va_controls(stat)
     
     def enable_port_controls(self, stat):
         """
         Enable/Diasble Port controls 
-
+        
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
