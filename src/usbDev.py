@@ -54,6 +54,7 @@ def get_tree_change(top, dl, newlist):
     #dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
+    
     if len(oldlist) == 0:
         oldlist = newlist
             
@@ -82,7 +83,7 @@ def get_tree_change(top, dl, newlist):
         strout = strout + get_usb_device_info(adlist)
     
     # Print the device list USB Device Tree Window
-    top.print_on_usb(strout)
+    top.print_on_log(strout)
 
 def get_usb_device_info(udlist):
     """
