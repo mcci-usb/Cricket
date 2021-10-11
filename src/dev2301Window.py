@@ -168,7 +168,7 @@ class Dev2301Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
-        sb = wx.StaticBox(self, -1, "Model 2301")
+        sb = wx.StaticBox(self, -1, "MCCI USB Switch  2301")
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
         self.vbox.AddMany([

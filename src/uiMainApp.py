@@ -89,7 +89,7 @@ class MultiStatus (wx.StatusBar):
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
-        self.SetStatusWidths([-1, -1, -3, -2, -8])
+        self.SetStatusWidths([-2, -1, -1, -4, -8])
 
 class UiPanel(wx.Panel):
     """
@@ -620,7 +620,7 @@ class UiMainFrame (wx.Frame):
        
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
-        self.menuBar.Append(self.comMenu,     "&Manage Model")
+        self.menuBar.Append(self.comMenu,     "&Select MCCI USB Switch")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
         # First we create a menubar object.
@@ -1023,7 +1023,7 @@ class UiMainFrame (wx.Frame):
         srlist.append("Disconnected")
         self.UpdateAll(srlist)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
@@ -1237,7 +1237,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()

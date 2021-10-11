@@ -77,7 +77,7 @@ class Dev2101Window(wx.Panel):
         # Call this to give the sizer a minimal size.
         self.SetMinSize((280, 140))
         # Create a staticbox naming as  Model2101 
-        sb = wx.StaticBox(self, -1, "Model 2101")
+        sb = wx.StaticBox(self, -1, "MCCI USB Switch  2101")
         # BoxSizer fixed with Vertical
         self.vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
         # BoxSizer fixed with Horizontal

@@ -110,8 +110,8 @@ class ComWindow(wx.Window):
         
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
-        self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
-                                            "Models (3141, 3201, 2101,2301)"))  
+        self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached "
+                                            "MCCI USB Switch (3141, 3201, 2101,2301)"))  
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
@@ -137,7 +137,7 @@ class ComWindow(wx.Window):
             None
         """
         if(self.wait_flg == False):
-            self.top.UpdateSingle("Searching Model", 3)
+            self.top.UpdateSingle("Searching MCCI USB Switch", 3)
             self.cb_device.Clear()
             self.cb_device.Enable()
             self.wait_flg = True
@@ -161,11 +161,11 @@ class ComWindow(wx.Window):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
             # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("Model(s) found", 3)
+            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
         else:
             self.btn_connect.Disable()
             # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No Models found", 3)
+            self.top.UpdateSingle("No MCCI USB Switch found", 3)
         self.wait_flg = False
         
 
@@ -186,11 +186,11 @@ class ComWindow(wx.Window):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
             # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("Model(s) found", 3)
+            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
         else:
             self.btn_connect.Disable()
             # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No Models found", 3)
+            self.top.UpdateSingle("No MCCI USB Switch found", 3)
 
 
     def search_device(self):
@@ -205,7 +205,7 @@ class ComWindow(wx.Window):
         Returns:
             None
         """
-        self.top.UpdateSingle("Searching Model", 3)
+        self.top.UpdateSingle("Searching MCCI USB Switch", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
         plist = devControl.search_device(self.top)
@@ -225,11 +225,11 @@ class ComWindow(wx.Window):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
             # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("Model(s) found", 3)
+            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
         else:
             self.btn_connect.Disable()
             # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No Models found", 3)
+            self.top.UpdateSingle("No MCCI USB Switch found", 3)
    
     def ConnectDevice(self, evt):
         """
@@ -324,7 +324,7 @@ class ComWindow(wx.Window):
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
+        self.top.print_on_log("MCCI USB Switch "+DEVICES[self.top.selDevice]
                                               +" Connected!\n")
         self.top.device_connected()
         self.parent.EndModal(True)
@@ -382,7 +382,7 @@ class ComDialog(wx.Dialog):
         Returns:
             None
         """
-        wx.Dialog.__init__(self, parent, -1, "Manage Model",
+        wx.Dialog.__init__(self, parent, -1, "Select MCCI USB Switch",
                            size=wx.Size(100, 100),
                            style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
                            name="Model Search Dialog")
