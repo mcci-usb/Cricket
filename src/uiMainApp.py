@@ -1265,7 +1265,7 @@ class UiMainFrame (wx.Frame):
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
         else:
-            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
 
     def device_disconnected(self):

@@ -31,6 +31,10 @@ from uiGlobals import *
 
 import devControl
 import json
+import timeit
+import threading
+
+import workthread
 
 ##############################################################################
 # Utilities
@@ -61,6 +65,7 @@ class ComWindow(wx.Window):
 
         self.top = top
         self.parent = parent
+        self.wait_flg = True
 
         self.dlist = []
 
@@ -114,7 +119,10 @@ class ComWindow(wx.Window):
         self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
+        EVT_RESULT(self, self.OnResult)
+        workthread.WorkerThread(self, self, self.top)
 
+    
     def ScanDevice(self, evt):
         """
         Scan the list of connected devices over the USB bus
@@ -128,7 +136,62 @@ class ComWindow(wx.Window):
         Returns:
             None
         """
-        self.search_device()
+        if(self.wait_flg == False):
+            self.top.UpdateSingle("Searching Model", 3)
+            self.cb_device.Clear()
+            self.cb_device.Enable()
+            self.wait_flg = True
+            workthread.WorkerThread(self, self, self.top)
+
+    def OnResult(self, event):
+        dev_list = event.data["devices"]
+        key_list = []
+        val_list = []
+
+        for i in range(len(dev_list)):
+            key_list.append(dev_list[i]["port"])
+            val_list.append(dev_list[i]["model"])
+        
+        self.cb_device.Clear()
+        for i in range(len(key_list)):
+            str1 = key_list[i]+"("+val_list[i]+")"
+            self.cb_device.Append(str1)
+
+        if(len(key_list)):
+            self.cb_device.SetSelection(0)
+            self.btn_connect.Enable()
+            # Device is found update in status bar Model(s) found
+            self.top.UpdateSingle("Model(s) found", 3)
+        else:
+            self.btn_connect.Disable()
+            # Device is not found update in status bar No Models found
+            self.top.UpdateSingle("No Models found", 3)
+        self.wait_flg = False
+        
+
+    def ShowDevices(self, plist):
+        dev_list = plist["devices"]
+        key_list = []
+        val_list = []
+
+        for i in range(len(dev_list)):
+            key_list.append(dev_list[i]["port"])
+            val_list.append(dev_list[i]["model"])
+        
+        for i in range(len(key_list)):
+            str1 = key_list[i]+"("+val_list[i]+")"
+            self.cb_device.Append(str1)
+
+        if(len(key_list)):
+            self.cb_device.SetSelection(0)
+            self.btn_connect.Enable()
+            # Device is found update in status bar Model(s) found
+            self.top.UpdateSingle("Model(s) found", 3)
+        else:
+            self.btn_connect.Disable()
+            # Device is not found update in status bar No Models found
+            self.top.UpdateSingle("No Models found", 3)
+
 
     def search_device(self):
         """
@@ -297,6 +360,9 @@ class ComWindow(wx.Window):
             None        
         """
         self.Layout()
+
+def EVT_RESULT(win, func):
+    win.Connect(-1, -1, EVT_RESULT_ID, func)     
 
 class ComDialog(wx.Dialog):
     """
