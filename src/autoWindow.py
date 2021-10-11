@@ -232,7 +232,12 @@ class AutoWindow(wx.Window):
         """
         self.set_port_list()
         if(len(self.psel) == 0):
-            pass
+            title = ("No Ports Selected")
+            msg = ("Please Select a Port to Continue Auto Mode "
+                    )
+            dlg = wx.MessageDialog(self, msg, title, wx.OK)
+            dlg.ShowModal()
+            return
 
         self.auto_flg = True
         # The Lablel to set name as Stop
