@@ -154,7 +154,7 @@ class ComWindow(wx.Window):
         
         self.cb_device.Clear()
         for i in range(len(key_list)):
-            str1 = key_list[i]+"("+val_list[i]+")"
+            str1 = val_list[i]+"("+key_list[i]+")"
             self.cb_device.Append(str1)
 
         if(len(key_list)):
@@ -175,11 +175,12 @@ class ComWindow(wx.Window):
         val_list = []
 
         for i in range(len(dev_list)):
-            key_list.append(dev_list[i]["port"])
             val_list.append(dev_list[i]["model"])
+            key_list.append(dev_list[i]["port"])
+            
         
         for i in range(len(key_list)):
-            str1 = key_list[i]+"("+val_list[i]+")"
+            str1 = val_list[i]+"("+key_list[i]+")"
             self.cb_device.Append(str1)
 
         if(len(key_list)):
@@ -218,7 +219,7 @@ class ComWindow(wx.Window):
             val_list.append(dev_list[i]["model"])
         
         for i in range(len(key_list)):
-            str1 = key_list[i]+"("+val_list[i]+")"
+            str1 = val_list[i]+"("+key_list[i]+")"
             self.cb_device.Append(str1)
 
         if(len(key_list)):
@@ -257,7 +258,7 @@ class ComWindow(wx.Window):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-        Returns:
+        Returns:f
             None
         """
         # Combo box, device list is disable
@@ -287,7 +288,7 @@ class ComWindow(wx.Window):
         """
         self.cval = self.cb_device.GetValue()
         txt = self.cval.split("(")
-        return txt[0], txt[1].replace(")","")
+        return txt[1].replace(")",""), txt[0]
 
     def device_connected(self):
         """
