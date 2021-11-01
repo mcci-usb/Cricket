@@ -26,6 +26,7 @@
 # Built-in imports
 import os
 import socket
+import sys
 
 # Lib imports
 import wx
@@ -127,7 +128,10 @@ class ScanNwThread(threading.Thread):
         Returns:
             hostcomputer ipaddress
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
+        if sys.platform == "linux":
+            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
+        else:
+            return (socket.gethostbyname_ex(socket.gethostname())[2])
 
 
 class SetWindow(wx.Window):
@@ -377,9 +381,11 @@ class SetWindow(wx.Window):
         Returns:
             None
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
-        
-                
+        if sys.platform == "linux":
+            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
+        else:
+            return (socket.gethostbyname_ex(socket.gethostname())[2])
+           
 class SetDialog(wx.Dialog):
     """
     wxWindows application must have a class derived from wx.Dialog.

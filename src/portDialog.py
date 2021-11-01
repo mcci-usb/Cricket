@@ -26,7 +26,7 @@
 # Built-in imports
 import os
 import socket
-
+import sys
 # Lib imports
 import wx
 
@@ -199,9 +199,12 @@ class PortWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return (socket.gethostbyname_ex(socket.gethostname())[2])
+            return ()[2])
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
+        if sys.platform == "linux":
+            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
+        else:
+            return (socket.gethostbyname_ex(socket.gethostname())[2])
         
         
 class PortDialog(wx.Dialog):
