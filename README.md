@@ -18,7 +18,7 @@ Simple standalone desktop application for handling MCCI USB Switches in a conven
 - [GUI Preview](#gui-preview)
 - [MCCI USB Switch 3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
 - [MCCI USB Switch 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
-- [MCCIUSB Switch 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
+- [MCCI USB Switch 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
 - [MCCI USB Switch 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
 - [Release History](#release-history)
 - [Meta](#meta)
