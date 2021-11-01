@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -306,30 +306,6 @@ class ComWindow(wx.Window):
         self.top.device_connected()
         self.parent.EndModal(True)
            
-    def device_connected2(self):
-        """
-        Connect the selected device
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        # Set label button name as Disconnect
-        self.btn_connect.SetLabel("Disconnect")
-        self.top.con_flg = True
-        self.top.UpdatePort()
-        # Device update info
-        self.top.UpdateDevice()
-        self.top.UpdateSingle("Connected", 3)
-        # Print on logwindow
-        self.top.print_on_log("MCCI USB Switch "+DEVICES[self.top.selDevice]
-                                              +" Connected!\n")
-        self.top.device_connected()
-        self.parent.EndModal(True)
-
     def OnClick (self, evt):
         """
         OnClick() event handler function retrieves the label of 

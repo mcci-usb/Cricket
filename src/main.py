@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -33,7 +33,7 @@ __credits__ = ['Terry Moore', 'Velmurugan Selvaraj']
 __date__ = '2021/07/12'
 __maintainer__ = ['Seenivasan V', 'Vinay N']
 __status__ = 'Production'
-__version__ = '2.4.0'
+__version__ = '2.5.0'
 ##############################################################################
 # Utilities
 ##############################################################################

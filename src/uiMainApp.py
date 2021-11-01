@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -53,6 +53,8 @@ from comDialog import *
 from setDialog import *
 from portDialog import *
 #from ccServer import *
+
+import vbusChart
 
 import devControl
 import serialDev
@@ -127,6 +129,8 @@ class UiPanel(wx.Panel):
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
+
+        self.chartPan = vbusChart.VbusChart(self, parent)
         
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
@@ -139,8 +143,8 @@ class UiPanel(wx.Panel):
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
         self.devObj.append(self.dev2301Pan)
+        self.devObj.append(self.chartPan)
 
-        
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
         self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
@@ -492,6 +496,7 @@ class UiPanel(wx.Panel):
         """
         self.comPan.auto_connect()
 
+
 class UiMainFrame (wx.Frame):
     """
     A UiMainFrame is a window of size and position usually changed by user
@@ -555,6 +560,12 @@ class UiMainFrame (wx.Frame):
 
         self.con_flg = False
 
+        self.vdata = None
+        self.adata = None
+
+        self.vgraph = False
+        self.agraph = False
+
         self.dev_list = []
 
         self.masterList = []
@@ -587,6 +598,14 @@ class UiMainFrame (wx.Frame):
         self.setMenu = wx.Menu()
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
+
+        # menu volts and amps created
+        self.volsAmps = wx.Menu()
+        base = os.path.abspath(os.path.dirname(__file__))
+        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_AMPS, "VBUS V/I Plot")
+
+        qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
+        self.volsAmps.Append(qmiamps)
 
         # Creating the help menu
         self.helpMenu = wx.Menu()
@@ -621,6 +640,7 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&Select MCCI USB Switch")
+        self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
         # First we create a menubar object.
@@ -656,6 +676,9 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+
+        #self.Bind(wx.EVT_MENU, self.Onconnectvolts, id = ID_MENU_VOLTS)
+        self.Bind(wx.EVT_MENU, self.Onconnectamps, id = ID_MENU_AMPS)
         EVT_RESULT(self, self.RunServerEvent)
 
         # Timer for monitor the connected devices
@@ -999,6 +1022,22 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+    
+    def Onconnectamps(self, event):
+        """
+        click on volts and amps menu then open the menu with plot frame
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling onconnect menu.
+        Returns:
+            None
+        """
+        self.vgraph = True
+        self.agraph = True
+        self.dlg = vbusChart.VbusChart(self, self)
+        self.dlg.Show()
         
     def device_no_response(self):
         """
@@ -1107,7 +1146,35 @@ class UiMainFrame (wx.Frame):
             Loop delay in String format
         """
         return self.panel.get_loop_param()
+
+    def get_volts_graph(self, voltin):
+        """
+        getting voltage data
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            voltin: voltage data reading
+        Returns:
+            Loop delay in String format
+        """
+        pass
     
+    def get_amps_graph(self, ampsin):
+        """
+        getting amps data
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            ampsin: current data reading
+        Returns:
+            Loop delay in String format
+        """
+        pass
+
     def get_auto_param(self):
         """
         Get Auto Window delay parameters
@@ -1778,6 +1845,32 @@ class UiMainFrame (wx.Frame):
                     # Print the message
                     wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
                     self.device_no_response()
+
+    def set_vgraph(self, status):
+        """
+        setting voltage graph
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: voltage graph status
+        Returns: 
+            None
+        """
+        self.vgraph = status
+
+    def set_agraph(self, status):
+        """
+        setting amps graph
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: voltage graph status
+        Returns: 
+            None
+        """
+        self.agraph = status
 
 def EVT_RESULT(win, func):
     """
