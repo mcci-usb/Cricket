@@ -75,8 +75,9 @@ Development environment
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
-* matplotlib - 1.18.1
-* pyinstaller - 3.6
+* matplotlib - 1.18.1 - Mac OS
+* matplotlib - 1.14.0 - Linux
+* pyinstaller - 4.6
 * hidapi - 0.10.1  - Only for Mac OS
 
 ```shell
