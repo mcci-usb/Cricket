@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,6 +28,13 @@ import wx
 from uiGlobals import *
 from datetime import datetime
 
+import wx
+import threading
+
+
+# Own modules
+import thControl
+
 ##############################################################################
 # Utilities
 ##############################################################################
@@ -36,7 +43,7 @@ class LogWindow(wx.Window):
     A class logWindow with init method
 
     To show the all actions while handling ports of devices 
-    """ 
+    """
     def __init__(self, parent, top):
         """
         logWindow values displayed for all Models 3201, 3141,2101 
@@ -59,14 +66,29 @@ class LogWindow(wx.Window):
 
         # Create StaticBoxSizer as vertical
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
+        self.chk_usb = wx.CheckBox(self, -1,
+                                  label='USB Host View Changes')
+
+        self.st_delay   = wx.StaticText(self, -1, " USB Enumeration Delay ", 
+                                        style=wx.ALIGN_CENTER)
+
+        self.tc_delay   = wx.TextCtrl(self, -1, "1000", size=(50,-1), 
+                                      style = wx.TE_CENTRE |
+                                      wx.TE_PROCESS_ENTER,
+                                      validator=NumericValidator(),
+                                      name="Enumeration Delay")
+
+        self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
+                                     style = wx.ALIGN_CENTER)
+
+        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Scan USB Change", size=(95,-1))
 
         self.chk_box = wx.CheckBox(self, -1, label='Show Timestamp')  
-        self.chk_usb = wx.CheckBox(self, -1,
-                                  label='Show USB Tree View Changes')  
+          
         self.btn_save = wx.Button(self, ID_BTN_AUTO, "Save",
                                         size=(60, -1))  
         self.btn_clear = wx.Button(self, ID_BTN_CLEAR, "Clear",
-                                         size=(60, -1))     
+                                         size=(60, 25))     
 
         self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
                                          size=(-1,-1))
@@ -79,23 +101,39 @@ class LogWindow(wx.Window):
                       ToolTip("Save Log content into a text file"))
 
         # Create BoxSizer as horizontal
+        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.wait_flg = False
+        
+        self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL, border=0)
+        self.hbox1.Add(self.st_delay, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 18)
+        self.hbox1.Add(self.tc_delay, flag=wx.ALIGN_LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL, border = 25)
+        self.hbox1.Add(self.st_ms, 0, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 1)
+        self.hbox1.Add(self.btn_ref,  0, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 20)
         
         self.hbox.Add(self.chk_box, 0, wx.ALIGN_LEFT | 
                                        wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.chk_usb, 0, wx.ALIGN_LEFT | 
-                                       wx.ALIGN_CENTER_VERTICAL)
-        self.hbox.Add(120,0,0)
+
+        self.hbox.Add(30,0,0)
         self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | 
                                          wx.ALIGN_CENTER_VERTICAL)
-        self.hbox.Add(30,0,0)
+        self.hbox.Add(45,0,0)
         self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , 
-                                         border = 10)
+                                         border = 20)
         
         # Bind the button event to handler
         self.btn_clear.Bind(wx.EVT_BUTTON, self.ClearLogWindow)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveLogWindow)
+
+        self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshUsbBus)
+        self.chk_usb.Bind(wx.EVT_CHECKBOX, self.OnCheckBox)
 
         self.szr_top = wx.BoxSizer(wx.VERTICAL)
         self.szr_top.AddMany([
@@ -105,6 +143,8 @@ class LogWindow(wx.Window):
             ])
 
         self.vbox.AddMany([
+            (self.hbox1, 0, wx.ALIGN_LEFT),
+            (10,5,0),
             (self.hbox, 0, wx.ALIGN_LEFT),
             (10,5,0),
             (self.szr_top, 1, wx.EXPAND),
@@ -117,26 +157,45 @@ class LogWindow(wx.Window):
 
     def ClearLogWindow(self, e):
         """
-        Clear the Log Window.
+        Event handler for Clear button
+        Clear the data in USB Device Tree View Window
+
         Args:
             self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
+            insance of the class,and is used to access variables
             that belongs to the class.
-            e: event handler for clear log window.
-            set the new text control value  
+            e: Type of the event
         Returns:
             None
         """
         self.scb.SetValue("")
     
-    def SaveLogWindow(self, e):
+    def UsbThread(self):
         """
-        Save the Logwindow data
+        Thread for USB tree view changes
+        Start the USB device scan and list the difference catagorized by 
+        Added and Removed
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e: event handler for save the content of logwindow.  
+        Returns:
+            None
+        """
+       
+        self.scb.SetValue("")
+    
+    def SaveLogWindow(self, e):
+        """
+        Event handler for the save button
+        Save the usb tree view Window content in a file under a directory
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: Type of the event
         Returns:
             None
         """
@@ -146,14 +205,16 @@ class LogWindow(wx.Window):
     
     def get_time_stamp(self):
         """
-        Get system time stamp.
+        Get System Time stamp for data log
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
-            that belongs to the class. 
+            that belongs to the class.
         Returns:
-            cstr - Time stamp
+            None
         """
+        
         ct = datetime.now()
         # Format using strftime 
         dtstr = ct.strftime("%Y-%m-%d  %H:%M:%S.%f")
@@ -162,30 +223,181 @@ class LogWindow(wx.Window):
      
     def print_on_log(self, strin):
         """
-        Update the data in Log Window
+        print the data in Logwindow
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
-            that belongs to the class. 
-            strin: print with string
+            that belongs to the class.
+            strin: USB device list in String format.
         Returns:
             None
         """
+        
         ctstr = ""
         # Print values of checkbox buttons True
         if(self.chk_box.GetValue() == True):
             ctstr = ctstr + self.get_time_stamp()
         ctstr = ctstr + strin
         self.scb.AppendText(ctstr)
-     
-    def is_usb_enabled(self):
+
+    def RefreshUsbBus(self, e):
         """
-        Get the status of USB Device Tree View Enable option
+        Event handler for Refresh button
+        Start the USB device scan thread
+
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
-            that belongs to the class. 
+            that belongs to the class.
+            e: Type of the event
         Returns:
-            Boolean: True - Enabled, False - Disabled
+            None
+        """
+        if(self.wait_flg == False):
+            self.btn_ref.Disable()
+            self.wait_flg = True
+            threading.Thread(target=self.UsbThread).run()
+
+    def disable_usb_scan(self):
+        """
+        Disble USB scan option selection
+        Called when USB delay is greater than the Port Switching delay
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        self.chk_usb.SetValue(False)
+    
+    def UsbThread(self):
+        """
+        Thread for USB tree view changes
+        Start the USB device scan and list the difference catagorized by 
+        Added and Removed
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        try:
+            thControl.get_tree_change(self.top)
+        except:
+            # print message
+            self.print_on_log("USB Read Error!")
+        self.wait_flg = False
+        self.btn_ref.Enable()
+    
+    def get_enum_delay(self):
+        """
+        Get USB device Enumeration delay
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            String: Enumeration delay
+        """
+        edly = self.tc_delay.GetValue()
+        
+        if(edly == ""):
+            edly = "100"
+        dval = int(edly)
+        
+        if(dval < 100):
+            dval = 100
+        elif(dval > 60000):
+            dval = 60000
+        
+        # Sets the new text control value.
+        self.tc_delay.SetValue(str(dval))
+
+        # Gets the contents of the control.
+        return self.tc_delay.GetValue()
+    
+    def get_delay_status(self):
+        """
+        Status of the USB Enumeration delay control selection
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            True: if the check box is checked
+            False: if the check box in unchecked
         """
         return self.chk_usb.GetValue()
+
+    def OnCheckBox(self, evt):
+        """
+        Event handler for Checkbox button
+        if enabled compare the delay parameter with Auto and Loop mode
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:event handler to interval, period
+        Returns:
+            None
+        """
+        self.update_interval_period()
+
+    def update_interval_period(self):
+        """
+        Override the Switching Interval period based on USB delay
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        if(self.get_delay_status()):
+            onTime, offTime, duty = self.top.get_loop_param()
+            if(int(onTime) >= int(offTime)):
+                if(int(offTime) < int(self.get_enum_delay())):
+                    duty = 100 - duty
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_period(str(ndly))
+            else:
+                if(int(onTime) < int(self.get_enum_delay())):
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_period(str(ndly))
+
+            onTime, offTime, duty = self.top.get_auto_param()
+            if(int(onTime) >= int(offTime)):
+                if(int(offTime) < int(self.get_enum_delay())):
+                    duty = 100 - duty
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_interval(str(ndly))
+            else:
+                if(int(onTime) < int(self.get_enum_delay())): 
+                    ndly = int((int(self.get_enum_delay())*100)/duty)
+                    self.top.set_interval(str(ndly))
+    
+    def update_controls(self, mode):
+        """
+        update the mode option Enable/Disble USB selection widgets
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            mode: check the mode
+        Returns:
+            None
+        """
+        if(mode == MODE_MANUAL):
+            self.chk_usb.Enable()
+            self.tc_delay.Enable()
+        else:
+            self.chk_usb.Disable()
+            self.tc_delay.Disable()

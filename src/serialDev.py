@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -71,7 +71,7 @@ class SerialDev:
             False: device comport error which is device not found
         """
         if self.devHand.is_open:
-            self.devHand.close() 
+            self.devHand.close()
         self.devHand.port = port
         self.devHand.baudrate = baud
         try:
@@ -107,7 +107,6 @@ class SerialDev:
             res: interger - length of data read from or write to serial
             rstr: data read from the serial port in String format
         """
-    
         res = self.write_serial(cmd)
         if res == 0:
             res, rstr = self.read_serial()

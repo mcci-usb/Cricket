@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -43,7 +43,7 @@ import dev2101Window
 import dev2301Window
 import loopWindow
 import logWindow
-import treeWindow
+#import treeWindow
 import autoWindow
 
 import getusb
@@ -53,6 +53,8 @@ from comDialog import *
 from setDialog import *
 from portDialog import *
 #from ccServer import *
+
+import vbusChart
 
 import devControl
 import serialDev
@@ -89,7 +91,7 @@ class MultiStatus (wx.StatusBar):
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
-        self.SetStatusWidths([-1, -1, -3, -2, -8])
+        self.SetStatusWidths([-2, -1, -1, -4, -8])
 
 class UiPanel(wx.Panel):
     """
@@ -126,9 +128,9 @@ class UiPanel(wx.Panel):
 
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
-        #self.comPan = comWindow.ComWindow(self, parent)
-        self.treePan = treeWindow.UsbTreeWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
+
+        self.chartPan = vbusChart.VbusChart(self, parent)
         
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
@@ -141,8 +143,8 @@ class UiPanel(wx.Panel):
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
         self.devObj.append(self.dev2301Pan)
+        self.devObj.append(self.chartPan)
 
-        
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
         self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
@@ -167,9 +169,6 @@ class UiPanel(wx.Panel):
 
         self.vboxr = wx.BoxSizer(wx.VERTICAL)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
-        self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
-        self.vboxr.Add((0,20), 0, wx.EXPAND)
-
        # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
@@ -296,24 +295,7 @@ class UiPanel(wx.Panel):
             None
         """
         self.logPan.print_on_log(strin)
-    
-    def print_on_usb(self, strin):
-        """
-        print usb device info on treewindow and Logwindow.
 
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: String which contains list of devices with VID, PID and 
-            Speed info
-        Returns:
-            None
-        """
-        self.treePan.print_on_usb(strin)
-        if(self.logPan.is_usb_enabled()):
-            self.logPan.print_on_log(strin+"\n")
-    
     def get_enum_delay(self):
         """
         Get the USB Enumaration delay 
@@ -325,7 +307,7 @@ class UiPanel(wx.Panel):
         Returns:
             String - USB Enumeration delay 
         """
-        return self.treePan.get_enum_delay()
+        return self.logPan.get_enum_delay()
       
     def get_delay_status(self):
         """
@@ -338,7 +320,7 @@ class UiPanel(wx.Panel):
         Returns:
             Boolean - Status of the delay check box
         """
-        return self.treePan.get_delay_status()
+        return self.logPan.get_delay_status()
     
     def get_interval(self):
         """
@@ -378,7 +360,7 @@ class UiPanel(wx.Panel):
         Returns: 
             None
         """
-        self.treePan.disable_usb_scan()
+        self.logPan.disable_usb_scan()
     
     def get_loop_param(self):
         """
@@ -465,7 +447,7 @@ class UiPanel(wx.Panel):
         self.devObj[self.parent.selDevice].update_controls(mode)
         self.loopPan.update_controls(mode)
         self.autoPan.update_controls(mode)
-        self.treePan.update_controls(mode)
+        self.logPan.update_controls(mode)
     
     def device_connected(self):
         """
@@ -514,6 +496,7 @@ class UiPanel(wx.Panel):
         """
         self.comPan.auto_connect()
 
+
 class UiMainFrame (wx.Frame):
     """
     A UiMainFrame is a window of size and position usually changed by user
@@ -535,7 +518,7 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(1020,680))
+                          size=wx.Size(650,785))
 
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
@@ -543,7 +526,7 @@ class UiMainFrame (wx.Frame):
 
         self.SetPosition((80,self.ytop))
 
-        self.SetMinSize((1020,680))
+        self.SetMinSize((650,785))
 
         self.init_flg = True
 
@@ -576,6 +559,12 @@ class UiMainFrame (wx.Frame):
         self.mode = MODE_MANUAL
 
         self.con_flg = False
+
+        self.vdata = None
+        self.adata = None
+
+        self.vgraph = False
+        self.agraph = False
 
         self.dev_list = []
 
@@ -610,6 +599,14 @@ class UiMainFrame (wx.Frame):
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
 
+        # menu volts and amps created
+        self.volsAmps = wx.Menu()
+        base = os.path.abspath(os.path.dirname(__file__))
+        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_AMPS, "VBUS V/I Plot")
+
+        qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
+        self.volsAmps.Append(qmiamps)
+
         # Creating the help menu
         self.helpMenu = wx.Menu()
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
@@ -642,7 +639,8 @@ class UiMainFrame (wx.Frame):
        
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
-        self.menuBar.Append(self.comMenu,     "&Manage Model")
+        self.menuBar.Append(self.comMenu,     "&Select MCCI USB Switch")
+        self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
         # First we create a menubar object.
@@ -678,6 +676,9 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+
+        #self.Bind(wx.EVT_MENU, self.Onconnectvolts, id = ID_MENU_VOLTS)
+        self.Bind(wx.EVT_MENU, self.Onconnectamps, id = ID_MENU_AMPS)
         EVT_RESULT(self, self.RunServerEvent)
 
         # Timer for monitor the connected devices
@@ -1021,6 +1022,22 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+    
+    def Onconnectamps(self, event):
+        """
+        click on volts and amps menu then open the menu with plot frame
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling onconnect menu.
+        Returns:
+            None
+        """
+        self.vgraph = True
+        self.agraph = True
+        self.dlg = vbusChart.VbusChart(self, self)
+        self.dlg.Show()
         
     def device_no_response(self):
         """
@@ -1045,7 +1062,7 @@ class UiMainFrame (wx.Frame):
         srlist.append("Disconnected")
         self.UpdateAll(srlist)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
@@ -1091,20 +1108,6 @@ class UiMainFrame (wx.Frame):
         """
         self.panel.PrintLog(strin)
     
-    def print_on_usb(self, strin):
-        """
-        Show data in USB Device Tree View
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: data in String format
-        Returns:
-            None
-        """
-        self.panel.print_on_usb(strin)
-    
     def get_enum_delay(self):
         """
         Get USB device Enumeration delay
@@ -1143,7 +1146,35 @@ class UiMainFrame (wx.Frame):
             Loop delay in String format
         """
         return self.panel.get_loop_param()
+
+    def get_volts_graph(self, voltin):
+        """
+        getting voltage data
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            voltin: voltage data reading
+        Returns:
+            Loop delay in String format
+        """
+        pass
     
+    def get_amps_graph(self, ampsin):
+        """
+        getting amps data
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            ampsin: current data reading
+        Returns:
+            Loop delay in String format
+        """
+        pass
+
     def get_auto_param(self):
         """
         Get Auto Window delay parameters
@@ -1273,7 +1304,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()
@@ -1301,7 +1332,7 @@ class UiMainFrame (wx.Frame):
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
         else:
-            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
 
     def device_disconnected(self):
@@ -1814,6 +1845,32 @@ class UiMainFrame (wx.Frame):
                     # Print the message
                     wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
                     self.device_no_response()
+
+    def set_vgraph(self, status):
+        """
+        setting voltage graph
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: voltage graph status
+        Returns: 
+            None
+        """
+        self.vgraph = status
+
+    def set_agraph(self, status):
+        """
+        setting amps graph
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: voltage graph status
+        Returns: 
+            None
+        """
+        self.agraph = status
 
 def EVT_RESULT(win, func):
     """
