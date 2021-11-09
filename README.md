@@ -1,9 +1,9 @@
 # CricketUI
 
-Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports Model3141, 3201, 2301 and 2101 USB Connection Exerciser.
+Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
 
 <!-- /TOC -->
-[![Git release](https://img.shields.io/badge/release-v2.4.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.4.0-17-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.3.0...master)
+[![Git release](https://img.shields.io/badge/release-v2.5.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.5.0-17-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.5.0...master)
 <!-- markdown-shield -->
 
 
