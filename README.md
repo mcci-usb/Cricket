@@ -16,10 +16,10 @@ Simple standalone desktop application for handling MCCI USB Switches in a conven
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [MCCI USB Switch 3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
-- [MCCI USB Switch 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
-- [MCCI USB Switch 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
-- [MCCI USB Switch 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
+- [3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
+- [model 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
+- [model 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
+- [model 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
 - [Release History](#release-history)
 - [Meta](#meta)
   - [Copyright and License](#Copyright-and-License)
@@ -47,7 +47,6 @@ Development environment
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
-* matplotlib - 1.16.0
 * pyinstaller - 3.6 
 
 Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install
@@ -58,7 +57,6 @@ pip install pyserial
 pip install pyusb
 pip install libusb
 pip install libusb1
-pip install matplotlib
 pip install pyinstaller
 ```
 
@@ -75,9 +73,7 @@ Development environment
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
-* matplotlib - 1.18.1 - Mac OS
-* matplotlib - 1.14.0 - Linux
-* pyinstaller - 4.6
+* pyinstaller - 3.6  
 * hidapi - 0.10.1  - Only for Mac OS
 
 ```shell
@@ -89,7 +85,6 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
-sudo pip3 install matplotlib
 sudo pip3 install pyinstaller
 brew install hidapi - Only for Mac OS
 ```
@@ -109,7 +104,6 @@ Development environment
 * pyusb - 1.1.1
 * libusb - 1.0.23b7
 * libusb1 - 1.9
-* matplotlib - 1.14.0
 * pyinstaller - 4.2
 
 ```shell
@@ -120,7 +114,6 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
-sudo pip3 install matplotlib
 sudo pip3 install pyinstaller
 ```
 
@@ -161,45 +154,45 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To know about MCCI USB Switch 3201
+## To know about MCCI USB Model3201
 
-MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser 
+MCCI Model 3201 Enhanced Type-C Connection Exerciser 
 
-* The MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+* The MCCI Model 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
 
- **Link:** For more information, see the product home page at [MCCI USB switch 3201 Enhanced type-c connection exerciser](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
+ **Link:** For more information, see the product home page at [3201 Enhanced type-c connection exerciser](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
  
    ![Model3201-typeC](assets/Model3201.png)
    
- ## To know about MCCI USB Switch 3141
+ ## To know about MCCI USB Model3141
 
-MCCI USB Switch 3141
+MCCI Model 3141 USB Switch
 
-* The MCCI® USB 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
-The MCCI USB Switch 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
+* The MCCI® Model 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
+The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB Switch 3141 usb switch](https://mcci.com/usb/dev-tools/model-3141/).
+ **Link:** For more information, see the product home page at [model 3141 usb switch](https://mcci.com/usb/dev-tools/model-3141/).
  
   ![Model3141-typeC](assets/TypeC3141.PNG)
   
-## To know about MCCI USB Switch 2101
+## To know about MCCI USB Model2101
 
-MCCI USB Switch 2101 USB Connection Exerciser
+MCCI Model 2101 USB Connection Exerciser
 
-* The MCCI USB 3.0 Connection Exerciser MCCI USB Switch 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.  
-The MCCI USB 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
+* The MCCI USB 3.0 Connection Exerciser Model 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.  
+The Model 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB Switch 2101 usb connection exerciser](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/).
+ **Link:** For more information, see the product home page at [model 2101 usb connection exerciser](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/).
  
   ![Model3201](assets/Model2101.png)
   
   ## To know about MCCI USB Model2301
 
-MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
+MCCI Model 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
-* The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
+* The MCCI Model 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
 
- **Link:** For more information, see the product home page at [MCCI Switch 2301 usb connection exerciser](https://mcci.com/usb/dev-tools/model-2301/).
+ **Link:** For more information, see the product home page at [model 2301 usb connection exerciser](https://mcci.com/usb/dev-tools/model-2301/).
 
  ![Model2301](assets/Model2301.png)
 
@@ -216,14 +209,9 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  - v2.2.0 Python implemented to Pep8 coding standard.
  Package release for Raspberry Pi OS ubuntu18.04
 
- - v2.3.0 Add support for MCCI Switch 2301 USB Connection Exerciser 
+ - v2.3.0 Add support for Model 2301 USB Connection Exerciser 
 
- - v2.4.0 Add new feature support for Three computer System and Two Computer .
- 
- - v2.5.0 -	Feature added – Plotting of VBUS Volt and Current, USB Tree view removed and merged with Logwindow, Perform device Search in advance, Auto mode improved (Port selection provided), Linux machine IP scanning issue fixed, The word Model replace by MCCI USB Switch, UI not responding issued fixed, Change Request – Do not disable Connect Switch, Enhancement – Highlight the name of the Switch not Port
-
-
-
+ - v2.4.0 Add new feature support for Three computer System and Two Computer System
 
 
  ## Meta

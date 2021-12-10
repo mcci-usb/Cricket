@@ -20,7 +20,6 @@ a.datas += [('\\icons\\mcci_logo.ico','.\\icons\\mcci_logo.ico', "DATA")]
 a.datas += [('\\icons\\mcci_logo.png','.\\icons\\mcci_logo.png', "DATA")]
 a.datas += [('\\icons\\btn_on.png','.\\icons\\btn_on.png', "DATA")]
 a.datas += [('\\icons\\btn_off.png','.\\icons\\btn_off.png', "DATA")]
-a.datas += [('\\icons\\wave.png','.\\icons\\wave.png', "DATA")]
 
 
 pyz = PYZ(a.pure, a.zipped_data,
