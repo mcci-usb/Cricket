@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.5.0"
+APP_VERSION = "2.4.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -54,7 +54,6 @@ IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
-IMG_WAVE = "wave.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -133,8 +132,6 @@ ID_MENU_CONFIG_THC = 1104
 ID_MENU_SET_SCC = 1105
 ID_MENU_SET_THC = 1106
 
-ID_MENU_VOLTS = 1107
-ID_MENU_AMPS = 1111
 EVT_RESULT_ID = 1100
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",

@@ -19,14 +19,14 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V 
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
 # Built-in imports
 import os
 import socket
-import sys
+
 # Lib imports
 import wx
 
@@ -199,12 +199,9 @@ class PortWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            return ()[2])
-        """
-        if sys.platform == "linux":
-            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
-        else:
             return (socket.gethostbyname_ex(socket.gethostname())[2])
+        """
+        return (socket.gethostbyname_ex(socket.gethostname())[2])
         
         
 class PortDialog(wx.Dialog):

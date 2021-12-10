@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -31,10 +31,6 @@ from uiGlobals import *
 
 import devControl
 import json
-import timeit
-import threading
-
-import workthread
 
 ##############################################################################
 # Utilities
@@ -65,7 +61,6 @@ class ComWindow(wx.Window):
 
         self.top = top
         self.parent = parent
-        self.wait_flg = True
 
         self.dlist = []
 
@@ -110,8 +105,8 @@ class ComWindow(wx.Window):
         
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
-        self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached "
-                                            "MCCI USB Switch (3141, 3201, 2101,2301)"))  
+        self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
+                                            "Models (3141, 3201, 2101,2301)"))  
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
@@ -119,10 +114,7 @@ class ComWindow(wx.Window):
         self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
-        EVT_RESULT(self, self.OnResult)
-        workthread.WorkerThread(self, self, self.top)
 
-    
     def ScanDevice(self, evt):
         """
         Scan the list of connected devices over the USB bus
@@ -136,63 +128,7 @@ class ComWindow(wx.Window):
         Returns:
             None
         """
-        if(self.wait_flg == False):
-            self.top.UpdateSingle("Searching MCCI USB Switch", 3)
-            self.cb_device.Clear()
-            self.cb_device.Enable()
-            self.wait_flg = True
-            workthread.WorkerThread(self, self, self.top)
-
-    def OnResult(self, event):
-        dev_list = event.data["devices"]
-        key_list = []
-        val_list = []
-
-        for i in range(len(dev_list)):
-            key_list.append(dev_list[i]["port"])
-            val_list.append(dev_list[i]["model"])
-        
-        self.cb_device.Clear()
-        for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
-            self.cb_device.Append(str1)
-
-        if(len(key_list)):
-            self.cb_device.SetSelection(0)
-            self.btn_connect.Enable()
-            # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
-        else:
-            self.btn_connect.Disable()
-            # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
-        self.wait_flg = False
-        
-
-    def ShowDevices(self, plist):
-        dev_list = plist["devices"]
-        key_list = []
-        val_list = []
-
-        for i in range(len(dev_list)):
-            val_list.append(dev_list[i]["model"])
-            key_list.append(dev_list[i]["port"])
-            
-        
-        for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
-            self.cb_device.Append(str1)
-
-        if(len(key_list)):
-            self.cb_device.SetSelection(0)
-            self.btn_connect.Enable()
-            # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
-        else:
-            self.btn_connect.Disable()
-            # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
-
+        self.search_device()
 
     def search_device(self):
         """
@@ -206,7 +142,7 @@ class ComWindow(wx.Window):
         Returns:
             None
         """
-        self.top.UpdateSingle("Searching MCCI USB Switch", 3)
+        self.top.UpdateSingle("Searching Model", 3)
         self.cb_device.Clear()
         self.cb_device.Enable()
         plist = devControl.search_device(self.top)
@@ -219,18 +155,18 @@ class ComWindow(wx.Window):
             val_list.append(dev_list[i]["model"])
         
         for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
+            str1 = key_list[i]+"("+val_list[i]+")"
             self.cb_device.Append(str1)
 
         if(len(key_list)):
             self.cb_device.SetSelection(0)
             self.btn_connect.Enable()
             # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
+            self.top.UpdateSingle("Model(s) found", 3)
         else:
             self.btn_connect.Disable()
             # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
+            self.top.UpdateSingle("No Models found", 3)
    
     def ConnectDevice(self, evt):
         """
@@ -258,7 +194,7 @@ class ComWindow(wx.Window):
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-        Returns:f
+        Returns:
             None
         """
         # Combo box, device list is disable
@@ -288,7 +224,7 @@ class ComWindow(wx.Window):
         """
         self.cval = self.cb_device.GetValue()
         txt = self.cval.split("(")
-        return txt[1].replace(")",""), txt[0]
+        return txt[0], txt[1].replace(")","")
 
     def device_connected(self):
         """
@@ -306,6 +242,30 @@ class ComWindow(wx.Window):
         self.top.device_connected()
         self.parent.EndModal(True)
            
+    def device_connected2(self):
+        """
+        Connect the selected device
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        # Set label button name as Disconnect
+        self.btn_connect.SetLabel("Disconnect")
+        self.top.con_flg = True
+        self.top.UpdatePort()
+        # Device update info
+        self.top.UpdateDevice()
+        self.top.UpdateSingle("Connected", 3)
+        # Print on logwindow
+        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
+                                              +" Connected!\n")
+        self.top.device_connected()
+        self.parent.EndModal(True)
+
     def OnClick (self, evt):
         """
         OnClick() event handler function retrieves the label of 
@@ -338,9 +298,6 @@ class ComWindow(wx.Window):
         """
         self.Layout()
 
-def EVT_RESULT(win, func):
-    win.Connect(-1, -1, EVT_RESULT_ID, func)     
-
 class ComDialog(wx.Dialog):
     """
     wxWindows application must have a class derived from wx.Dialog.
@@ -359,7 +316,7 @@ class ComDialog(wx.Dialog):
         Returns:
             None
         """
-        wx.Dialog.__init__(self, parent, -1, "Select MCCI USB Switch",
+        wx.Dialog.__init__(self, parent, -1, "Manage Model",
                            size=wx.Size(100, 100),
                            style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
                            name="Model Search Dialog")

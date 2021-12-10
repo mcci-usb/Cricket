@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
+#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -86,23 +86,9 @@ class AutoWindow(wx.Window):
         self.dlist = []
 
         self.portno = 0
-        self.cbPorts = []
-        self.psel = []
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
-
-        self.cb_port = wx.StaticText(self, -1, "Port")
-
-        self.cb_p1 = wx.CheckBox(self, -1, "1")
-        self.cb_p2 = wx.CheckBox(self, -1, "2")
-        self.cb_p3 = wx.CheckBox(self, -1, "3")
-        self.cb_p4 = wx.CheckBox(self, -1, "4")
-
-        self.cbPorts.append(self.cb_p1)
-        self.cbPorts.append(self.cb_p2)
-        self.cbPorts.append(self.cb_p3)
-        self.cbPorts.append(self.cb_p4)
 
         self.st_si   = wx.StaticText(self, -1, "Interval",
                                      style = wx.ALIGN_CENTER_VERTICAL | 
@@ -143,37 +129,24 @@ class AutoWindow(wx.Window):
         # Creates a boxsizer is vertical
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
         # Creates a boxsizer is horizontal
-        self.hbox0 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.hbox0.Add(self.cb_port, 0, flag=wx.LEFT | 
-                        wx.ALIGN_CENTER_VERTICAL, border=50)
-        self.hbox0.Add(self.cb_p1, 0, flag=wx.ALIGN_CENTER | 
-                       wx.LEFT, border=22)
-        self.hbox0.Add(self.cb_p2, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 10)
-        self.hbox0.Add(self.cb_p3,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=20)
-        self.hbox0.Add(self.cb_p4,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=10)
         self.hbox1.Add(self.st_si, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL, border=12)
+                       wx.ALIGN_CENTER_VERTICAL, border=20)
         self.hbox1.Add(self.tc_ival, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 18)
+                       wx.LEFT, border = 10)
         self.hbox1.Add(self.st_ms, flag=wx.ALIGN_LEFT | 
                        wx.ALIGN_CENTER_VERTICAL)
         self.hbox1.Add(self.btn_auto, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 20)
         self.hbox2.Add(self.st_duty, flag=wx.LEFT |  wx.ALIGN_RIGHT |
-                       wx.ALIGN_CENTER_VERTICAL, border=12)
+                       wx.ALIGN_CENTER_VERTICAL, border=20)
         self.hbox2.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=18)
+                       wx.LEFT, border=10)
         self.hbox2.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
 
         self.bs_vbox.AddMany([
-            (0,10,0),
-            (self.hbox0, 1, wx.EXPAND | wx.ALL),
             (0,10,0),
             (self.hbox1, 1, wx.EXPAND | wx.ALL),
             (0,10,0),
@@ -192,10 +165,6 @@ class AutoWindow(wx.Window):
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         # Bind the usbtimer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
-        self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p1)
-        self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p2)
-        self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p3)
-        self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p4)
 
         self.enable_controls(True)
 
@@ -230,15 +199,6 @@ class AutoWindow(wx.Window):
         Returns:
             None
         """
-        self.set_port_list()
-        if(len(self.psel) == 0):
-            title = ("No Ports Selected")
-            msg = ("Please Select a Port to Continue Auto Mode "
-                    )
-            dlg = wx.MessageDialog(self, msg, title, wx.OK)
-            dlg.ShowModal()
-            return
-
         self.auto_flg = True
         # The Lablel to set name as Stop
         self.btn_auto.SetLabel("Stop")
@@ -268,39 +228,6 @@ class AutoWindow(wx.Window):
         # Print the string in logwindow
         self.top.print_on_log("Auto Mode Stopped!\n")
         self.timer.Start(1)
-
-    def auto_ports_enable_p1(self, event):
-        """
-        auto ports binding the events handling
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: if check the ports its enable
-        Returns:
-            None
-        """
-        pass
-
-    def set_port_list(self):
-        """
-        adding all selected ports in a List, used for the AutoMode 
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.psel.clear()
-        if self.cb_p1.IsChecked():
-            self.psel.append(1)
-        if self.cb_p2.IsChecked():
-            self.psel.append(2)
-        if self.cb_p3.IsChecked():
-            self.psel.append(3)
-        if self.cb_p4.IsChecked():
-            self.psel.append(4)
     
     def TimerServ(self, evt):
         """
@@ -321,15 +248,15 @@ class AutoWindow(wx.Window):
                 self.timer.Stop()
                 self.pulse_flg = False
                 if(self.On_flg):
-                    self.port_on(self.psel[self.pcnt], False)
+                    self.port_on(self.pcnt+1, False)
                     self.On_flg = False
                     if self.auto_flg:
                         self.timer.Start(self.OffTime)
                 else:
                     self.pcnt = self.pcnt + 1
-                    if(self.pcnt >= len(self.psel)):
+                    if(self.pcnt >= self.total_ports):
                         self.pcnt = 0
-                    self.port_on(self.psel[self.pcnt], True)
+                    self.port_on(self.pcnt+1, True)
                     if self.auto_flg:
                         self.timer.Start(self.OnTime)
                         self.On_flg = True
@@ -490,7 +417,6 @@ class AutoWindow(wx.Window):
             None
         """
         self.total_ports = port
-        self.enable_ports()
 
     def UsbTimer(self, e):
         """
@@ -506,11 +432,6 @@ class AutoWindow(wx.Window):
             None
         """
         self.timer_usb.Stop()
-        self.cb_p1.Enable()
-        self.cb_p2.Enable()
-        self.cb_p3.Enable()
-        self.cb_p4.Enable()
-        self.usb_flg = False
         try:
             thControl.get_tree_change(self.top)
         except:
@@ -519,7 +440,6 @@ class AutoWindow(wx.Window):
         
         if(self.auto_flg == True & self.pulse_flg == True):
             self.timer.Start(1)
-            
     
     def usb_dly_warning(self):        
         """
@@ -592,7 +512,7 @@ class AutoWindow(wx.Window):
             self.enable_controls(True)
         else:
             self.enable_controls(False)
-       
+    
     def enable_controls(self, stat):
         """
         Enable/Disable Auto mode Controls
@@ -624,7 +544,7 @@ class AutoWindow(wx.Window):
         if not self.top.con_flg:
             # Auto Button is Disable
             self.btn_auto.Disable()
-
+   
     def device_disconnected(self):
         """
         Called when device get disconnected show Popup messgage
@@ -639,39 +559,3 @@ class AutoWindow(wx.Window):
         if self.auto_flg:
             # The device is disconnected auto mode will stop
             self.stop_auto()
-
-    def enable_ports(self):
-        """
-       called  when device gets connected , all ports of the  
-       connected device are enabled and excess port controls are unchecked
-       and disabled
-        
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            stat: the status is which port selection 
-        Returns:
-            None
-        """
-        if self.total_ports == 1:
-            self.cb_p1.Enable()
-            self.cb_p2.SetValue(False)
-            self.cb_p3.SetValue(False)
-            self.cb_p4.SetValue(False)
-            self.cb_p2.Disable()
-            self.cb_p3.Disable()
-            self.cb_p4.Disable()
-        elif self.total_ports == 2:
-            self.cb_p1.Enable()
-            self.cb_p2.Enable()
-            self.cb_p3.SetValue(False)
-            self.cb_p4.SetValue(False)
-            self.cb_p3.Disable() 
-            self.cb_p4.Disable()
-        elif self.total_ports == 4:
-            self.cb_p1.Enable()
-            self.cb_p2.Enable()
-            self.cb_p3.Enable()
-            self.cb_p4.Enable()
-            
