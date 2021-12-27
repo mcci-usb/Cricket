@@ -202,6 +202,7 @@ class UiPanel(wx.Panel):
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
+        self.logPan.show_usb_ctrls(True)
         self.vboxl.Show(self.logPan)
         self.Layout()
         self.parent.terminateCcServer()
@@ -219,6 +220,7 @@ class UiPanel(wx.Panel):
             None
         """
         self.hboxm.Hide(self.vboxr)
+        self.logPan.show_usb_ctrls(False)
         self.vboxl.Show(self.logPan)
         self.hboxm.Show(self.vboxl)
         self.vboxl.Hide(self.hboxdl)
@@ -526,6 +528,7 @@ class UiMainFrame (wx.Frame):
 
         self.SetMinSize((630, 710))
         self.SetMaxSize((630, 710))
+        self.CenterOnScreen()
 
         self.init_flg = True
 

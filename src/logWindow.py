@@ -60,6 +60,8 @@ class LogWindow(wx.Window):
         # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
 
+        self.SetMinSize((480, 520))
+
         self.top = top
         # Create static box with naming of Log Window
         sb = wx.StaticBox(self, -1,"Log Window")
@@ -154,6 +156,7 @@ class LogWindow(wx.Window):
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
+
 
     def ClearLogWindow(self, e):
         """
@@ -401,3 +404,9 @@ class LogWindow(wx.Window):
         else:
             self.chk_usb.Disable()
             self.tc_delay.Disable()
+    
+    def show_usb_ctrls(self, status):
+        if(status):
+            self.vbox.Show(self.hbox1)
+        else:
+            self.vbox.Hide(self.hbox1)
