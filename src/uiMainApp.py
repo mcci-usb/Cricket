@@ -32,6 +32,8 @@ import shelve
 import os
 import sys
 from sys import platform
+from pathlib import Path
+from os import getenv
 
 from wx.core import ITEM_CHECK
 
@@ -43,7 +45,6 @@ import dev2101Window
 import dev2301Window
 import loopWindow
 import logWindow
-#import treeWindow
 import autoWindow
 
 import getusb
@@ -52,7 +53,6 @@ from aboutDialog import *
 from comDialog import *
 from setDialog import *
 from portDialog import *
-#from ccServer import *
 
 import vbusChart
 
@@ -1428,7 +1428,14 @@ class UiMainFrame (wx.Frame):
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
         # in dict objects and string objects as key.
-        ds = shelve.open('CricketSettings.txt')
+
+        lpath = self.get_user_data_dir()
+        dpath = os.path.join(lpath, "MCCI", "Cricket")
+
+        os.makedirs(dpath, exist_ok=True)
+        fpath = os.path.join(dpath, "CricketSettings.txt")
+        
+        ds = shelve.open(fpath)
         ds['port'] = self.selPort
         ds['device'] = self.selDevice
 
@@ -1706,7 +1713,14 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        ds = shelve.open('CricketSettings.txt')
+
+        lpath = self.get_user_data_dir()
+        dpath = os.path.join(lpath, "MCCI", "Cricket")
+
+        os.makedirs(dpath, exist_ok=True)
+        fpath = os.path.join(dpath, "CricketSettings.txt")
+        
+        ds = shelve.open(fpath)
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
         
@@ -1872,6 +1886,28 @@ class UiMainFrame (wx.Frame):
         """
         self.agraph = status
 
+    def get_user_data_dir(self):
+        """
+        getting usr directory path, code and installer executes in Local Path
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            dpath: local directory path
+        """
+        if sys.platform == "win32":
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+            r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders")
+            dir_,_ = winreg.QueryValueEx(key, "Local AppData")
+            dpath = Path(dir_).resolve(strict=False)
+        elif sys.platform == "darwin":
+            dpath = Path('~/Library/Application Support/').expanduser()
+        else:
+            dpath = Path(getenv('XDG_DATA_HOME', "~/.local/share")).expanduser()
+        return dpath
+
 def EVT_RESULT(win, func):
     """
     event function window cant hang
@@ -1918,6 +1954,8 @@ class UiApp(wx.App):
         """
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
+
+        
 
 def run():
     """
