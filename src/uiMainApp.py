@@ -1081,6 +1081,7 @@ class UiMainFrame (wx.Frame):
                               +" Disconnected!\n")
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
+        self.StoreDevice()
             
     def save_usb_list(self, mlist):
         """
