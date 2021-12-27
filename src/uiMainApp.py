@@ -943,6 +943,8 @@ class UiMainFrame (wx.Frame):
             None
         """ 
         # Close this window
+        self.terminateHcServer()
+        self.terminateCcServer()
         self.Close(True)
     
     def OnIconize (self, event):
