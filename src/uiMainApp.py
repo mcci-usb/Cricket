@@ -129,8 +129,6 @@ class UiPanel(wx.Panel):
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
-
-        self.chartPan = vbusChart.VbusChart(self, parent)
         
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
         self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
@@ -143,7 +141,6 @@ class UiPanel(wx.Panel):
         self.devObj.append(self.dev3201Pan)
         self.devObj.append(self.dev2101Pan)
         self.devObj.append(self.dev2301Pan)
-        self.devObj.append(self.chartPan)
 
         # Creating Sizers
         self.vboxdl = wx.BoxSizer(wx.VERTICAL)
@@ -678,7 +675,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
-
+        
+        self.Bind(wx.EVT_CLOSE, self.OnAppClose)
         #self.Bind(wx.EVT_MENU, self.Onconnectvolts, id = ID_MENU_VOLTS)
         self.Bind(wx.EVT_MENU, self.Onconnectamps, id = ID_MENU_AMPS)
         EVT_RESULT(self, self.RunServerEvent)
@@ -691,6 +689,7 @@ class UiMainFrame (wx.Frame):
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
             self.Bind(wx.EVT_ICONIZE, self.OnIconize)
+            self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
 
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
@@ -928,6 +927,11 @@ class UiMainFrame (wx.Frame):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def OnAppClose (self, event):
+        self.terminateHcServer()
+        self.terminateCcServer()
+        self.Destroy()
     
     def OnCloseWindow (self, event):
         """
@@ -1026,6 +1030,10 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+    def OnClose(self, event):
+        self.terminateHcServer()
+        self.terminateCcServer()
+        wx.Exit()
     
     def Onconnectamps(self, event):
         """
