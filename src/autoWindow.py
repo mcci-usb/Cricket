@@ -95,9 +95,13 @@ class AutoWindow(wx.Window):
         self.cb_port = wx.StaticText(self, -1, "Port")
 
         self.cb_p1 = wx.CheckBox(self, -1, "1")
+        self.cb_p1.Disable()     
         self.cb_p2 = wx.CheckBox(self, -1, "2")
+        self.cb_p2.Disable()
         self.cb_p3 = wx.CheckBox(self, -1, "3")
+        self.cb_p3.Disable()
         self.cb_p4 = wx.CheckBox(self, -1, "4")
+        self.cb_p4.Disable()
 
         self.cbPorts.append(self.cb_p1)
         self.cbPorts.append(self.cb_p2)
@@ -656,6 +660,7 @@ class AutoWindow(wx.Window):
         """
         if self.total_ports == 1:
             self.cb_p1.Enable()
+            self.cb_p1.SetValue(True)
             self.cb_p2.SetValue(False)
             self.cb_p3.SetValue(False)
             self.cb_p4.SetValue(False)
@@ -665,6 +670,8 @@ class AutoWindow(wx.Window):
         elif self.total_ports == 2:
             self.cb_p1.Enable()
             self.cb_p2.Enable()
+            self.cb_p1.SetValue(True)
+            self.cb_p2.SetValue(True)
             self.cb_p3.SetValue(False)
             self.cb_p4.SetValue(False)
             self.cb_p3.Disable() 
@@ -674,4 +681,8 @@ class AutoWindow(wx.Window):
             self.cb_p2.Enable()
             self.cb_p3.Enable()
             self.cb_p4.Enable()
+            self.cb_p1.SetValue(True)
+            self.cb_p2.SetValue(True)
+            self.cb_p3.SetValue(True)
+            self.cb_p4.SetValue(True)
             
