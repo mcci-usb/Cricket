@@ -201,10 +201,9 @@ class PortWindow(wx.Window):
         Returns:
             return ()[2])
         """
-        if sys.platform == "linux":
-            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
-        else:
-            return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
         
         
 class PortDialog(wx.Dialog):

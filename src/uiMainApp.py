@@ -568,6 +568,8 @@ class UiMainFrame (wx.Frame):
         self.vgraph = False
         self.agraph = False
 
+        self.stype = READ_CONFIG
+
         self.dev_list = []
 
         self.masterList = []
@@ -604,7 +606,7 @@ class UiMainFrame (wx.Frame):
         # menu volts and amps created
         self.volsAmps = wx.Menu()
         base = os.path.abspath(os.path.dirname(__file__))
-        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_AMPS, "VBUS V/I Plot")
+        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_GRAPH, "VBUS V/I Plot")
 
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.volsAmps.Append(qmiamps)
@@ -680,14 +682,16 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
         
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
-        #self.Bind(wx.EVT_MENU, self.Onconnectvolts, id = ID_MENU_VOLTS)
-        self.Bind(wx.EVT_MENU, self.Onconnectamps, id = ID_MENU_AMPS)
+
+        self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         EVT_RESULT(self, self.RunServerEvent)
 
         # Timer for monitor the connected devices
         self.timer_lp = wx.Timer(self)
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
+        self.timer_auc = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.TriggerConnections, self.timer_auc)
 
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
@@ -702,6 +706,8 @@ class UiMainFrame (wx.Frame):
         self.save_usb_list(usbList)
         self.update_usb_status(td)
 
+        self.print_on_log("Reading Configuration ...\n")
+        
         try:
             self.LoadDevice()
             
@@ -727,12 +733,10 @@ class UiMainFrame (wx.Frame):
             self.ldata['sthcif'] = "network"
             self.ldata['sthcpn'] = "2022"
 
+        self.print_on_log("Loading Configuration\n")
         self.update_config_menu()
         self.update_settings_menu()
-        devControl.SetDeviceControl(self)
-        thControl.SetDeviceControl(self)
-        if self.ldata['uc']:
-            self.auto_connect()
+        self.timer_auc.Start(2000)
 
     def RunServerEvent(self, event):
         """
@@ -747,14 +751,14 @@ class UiMainFrame (wx.Frame):
             None
         """
         if event.data is None:
-            self.print_on_log("\nNo Server Event")
+            self.print_on_log("No Server Event\n")
         else:
             if event.data == "search":
-                self.print_on_log("\nSearch Event")
+                self.print_on_log("Search Event\n")
                 self.dev_list.clear()
                 self.dev_list = search.search_port(self.usbHand)
             else:
-                self.print_on_log("\nUnknown Server Event")
+                self.print_on_log("Unknown Server Event\n")
 
     def auto_connect(self):
         """
@@ -769,10 +773,17 @@ class UiMainFrame (wx.Frame):
             None
         """
         if(self.ldata['port'] != None and self.ldata['device'] != None):
+            self.print_on_log("Auto connecting initiated ...\n")
             self.selPort = self.ldata['port']
             self.selDevice = self.ldata['device']
-            if devControl.connect_device(self):
-                self.device_connected()
+            self.stype = AUTO_CONNECT
+            self.timer_auc.Start(500)
+
+    def auto_connect_service(self):        
+        if devControl.connect_device(self):
+            self.device_connected()
+        else:
+            self.print_on_log("Auto connection failed\n")
                 
     def update_config_menu(self):
         """
@@ -1017,6 +1028,7 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        self.print_on_log("Search Devices ...\n")
         dlg = ComDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
@@ -1033,12 +1045,13 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+
     def OnClose(self, event):
         self.terminateHcServer()
         self.terminateCcServer()
         wx.Exit()
     
-    def Onconnectamps(self, event):
+    def OnConnectGraph(self, event):
         """
         click on volts and amps menu then open the menu with plot frame
         Args:
@@ -1852,6 +1865,17 @@ class UiMainFrame (wx.Frame):
                 self.timer_lp.Start(700)
         else:
             self.timer_lp.Stop()
+
+    def TriggerConnections(self, e):
+        self.timer_auc.Stop()
+        if self.stype == READ_CONFIG:
+            devControl.SetDeviceControl(self)
+            thControl.SetDeviceControl(self)
+            if self.ldata['uc']:
+                self.auto_connect()
+        elif self.stype == AUTO_CONNECT:
+            self.auto_connect_service()
+
 
     def DeviceMonitor(self, e):
         """

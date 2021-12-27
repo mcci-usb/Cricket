@@ -128,10 +128,9 @@ class ScanNwThread(threading.Thread):
         Returns:
             hostcomputer ipaddress
         """
-        if sys.platform == "linux":
-            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
-        else:
-            return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
 
 
 class SetWindow(wx.Window):
@@ -381,10 +380,9 @@ class SetWindow(wx.Window):
         Returns:
             None
         """
-        if sys.platform == "linux":
-            return (socket.gethostbyname_ex(socket.gethostname() + ".local")[2])
-        else:
-            return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
            
 class SetDialog(wx.Dialog):
     """

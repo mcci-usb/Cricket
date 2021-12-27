@@ -50,6 +50,9 @@ BAUDRATE = [115200, 115200, 0, 9600]
 
 DEVICES    = ["3141", "3201", "2101", "2301"]
 
+READ_CONFIG = 0
+AUTO_CONNECT = 1
+
 IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
@@ -133,8 +136,7 @@ ID_MENU_CONFIG_THC = 1104
 ID_MENU_SET_SCC = 1105
 ID_MENU_SET_THC = 1106
 
-ID_MENU_VOLTS = 1107
-ID_MENU_AMPS = 1111
+ID_MENU_GRAPH = 1110
 EVT_RESULT_ID = 1100
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
