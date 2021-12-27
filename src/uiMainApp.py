@@ -91,7 +91,7 @@ class MultiStatus (wx.StatusBar):
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
-        self.SetStatusWidths([-2, -1, -1, -4, -8])
+        self.SetStatusWidths([-2, -1, -1, -4, -10])
 
 class UiPanel(wx.Panel):
     """
@@ -518,7 +518,8 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(650,785))
+                          size=wx.Size(630, 710), style= wx.SYSTEM_MENU | 
+                          wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX)
 
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
@@ -526,7 +527,8 @@ class UiMainFrame (wx.Frame):
 
         self.SetPosition((80,self.ytop))
 
-        self.SetMinSize((650,785))
+        self.SetMinSize((630, 710))
+        self.SetMaxSize((630, 710))
 
         self.init_flg = True
 
