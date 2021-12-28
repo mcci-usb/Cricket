@@ -86,8 +86,11 @@ class ServerHc:
         self.PORT = port
         self.ADDR = ((self.IP, self.PORT))
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((host, port))
-        self.socket.listen(5)
+        try:
+            self.socket.bind((host, port))
+            self.socket.listen(5)
+        except:
+            print("Server Init failed")
         #print('Test Host Server Listeneing port: ' + host + ':' + str(port))
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None

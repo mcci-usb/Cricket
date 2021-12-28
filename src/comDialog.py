@@ -34,11 +34,20 @@ import json
 import timeit
 import threading
 
-import workthread
 
 ##############################################################################
 # Utilities
 ##############################################################################
+class SearchSwitch(wx.PyEvent):
+    """A class ServerEvent with init method"""
+
+    def __init__(self, data):
+        """Init Result Event."""
+        wx.PyEvent.__init__(self)
+        self.SetEventType(EVT_RESULT_ID)
+        self.data = data
+
+
 class ComWindow(wx.Window):
     """
     A  class AboutWindow with init method
@@ -119,119 +128,71 @@ class ComWindow(wx.Window):
         self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
-        EVT_RESULT(self, self.OnResult)
-        workthread.WorkerThread(self, self, self.top)
+        #EVT_RESULT(self, self.OnResult)
+        #workthread.WorkerThread(self, self, self.top)
+        EVT_RESULT(self, self.SearchEvent)
+        wx.PostEvent(self, SearchSwitch("search"))
+        
 
-    
     def ScanDevice(self, evt):
+        wx.PostEvent(self, SearchSwitch("print"))
+        wx.PostEvent(self, SearchSwitch("search"))
+        
+    def SearchEvent(self, event):
         """
-        Scan the list of connected devices over the USB bus
-
+        serching the port event handling indicates 
+        server is connecting that port
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            evt: The event parameter in the AutoButton() method is an 
-            object specific to a particular event type.
+            event: searching the event with server.
         Returns:
             None
         """
-        if(self.wait_flg == False):
-            self.top.UpdateSingle("Searching MCCI USB Switch", 3)
+        if event.data is None:
+            self.top.print_on_log("No Search event\n")
+        elif event.data == "search":
+            #self.btn_scan.Enable(False)
+            self.btn_scan.Unbind(wx.EVT_BUTTON)
+            self.get_devices()
+            wx.GetApp().Yield()
+            self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
+        elif event.data == "print":
+            self.top.print_on_log("Searching Devices ...\n")
+
+    def get_devices(self):    
+        devlist = devControl.search_device(self.top)
+        dev_list = devlist["devices"]
+        if(len(dev_list) == 0):
+            self.top.print_on_log("No Devices found\n")
             self.cb_device.Clear()
-            self.cb_device.Enable()
-            self.wait_flg = True
-            workthread.WorkerThread(self, self, self.top)
-
-    def OnResult(self, event):
-        dev_list = event.data["devices"]
-        key_list = []
-        val_list = []
-
-        for i in range(len(dev_list)):
-            key_list.append(dev_list[i]["port"])
-            val_list.append(dev_list[i]["model"])
-        
-        self.cb_device.Clear()
-        for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
-            self.cb_device.Append(str1)
-
-        if(len(key_list)):
-            self.cb_device.SetSelection(0)
-            self.btn_connect.Enable()
-            # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
         else:
-            self.btn_connect.Disable()
-            # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
-        self.wait_flg = False
+            key_list = []
+            val_list = []
+
+            for i in range(len(dev_list)):
+                key_list.append(dev_list[i]["port"])
+                val_list.append(dev_list[i]["model"])
         
+            self.cb_device.Clear()
+            for i in range(len(key_list)):
+                str1 = val_list[i]+"("+key_list[i]+")"
+                self.cb_device.Append(str1)
+                self.top.print_on_log(str1+"\n")
 
-    def ShowDevices(self, plist):
-        dev_list = plist["devices"]
-        key_list = []
-        val_list = []
-
-        for i in range(len(dev_list)):
-            val_list.append(dev_list[i]["model"])
-            key_list.append(dev_list[i]["port"])
-            
+            if(len(key_list)):
+                self.cb_device.SetSelection(0)
+                self.btn_connect.Enable()
+                # Device is found update in status bar Model(s) found
+                self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
+            else:
+                self.btn_connect.Disable()
+                # Device is not found update in status bar No Models found
+                self.top.UpdateSingle("No MCCI USB Switch found", 3)
         
-        for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
-            self.cb_device.Append(str1)
-
-        if(len(key_list)):
-            self.cb_device.SetSelection(0)
-            self.btn_connect.Enable()
-            # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
-        else:
-            self.btn_connect.Disable()
-            # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
-
-
-    def search_device(self):
-        """
-        Event Handler for Device Search Button.
-        search the device(s) its displays in the statusbar and dropdown box 
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.top.UpdateSingle("Searching MCCI USB Switch", 3)
-        self.cb_device.Clear()
-        self.cb_device.Enable()
-        plist = devControl.search_device(self.top)
-        dev_list = plist["devices"]
-        key_list = []
-        val_list = []
-
-        for i in range(len(dev_list)):
-            key_list.append(dev_list[i]["port"])
-            val_list.append(dev_list[i]["model"])
         
-        for i in range(len(key_list)):
-            str1 = val_list[i]+"("+key_list[i]+")"
-            self.cb_device.Append(str1)
-
-        if(len(key_list)):
-            self.cb_device.SetSelection(0)
-            self.btn_connect.Enable()
-            # Device is found update in status bar Model(s) found
-            self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
-        else:
-            self.btn_connect.Disable()
-            # Device is not found update in status bar No Models found
-            self.top.UpdateSingle("No MCCI USB Switch found", 3)
-   
+                
     def ConnectDevice(self, evt):
         """
         Event Handler for Connect Button, to connect device
@@ -338,8 +299,14 @@ class ComWindow(wx.Window):
         """
         self.Layout()
 
+
+
 def EVT_RESULT(win, func):
-    win.Connect(-1, -1, EVT_RESULT_ID, func)     
+    win.Connect(-1, -1, EVT_RESULT_ID, func)    
+
+def get_devices(top):
+        devlist = devControl.search_device(top)
+        dev_list = devlist["devices"]
 
 class ComDialog(wx.Dialog):
     """
@@ -405,3 +372,4 @@ class ComDialog(wx.Dialog):
             None        
         """ 
         self.Layout()
+

@@ -103,10 +103,10 @@ def connect_device(top):
     """
     if top.devCtrl == "local":
         if top.selDevice == DEV_2101:
+            top.usbHand.scan_2101()
             return top.usbHand.select_usb_device(top.selPort)
         else:
-            return top.devHand.open_serial_device(top.selPort,
-                                        BAUDRATE[top.selDevice])
+            return top.devHand.open_serial_device(top.selPort,BAUDRATE[top.selDevice])
         top.device_connected()
     elif top.devCtrl == "network":
         resdict = None
@@ -170,7 +170,7 @@ def send_port_cmd(top,cmd):
                 top.device_no_response()
             return findict
         else:
-            top.print_on_log("Control Computer Connection Fail!\n")
+            top.print_on_log("\nControl Computer Connection Fail!")
             top.device_no_response()
             top.ccflag = False
             return-1, "No CC"

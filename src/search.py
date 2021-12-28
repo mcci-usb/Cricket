@@ -66,6 +66,7 @@ def search_port(usbHand):
         rdict - A dictionary of two lists, one for port number and another for
         Model number
     """
+
     # It will print a list of available ports
     comlist = serial.tools.list_ports.comports()
     port_name = []

@@ -100,14 +100,13 @@ class Dev2101:
         """
         dlist = []
         self.slno_list.clear()
-        
+
         if sys.platform == 'darwin':
             self.path_list.clear()
         
             dev = hid.enumerate(VID_2101, PID_2101)
             if len(dev) != 0:
                 for dev in hid.enumerate(VID_2101, PID_2101):
-                    print("SlNo: ", dev['serial_number'])
                     try:
                         dlist.append(dev['serial_number'])
                         self.slno_list.append(dev['serial_number'])
@@ -171,7 +170,7 @@ class Dev2101:
         """
         self.slno = None
         self.path = None
-        
+
         if sys.platform == 'darwin':
             for i in range(len(self.slno_list)):
                 if(self.slno_list[i] == serialno):
@@ -184,7 +183,6 @@ class Dev2101:
                     self.slno = serialno
                     self.dev = self.dev_list[i]
                     break
-            
         if self.slno == serialno:
             return True
         else:

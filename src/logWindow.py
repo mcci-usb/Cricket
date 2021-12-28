@@ -404,7 +404,7 @@ class LogWindow(wx.Window):
         else:
             self.chk_usb.Disable()
             self.tc_delay.Disable()
-    
+
     def show_usb_ctrls(self, status):
         if(status):
             self.vbox.Show(self.hbox1)

@@ -517,8 +517,7 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(630, 710), style= wx.SYSTEM_MENU | 
-                          wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX)
+                          size=wx.Size(630, 710))
 
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
@@ -664,7 +663,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
         self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
-
+        
         self.Bind(wx.EVT_MENU, self.SelectUC, self.ucmenu)
         self.Bind(wx.EVT_MENU, self.SelectCC, self.ccmenu)
         self.Bind(wx.EVT_MENU, self.SelectHC, self.hcmenu)
@@ -680,7 +679,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
-        
+
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
@@ -690,6 +689,7 @@ class UiMainFrame (wx.Frame):
         self.timer_lp = wx.Timer(self)
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
+
         self.timer_auc = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.TriggerConnections, self.timer_auc)
 
@@ -707,7 +707,7 @@ class UiMainFrame (wx.Frame):
         self.update_usb_status(td)
 
         self.print_on_log("Reading Configuration ...\n")
-        
+
         try:
             self.LoadDevice()
             
@@ -941,12 +941,12 @@ class UiMainFrame (wx.Frame):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
-
+    
     def OnAppClose (self, event):
         self.terminateHcServer()
         self.terminateCcServer()
         self.Destroy()
-    
+        
     def OnCloseWindow (self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -1445,7 +1445,7 @@ class UiMainFrame (wx.Frame):
     def StoreDevice(self):
         """
         Store the device configuration
-
+        ings
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1874,8 +1874,8 @@ class UiMainFrame (wx.Frame):
             if self.ldata['uc']:
                 self.auto_connect()
         elif self.stype == AUTO_CONNECT:
-            self.auto_connect_service()
-
+            self.auto_connect_service()    
+        
 
     def DeviceMonitor(self, e):
         """
@@ -1995,7 +1995,7 @@ class UiApp(wx.App):
         self.frame = UiMainFrame(parent=None, title="MCCI - Cricket UI")
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
 
-        
+
 
 def run():
     """

@@ -594,7 +594,7 @@ class VbusChart(wx.Frame):
                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
      
      if dlg.ShowModal() == wx.ID_CANCEL:
-        returnp
+        return
      
      pathname = dlg.GetPath()
      #print("File Path: ", pathname)
