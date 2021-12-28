@@ -475,6 +475,9 @@ class VbusChart(wx.Frame):
      Returns:
         None
      """
+     
+     self.top.vgraph = False
+     self.top.agraph = False
      self.data_thread.stop()
      self.chart_thread.stop()
      self.data_thread.join()
