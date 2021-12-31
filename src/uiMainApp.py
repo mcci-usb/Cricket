@@ -517,7 +517,8 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(630, 710))
+                          size=wx.Size(630, 710), style= wx.SYSTEM_MENU | 
+                          wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX)
 
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
