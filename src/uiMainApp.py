@@ -268,7 +268,7 @@ class UiPanel(wx.Panel):
 
     def remove_dev_panels(self):
         """
-        Remove or Hide the the all Model 3141, 3201, 2101, 2301 windows panels.
+        Remove or Hide the the all Model 3141, 3201, 2101, 2301 windows panels
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -944,6 +944,18 @@ class UiMainFrame (wx.Frame):
         dlg.Destroy()
     
     def OnAppClose (self, event):
+        """
+        Virtual event handlers, overide them in your derived class
+        for Mac Close
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:event handler for Mac close
+        Returns:
+            None
+        """
         self.terminateHcServer()
         self.terminateCcServer()
         self.Destroy()
@@ -1552,7 +1564,7 @@ class UiMainFrame (wx.Frame):
 
     def SelectCC(self, event):
         """
-        if select Switch control computer menu ISCHECKED its act as SCC server.
+        if select Switch control computer menu ISCHECKED its act as SCC server
         if UNCHECKED User computer and Test host computer,
         its automatically setting menu SCC is enable THC is Disable
         Args:

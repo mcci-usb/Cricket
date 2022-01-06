@@ -41,7 +41,7 @@ class Dev3141Window(wx.Panel):
     """
     A class dev3141Window with init method
 
-    the dev3141Window navigate to Super speed and High speed enable 
+    the dev3141Window navigate to Super speed and High speed enable
     or disable options.
     """
     def __init__(self, parent, top):

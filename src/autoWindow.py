@@ -246,6 +246,7 @@ class AutoWindow(wx.Window):
         self.auto_flg = True
         # The Lablel to set name as Stop
         self.btn_auto.SetLabel("Stop")
+        self.disable_ports()
         self.top.set_mode(MODE_AUTO)
         # This function to dispaly the auto start message 
         self.Auto_strat_msg()
@@ -268,6 +269,7 @@ class AutoWindow(wx.Window):
         self.btn_auto.SetLabel("Auto")
         # The mode set as Manual Mode.
         self.top.set_mode(MODE_MANUAL)
+        self.enable_ports()
 
         # Print the string in logwindow
         self.top.print_on_log("Auto Mode Stopped!\n")
@@ -494,7 +496,7 @@ class AutoWindow(wx.Window):
             None
         """
         self.total_ports = port
-        self.enable_ports()
+        self.set_ports()
 
     def UsbTimer(self, e):
         """
@@ -510,10 +512,6 @@ class AutoWindow(wx.Window):
             None
         """
         self.timer_usb.Stop()
-        self.cb_p1.Enable()
-        self.cb_p2.Enable()
-        self.cb_p3.Enable()
-        self.cb_p4.Enable()
         self.usb_flg = False
         try:
             thControl.get_tree_change(self.top)
@@ -523,7 +521,6 @@ class AutoWindow(wx.Window):
         
         if(self.auto_flg == True & self.pulse_flg == True):
             self.timer.Start(1)
-            
     
     def usb_dly_warning(self):        
         """
@@ -645,6 +642,42 @@ class AutoWindow(wx.Window):
             self.stop_auto()
 
     def enable_ports(self):
+
+        """
+        while starting the Auto mode (Connecting Device) 
+        all check boxes are disable.
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+
+        Returns:
+            None
+        """
+        self.cb_p1.Enable()
+        self.cb_p2.Enable()
+        self.cb_p3.Enable()
+        self.cb_p4.Enable()
+
+    def disable_ports(self):
+
+        """
+        while starting the Auto mode (Connecting Device) 
+        all check boxes are disable.
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+
+        Returns:
+            None
+        """
+        self.cb_p1.Disable()
+        self.cb_p2.Disable()
+        self.cb_p3.Disable()
+        self.cb_p4.Disable()
+
+    def set_ports(self):
         """
        called  when device gets connected , all ports of the  
        connected device are enabled and excess port controls are unchecked

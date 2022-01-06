@@ -116,7 +116,8 @@ class LoopWindow(wx.Window):
         self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
                                       style = wx.ALIGN_CENTER)
         self.cb_cycle = wx.CheckBox (self, -1, label = 'Until Stopped')
-        self.st_repeat_cnt   = wx.StaticText(self, -1, "Finished Count", size=(-1,-1))
+        self.st_repeat_cnt   = wx.StaticText(self, -1, 
+                                     "Finished Count", size=(-1,-1))
         self.st_cnt_port   = wx.StaticText(self, -1, "----", size=(-1, -1), 
                                       style = wx.ALIGN_CENTER)
 

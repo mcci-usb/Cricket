@@ -120,7 +120,7 @@ class ComWindow(wx.Window):
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
         self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached "
-                                            "MCCI USB Switch (3141, 3201, 2101,2301)"))  
+                            "MCCI USB Switch (3141, 3201, 2101,2301)"))
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
