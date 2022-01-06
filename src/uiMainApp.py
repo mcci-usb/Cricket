@@ -1958,7 +1958,7 @@ class UiMainFrame (wx.Frame):
         elif sys.platform == "darwin":
             dpath = Path('~/Library/Application Support/').expanduser()
         else:
-            dpath = Path(getenv('XDG_DATA_HOME', "~/.local/share")).expanduser()
+            dpath = Path(getenv('XDG_DATA_HOME', "~/.local/lib")).expanduser()
         return dpath
 
 def EVT_RESULT(win, func):
