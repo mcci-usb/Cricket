@@ -203,6 +203,7 @@ class UiPanel(wx.Panel):
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
+        self.logPan.show_usb_ctrls(True)
         self.vboxl.Show(self.logPan)
         self.Layout()
         self.parent.terminateCcServer()
@@ -220,6 +221,7 @@ class UiPanel(wx.Panel):
             None
         """
         self.hboxm.Hide(self.vboxr)
+        self.logPan.show_usb_ctrls(False)
         self.vboxl.Show(self.logPan)
         self.hboxm.Show(self.vboxl)
         self.vboxl.Hide(self.hboxdl)
@@ -445,6 +447,7 @@ class UiPanel(wx.Panel):
         self.devObj[self.parent.selDevice].update_controls(mode)
         self.loopPan.update_controls(mode)
         self.autoPan.update_controls(mode)
+        self.logPan.update_controls(mode)
     
     def device_connected(self):
         """

@@ -59,6 +59,7 @@ class LogWindow(wx.Window):
         wx.Window.__init__(self, parent)
         # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
+        self.SetMinSize((480,520))
 
         self.top = top
         # Create static box with naming of Log Window
@@ -81,7 +82,7 @@ class LogWindow(wx.Window):
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
 
-        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Scan USB Change", size=(95,-1))
+        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Scan USB Change", size=(110,-1))
 
         self.chk_box = wx.CheckBox(self, -1, label='Show Timestamp')  
           
@@ -102,7 +103,6 @@ class LogWindow(wx.Window):
 
         # Create BoxSizer as horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.wait_flg = False
         
@@ -401,3 +401,20 @@ class LogWindow(wx.Window):
         else:
             self.chk_usb.Disable()
             self.tc_delay.Disable()
+
+    def show_usb_ctrls(self, status):
+        """
+        show and hide usb host view widgets based on Client and Server config. 
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            status: false or true.
+        Returns:
+            None
+        """
+        if(status):
+            self.vbox.Show(self.hbox1)
+        else:
+            self.vbox.Hide(self.hbox1)
