@@ -567,8 +567,10 @@ class UiMainFrame (wx.Frame):
         self.con_flg = False
         self.vdata = None
         self.adata = None
-        self.vgraph = None
-        self.agraph = None
+        self.vgraph = False
+        self.agraph = False
+
+        self.stype = READ_CONFIG
 
         self.dev_list = []
 
@@ -687,6 +689,9 @@ class UiMainFrame (wx.Frame):
         self.timer_lp = wx.Timer(self)
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
+        
+        self.timer_auc = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.TriggerConnections, self.timer_auc)
 
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
@@ -699,6 +704,7 @@ class UiMainFrame (wx.Frame):
         td, usbList = getusb.scan_usb()
         self.save_usb_list(usbList)
         self.update_usb_status(td)
+        self.print_on_log("Reading Configuration ...\n")
 
         try:
             self.LoadDevice()
@@ -725,12 +731,10 @@ class UiMainFrame (wx.Frame):
             self.ldata['sthcif'] = "network"
             self.ldata['sthcpn'] = "2022"
 
+        self.print_on_log("Loading Configuration\n")
         self.update_config_menu()
         self.update_settings_menu()
-        devControl.SetDeviceControl(self)
-        thControl.SetDeviceControl(self)
-        if self.ldata['uc']:
-            self.auto_connect()
+        self.timer_auc.Start(2000)
 
     def RunServerEvent(self, event):
         """
@@ -767,10 +771,17 @@ class UiMainFrame (wx.Frame):
             None
         """
         if(self.ldata['port'] != None and self.ldata['device'] != None):
+            self.print_on_log("Auto connecting initiated ...\n")
             self.selPort = self.ldata['port']
             self.selDevice = self.ldata['device']
-            if devControl.connect_device(self):
-                self.device_connected()
+            self.stype = AUTO_CONNECT
+            self.timer_auc.Start(500)
+    
+    def auto_connect_service(self):        
+        if devControl.connect_device(self):
+            self.device_connected()
+        else:
+            self.print_on_log("Auto connection failed\n")
                 
     def update_config_menu(self):
         """
@@ -1812,6 +1823,16 @@ class UiMainFrame (wx.Frame):
                 self.timer_lp.Start(700)
         else:
             self.timer_lp.Stop()
+
+    def TriggerConnections(self, e):
+        self.timer_auc.Stop()
+        if self.stype == READ_CONFIG:
+            devControl.SetDeviceControl(self)
+            thControl.SetDeviceControl(self)
+            if self.ldata['uc']:
+                self.auto_connect()
+        elif self.stype == AUTO_CONNECT:
+            self.auto_connect_service()
 
     def DeviceMonitor(self, e):
         """

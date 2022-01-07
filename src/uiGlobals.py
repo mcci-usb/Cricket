@@ -50,6 +50,9 @@ BAUDRATE = [115200, 115200, 0, 9600]
 
 DEVICES    = ["3141", "3201", "2101", "2301"]
 
+READ_CONFIG = 0
+AUTO_CONNECT = 1
+
 IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
