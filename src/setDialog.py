@@ -47,7 +47,7 @@ class ScanNwThread(threading.Thread):
     A class ScannNwThread with init method.
     using Threading in Scanning the network from client and server.
     """
-    def __init__(self, port, txtsysip, txtctrl,  name="NwScanThread"):
+    def __init__(self, port, txtsysip, txtctrl, btnScan, name="NwScanThread"):
         """
         adding event with threading.
 
@@ -67,6 +67,7 @@ class ScanNwThread(threading.Thread):
         self.port = port
         self.txtctrl = txtctrl
         self.txtsysip = txtsysip
+        self.btnScan = btnScan
         
         threading.Thread.__init__(self, name=name)
  
@@ -100,7 +101,8 @@ class ScanNwThread(threading.Thread):
                 break
             except:
                 s.close()
-        self.txtctrl.SetValue(portip)        
+        self.txtctrl.SetValue(portip)
+        self.btnScan.SetLabel("scan network")    
 
     def join(self, timeout = None):
         """
@@ -318,7 +320,7 @@ class SetWindow(wx.Window):
 
         if self.searchthread != None:
             del self.searchthread
-        self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip)
+        self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip, self.btn_scan)
         self.searchthread.start()
         
     def StopNwScan(self):
