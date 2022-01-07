@@ -682,6 +682,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
 
+        self.Bind(wx.EVT_CLOSE, self.OnAppClose)
+
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         EVT_RESULT(self, self.RunServerEvent)
 
@@ -696,6 +698,7 @@ class UiMainFrame (wx.Frame):
         if sys.platform == 'darwin':
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
             self.Bind(wx.EVT_ICONIZE, self.OnIconize)
+            self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
 
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
@@ -940,6 +943,23 @@ class UiMainFrame (wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
     
+    def OnAppClose (self, event):
+        """
+        Virtual event handlers, overide them in your derived class
+        for Mac Close
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event:event handler for Mac close
+        Returns:
+            None
+        """
+        self.terminateHcServer()
+        self.terminateCcServer()
+        self.Destroy()
+    
     def OnCloseWindow (self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -1038,6 +1058,22 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+    
+    def OnClose(self, event):
+        """
+        click on close application termiante
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling on closing menu.
+        Returns:
+            None
+        """
+
+        self.terminateHcServer()
+        self.terminateCcServer()
+        wx.Exit()
 
     def OnConnectGraph(self, event):
         """
