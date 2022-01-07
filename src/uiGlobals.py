@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.5.0 Mon Nov 01 2021 20:20:05   Seenivasan V
+#     V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.5.0-4"
+APP_VERSION = "2.5.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
