@@ -32,6 +32,7 @@ import shelve
 import os
 import sys
 from sys import platform
+from pathlib import Path
 
 from wx.core import ITEM_CHECK
 
@@ -1391,7 +1392,7 @@ class UiMainFrame (wx.Frame):
     def StoreDevice(self):
         """
         Store the device configuration
-
+        ings
         Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -1403,7 +1404,14 @@ class UiMainFrame (wx.Frame):
         # the filename as it’s parameter not a dict object like others. 
         # This is the base class of shelve which stores pickled object values 
         # in dict objects and string objects as key.
-        ds = shelve.open('CricketSettings.txt')
+
+        lpath = self.get_user_data_dir()
+        dpath = os.path.join(lpath, "MCCI", "Cricket")
+
+        os.makedirs(dpath, exist_ok=True)
+        fpath = os.path.join(dpath, "CricketSettings.txt")
+        
+        ds = shelve.open(fpath)
         ds['port'] = self.selPort
         ds['device'] = self.selDevice
 
@@ -1681,7 +1689,14 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        ds = shelve.open('CricketSettings.txt')
+
+        lpath = self.get_user_data_dir()
+        dpath = os.path.join(lpath, "MCCI", "Cricket")
+
+        os.makedirs(dpath, exist_ok=True)
+        fpath = os.path.join(dpath, "CricketSettings.txt")
+        
+        ds = shelve.open(fpath)
         self.ldata['port'] = ds['port']
         self.ldata['device'] = ds['device']
         
@@ -1820,6 +1835,28 @@ class UiMainFrame (wx.Frame):
                     # Print the message
                     wx.MessageBox("MCCI USB Switch Disconnected !", "Port Error", wx.OK)
                     self.device_no_response()
+                
+    def get_user_data_dir(self):
+        """
+        getting usr directory path, code and installer executes in Local Path
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns: 
+            dpath: local directory path
+        """
+        if sys.platform == "win32":
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+            r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders")
+            dir_,_ = winreg.QueryValueEx(key, "Local AppData")
+            dpath = Path(dir_).resolve(strict=False)
+        elif sys.platform == "darwin":
+            dpath = Path('~/Library/Application Support/').expanduser()
+        else:
+            dpath = Path(getenv('XDG_DATA_HOME', "~/.local/lib")).expanduser()
+        return dpath
 
 def EVT_RESULT(win, func):
     """
