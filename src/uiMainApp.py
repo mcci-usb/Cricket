@@ -53,6 +53,8 @@ from setDialog import *
 from portDialog import *
 #from ccServer import *
 
+import vbusChart
+
 import devControl
 import serialDev
 import control2101
@@ -562,6 +564,10 @@ class UiMainFrame (wx.Frame):
         self.mode = MODE_MANUAL
 
         self.con_flg = False
+        self.vdata = None
+        self.adata = None
+        self.vgraph = None
+        self.agraph = None
 
         self.dev_list = []
 
@@ -596,6 +602,13 @@ class UiMainFrame (wx.Frame):
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
 
+        self.volsAmps = wx.Menu()
+        base = os.path.abspath(os.path.dirname(__file__))
+        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_GRAPH, "VBUS V/I Plot")
+
+        qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
+        self.volsAmps.Append(qmiamps)
+
         # Creating the help menu
         self.helpMenu = wx.Menu()
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
@@ -629,6 +642,7 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&Manage Model")
+        self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
         # First we create a menubar object.
@@ -664,6 +678,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
         self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+
+        self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         EVT_RESULT(self, self.RunServerEvent)
 
         # Timer for monitor the connected devices
@@ -1007,6 +1023,22 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.device_no_response()
+
+    def OnConnectGraph(self, event):
+        """
+        click on volts and amps menu then open the menu with plot frame
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: event handling onconnect menu.
+        Returns:
+            None
+        """
+        self.vgraph = True
+        self.agraph = True
+        self.dlg = vbusChart.VbusChart(self, self)
+        self.dlg.Show()
         
     def device_no_response(self):
         """

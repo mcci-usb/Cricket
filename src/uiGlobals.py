@@ -54,6 +54,7 @@ IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
+IMG_WAVE = "wave.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -131,6 +132,7 @@ ID_MENU_CONFIG_THC = 1104
 
 ID_MENU_SET_SCC = 1105
 ID_MENU_SET_THC = 1106
+ID_MENU_GRAPH = 1110
 
 EVT_RESULT_ID = 1100
 
