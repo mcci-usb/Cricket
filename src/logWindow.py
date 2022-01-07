@@ -83,7 +83,7 @@ class LogWindow(wx.Window):
         self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
                                      style = wx.ALIGN_CENTER)
 
-        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Scan USB Change", size=(95,-1))
+        self.btn_ref = wx.Button(self, ID_BTN_AUTO, "Scan USB Change", size=(110,-1))
 
         self.chk_box = wx.CheckBox(self, -1, label='Show Timestamp')  
           

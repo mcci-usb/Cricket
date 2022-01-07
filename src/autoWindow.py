@@ -654,10 +654,16 @@ class AutoWindow(wx.Window):
         Returns:
             None
         """
-        self.cb_p1.Enable()
-        self.cb_p2.Enable()
-        self.cb_p3.Enable()
-        self.cb_p4.Enable()
+        if self.total_ports == 1:
+            self.cb_p1.Enable()
+        elif self.total_ports == 2:
+            self.cb_p1.Enable()
+            self.cb_p2.Enable()
+        elif self.total_ports == 4:
+            self.cb_p1.Enable()
+            self.cb_p2.Enable()
+            self.cb_p3.Enable()
+            self.cb_p4.Enable()
 
     def disable_ports(self):
 
