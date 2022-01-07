@@ -103,6 +103,7 @@ def connect_device(top):
     """
     if top.devCtrl == "local":
         if top.selDevice == DEV_2101:
+            top.usbHand.scan_2101()
             return top.usbHand.select_usb_device(top.selPort)
         else:
             return top.devHand.open_serial_device(top.selPort,

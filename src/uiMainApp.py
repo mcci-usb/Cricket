@@ -1007,6 +1007,7 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        self.print_on_log("Search Devices ...\n")
         dlg = ComDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
