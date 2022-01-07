@@ -26,10 +26,13 @@
 import wx
 
 # Own modules
+import search
 from uiGlobals import *
 
 import devControl
-
+import json
+import timeit
+import threading
 
 ##############################################################################
 # Utilities
@@ -70,6 +73,7 @@ class ComWindow(wx.Window):
 
         self.top = top
         self.parent = parent
+        self.wait_flg = True
 
         self.dlist = []
 

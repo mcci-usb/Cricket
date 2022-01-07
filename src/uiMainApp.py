@@ -33,6 +33,7 @@ import os
 import sys
 from sys import platform
 from pathlib import Path
+from os import getenv
 
 from wx.core import ITEM_CHECK
 
