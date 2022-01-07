@@ -93,7 +93,7 @@ class VbusChart(wx.Frame):
         self.tc_xlim.SetMaxLength(3)
         
         self.btnSet = wx.Button(self.panel, -1, "Set", size =  (50,-1))
-        self.btnPause = wx.Button(self.panel, -1, "Pause", size =  (60,-1))
+        self.btnPause = wx.Button(self.panel, -1, "Pause", size =  (70,-1))
         self.btnLoad = wx.Button(self.panel, -1, 'Load', size =  (50,-1))
         self.btnSave = wx.Button(self.panel, -1, 'Save', size =  (50,-1))
 
