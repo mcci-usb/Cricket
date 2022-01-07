@@ -19,13 +19,14 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
+#    V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
 # Built-in imports
 import os
 import socket
+import os
 
 # Lib imports
 import wx
@@ -47,7 +48,7 @@ class ScanNwThread(threading.Thread):
     A class ScannNwThread with init method.
     using Threading in Scanning the network from client and server.
     """
-    def __init__(self, port, txtsysip, txtctrl,  name="NwScanThread"):
+    def __init__(self, port, txtsysip, txtctrl, btnScan, name="NwScanThread"):
         """
         adding event with threading.
 
@@ -67,6 +68,7 @@ class ScanNwThread(threading.Thread):
         self.port = port
         self.txtctrl = txtctrl
         self.txtsysip = txtsysip
+        self.btnScan = btnScan
         
         threading.Thread.__init__(self, name=name)
  
@@ -100,7 +102,8 @@ class ScanNwThread(threading.Thread):
                 break
             except:
                 s.close()
-        self.txtctrl.SetValue(portip)        
+        self.txtctrl.SetValue(portip)
+        self.btnScan.SetLabel("scan network")    
 
     def join(self, timeout = None):
         """
@@ -127,7 +130,9 @@ class ScanNwThread(threading.Thread):
         Returns:
             hostcomputer ipaddress
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
 
 
 class SetWindow(wx.Window):
@@ -316,7 +321,7 @@ class SetWindow(wx.Window):
 
         if self.searchthread != None:
             del self.searchthread
-        self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip)
+        self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip, self.btn_scan)
         self.searchthread.start()
         
     def StopNwScan(self):
@@ -377,7 +382,9 @@ class SetWindow(wx.Window):
         Returns:
             None
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
         
                 
 class SetDialog(wx.Dialog):

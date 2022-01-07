@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#    V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -103,6 +103,7 @@ def connect_device(top):
     """
     if top.devCtrl == "local":
         if top.selDevice == DEV_2101:
+            top.usbHand.scan_2101()
             return top.usbHand.select_usb_device(top.selPort)
         else:
             return top.devHand.open_serial_device(top.selPort,
@@ -320,6 +321,6 @@ def device_connected(top):
     top.UpdatePort()
     top.UpdateDevice()
     top.UpdateSingle("Connected", 3)
-    top.print_on_log("Model "+DEVICES[top.selDevice]
+    top.print_on_log("MCCI USB Switch "+DEVICES[top.selDevice]
                                         +" Connected!\n")
     top.device_connected()

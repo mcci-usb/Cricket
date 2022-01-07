@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lip imports
@@ -77,6 +77,7 @@ class Dev2301Window(wx.Window):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         self.timer_va = wx.Timer(self)
+        self.timer_vu = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
         
@@ -168,7 +169,7 @@ class Dev2301Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
-        sb = wx.StaticBox(self, -1, "Model 2301")
+        sb = wx.StaticBox(self, -1, "MCCI USB Switch  2301")
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
 
         self.vbox.AddMany([
@@ -189,6 +190,7 @@ class Dev2301Window(wx.Window):
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
+        self.Bind(wx.EVT_TIMER, self.GraphTimer, self.timer_vu)
         # Bind the button event to handler
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p1)
@@ -205,6 +207,7 @@ class Dev2301Window(wx.Window):
         self.btnStat = [False, False, False, False]
         
         self.enable_controls(False)
+        self.timer_vu.Start(50)
 
     def OnOffPort (self, e):
         """
@@ -258,12 +261,12 @@ class Dev2301Window(wx.Window):
             outstr = "Comm Error\n"
         else:
             outstr.replace(' ', '')
-            vstr = outstr.split('\n')
-            iv = int(vstr[0])
-            fv = iv/100
-            outstr = str(fv) + "V"
-            self.update_volts(outstr)
-        self.top.print_on_log("Volts : "+outstr+"\n")
+            if outstr != "":
+                vstr = outstr.split('\n')
+                iv = int(vstr[0])
+                self.fv = iv/100
+                outstr = str(self.fv) + "V"
+                self.update_volts(outstr)
 
     def AmpsCmd(self, evt):
         """
@@ -298,18 +301,19 @@ class Dev2301Window(wx.Window):
             outstr = "Comm Error\n"
         else:
             outstr.replace(' ', '')
-            astr = outstr.split('\n')
-            sstr = astr[0][:1]
-            rstr = astr[0][1:]
-            ia = int(rstr) 
-            fa =  ia/100 
-            ss = ""
-            if(sstr == '1'):
-                ss = "-"
-            outstr = ss + str(fa) + "A"
+            if outstr != "":
+                astr = outstr.split('\n')
+                sstr = astr[0][:1]
+                rstr = astr[0][1:]
+                ia = int(rstr) 
+                fa =  ia/100 
+                ss = ""
+                if(sstr == '1'):
+                    ss = "-"
+                outstr = ss + str(fa) + "A"
 
-            self.update_amps(outstr)
-        self.top.print_on_log("Amps : "+outstr+"\n")
+                self.update_amps(outstr)
+        #self.top.print_on_log("Amps : "+outstr+"\n")
     
     def PortSpeedChanged(self, e):
         """
@@ -380,6 +384,33 @@ class Dev2301Window(wx.Window):
         self.get_voltage()
         # Check amps
         self.get_amps()
+    
+    def GraphTimer(self, e):
+        """
+        once start the volts and amps plotting timer start from here.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: event handling of volts and amps.
+        Returns:
+            None
+       """
+        self.timer_vu.Stop()
+        # Check voltage
+        if(self.top.vgraph):
+            self.get_voltage()
+            #self.top.vnew = True
+            #self.top.vdata = fv
+        
+        # Check amps
+        if(self.top.agraph):
+            self.get_amps()
+            #self.top.anew = True
+            #self.top.adata = self.fa
+        
+        self.timer_vu.Start()
       
     def port_on_manual(self, port):
         """

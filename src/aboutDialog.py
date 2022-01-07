@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
+#     V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -70,8 +70,8 @@ class AboutWindow(wx.Window):
         self.text = [ wx.StaticText(self, -1, VERSION_NAME),
                       wx.StaticText(self, -1, VERSION_ID ),
                       wx.StaticText(self, -1,  VERSION_STR),
-                      wx.StaticText(self, -1, VERSION_COPY),
-                      wx.StaticText(self, -1, "All rights reserved.\n\n")
+                      wx.StaticText(self, -1, VERSION_COPY, style=wx.ALIGN_CENTER),
+                      wx.StaticText(self, -1, "\nAll rights reserved.\n\n")
                     ]
         self.image.Bind(wx.EVT_LEFT_UP, self.OnClick)
         for i in self.text:
@@ -90,7 +90,7 @@ class AboutWindow(wx.Window):
         # A vertical box sizer is applied to a panel object, 
         # which is placed inside wxFrame window.
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        widgets = [ (self.image, 1, wx.EXPAND) ]
+        widgets = [ (self.image, 1, wx.CENTER) ]
         for i in self.text:
             widgets.extend([ (i, 0, wx.CENTER) ])
         

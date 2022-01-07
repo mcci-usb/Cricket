@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#     V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.4.0"
+APP_VERSION = "2.5.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -50,10 +50,14 @@ BAUDRATE = [115200, 115200, 0, 9600]
 
 DEVICES    = ["3141", "3201", "2101", "2301"]
 
+READ_CONFIG = 0
+AUTO_CONNECT = 1
+
 IMG_ICON = "mcci_logo.ico"
 IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
+IMG_WAVE = "wave.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -132,6 +136,7 @@ ID_MENU_CONFIG_THC = 1104
 ID_MENU_SET_SCC = 1105
 ID_MENU_SET_THC = 1106
 
+ID_MENU_GRAPH = 1110
 EVT_RESULT_ID = 1100
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
@@ -158,7 +163,7 @@ usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-21 MCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-22\nMCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 

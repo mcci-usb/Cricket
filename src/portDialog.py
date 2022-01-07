@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V 
+#    V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -201,7 +201,9 @@ class PortWindow(wx.Window):
         Returns:
             return (socket.gethostbyname_ex(socket.gethostname())[2])
         """
-        return (socket.gethostbyname_ex(socket.gethostname())[2])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 88))
+        return (s.getsockname())
         
         
 class PortDialog(wx.Dialog):

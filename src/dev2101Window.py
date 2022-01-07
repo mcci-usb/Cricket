@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.4.0 Wed July 14 2021 15:20:05   Seenivasan V
+#    V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
 #       Module created
 ##############################################################################
 #Lib imports
@@ -77,7 +77,7 @@ class Dev2101Window(wx.Panel):
         # Call this to give the sizer a minimal size.
         self.SetMinSize((280, 140))
         # Create a staticbox naming as  Model2101 
-        sb = wx.StaticBox(self, -1, "Model 2101")
+        sb = wx.StaticBox(self, -1, "MCCI USB Switch 2101")
         # BoxSizer fixed with Vertical
         self.vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
         # BoxSizer fixed with Horizontal
@@ -221,7 +221,7 @@ class Dev2101Window(wx.Panel):
             thControl.get_tree_change(self.top)
         except:
             # To print on usb tree view change "USB Read Error!"
-            self.top.print_on_usb("USB Read Error!")
+            self.top.print_on_log("USB Read Error!")
         self.usb_flg = False
       
     def port_on_manual(self, port):
