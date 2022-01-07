@@ -43,7 +43,6 @@ import dev2101Window
 import dev2301Window
 import loopWindow
 import logWindow
-import treeWindow
 import autoWindow
 
 import getusb
@@ -127,7 +126,6 @@ class UiPanel(wx.Panel):
         self.logPan = logWindow.LogWindow(self, parent)
         self.loopPan = loopWindow.LoopWindow(self, parent)
         #self.comPan = comWindow.ComWindow(self, parent)
-        self.treePan = treeWindow.UsbTreeWindow(self, parent)
         self.autoPan = autoWindow.AutoWindow(self, parent)
         
         self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
@@ -167,7 +165,6 @@ class UiPanel(wx.Panel):
 
         self.vboxr = wx.BoxSizer(wx.VERTICAL)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
-        self.vboxr.Add(self.treePan, 1, wx.ALIGN_RIGHT | wx.EXPAND)
         self.vboxr.Add((0,20), 0, wx.EXPAND)
 
        # BoxSizer fixed with Horizontal
@@ -297,23 +294,6 @@ class UiPanel(wx.Panel):
         """
         self.logPan.print_on_log(strin)
     
-    def print_on_usb(self, strin):
-        """
-        print usb device info on treewindow and Logwindow.
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: String which contains list of devices with VID, PID and 
-            Speed info
-        Returns:
-            None
-        """
-        self.treePan.print_on_usb(strin)
-        if(self.logPan.is_usb_enabled()):
-            self.logPan.print_on_log(strin+"\n")
-    
     def get_enum_delay(self):
         """
         Get the USB Enumaration delay 
@@ -325,7 +305,7 @@ class UiPanel(wx.Panel):
         Returns:
             String - USB Enumeration delay 
         """
-        return self.treePan.get_enum_delay()
+        return self.logPan.get_enum_delay()
       
     def get_delay_status(self):
         """
@@ -338,7 +318,7 @@ class UiPanel(wx.Panel):
         Returns:
             Boolean - Status of the delay check box
         """
-        return self.treePan.get_delay_status()
+        return self.logPan.get_delay_status()
     
     def get_interval(self):
         """
@@ -378,7 +358,7 @@ class UiPanel(wx.Panel):
         Returns: 
             None
         """
-        self.treePan.disable_usb_scan()
+        self.logPan.disable_usb_scan()
     
     def get_loop_param(self):
         """
@@ -465,7 +445,6 @@ class UiPanel(wx.Panel):
         self.devObj[self.parent.selDevice].update_controls(mode)
         self.loopPan.update_controls(mode)
         self.autoPan.update_controls(mode)
-        self.treePan.update_controls(mode)
     
     def device_connected(self):
         """
@@ -1090,20 +1069,6 @@ class UiMainFrame (wx.Frame):
             return None
         """
         self.panel.PrintLog(strin)
-    
-    def print_on_usb(self, strin):
-        """
-        Show data in USB Device Tree View
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: data in String format
-        Returns:
-            None
-        """
-        self.panel.print_on_usb(strin)
     
     def get_enum_delay(self):
         """

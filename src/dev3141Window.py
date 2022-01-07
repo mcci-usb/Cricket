@@ -236,7 +236,7 @@ class Dev3141Window(wx.Panel):
             thControl.get_tree_change(self.top)
         except:
             # To print on usb tree view change "USB Read Error!"
-            self.top.print_on_usb("USB Read Error!")
+            self.top.print_on_log("USB Read Error!")
         self.usb_flg = False
   
     def DoTimer(self, e):

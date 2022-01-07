@@ -306,7 +306,7 @@ class LoopWindow(wx.Window):
         try:
             thControl.get_tree_change(self.top)
         except:
-            self.top.print_on_usb("USB Read Error!")
+            self.top.print_on_log("USB Read Error!")
         self.usb_flg = False
         
         if(self.start_flg == True & self.pulse_flg == True):
