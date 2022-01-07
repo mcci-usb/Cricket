@@ -321,6 +321,6 @@ def device_connected(top):
     top.UpdatePort()
     top.UpdateDevice()
     top.UpdateSingle("Connected", 3)
-    top.print_on_log("Model "+DEVICES[top.selDevice]
+    top.print_on_log("MCCI USB Switch "+DEVICES[top.selDevice]
                                         +" Connected!\n")
     top.device_connected()

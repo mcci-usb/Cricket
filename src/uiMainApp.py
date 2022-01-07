@@ -3,8 +3,8 @@
 # Module: uiMainApp.py
 #
 # Description:
-#     Main Application body for the Model3201,Model3141 
-#     and Model2101 GUI Application
+#     Main Application body for the MCCI USB Switch 3201,MCCI USB Switch 3141 
+#     and MCCI USB Switch 2101 GUI Application
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -612,9 +612,9 @@ class UiMainFrame (wx.Frame):
         # Creating the help menu
         self.helpMenu = wx.Menu()
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
-        self.helpMenu.Append(ID_MENU_HELP_3201, "Visit Model 3201")
-        self.helpMenu.Append(ID_MENU_HELP_2101, "Visit Model 2101")
-        self.helpMenu.Append(ID_MENU_HELP_2301, "Visit Model 2301")
+        self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
+        self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
+        self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
         self.helpMenu.AppendSeparator()
         self.helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
         self.helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
@@ -641,7 +641,7 @@ class UiMainFrame (wx.Frame):
        
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
-        self.menuBar.Append(self.comMenu,     "&Manage Model")
+        self.menuBar.Append(self.comMenu,     "&MCCI USB Switch")
         self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
@@ -1064,7 +1064,7 @@ class UiMainFrame (wx.Frame):
         srlist.append("Disconnected")
         self.UpdateAll(srlist)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
@@ -1278,7 +1278,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.print_on_log("Model "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Swicth "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()
@@ -1817,7 +1817,7 @@ class UiMainFrame (wx.Frame):
                 else:
                     self.con_flg = False
                     # Print the message
-                    wx.MessageBox("Model Disconnected !", "Port Error", wx.OK)
+                    wx.MessageBox("MCCI USB Switch Disconnected !", "Port Error", wx.OK)
                     self.device_no_response()
 
 def EVT_RESULT(win, func):

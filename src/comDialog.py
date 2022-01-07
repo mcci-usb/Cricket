@@ -3,7 +3,7 @@
 # Module: comDialog.py
 #
 # Description:
-#     Dialog to show list of available Models (3141, 3201, 2101 and 2301)
+#     Dialog to show list of available MCCI USB Switch (3141, 3201, 2101 and 2301)
 #     Search, view, select and connect module
 #
 # Copyright notice:
@@ -115,7 +115,7 @@ class ComWindow(wx.Window):
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
         self.btn_scan.SetToolTip(wx.ToolTip("Search for the attached USB"
-                                            "Models (3141, 3201, 2101,2301)"))  
+                                            "MCCI USB Switch(3141, 3201, 2101,2301)"))  
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         # Bind the button event to handler
@@ -191,11 +191,11 @@ class ComWindow(wx.Window):
                 self.cb_device.SetSelection(0)
                 self.btn_connect.Enable()
                 # Device is found update in status bar Model(s) found
-                self.top.UpdateSingle("MCCI USB Switch(s) found", 3)
+                self.top.UpdateSingle("Switch(s) found", 3)
             else:
                 self.btn_connect.Disable()
                 # Device is not found update in status bar No Models found
-                self.top.UpdateSingle("No MCCI USB Switch found", 3)
+                self.top.UpdateSingle("No Switch found", 3)
    
     def ConnectDevice(self, evt):
         """
@@ -290,7 +290,7 @@ class ComWindow(wx.Window):
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.top.print_on_log("Model "+DEVICES[self.top.selDevice]
+        self.top.print_on_log("MCCI USB Swicth "+DEVICES[self.top.selDevice]
                                               +" Connected!\n")
         self.top.device_connected()
         self.parent.EndModal(True)
@@ -352,10 +352,10 @@ class ComDialog(wx.Dialog):
         Returns:
             None
         """
-        wx.Dialog.__init__(self, parent, -1, "Manage Model",
+        wx.Dialog.__init__(self, parent, -1, "MCCI USB Switch",
                            size=wx.Size(100, 100),
                            style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
-                           name="Model Search Dialog")
+                           name="MCCI USB Switch Search Dialog")
 
         self.top = top
         self.win = ComWindow(self, top)
