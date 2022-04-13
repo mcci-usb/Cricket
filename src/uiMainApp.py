@@ -1330,7 +1330,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.print_on_log("MCCI USB Swicth "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()
@@ -1485,7 +1485,7 @@ class UiMainFrame (wx.Frame):
 
     def OnSelectScc (self, event):
         """
-        if User computer menu ISCHECKED , Swicth control 
+        if User computer menu ISCHECKED , Switch control 
         computer act as SCC server
         Args:
             self: The self parameter is a reference to the current 
