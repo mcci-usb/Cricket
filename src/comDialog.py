@@ -294,7 +294,7 @@ class ComWindow(wx.Window):
         self.top.UpdateDevice()
         self.top.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.top.print_on_log("MCCI USB Swicth "+DEVICES[self.top.selDevice]
+        self.top.print_on_log("MCCI USB Switch "+DEVICES[self.top.selDevice]
                                               +" Connected!\n")
         self.top.device_connected()
         self.parent.EndModal(True)
