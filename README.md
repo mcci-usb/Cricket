@@ -235,6 +235,8 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  ![Model2301](assets/Model2301.png)
 
  ## Release History
+- HEAD has the following changes.
+  - misspelling in the log window instead of Switch it was spelled as Swicth [#61](https://github.com/mcci-usb/Cricket/commit/1344384596efdfd3288ef40bea38c8149b2039f6).
 - v2.5.0 is major release; it Contains the following changes
   -	Feature added – Plotting of VBUS Volt and Current `VBUS V/I Plotting` [#18 #48 #52](https://github.com/mcci-usb/Cricket/commit/eb30f3b4a2e1da2c21db470315a8489b19d7b87d).
   - USB Tree view removed and merged with Logwindow `Replaced USB Tree view window to Log Window` [#24](https://github.com/mcci-usb/Cricket/issues/24).
