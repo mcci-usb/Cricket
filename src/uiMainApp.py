@@ -1330,7 +1330,7 @@ class UiMainFrame (wx.Frame):
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
         # Print on logwindow
-        self.print_on_log("MCCI USB Swicth "+DEVICES[self.selDevice]
+        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()
