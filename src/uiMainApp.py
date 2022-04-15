@@ -651,6 +651,7 @@ class UiMainFrame (wx.Frame):
 
         # First we create a menubar object.
         self.SetMenuBar(self.menuBar)
+        self.menuBar.EnableTop(4, False)
         
         # set menubar
         self.menuBar = self.GetMenuBar()
@@ -1338,6 +1339,20 @@ class UiMainFrame (wx.Frame):
         self.update_connect_menu(False)
         self.set_mode(MODE_MANUAL)
         self.update_port_timer()
+        self.enable_graph_menu(True)
+    
+    def enable_graph_menu(self, status):
+        if status == False:
+            self.menuBar.EnableTop(4, False)
+        else:
+            if DEVICES[self.selDevice] == "3141":
+                self.menuBar.EnableTop(4, False)
+            elif DEVICES[self.selDevice] == "3201":
+                self.menuBar.EnableTop(4, True)
+            elif DEVICES[self.selDevice] == "2101":
+                self.menuBar.EnableTop(4, False)
+            elif DEVICES[self.selDevice] == "2301":
+                self.menuBar.EnableTop(4, True)
 
     def update_connect_menu(self, status):
         """
@@ -1374,6 +1389,7 @@ class UiMainFrame (wx.Frame):
         """
         self.panel.device_disconnected()
         self.update_connect_menu(True)
+        self.enable_graph_menu(False)
     
     def update_usb_status(self, dl):
         """
