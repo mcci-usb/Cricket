@@ -167,17 +167,14 @@ class UiPanel(wx.Panel):
         self.vboxl.Add(self.logPan, 1, wx.EXPAND)
         self.vboxl.Add((0,20), 0, wx.EXPAND)
 
-        self.vboxr = wx.BoxSizer(wx.VERTICAL)
-        self.vboxr.Add((0,20), 0, wx.EXPAND)
-        self.vboxr.Add((0,20), 0, wx.EXPAND)
 
        # BoxSizer fixed with Horizontal
         self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
         self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
         self.hboxm.Add((20,0), 1, wx.EXPAND)
-        self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
-        self.hboxm.Add((20,0), 1, wx.EXPAND)
+        # self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
+        # self.hboxm.Add((20,0), 1, wx.EXPAND)
         
         # Set size of frame
         self.SetSizer(self.hboxm)
@@ -203,7 +200,7 @@ class UiPanel(wx.Panel):
         """
         self.vboxl.Show(self.vboxl)
         self.vboxl.Show(self.hboxdl)
-        self.hboxm.Show(self.vboxr)
+        #self.hboxm.Show(self.vboxr)
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
@@ -224,7 +221,7 @@ class UiPanel(wx.Panel):
         Returns:
             None
         """
-        self.hboxm.Hide(self.vboxr)
+        #self.hboxm.Hide(self.vboxr)
         self.logPan.show_usb_ctrls(False)
         self.vboxl.Show(self.logPan)
         self.hboxm.Show(self.vboxl)
@@ -268,7 +265,7 @@ class UiPanel(wx.Panel):
             None
         """
         self.hboxm.Hide(self.vboxl)
-        self.hboxm.Hide(self.vboxr)
+        #self.hboxm.Hide(self.vboxr)
         self.Layout()
 
     def remove_dev_panels(self):
@@ -521,17 +518,15 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(630, 710), style= wx.SYSTEM_MENU | 
-                          wx.CAPTION | wx.CLOSE_BOX | wx.MINIMIZE_BOX)
-
+                          size=wx.Size(630, 710))
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
 
         self.SetPosition((80,self.ytop))
 
-        self.SetMinSize((630, 710))
-        self.SetMaxSize((630, 710))
+        # self.SetMinSize((630, 710))
+        # self.SetMaxSize((630, 710))
         self.CenterOnScreen()
 
 
