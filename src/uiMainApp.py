@@ -92,7 +92,7 @@ class MultiStatus (wx.StatusBar):
         # Sets the number of field count "5"
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
-        self.SetStatusWidths([-1, -1, -3, -2, -10])
+        self.SetStatusWidths([-2, -2, -2, -2, -10])
 
 class UiPanel(wx.Panel):
     """
