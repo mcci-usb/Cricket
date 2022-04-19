@@ -236,6 +236,7 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
  ## Release History
 - HEAD has the following changes.
+  - Minimizing and maximizing the application [#60] (https://github.com/mcci-usb/Cricket/commit/f6bb6a8a79cf8ccf69931c288e1e417574cf8fe4)
   - Disable VBUS V/I monitor if switch doesn't support [#63](https://github.com/mcci-usb/Cricket/commit/2c569d5131f1f04fa3e802f67e04ded35b80b802)
   - misspelling in the log window instead of Switch it was spelled as Swicth [#61](https://github.com/mcci-usb/Cricket/commit/1344384596efdfd3288ef40bea38c8149b2039f6).
 - v2.5.0 is major release; it Contains the following changes

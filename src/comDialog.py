@@ -127,10 +127,26 @@ class ComWindow(wx.Window):
         self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.SearchTimer, self.timer_lp)
 
         EVT_RESULT(self, self.SearchEvent)
-        wx.PostEvent(self, SearchSwitch("search"))
+        self.timer_lp.Start(1500)
 
+    def SearchTimer(self, evt):
+        """
+        while Searching the Device timer start.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt: event start for Search timer.
+        Returns:
+            None
+        """
+        wx.PostEvent(self, SearchSwitch("search"))
+        self.timer_lp.Stop()
+        
     def ScanDevice(self, evt):
         """
         Scan the list of connected devices over the USB bus
