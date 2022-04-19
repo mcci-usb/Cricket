@@ -36,6 +36,25 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
+def filter_port():
+    """
+    filter the Comports list from list UI supported Switch with same VID and PID.
+    Args:
+        No argument
+    Return:
+        port_name -  list of availablable port numbers and serial number of 
+        the 2101     
+    """
+    usb_hwid_str = ["USB VID:PID=045E:0646", "USB VID:PID=2341:0042"]
+    comlist = serial.tools.list_ports.comports()
+    port_name = []
+
+    for port, desc, hwid in sorted(comlist):
+        res = [True for gnhwid in usb_hwid_str if(gnhwid in hwid)]
+        if(res):
+            port_name.append(port)
+    return port_name
+
 def check_port(usbHand):
     """
     Scan the USB port and collect all the device under a list
@@ -67,13 +86,20 @@ def search_port(usbHand):
         Model number
     """
     # It will print a list of available ports
-    comlist = serial.tools.list_ports.comports()
+
     port_name = []
+
+    # comlist = serial.tools.list_ports.comports()
+    # for port, desc, hwid in sorted(comlist):
+    #     port_name.append(port)
+    port_name = filter_port()
+
+    #port_name = []
     rev_list = []
     dev_list = []
 
-    for port, desc, hwid in sorted(comlist):
-        port_name.append(port)
+    #for port, desc, hwid in sorted(comlist):
+    #    port_name.append(port)
     
     for i in range(len(port_name)):
         try:
