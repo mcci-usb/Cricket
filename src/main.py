@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V2.5.0 Fri Jan 07 2022 17:40:05   Seenivasan V
+#    V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -30,10 +30,10 @@ import uiMainApp
 __author__ = 'Seenivasan V'
 __contact__ = 'seenivasanv@mcci.com'
 __credits__ = ['Terry Moore', 'Velmurugan Selvaraj']
-__date__ = '2021/07/12'
+__date__ = '2022/04/20'
 __maintainer__ = ['Seenivasan V', 'Vinay N']
 __status__ = 'Production'
-__version__ = '2.3.14'
+__version__ = '2.6.0'
 ##############################################################################
 # Utilities
 ##############################################################################
