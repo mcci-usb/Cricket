@@ -48,7 +48,6 @@ Development environment
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 1.16.0
-* pyinstaller - 3.6 
 
 Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install
 
@@ -59,7 +58,6 @@ pip install pyusb
 pip install libusb
 pip install libusb1
 pip install matplotlib
-pip install pyinstaller
 ```
 
 <strong>On Linux OS:</strong>
@@ -76,7 +74,6 @@ Development environment
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 3.5
-* pyinstaller - 4.6
 
 ```shell
 sudo apt-get update
@@ -88,7 +85,6 @@ sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
 sudo pip3 install matplotlib
-sudo pip3 install pyinstaller
 ```
 
 Note:
@@ -107,7 +103,6 @@ Development environment
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 3.2.2 
-* pyinstaller - 4.6
 * hidapi - 0.10.1  - Only for Mac OS
 
 ```shell
@@ -120,7 +115,6 @@ sudo pip3 install pyusb
 brew install libusb
 sudo pip3 install libusb1
 sudo pip3 install matplotlib
-sudo pip3 install pyinstaller
 brew install hidapi - Only for Mac OS
 ```
 
@@ -136,7 +130,6 @@ Development environment
 * libusb - 1.0.23b7
 * libusb1 - 1.9
 * matplotlib - 1.14.0
-* pyinstaller - 4.2
 
 ```shell
 sudo add-apt-repository ppa:swt-techie/wxpython4
@@ -147,7 +140,6 @@ sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
 sudo pip3 install matplotlib
-sudo pip3 install pyinstaller
 ```
 
 Note:
