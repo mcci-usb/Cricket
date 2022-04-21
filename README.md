@@ -1,9 +1,9 @@
-# CricketUI
+# Cricket UI
 
 Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
 
 <!-- /TOC -->
-[![Git release](https://img.shields.io/badge/release-v2.5.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.5.0-4-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.5.0...master)
+[![Git release](https://img.shields.io/badge/release-v2.6.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.6.0-5-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
 
@@ -227,13 +227,13 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  ![Model2301](assets/Model2301.png)
 
  ## Release History
-- HEAD has the following changes.
+- v2.6.0 is a patch release.
   - Device search dialog goes blank until complete the search [#70](https://github.com/mcci-usb/Cricket/commit/7fe8957ab618dff0510e72076c24afb81a85fb51)
   - App not responding when other com port devices(Non MCCI USB Switchs) attached to the system USB & Slow search for switches [#59](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a) [#65](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a)
   - Minimizing and maximizing the application [#60](https://github.com/mcci-usb/Cricket/commit/f6bb6a8a79cf8ccf69931c288e1e417574cf8fe4)
   - Disable VBUS V/I monitor if switch doesn't support [#63](https://github.com/mcci-usb/Cricket/commit/2c569d5131f1f04fa3e802f67e04ded35b80b802)
   - misspelling in the log window instead of Switch it was spelled as Swicth [#61](https://github.com/mcci-usb/Cricket/commit/1344384596efdfd3288ef40bea38c8149b2039f6).
-- v2.5.0 is major release; it Contains the following changes
+- v2.5.0 is major release it Contains the following changes
   -	Feature added – Plotting of VBUS Volt and Current `VBUS V/I Plotting` [#18 #48 #52](https://github.com/mcci-usb/Cricket/commit/eb30f3b4a2e1da2c21db470315a8489b19d7b87d).
   - USB Tree view removed and merged with Logwindow `Replaced USB Tree view window to Log Window` [#24](https://github.com/mcci-usb/Cricket/issues/24).
   - Perform device Search in advance, Device searching automatically or manually seaching the device `USB Switch Scanning` [#30](https://github.com/mcci-usb/Cricket/issues/30).
