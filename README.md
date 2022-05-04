@@ -227,6 +227,8 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  ![Model2301](assets/Model2301.png)
 
  ## Release History
+ - Head has the following changes
+  - update the version tag [#75](https://github.com/mcci-usb/Cricket/commit/60b52983a71e6fd05813e7bd727a9ba21e261eb8)
 - v2.6.0 is a patch release.
   - Device search dialog goes blank until complete the search [#70](https://github.com/mcci-usb/Cricket/commit/7fe8957ab618dff0510e72076c24afb81a85fb51)
   - App not responding when other com port devices(Non MCCI USB Switchs) attached to the system USB & Slow search for switches [#59](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a) [#65](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a)
