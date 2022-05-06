@@ -3,7 +3,7 @@
 Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
 
 <!-- /TOC -->
-[![Git release](https://img.shields.io/badge/release-v2.6.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.6.0-5-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
+[![Git release](https://img.shields.io/badge/release-v2.6.1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.6.1-9-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
 
@@ -190,7 +190,7 @@ MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser
 
 * The MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
 
- **Link:** For more information, see the product home page at [MCCI USB switch 3201 Enhanced type-c connection exerciser](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
+ **Link:** For more information, see the product home page at [MCCI USB switch 3201](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
  
    ![Model3201-typeC](assets/Model3201.png)
    
@@ -201,7 +201,7 @@ MCCI USB Switch 3141
 * The MCCI® USB 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
 The MCCI USB Switch 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB Switch 3141 usb switch](https://mcci.com/usb/dev-tools/model-3141/).
+ **Link:** For more information, see the product home page at [MCCI USB Switch 3141](https://mcci.com/usb/dev-tools/model-3141/).
  
   ![Model3141-typeC](assets/TypeC3141.PNG)
   
@@ -212,7 +212,7 @@ MCCI USB Switch 2101 USB Connection Exerciser
 * The MCCI USB 3.0 Connection Exerciser MCCI USB Switch 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.  
 The MCCI USB 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB Switch 2101 usb connection exerciser](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/).
+ **Link:** For more information, see the product home page at [MCCI USB Switch 2101](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/).
  
   ![Model3201](assets/Model2101.png)
   
@@ -222,12 +222,12 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
 * The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
 
- **Link:** For more information, see the product home page at [MCCI Switch 2301 usb connection exerciser](https://mcci.com/usb/dev-tools/model-2301/).
+ **Link:** For more information, see the product home page at [MCCI USB Switch 2301](https://mcci.com/usb/dev-tools/model-2301/).
 
  ![Model2301](assets/Model2301.png)
 
  ## Release History
- - Head has the following changes
+- v2.6.1 is a patch release.
   - update the version tag [#75](https://github.com/mcci-usb/Cricket/commit/60b52983a71e6fd05813e7bd727a9ba21e261eb8)
 - v2.6.0 is a patch release.
   - Device search dialog goes blank until complete the search [#70](https://github.com/mcci-usb/Cricket/commit/7fe8957ab618dff0510e72076c24afb81a85fb51)
