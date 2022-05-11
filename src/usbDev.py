@@ -21,6 +21,8 @@
 #    V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
+import copy
+
 # Own modules
 import getusb
 from uiGlobals import *
@@ -59,11 +61,32 @@ def get_tree_change(top, dl, newlist):
             
     # Save usb device list
     top.save_usb_list(newlist)
+
+    newset =  [i for n, i in enumerate(newlist) if i not in newlist[n + 1:]]
+
+    unewlist = copy.deepcopy(newlist)    
+    for i in newset:
+        rcnt = 0
+        for j in unewlist:
+            if(i == j):
+                rcnt = rcnt + 1
+                j["count"] = rcnt
+
+    oldset =  [i for n, i in enumerate(oldlist) if i not in oldlist[n + 1:]]
+
+    uoldlist = copy.deepcopy(oldlist)
+
+    for i in oldset:
+        rcnt = 0
+        for j in uoldlist:
+            if(i == j):
+                rcnt = rcnt + 1
+                j["count"] = rcnt
     
     strchg = None
 
-    adlist = [i for i in newlist if i not in oldlist]
-    rmlist = [i for i in oldlist if i not in newlist]
+    adlist = [i for i in unewlist if i not in uoldlist]
+    rmlist = [i for i in uoldlist if i not in unewlist]
 
     strout = ""
     
