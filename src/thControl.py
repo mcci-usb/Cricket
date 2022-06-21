@@ -29,6 +29,7 @@ import thClient as thnw
 import usbDev as thlocal
 import socket
 import json
+import sys
 
 from uiGlobals import *
 
@@ -81,6 +82,11 @@ def get_tree_change(top):
     if top.thCtrl == "local":
         dl, newlist = thlocal.get_usb_tree()
         thlocal.get_tree_change(top, dl, newlist)
+        
+        if sys.platform == "darwin":
+            newdict = thlocal.get_tb_tree()
+            thlocal.get_tb_tree_change(top, newdict)
+
     elif top.thCtrl == "network":
         resdict = thnw.get_usb_tree(top.ldata['thcid'],
                                 int(top.ldata['sthcpn']))
