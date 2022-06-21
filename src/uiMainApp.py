@@ -970,7 +970,7 @@ class UiMainFrame (wx.Frame):
         self.terminateHcServer()
         self.terminateCcServer()
         time.sleep(1)
-        wx.Exit
+        wx.Exit()
 
     
     def OnCloseWindow (self, event):
