@@ -48,6 +48,8 @@ import logWindow
 import autoWindow
 
 import getusb
+import getTb
+from copy import deepcopy
 
 from aboutDialog import *
 from comDialog import *
@@ -571,6 +573,7 @@ class UiMainFrame (wx.Frame):
         self.dev_list = []
 
         self.masterList = []
+        self.tbMasterList = None
         
         self.panel = UiPanel(self)
         
@@ -696,6 +699,7 @@ class UiMainFrame (wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
             self.Bind(wx.EVT_ICONIZE, self.OnIconize)
             self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
+            self.Bind(wx.EVT_CLOSE, self.OnCloseAPP)
 
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
@@ -706,6 +710,11 @@ class UiMainFrame (wx.Frame):
         self.update_usb_status(td)
         self.print_on_log("Reading Configuration ...\n")
 
+        # scan and save ThunderBolt USB device
+        if sys.platform == "darwin":
+            tbList = getTb.scan_tb()
+            self.save_tb_list(tbList)
+        
         try:
             self.LoadDevice()
             
@@ -957,6 +966,13 @@ class UiMainFrame (wx.Frame):
         self.terminateCcServer()
         self.Destroy()
     
+    def OnCloseAPP(self, event):
+        self.terminateHcServer()
+        self.terminateCcServer()
+        time.sleep(1)
+        wx.Exit
+
+    
     def OnCloseWindow (self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -1130,7 +1146,11 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.masterList = mlist[:]  
-    
+
+
+    def save_tb_list(self, mlist):
+        self.tbMasterList = deepcopy(mlist)
+        
     def get_usb_list(self):
         """
         Get usb device list
@@ -1143,6 +1163,9 @@ class UiMainFrame (wx.Frame):
             masterList- Added or removed device list
         """
         return self.masterList
+
+    def get_tb_list(self):
+        return self.tbMasterList
     
     def print_on_log(self, strin):
         """
