@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "3.0.0-testPre3"
+APP_VERSION = "3.0.0-Pre2-3"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -77,6 +77,7 @@ wx.RegisterId(ID_MAX)
 # ComWindow Widgets
 ID_BTN_DEV_SCAN = 1000
 ID_BTN_CONNECT = 1001
+ID_BTN_ADD = 1111
 
 # LoopWindow Widgets
 ID_TC_PERIOD = 1002
@@ -138,6 +139,9 @@ ID_MENU_SET_THC = 1106
 
 ID_MENU_GRAPH = 1110
 EVT_RESULT_ID = 1100
+
+ID_MENU_CONFIG_SL1 = 1112
+ID_MENU_CONFIG_SL2 = 1113
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",

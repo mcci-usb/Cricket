@@ -79,9 +79,17 @@ class LoopWindow(wx.Window):
 
         self.portno = 0
 
+        self.st_switch   = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_RIGHT)
+        
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(53,-1),
+                                     style = wx.TE_PROCESS_ENTER)
+
         self.cb_psel = wx.ComboBox(self,
                                      size=(53,-1),
                                      style = wx.TE_PROCESS_ENTER)
+
         self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
                                       style = wx.ALIGN_RIGHT)
      
@@ -135,8 +143,11 @@ class LoopWindow(wx.Window):
         self.tc_cycle.SetMaxLength(3)
         # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
+
+        self.con_flg = True
         
         # Creates BoxSizer in horizontal
+        self.bs_selSwitch = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_psel = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
@@ -144,6 +155,12 @@ class LoopWindow(wx.Window):
         self.bs_cnt = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
         
+        self.bs_selSwitch.Add(20,0,0)
+        self.bs_selSwitch.Add(self.st_switch,0, wx.ALIGN_CENTER)
+        self.bs_selSwitch.Add(15,20,0)
+        self.bs_selSwitch.Add(self.cb_switch,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+
         self.bs_psel.Add(40,0,0)
         self.bs_psel.Add(self.st_port,0, wx.ALIGN_CENTER)
         self.bs_psel.Add(15,20,0)
@@ -201,6 +218,7 @@ class LoopWindow(wx.Window):
         self.timer_usb = wx.Timer(self)
 
         self.bs_vbox.AddMany([
+            (self.bs_selSwitch, 1, wx.EXPAND),
             (self.bs_psel,1, wx.EXPAND),
             (self.bs_pers, 1, wx.EXPAND),
             (self.bs_duty, 1, wx.EXPAND),
@@ -616,7 +634,7 @@ class LoopWindow(wx.Window):
             self.cb_cycle.Disable()
             if self.top.mode != MODE_LOOP:
                 self.btn_start.Disable()
-        if not self.top.con_flg:
+        if not self.con_flg:
             self.btn_start.Disable()
     
     def set_port_list(self, port):

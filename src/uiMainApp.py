@@ -39,13 +39,6 @@ from wx.core import ITEM_CHECK
 
 # Own modules
 from uiGlobals import *
-import dev3141Window
-import dev3201Window
-import dev2101Window
-import dev2301Window
-import loopWindow
-import logWindow
-import autoWindow
 
 import getusb
 import getTb
@@ -56,6 +49,10 @@ from comDialog import *
 from setDialog import *
 from portDialog import *
 #from ccServer import *
+
+# import panels
+from uiPanel import *
+
 
 import vbusChart
 
@@ -68,6 +65,8 @@ import thControl
 import thServer
 
 import search
+
+from cricketlib import searchswitch
 
 ##############################################################################
 # Utilities
@@ -95,409 +94,6 @@ class MultiStatus (wx.StatusBar):
         self.SetFieldsCount(5)
         # Sets the widths of the fields in the status bar.
         self.SetStatusWidths([-2, -2, -2, -2, -10])
-
-class UiPanel(wx.Panel):
-    """
-    A class UiPanel with init method
-    the UiPanel navigate to UIApp name
-    """ 
-    def __init__(self, parent):
-        """
-        Uipanel created
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-        Returns:
-            None
-        """
-        super(UiPanel, self).__init__(parent)
-
-        wx.GetApp().SetAppName("Cricket")
-
-        self.parent = parent
-        # set back ground colour White
-        self.SetBackgroundColour('White')
-
-        self.font_size = DEFAULT_FONT_SIZE
-
-        # MAC OS X
-        if platform == "darwin":
-            self.font_size = MAC_FONT_SIZE
-        # Sets the font for this window
-        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,
-                             False,'MS Shell Dlg 2'))
-
-        self.logPan = logWindow.LogWindow(self, parent)
-        self.loopPan = loopWindow.LoopWindow(self, parent)
-        #self.comPan = comWindow.ComWindow(self, parent)
-        self.autoPan = autoWindow.AutoWindow(self, parent)
-        
-        self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
-        self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
-        self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
-        self.dev2301Pan = dev2301Window.Dev2301Window(self, parent)
-
-        self.devObj = []  
-        # Device panel added
-        self.devObj.append(self.dev3141Pan)
-        self.devObj.append(self.dev3201Pan)
-        self.devObj.append(self.dev2101Pan)
-        self.devObj.append(self.dev2301Pan)
-
-        
-        # Creating Sizers
-        self.vboxdl = wx.BoxSizer(wx.VERTICAL)
-        self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev3201Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev2301Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev2101Pan, 0, wx.EXPAND)
-
-        self.vboxdl.Add(0, 10, 0)
-        self.vboxdl.Add(self.autoPan, 1, wx.EXPAND)
-
-        self.hboxdl = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxdl.Add(self.vboxdl, 1 ,wx.ALIGN_LEFT | wx.EXPAND)
-        self.hboxdl.Add((20,0), 0, wx.EXPAND)
-        self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
-        
-        self.vboxl = wx.BoxSizer(wx.VERTICAL)
-        self.vboxl.Add((0,20), 0, wx.EXPAND)
-        self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
-        self.vboxl.Add((0,10), 0, 0)
-        self.vboxl.Add(self.logPan, 1, wx.EXPAND)
-        self.vboxl.Add((0,20), 0, wx.EXPAND)
-
-
-       # BoxSizer fixed with Horizontal
-        self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxm.Add((20,0), 1, wx.EXPAND)
-        self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
-        self.hboxm.Add((20,0), 1, wx.EXPAND)
-        # self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
-        # self.hboxm.Add((20,0), 1, wx.EXPAND)
-        
-        # Set size of frame
-        self.SetSizer(self.hboxm)
-        
-        # Setting Layouts
-        self.SetAutoLayout(True)
-        self.hboxm.Fit(self)
-        self.Layout()
-
-    def update_uc_panels(self):
-        """
-        Here updated the user computer panel depend on the connecting 
-        Model devices.
-        also termianate the switching Control Compter server,
-        and terminate the Test Host Computer server,
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-        Returns:
-            None
-        """
-        self.vboxl.Show(self.vboxl)
-        self.vboxl.Show(self.hboxdl)
-        #self.hboxm.Show(self.vboxr)
-        self.vboxdl.Hide(self.dev2301Pan)
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev3141Pan)
-        self.logPan.show_usb_ctrls(True)
-        self.vboxl.Show(self.logPan)
-        self.Layout()
-        self.parent.terminateCcServer()
-        self.parent.terminateHcServer()
- 
-    def update_server_panel(self):
-        """
-        here USB tree window and Log window update the on selection server
-        with SCC and THC servers.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        #self.hboxm.Hide(self.vboxr)
-        self.logPan.show_usb_ctrls(False)
-        self.vboxl.Show(self.logPan)
-        self.hboxm.Show(self.vboxl)
-        self.vboxl.Hide(self.hboxdl)
-        self.Layout()
-
-    def update_cc_panels(self):
-        """
-        when selecting Switching Control Computer server menu,
-        its starts the Siwting control computer server.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.parent.startCcServer()
-        
-    def update_hc_panels(self):
-        """
-        when selecting Test Host Computer server menu,
-        its starts the Test Host computer server.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.parent.startHcServer()
-    
-    def remove_all_panels(self):
-        """
-        Remove or Hide the the logwinodow and USB Tree view window.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.hboxm.Hide(self.vboxl)
-        #self.hboxm.Hide(self.vboxr)
-        self.Layout()
-
-    def remove_dev_panels(self):
-        """
-        Remove or Hide the the all Model 3141, 3201, 2101, 2301 windows panels.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.vboxdl.Hide(self.dev2301Pan)
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev3141Pan)
-        self.vboxdl.Hide(self.dev2101Pan)
-
-    def PrintLog(self, strin):
-        """
-        print data/status on logwindow 
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: data in String format
-        Returns:
-            None
-        """
-        self.logPan.print_on_log(strin)
-    
-    def get_enum_delay(self):
-        """
-        Get the USB Enumaration delay 
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            String - USB Enumeration delay 
-        """
-        return self.logPan.get_enum_delay()
-      
-    def get_delay_status(self):
-        """
-        Get the status of USB device Enumeration delay check box
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            Boolean - Status of the delay check box
-        """
-        return self.logPan.get_delay_status()
-    
-    def get_interval(self):
-        """
-        Get the interval parameter of Auto Mode
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            String - Auto Mode interval
-        """
-        return self.autoPan.get_interval()
-    
-    def set_interval(self, strval):
-        """
-        Update/Set the Auto Mode interval
-
-        Args: 
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: interval value in Sting format
-        Returns:
-            None
-        """
-        self.autoPan.set_interval(strval)
-    
-    def disable_usb_scan(self):
-        """
-        Disable the USB device scan by uncheck the check box
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            None
-        """
-        self.logPan.disable_usb_scan()
-    
-    def get_loop_param(self):
-        """
-        Get the Loop Window prameters
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            return None
-        """
-        return self.loopPan.get_loop_param()
-    
-    def get_auto_param(self):
-        """
-        Get the Auto Window prameters
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            return None
-        """
-        return self.autoPan.get_auto_param()
-    
-    def set_period(self, strval):
-        """
-        Set the period for Loop Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: Period value in String format
-        Returns:
-            return None
-        """
-        self.loopPan.set_period(strval)
-
-    def set_port_list(self, ports):
-        """
-        Set the ports list for Loop Window and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            ports: upated the ports list
-        Returns:
-            return None
-        """
-        self.loopPan.set_port_list(ports)
-        self.autoPan.set_port_count(ports)
-    
-    def port_on(self, port, stat):
-        """
-        Port On/Off command from Loop and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            port: device port number
-            stat: port on status will updated 
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].port_on(port, stat)
-    
-    def update_controls(self, mode):
-        """
-        Update the controls based on the mode
-        
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            mode: mode controls
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].update_controls(mode)
-        self.loopPan.update_controls(mode)
-        self.autoPan.update_controls(mode)
-        self.logPan.update_controls(mode)
-    
-    def device_connected(self):
-        """
-        Once device connected, Model Window get updated with selected Model
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        for dev in range(len(DEVICES)):
-            if dev == self.parent.selDevice:
-                self.vboxdl.Show(self.devObj[self.parent.selDevice])
-            else:
-                self.vboxdl.Hide(self.devObj[dev])
-        self.Layout()
-        self.devObj[self.parent.selDevice].device_connected()
-    
-    def device_disconnected(self):
-        """
-        Once device disconnected, disable all controls in Model, Loop 
-        and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].device_disconnected()
-        self.loopPan.device_disconnected()
-        self.autoPan.device_disconnected()
-    
-    def auto_connect(self):
-        """
-        Once application loaded, initiate the auto connect 
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.comPan.auto_connect()
 
 class UiMainFrame (wx.Frame):
     """
@@ -571,12 +167,13 @@ class UiMainFrame (wx.Frame):
         self.stype = READ_CONFIG
 
         self.dev_list = []
+        self.switch_list = []
 
         self.masterList = []
         self.tbMasterList = None
         
         self.panel = UiPanel(self)
-        
+       
         self.menuBar = wx.MenuBar()
         
         # If its not darwin or MAC OS
@@ -610,6 +207,13 @@ class UiMainFrame (wx.Frame):
 
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.volsAmps.Append(qmiamps)
+
+
+        self.slogMenu = wx.Menu()        
+        self.sl1menu = self.slogMenu.Append(ID_MENU_CONFIG_SL1, 
+                            "Serial Log Window - 1", kind = ITEM_CHECK)
+        self.sl2menu = self.slogMenu.Append(ID_MENU_CONFIG_SL2, 
+                            "Serial Log Window - 2", kind = ITEM_CHECK)
 
         # Creating the help menu
         self.helpMenu = wx.Menu()
@@ -645,6 +249,7 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.setMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&MCCI USB Switch")
         self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
+        self.menuBar.Append(self.slogMenu, "&View ")
         self.menuBar.Append(self.helpMenu,    "&Help")
 
         # First we create a menubar object.
@@ -669,6 +274,9 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.SelectUC, self.ucmenu)
         self.Bind(wx.EVT_MENU, self.SelectCC, self.ccmenu)
         self.Bind(wx.EVT_MENU, self.SelectHC, self.hcmenu)
+
+        self.Bind(wx.EVT_MENU, self.SelectSL1, self.sl1menu)
+        self.Bind(wx.EVT_MENU, self.SelectSL2, self.sl2menu)
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
@@ -724,6 +332,9 @@ class UiMainFrame (wx.Frame):
             self.ldata['uc'] = True
             self.ldata['cc'] = True
             self.ldata['hc'] = True
+
+            self.ldata['sl1'] = False
+            self.ldata['sl2'] = False
             
             self.ldata['sccif'] = "network"
             self.ldata['sccid'] = "No host"
@@ -742,6 +353,8 @@ class UiMainFrame (wx.Frame):
         self.print_on_log("Loading Configuration\n")
         self.update_config_menu()
         self.update_settings_menu()
+        self.update_slog_menu()
+        self.update_slog_panel()
         self.timer_auc.Start(2000)
 
     def RunServerEvent(self, event):
@@ -791,6 +404,18 @@ class UiMainFrame (wx.Frame):
         else:
             self.print_on_log("Auto connection failed\n")
                 
+    
+    def update_slog_menu(self):
+        if self.ldata['sl1']:
+            self.sl1menu.Check(True)
+        else:
+            self.sl1menu.Check(False)
+
+        if self.ldata['sl2']:
+            self.sl2menu.Check(True)
+        else:
+            self.sl2menu.Check(False)
+    
     def update_config_menu(self):
         """
         update the Config system menu checked User compuer and 
@@ -1047,9 +672,28 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.print_on_log("Search Devices ...\n")
-        dlg = ComDialog(self, self)
-        dlg.ShowModal()
-        dlg.Destroy()
+        self.dev_list.clear()
+        # self.dev_list = search.search_port(self.usbHand)
+        self.dev_list = searchswitch.get_switches()
+        self.dev_list = self.dev_list['switches']
+        
+        # print(self.dev_list['switches'])
+
+        # parsed = json.loads(self.dev_list)
+        # print(parsed.switches)
+        
+        # print(type(self.dev_list))
+
+        if(len(self.dev_list) > 1):
+            dlg = ComDialog(self, self)
+            dlg.ShowModal()
+            dlg.Destroy()
+        else:
+            dname = self.dev_list[0]["model"]
+            print("I am MainApp, initiate single device connect")
+            self.panel.show_selected(dname)
+
+        
 
     def OnDisconnect (self, event):
         """
@@ -1124,6 +768,19 @@ class UiMainFrame (wx.Frame):
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
         self.StoreDevice()
+    
+    # Multiple Switches
+
+    def add_switch_dialogs(self):
+        print("MF - Add switch dialog: ", self.switch_list)
+        self.panel.add_switches(self.switch_list)
+
+        # if len(self.switch_list) == 1:
+        #     self.panel.Hide_LeftPanel()
+        # elif len(self.switch_list) > 1:
+        #     self.panel.add_switches(self.switch_list)
+        #     # self.panel.Show_LeftPanel()
+        self.Refresh()
             
     def save_usb_list(self, mlist):
         """
@@ -1507,6 +1164,9 @@ class UiMainFrame (wx.Frame):
         ds['thcif'] = self.ldata['thcif']
         ds['thcid'] = self.ldata['thcid']
         ds['thcpn'] = self.ldata['thcpn']
+
+        ds['sl1'] = self.ldata['sl1']
+        ds['sl2'] = self.ldata['sl2']
         ds.close()
 
     def OnSelectScc (self, event):
@@ -1551,6 +1211,32 @@ class UiMainFrame (wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
         self.StoreDevice()
+
+
+    def update_slog_panel(self):
+        cnt = 0
+        if self.ldata['sl1'] == True:
+            cnt = cnt + 1
+        if self.ldata['sl2'] == True:
+            cnt = cnt + 1
+        self.panel.update_slog_panel(cnt)
+        self.Refresh()
+    
+    def SelectSL1(self, event):
+        if self.sl1menu.IsChecked():
+            self.ldata['sl1'] = True
+        else:
+            self.ldata['sl1'] = False
+        self.StoreDevice()
+        self.update_slog_panel()
+
+    def SelectSL2(self, event):
+        if self.sl2menu.IsChecked():
+            self.ldata['sl2'] = True
+        else:
+            self.ldata['sl2'] = False
+        self.StoreDevice()
+        self.update_slog_panel()
 
     def SelectUC(self, event):
         """
@@ -1793,6 +1479,9 @@ class UiMainFrame (wx.Frame):
 
         self.ldata['sthcif'] = ds['sthcif']
         self.ldata['sthcpn'] = ds['sthcpn']
+
+        self.ldata['sl1'] = ds['sl1']
+        self.ldata['sl2'] = ds['sl2']
 
         ds.close()
 

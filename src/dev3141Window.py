@@ -71,6 +71,8 @@ class Dev3141Window(wx.Panel):
         self.auto_flg = False
         self.pulse_flg = False
 
+        self.con_flg = None
+
         self.usb_flg = False 
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
@@ -412,7 +414,7 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
@@ -430,7 +432,7 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
             self.btn_p2.Enable()

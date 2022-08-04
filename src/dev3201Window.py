@@ -66,6 +66,8 @@ class Dev3201Window(wx.Window):
         self.fv = None
         self.fa = None
 
+        self.con_flg = None
+
         self.pcnt = 0
 
         self.duty = 0
@@ -605,7 +607,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
@@ -623,7 +625,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
             self.btn_p2.Enable()
@@ -736,7 +738,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        if(self.top.con_flg):
+        if(self.con_flg):
             time.sleep(1)
             res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':

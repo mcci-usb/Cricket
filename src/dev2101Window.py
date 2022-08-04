@@ -104,6 +104,8 @@ class Dev2101Window(wx.Panel):
         self.OnTime = 0
         self.OffTime = 0
 
+        self.con_flg = None
+
         self.On_flg = False
         self.auto_flg = False
 
@@ -363,7 +365,7 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         
         self.enable_port_controls(stat)
@@ -382,7 +384,7 @@ class Dev2101Window(wx.Panel):
             None
         """              
 
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
         else:

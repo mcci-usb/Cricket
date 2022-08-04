@@ -85,12 +85,22 @@ class AutoWindow(wx.Window):
 
         self.dlist = []
 
+        self.con_flg = None
+
         self.portno = 0
         self.cbPorts = []
         self.psel = []
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+
+        self.st_switch   = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_RIGHT)
+        
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(53,-1),
+                                     style = wx.TE_PROCESS_ENTER)
+
 
         self.cb_port = wx.StaticText(self, -1, "Port")
 
@@ -147,9 +157,15 @@ class AutoWindow(wx.Window):
         # Creates a boxsizer is vertical
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
         # Creates a boxsizer is horizontal
+        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox0 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.hbox.Add(self.st_switch, 0, flag=wx.LEFT | 
+                        wx.ALIGN_CENTER_VERTICAL, border=10)
+        self.hbox.Add(self.cb_switch, 0, flag=wx.ALIGN_CENTER | 
+                       wx.LEFT, border=15)
 
         self.hbox0.Add(self.cb_port, 0, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=50)
@@ -176,6 +192,8 @@ class AutoWindow(wx.Window):
         self.hbox2.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
 
         self.bs_vbox.AddMany([
+            (0,10,0),
+            (self.hbox, 1, wx.EXPAND | wx.ALL),
             (0,10,0),
             (self.hbox0, 1, wx.EXPAND | wx.ALL),
             (0,10,0),
@@ -622,7 +640,7 @@ class AutoWindow(wx.Window):
             self.tc_ival.Disable()
             # Text control duty is Disable
             self.tc_duty.Disable()
-        if not self.top.con_flg:
+        if not self.con_flg:
             # Auto Button is Disable
             self.btn_auto.Disable()
 

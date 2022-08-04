@@ -62,6 +62,8 @@ class Dev2301Window(wx.Window):
         self.parent = parent
         self.top = top
 
+        self.con_flg = None
+
         self.pcnt = 0
 
         self.duty = 0
@@ -599,7 +601,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
@@ -617,7 +619,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
             self.btn_p2.Enable()
