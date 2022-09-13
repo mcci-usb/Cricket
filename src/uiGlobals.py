@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "2.6.1"
+APP_VERSION = "3.0.1-pre1-2"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -77,6 +77,7 @@ wx.RegisterId(ID_MAX)
 # ComWindow Widgets
 ID_BTN_DEV_SCAN = 1000
 ID_BTN_CONNECT = 1001
+ID_BTN_ADD = 1111
 
 # LoopWindow Widgets
 ID_TC_PERIOD = 1002
@@ -122,22 +123,34 @@ ID_BTN_CLEAR = 1046
 ID_BTN_REF = 1047
 ID_BTN_UCLEAR = 1048
 
+# Serial Log Window
+ID_BTN_SL_SAVE = 1049
+ID_BTN_SL_CLEAR = 1050
+ID_BTN_SL_CONFIG = 1051
+ID_BTN_SL_CONNECT = 1052
+
 # Menu for Mac
-ID_MENU_WIN_MIN = 1049
-ID_MENU_WIN_SHOW = 1050
+ID_MENU_WIN_MIN = 1100
+ID_MENU_WIN_SHOW = 1101
 
-ID_MENU_MODEL_CONNECT = 1100
-ID_MENU_MODEL_DISCONNECT = 1101
+ID_MENU_MODEL_CONNECT = 1102
+ID_MENU_MODEL_DISCONNECT = 1103
 
-ID_MENU_CONFIG_UC = 1102
-ID_MENU_CONFIG_SCC = 1103
-ID_MENU_CONFIG_THC = 1104
+ID_MENU_CONFIG_UC = 1104
+ID_MENU_CONFIG_SCC = 1105
+ID_MENU_CONFIG_THC = 1106
 
-ID_MENU_SET_SCC = 1105
-ID_MENU_SET_THC = 1106
+ID_MENU_SET_SCC = 1107
+ID_MENU_SET_THC = 1108
 
-ID_MENU_GRAPH = 1110
-EVT_RESULT_ID = 1100
+ID_MENU_GRAPH = 1109
+
+EVT_RESULT_ID = 1110
+EVT_SUT_SL_DATA_ID = 1111  # SUT Data arrival 
+EVT_SUT_SL_ERR_ID = 1112   # SUT Err Msg arrival
+
+ID_MENU_CONFIG_SL1 = 1113
+ID_MENU_CONFIG_SL2 = 1114
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
@@ -146,7 +159,8 @@ usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Billboard Device", "Type-C Bridge", "Diagnostic Device",
             ]
 
-usbClass = {1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
+usbClass = {0: "Unknown",
+            1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
             6: "Image", 7: "Printer", 8: "Mass Storage", 9: "Hub",
             10: "CDC-Data", 11: "Smart Card", 13: "Content Security",
             14: "Video", 15: "Personal Healthcare", 16: "Audio/Video Devices",
@@ -155,7 +169,9 @@ usbClass = {1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
             239: "Miscellaneous", 254: "Application Specific",
             255: "Vendor Specific"}
 
-usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed"}
+usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
+
+portCnt = {"3141": 2, "3201": 4, "2301": 4, "2101": 1}
 
 
 ##############################################################################

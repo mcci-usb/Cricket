@@ -44,7 +44,7 @@ class Dev2301Window(wx.Window):
     The dev2301Window navigate to Super speed and High speed enable 
     or disable options.
     """
-    def __init__(self, parent, top):
+    def __init__(self, parent, top, portno):
         """
         Device specific functions and UI for interfacing Model 2301 with GUI 
         Args:
@@ -61,6 +61,13 @@ class Dev2301Window(wx.Window):
 
         self.parent = parent
         self.top = top
+        self.swid = portno
+
+        self.swtitle = "MCCI USB Switch 2301"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
+
+        self.con_flg = None
 
         self.pcnt = 0
 
@@ -169,8 +176,8 @@ class Dev2301Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
-        sb = wx.StaticBox(self, -1, "MCCI USB Switch  2301")
-        self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
+        self.sb = wx.StaticBox(self, -1, self.swtitle)
+        self.vbox = wx.StaticBoxSizer(self.sb, wx.VERTICAL)
 
         self.vbox.AddMany([
             (0,10,0),
@@ -206,8 +213,17 @@ class Dev2301Window(wx.Window):
 
         self.btnStat = [False, False, False, False]
         
-        self.enable_controls(False)
+        self.con_flg = True
+        self.enable_controls(True)
         self.timer_vu.Start(50)
+
+    def update_cport(self, portno):
+        self.swtitle = "MCCI USB Switch 2301"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
+        self.swid = portno
+        self.sb.SetLabel(self.swtitle)
+        self.Layout()
 
     def OnOffPort (self, e):
         """
@@ -476,8 +492,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = model.send_port_cmd(self.top, cmd)
+        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -486,6 +501,7 @@ class Dev2301Window(wx.Window):
             outstr = outstr.replace('4', '4 ON')
             outstr = outstr[:-2] + "; Other Ports are OFF\n"
             self.top.print_on_log(outstr)
+
           
     def port_off_cmd(self, pno):
         """
@@ -499,8 +515,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = model.send_port_cmd(self.top, cmd)
+        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -599,7 +614,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
@@ -617,7 +632,7 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
             self.btn_p2.Enable()
@@ -710,14 +725,17 @@ class Dev2301Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = model.send_port_cmd(self.top,cmd)
+        speed = "HS"
+        if(val == 1):
+            speed = "SS"
+        res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
+
+        # cmd = 'superspeed'+' '+str(val)+'\r\n'
+        # res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
             outstr = outstr.replace('0', 'Disabled')
-
-        # Print on logwindow SuperSpeed Enabled or superspeed Disabled
         self.top.print_on_log(outstr)
     
     def device_connected(self):

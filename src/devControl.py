@@ -30,6 +30,8 @@ import search
 import socket
 import json
 
+from cricketlib import searchswitch
+
 from uiGlobals import *
 
 PORT = 5566
@@ -73,13 +75,14 @@ def search_device(top):
         dev_dict: devices in dictionary
     """
     if top.devCtrl == "local":
-        dev_dict = search.search_port(top.usbHand)
+        dev_dict = searchswitch.get_switches()
         return dev_dict
     elif top.devCtrl == "network":
         resdict = devnw.get_device_list(top.ldata['sccid'],
                                     int(top.ldata['ssccpn']))
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]
+            print("DEvControl: ",resdict["result"])
             top.ccflag = True
             return findict
         else:
@@ -88,8 +91,27 @@ def search_device(top):
             findict = {}
             findict["devices"] = []
             return findict
-       
-def connect_device(top):
+
+def connect_device(top,swdict):
+    if top.devCtrl == "local":
+        swname = list(swdict.keys())
+        port = list(swdict.values())
+        print("Port: ",port)
+        swhand = top.swobjmap[swname[0]](port[0])
+        if(swhand.connect() or swname[0] == "2101"):
+            top.handlers[port[0]] = swhand
+            top.swuidict[port[0]] = swname[0]
+
+        # if swdict.key == DEV_2101:
+        #     top.usbHand.scan_2101()
+        #     return top.usbHand.select_usb_device(top.selPort)
+        # else:
+        #     return top.devHand.open_serial_device(top.selPort,
+        #                                 BAUDRATE[top.selDevice])
+        # top.device_connected()
+
+
+def connect_device_old(top):
     """
     connect the device
     Args:
@@ -148,7 +170,38 @@ def disconnect_device(top):
         return devnw.close_serial_device(top.ldata['sccid'],
                                     int(top.ldata['ssccpn']))
 
-def send_port_cmd(top,cmd):
+def send_port_cmd(top, cmd):
+    if top.fault_flg == True:
+        return (1, "Stop Event occurred!")
+    
+    if top.devCtrl == "local":
+        print("Port command")
+        swid, opr, pno = cmd.split(',')
+        print(swid, opr, pno)
+        if(pno == "0"):
+            return top.handlers[swid].port_off()
+        else:
+            return top.handlers[swid].port_on(pno)
+
+def control_port(top, cmd):
+    if top.devCtrl == "local":
+        print("2101 Port command")
+        swid, opr = cmd.split(',')
+        print(swid, opr)
+        if(opr == "off"):
+            return top.handlers[swid].port_off()
+        else:
+            return top.handlers[swid].port_on(opr)
+
+def send_speed_cmd(top, cmd):
+    if top.devCtrl == "local":
+        print("Speed command")
+        swid, speed = cmd.split(',')
+        print(swid, speed)
+        return top.handlers[swid].set_speed(speed)
+        
+
+def send_port_cmd_old(top,cmd):
     """
     sending the port 
     Args:
@@ -280,7 +333,8 @@ def send_amps_cmd(top):
             top.ccflag = False
             return-1, "No CC"
 
-def control_port(top, cmd):
+
+def control_port_old(top, cmd):
     """
     controls the ports
     Args:

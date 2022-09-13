@@ -1,0 +1,20 @@
+config_data = {"computer": ["uc", "cc", "thc"],
+ "uc": {"cc": [{"type": "tcp", "port": "2021", "ip": "192.168.0.34"}, {"type": "tcp", "port": "2021", "ip": "192.168.0.112"}], 
+        "thc": {"type": "tcp", "port": "2022", "ip": "192.168.0.95"}, 
+        "SUT": []
+        },
+ "cc": {"type": "tcp", "port": "2021"},
+ "thc": {"type": "tcp", "port": "2022"},
+ "SUT": {"Alpha - SUT-1": {"type": "serial", 
+                 "serial": {"comPort": "COM10", "baudRate": "9600", "dataBits": "8",
+
+                 "parity": "None", "stopBits": "1", "parityErrChk": "(ignore)"},
+                 "network": { }, 
+                 "faultMsg": ["Non-secure Usage Fault", "FATAL ERROR: Secure Fault", 
+                              "osTimerNew() failed"]},
+        "Beta - SUT-2": {"type": "serial", 
+                 "settings": {"comPort": "COM12", "baudRate": "115200", "dataBits": "8",
+                 "parity": "None", "stopBits": "1", "parityErrChk": "(ignore)"}, 
+                 "network": { }, 
+                 "faultMsg": ["Non-secure Usage Fault", "FATAL ERROR: Secure Fault", 
+                              "osTimerNew() failed"]} }   }

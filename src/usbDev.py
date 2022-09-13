@@ -21,8 +21,13 @@
 #    V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
+import copy
+from distutils.dep_util import newer
+
 # Own modules
 import getusb
+import getTb
+
 from uiGlobals import *
 
 ##############################################################################
@@ -40,6 +45,90 @@ def get_usb_tree():
     dl, newlist = getusb.scan_usb()
     return dl, newlist
 
+def get_tb_tree():
+    newdict = getTb.scan_tb()
+    return newdict
+
+def get_tb_tree_change(top, newdict):
+    olddict = top.get_tb_list()
+    if len(olddict) == 0:
+        olddict = newdict
+            
+    # Save tb device list
+    top.save_tb_list(newdict)
+
+    nlist = newdict
+    olist = olddict
+
+    keyol = list(nlist.keys())
+    keynl = list(olist.keys())
+    
+    adlist = [i for i in keynl if i not in keyol]
+    # print("adlist:", adlist)
+    rmlist = [i for i in keyol if i not in keynl]
+    # print("rmlist:",rmlist)
+
+    resd = {}
+
+    for bus in keyol:
+        ol = olddict[bus]
+        nl = newdict[bus]
+        ind = {}
+        alist = [i for i in nl if i not in ol]
+        # print("alist:", alist)
+        rlist = [i for i in ol if i not in nl]
+        ind["added"] = alist
+        ind["removed"] = rlist
+        resd[bus] = ind
+
+    print("TB Tree change\n")
+    print(resd)
+
+    # addCnt = 0
+    # rmdCnt = 0
+    # strout = ""
+
+    # for idict in resd:
+    #     addCnt = addCnt + len(resd[idict]["added"])
+    #     rmdCnt = rmdCnt + len(resd[idict]["removed"])
+
+    # if(addCnt == 0 and rmdCnt == 0):
+    #     # No device added removed from port, then print "No change"
+    #     strout = ("TB No Change\n")
+    
+    # if(addCnt > 0):
+    #     strout = ("TB Added: "+str(addCnt)+"\n")
+
+    # if(rmdCnt > 0):
+    #     strout = strout + ("TB Removed: "+str(rmdCnt)+"\n")
+
+    addLst = []
+    rmdLst = []
+    strout = ""
+
+    for idict in resd:
+        for elem in resd[idict]["added"]:
+            addLst.append(elem)
+        for elem in resd[idict]["removed"]:
+            rmdLst.append(elem)
+
+    if(len(addLst) == 0 and len(rmdLst) == 0):
+        # No device added removed from port, then print "No change"
+        strout = ("Thunderbolt No Change\n")
+    
+    if(len(addLst) > 0):
+        strout = strout + "Thunderbolt Added\n"
+        for elem in addLst:
+            strout = strout + elem + "\n"
+
+    if(len(rmdLst) > 0):
+        strout = strout + "Thunderbolt Removed\n"
+        for elem in rmdLst:
+            strout = strout + elem + "\n"
+
+    top.print_on_log(strout)
+
+
 def get_tree_change(top, dl, newlist):
     """
     Get USB Device Tree changes list and print the list in USB Device Tree
@@ -50,8 +139,6 @@ def get_tree_change(top, dl, newlist):
     Returns:
         None
     """
-    # Usb device scanning 
-    #dl, newlist = getusb.scan_usb()
     top.update_usb_status(dl)
     oldlist = top.get_usb_list()
     if len(oldlist) == 0:
@@ -59,11 +146,32 @@ def get_tree_change(top, dl, newlist):
             
     # Save usb device list
     top.save_usb_list(newlist)
+
+    newset =  [i for n, i in enumerate(newlist) if i not in newlist[n + 1:]]
+
+    unewlist = copy.deepcopy(newlist)    
+    for i in newset:
+        rcnt = 0
+        for j in unewlist:
+            if(i == j):
+                rcnt = rcnt + 1
+                j["count"] = rcnt
+
+    oldset =  [i for n, i in enumerate(oldlist) if i not in oldlist[n + 1:]]
+
+    uoldlist = copy.deepcopy(oldlist)
+
+    for i in oldset:
+        rcnt = 0
+        for j in uoldlist:
+            if(i == j):
+                rcnt = rcnt + 1
+                j["count"] = rcnt
     
     strchg = None
 
-    adlist = [i for i in newlist if i not in oldlist]
-    rmlist = [i for i in oldlist if i not in newlist]
+    adlist = [i for i in unewlist if i not in uoldlist]
+    rmlist = [i for i in uoldlist if i not in unewlist]
 
     strout = ""
     

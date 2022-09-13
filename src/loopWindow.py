@@ -29,6 +29,8 @@ import thControl
 
 from uiGlobals import *
 import control2101 as d2101
+import devControl as model
+
 ##############################################################################
 # Utilities
 ##############################################################################
@@ -77,11 +79,22 @@ class LoopWindow(wx.Window):
 
         self.dlist = []
 
+        self.swid = None
+        self.swkey = None
+
         self.portno = 0
+
+        self.st_switch   = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_RIGHT)
+        
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(145,-1),
+                                     style = wx.TE_PROCESS_ENTER)
 
         self.cb_psel = wx.ComboBox(self,
                                      size=(53,-1),
                                      style = wx.TE_PROCESS_ENTER)
+
         self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
                                       style = wx.ALIGN_RIGHT)
      
@@ -135,8 +148,11 @@ class LoopWindow(wx.Window):
         self.tc_cycle.SetMaxLength(3)
         # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
+
+        self.con_flg = True
         
         # Creates BoxSizer in horizontal
+        self.bs_selSwitch = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_psel = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
@@ -144,6 +160,12 @@ class LoopWindow(wx.Window):
         self.bs_cnt = wx.BoxSizer(wx.HORIZONTAL)
         self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
         
+        self.bs_selSwitch.Add(20,0,0)
+        self.bs_selSwitch.Add(self.st_switch,0, wx.ALIGN_CENTER)
+        self.bs_selSwitch.Add(15,20,0)
+        self.bs_selSwitch.Add(self.cb_switch,0, wx.ALIGN_CENTER | 
+                         wx.ALIGN_CENTER_VERTICAL)
+
         self.bs_psel.Add(40,0,0)
         self.bs_psel.Add(self.st_port,0, wx.ALIGN_CENTER)
         self.bs_psel.Add(15,20,0)
@@ -201,6 +223,7 @@ class LoopWindow(wx.Window):
         self.timer_usb = wx.Timer(self)
 
         self.bs_vbox.AddMany([
+            (self.bs_selSwitch, 1, wx.EXPAND),
             (self.bs_psel,1, wx.EXPAND),
             (self.bs_pers, 1, wx.EXPAND),
             (self.bs_duty, 1, wx.EXPAND),
@@ -215,6 +238,8 @@ class LoopWindow(wx.Window):
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
+
+        self.cb_switch.Bind(wx.EVT_COMBOBOX, self.SwitchChange, self.cb_switch)
         
         # Set size of frame
         self.SetSizer(self.bs_vbox)
@@ -222,6 +247,29 @@ class LoopWindow(wx.Window):
         self.Layout()
 
         self.enable_controls(True)
+
+    def update_sw_selector(self, swdict):
+        print("Update SW selector in Loop window")
+        print(swdict)
+
+        for key, val in swdict.items():
+            swstr = ""+val+"("+key+")"
+            self.cb_switch.Append(swstr)
+        self.cb_switch.SetSelection(0)
+        self.Update_port_count()
+
+
+    def Update_port_count(self):
+        self.swid = self.cb_switch.GetValue()
+        self.swkey = self.swid.split("(")[1][:-1]
+        print("-------------------:", self.swkey)
+        swname = self.swid.split("(")[0]
+        print("========================:", swname)
+        self.set_port_list(portCnt[swname])
+
+
+    def SwitchChange(self, evt):
+        self.Update_port_count()
 
     def StartAuto(self, evt):
         """
@@ -554,7 +602,8 @@ class LoopWindow(wx.Window):
         Returns:
             None
         """
-        self.top.port_on(portno, stat)
+        self.top.port_on(self.swkey, portno, stat)
+        # self.top.panel.lpanel.p
         # Getting delay status
         if(self.top.get_delay_status()):
             self.keep_delay()
@@ -616,7 +665,7 @@ class LoopWindow(wx.Window):
             self.cb_cycle.Disable()
             if self.top.mode != MODE_LOOP:
                 self.btn_start.Disable()
-        if not self.top.con_flg:
+        if not self.con_flg:
             self.btn_start.Disable()
     
     def set_port_list(self, port):
@@ -634,6 +683,7 @@ class LoopWindow(wx.Window):
         self.cb_psel.Clear()
         for i in range(port):
             self.cb_psel.Append(str(i+1))
+            print("iiiiiiiiiiiiiiiiiii:", i)
         self.cb_psel.SetSelection(0)
     
     def device_disconnected(self):

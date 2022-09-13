@@ -45,7 +45,7 @@ class Dev3201Window(wx.Window):
     The dev3201Window navigate to Super speed and High speed enable 
     or disable options.
     """
-    def __init__(self, parent, top):
+    def __init__(self, parent, top, portno):
         """
         Device specific functions and UI for interfacing Model 3201 with GUI 
         Args:
@@ -62,9 +62,16 @@ class Dev3201Window(wx.Window):
 
         self.parent = parent
         self.top = top
+        self.swid = portno
+
+        self.swtitle = "MCCI USB Switch 3201"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
 
         self.fv = None
         self.fa = None
+
+        self.con_flg = None
 
         self.pcnt = 0
 
@@ -173,8 +180,8 @@ class Dev3201Window(wx.Window):
                        wx.ALIGN_RIGHT, border=20)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
-        sb = wx.StaticBox(self, -1, "MCCI USB Switch  3201")
-        self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
+        self.sb = wx.StaticBox(self, -1, self.swtitle)
+        self.vbox = wx.StaticBoxSizer(self.sb, wx.VERTICAL)
 
         self.vbox.AddMany([
             (0,10,0),
@@ -210,9 +217,18 @@ class Dev3201Window(wx.Window):
 
         self.btnStat = [False, False, False, False]
         
-        self.enable_controls(False)
+        self.con_flg = True
+        self.enable_controls(True)
 
         self.timer_vu.Start(50)
+
+    def update_cport(self, portno):
+        self.swtitle = "MCCI USB Switch 3201"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
+        self.swid = portno
+        self.sb.SetLabel(self.swtitle)
+        self.Layout()
 
     def OnOffPort (self, e):
         """
@@ -456,6 +472,8 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
+        if self.top.con_flg == False:
+            return
         if(stat):
             # Here port on command
             self.port_on_cmd(port)
@@ -482,8 +500,8 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'port'+' '+str(pno)+'\r\n'
-        res, outstr = model.send_port_cmd(self.top, cmd)
+
+        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -492,7 +510,8 @@ class Dev3201Window(wx.Window):
             outstr = outstr.replace('4', '4 ON')
             outstr = outstr[:-2] + "; Other Ports are OFF\n"
             self.top.print_on_log(outstr)
-          
+
+
     def port_off_cmd(self, pno):
         """
         Sendng the Port OFF Command
@@ -505,12 +524,12 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'port'+' '+'0'+'\r\n'
-        res, outstr = model.send_port_cmd(self.top, cmd)
+        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
             self.top.print_on_log(outstr)
+
     
     def enable_ss_controls(self, port, stat):
         """
@@ -605,7 +624,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
@@ -623,7 +642,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
             self.btn_p2.Enable()
@@ -716,13 +735,17 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        cmd = 'superspeed'+' '+str(val)+'\r\n'
-        res, outstr = model.send_port_cmd(self.top, cmd)
+        speed = "HS"
+        if(val == 1):
+            speed = "SS"
+        res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
+
+        # cmd = 'superspeed'+' '+str(val)+'\r\n'
+        # res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
             outstr = outstr.replace('0', 'Disabled')
-        # Print on logwindow SuperSpeed Enabled or superspeed Disabled
         self.top.print_on_log(outstr)
     
     def device_connected(self):
@@ -736,7 +759,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        if(self.top.con_flg):
+        if(self.con_flg):
             time.sleep(1)
             res, outstr = model.read_port_cmd(self.top)
             if res == 0 and outstr == '':

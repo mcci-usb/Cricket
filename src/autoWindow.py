@@ -85,12 +85,26 @@ class AutoWindow(wx.Window):
 
         self.dlist = []
 
+        self.con_flg = None
+
+        self.swid = None
+        self.swkey = None
+
+    
         self.portno = 0
         self.cbPorts = []
         self.psel = []
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+
+        self.st_switch   = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_RIGHT)
+        
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(155,-1),
+                                     style = wx.TE_PROCESS_ENTER)
+
 
         self.cb_port = wx.StaticText(self, -1, "Port")
 
@@ -147,9 +161,15 @@ class AutoWindow(wx.Window):
         # Creates a boxsizer is vertical
         self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
         # Creates a boxsizer is horizontal
+        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox0 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.hbox.Add(self.st_switch, 0, flag=wx.LEFT | 
+                        wx.ALIGN_CENTER_VERTICAL, border=10)
+        self.hbox.Add(self.cb_switch, 0, flag=wx.ALIGN_CENTER | 
+                       wx.LEFT, border=15)
 
         self.hbox0.Add(self.cb_port, 0, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=50)
@@ -177,6 +197,8 @@ class AutoWindow(wx.Window):
 
         self.bs_vbox.AddMany([
             (0,10,0),
+            (self.hbox, 1, wx.EXPAND | wx.ALL),
+            (0,10,0),
             (self.hbox0, 1, wx.EXPAND | wx.ALL),
             (0,10,0),
             (self.hbox1, 1, wx.EXPAND | wx.ALL),
@@ -190,6 +212,7 @@ class AutoWindow(wx.Window):
         self.bs_vbox.Fit(self)
         self.Layout()
         
+        self.cb_switch.Bind(wx.EVT_COMBOBOX, self.SwitchChange, self.cb_switch)
         # Bind the button event to handler
         self.btn_auto.Bind(wx.EVT_BUTTON, self.OprAuto)
         # Bind the timer event to handler
@@ -202,6 +225,29 @@ class AutoWindow(wx.Window):
         self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p4)
 
         self.enable_controls(True)
+
+    def update_sw_selector(self, swdict):
+        print("Update SW selector in Loop window")
+        # print(swdict)
+
+        for key, val in swdict.items():
+            swstr = ""+val+"("+key+")"
+            self.cb_switch.Append(swstr)
+        self.cb_switch.SetSelection(0)
+        self.Update_port_count()
+        self.con_flg = True
+
+
+    def Update_port_count(self):
+        self.swid = self.cb_switch.GetValue()
+        self.swkey = self.swid.split("(")[1][:-1]
+        # print("------------------------:", self.swkey)
+        swname = self.swid.split("(")[0]
+        # print("==============================:", swname)
+        self.set_port_count(portCnt[swname])
+    
+    def SwitchChange(self, evt):
+        self.Update_port_count()
 
     def OprAuto(self, evt):
         """
@@ -354,7 +400,7 @@ class AutoWindow(wx.Window):
         Returns:
             None
         """
-        self.top.port_on(portno, stat)
+        self.top.port_on(self.swkey, portno, stat)
         if(self.top.get_delay_status()):
             self.keep_delay()
             
@@ -622,7 +668,7 @@ class AutoWindow(wx.Window):
             self.tc_ival.Disable()
             # Text control duty is Disable
             self.tc_duty.Disable()
-        if not self.top.con_flg:
+        if not self.con_flg:
             # Auto Button is Disable
             self.btn_auto.Disable()
 
