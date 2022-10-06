@@ -15,6 +15,9 @@ Simple standalone desktop application for handling MCCI USB Switches in a conven
 - [Prerequisites for running or building](#prerequisites-for-running-or-building)
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
+- [Windows Installation Steps](#Windows-Installation)
+- [Linux Installation Steps](#Linux-Installation-Steps)
+- [Cricket UI Packages](#Cricket-UI-Packages)
 - [GUI Preview](#gui-preview)
 - [MCCI USB Switch 3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
 - [MCCI USB Switch 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
@@ -177,6 +180,56 @@ To update the version for each release
 * Open the file `uiGlobals.py`
 * Update the value of the String Macro `APP_VERSION`
 * Update the VERSION.md `destdir/VERSION.md`
+
+## Windows Installation Steps
+
+### Install Mode
+* please select a any option for Install for all users or Install for me only.
+
+  ![UI Preview](assets/windows/Selectinstallmode.png)
+### Select Destination Location
+* choose destination location before start the installing.
+* Click on Next button its goto next file.
+
+  ![UI Preview](assets/windows/destinationlocation.png)
+### Select Additional Tasks.
+* check create a desktop shortcut: show in desktop
+* uncheck Create a desktop shortcut: loaded in locally
+* Click on Next button its goto next file.
+
+  ![UI Preview](assets/windows/additionaltask.png)
+
+### Ready to Install
+* the Setup is ready to begin installing Cricket UI on your computer.
+* click on install button, its started to Install.
+
+  ![UI Preview](assets/windows/Readyforinstallation.png)
+
+### Installing
+* Cricket UI installing started on your computer.
+
+  ![UI Preview](assets/windows/InstallingUI.png)
+
+## Linux Installation Steps 
+* Extract the Cricket UI tar file.
+* open the Terminal in Cricket_2.7.0_all.deb location.
+* install .deb file using cmd of `sudo dpkg -i Cricket_2.7.0_all.deb`.
+
+  ![UI Preview](assets/Linux/Install.png)
+
+## Linux Installation Failed
+* while installing Cricket UI getting the errors.
+`dpkg:error processing package install-info or`
+`Error were emcountered while processing: install info`
+please uninstall or remove previous installer and reinstall it again.
+* open the Terminal any location.
+* use the cmd `sudo apt remove cricket`
+  ![UI Preview](assets/Linux/UnInstall.png)
+
+
+## Cricket UI Packages 
+* Download the package from v2.7.0 releases [Cricket-UI v2.7.0 Installer Packages](https://github.com/mcci-usb/Cricket/releases/tag/v2.7.0)
+
 
 ## GUI Preview
 
