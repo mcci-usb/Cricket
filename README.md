@@ -3,7 +3,7 @@
 Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
 
 <!-- /TOC -->
-[![Git release](https://img.shields.io/badge/release-v2.6.1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.6.1-9-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
+[![Git release](https://img.shields.io/badge/release-v2.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.7.0-1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
 
@@ -64,10 +64,8 @@ pip install matplotlib
 
 Development environment
 
-* Linux OS - Ubuntu 16.04 64 bit
+* Linux OS - Ubuntu 20.04 64 bit
 * Python - 3.8.2
-* Mac OS - Cataina V10.15.7 64 bit
-* Python - 3.7.0
 * wxpython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
@@ -227,6 +225,8 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
  ![Model2301](assets/Model2301.png)
 
  ## Release History
+- v2.7.0 is a patch release.
+  - Cricket UI fails to launch on ubuntu 20.04 and 22.04
 - v2.6.1 is a patch release.
   - update the version tag [#75](https://github.com/mcci-usb/Cricket/commit/60b52983a71e6fd05813e7bd727a9ba21e261eb8)
 - v2.6.0 is a patch release.
