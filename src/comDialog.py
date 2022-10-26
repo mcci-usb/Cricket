@@ -81,25 +81,13 @@ class ComWindow(wx.Window):
         self.parent = parent
         self.wait_flg = True
 
-        # print("I am Com dialog: ", self.top.dev_list)
-
         self.dlist = []
         self.clist = []
         self.switchlist = []
         self.addswitchlist = []
         
-        # self.switchlist = self.addswitchlist
-
         self.btn_scan = wx.Button(self, ID_BTN_DEV_SCAN, "Search",
                                   size=(77,25))
-
-        # self.fst_lb = wx.ComboBox(self,
-        #                              size=(135, -1),
-        #                              choices=self.dlist,
-        #                              style=wx.CB_DROPDOWN)
-        
-        # self.fst_lb = wx.ListCtrl(self, size=(160, 25))
-        # self.fst_lb = wx.ListCtrl(self, size=(160, 30))
 
         self.fst_lb = wx.ListBox(self, size=(160, 120), style=wx.LB_EXTENDED, choices = self.dlist)
 
@@ -212,6 +200,7 @@ class ComWindow(wx.Window):
         """
         wx.PostEvent(self, SearchSwitch("print"))
         wx.PostEvent(self, SearchSwitch("search"))
+        wx.BeginBusyCursor()
     
 
     def SearchEvent(self, event):
@@ -239,7 +228,10 @@ class ComWindow(wx.Window):
         
     def get_devices(self):    
         devlist = devControl.search_device(self.top)
-        dev_list = devlist["devices"]
+        if (wx.IsBusy()):
+            wx.EndBusyCursor()
+
+        dev_list = devlist["switches"]
         if(len(dev_list) == 0):
             self.top.print_on_log("No Devices found\n")
             self.fst_lb.Clear()
@@ -254,7 +246,6 @@ class ComWindow(wx.Window):
             self.fst_lb.Clear()
             for i in range(len(key_list)):
                 str1 = val_list[i]+"("+key_list[i]+")"
-                print("str1-----:", str1)
                 self.fst_lb.Append([str1])
                 self.top.print_on_log(str1+"\n")
 
@@ -319,7 +310,6 @@ class ComWindow(wx.Window):
         # self.fst_lb.Disable()
         self.scnd_lb.Disable()
         self.top.selPort, devname = self.get_selected_com()
-        print("Hello")
         if devname == DEVICES[DEV_2301]:
             self.top.selBaud = 9600
         else:

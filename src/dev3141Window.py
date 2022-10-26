@@ -314,8 +314,7 @@ class Dev3141Window(wx.Panel):
             self.port_on_cmd(port)
         else:
             self.port_off_cmd(port)
-        self.port_led_update(port-1, stat)
-
+        
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
@@ -353,7 +352,9 @@ class Dev3141Window(wx.Panel):
             outstr = outstr.replace('1', '1 ON')
             outstr = outstr.replace('2', '2 ON')
             outstr = outstr[:-2] + "; Other Ports are OFF\n"
-            self.top.print_on_log(outstr)
+            self.top.print_on_log(self.swid+": "+outstr)
+            self.port_led_update(pno-1, True)
+
         #     if self.top.mode == MODE_MANUAL:
         #         self.enable_do_controls(True)
 
@@ -376,7 +377,8 @@ class Dev3141Window(wx.Panel):
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
-            self.top.print_on_log(outstr)
+            self.top.print_on_log(self.swid+": "+outstr)
+            self.port_led_update(pno-1, False)
         #     self.enable_do_controls(False)
         # model.send_port_cmd(self.top, self.swid+",on,"+str(0))
      

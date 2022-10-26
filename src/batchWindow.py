@@ -26,9 +26,6 @@ import wx
 
 from uiGlobals import *
 
-
-import configdata
-
 import os
 
 from wx.lib.scrolledpanel import ScrolledPanel
@@ -45,9 +42,7 @@ class BatchWindow(wx.Window):
         #self.SetMinSize((200,200))
         self.parent = parent
         self.top = top
-        self.config = top.config_data
         
-        # Oct 08 2022
         self.batch_flg = False
 
         self.batchopcode = {
@@ -76,8 +71,6 @@ class BatchWindow(wx.Window):
         self.hbSelect = wx.BoxSizer(wx.HORIZONTAL)
         self.vbSeq = wx.BoxSizer(wx.VERTICAL)
         self.hbBtn = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.cb_seqlist = self.getSeqList()
 
         self.mappedSw = {}
         self.reqSw = {}
@@ -163,18 +156,6 @@ class BatchWindow(wx.Window):
 
     def executeRepeat(self, repeat):
         self.top.print_on_log("Repeat\n")
-
-    def getSeqList(self):
-        keys = list(self.config.keys())
-        if "sequenceconfig" in keys:
-            cval = self.config["sequenceconfig"]
-            ikeys = list(cval.keys())
-            if(len(ikeys) == 0):
-                return ["no sequence found"]
-            else:
-                return ikeys
-        else:
-            return ["no sequence found"]
 
     def InitTopHbox(self):
         self.st_seqname = wx.StaticText(self, -1, "Browse the Sequence: ")

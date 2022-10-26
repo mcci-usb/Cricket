@@ -283,8 +283,7 @@ class Dev2101Window(wx.Panel):
                 self.port_on_cmd(port)
         else:
             self.port_off_cmd(port)
-        self.port_led_update(port-1, stat)
-
+        
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
@@ -302,9 +301,10 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """ 
-        model.control_port(self.top, self.swid+","+self.portcmd)
-        self.top.print_on_log("Port ON\n")
-        self.port_led_update(port, True)
+        res, outstr = model.control_port(self.top, self.swid+","+self.portcmd)
+        if res == 0:
+            self.top.print_on_log(self.swid+": Port ON\n")
+            self.port_led_update(port, True)
        
     def port_off_cmd(self, port):
         """
@@ -319,10 +319,11 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        model.control_port(self.top, self.swid+",off")
-        # model.control_port(self.top, DEV_DISCONNECT)
-        self.top.print_on_log("Port OFF\n")
-        self.port_led_update(port, False)
+
+        res, outstr = model.control_port(self.top, self.swid+",off")
+        if res == 0:
+            self.top.print_on_log(self.swid+": Port OFF\n")
+            self.port_led_update(port, False)
 
     
     def set_speed(self, speed):

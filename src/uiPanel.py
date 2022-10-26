@@ -298,7 +298,7 @@ class UiPanel(wx.Panel):
         Returns:
             None
         """
-        self.autoPan.set_interval(strval)
+        self.cpanel.set_interval(strval)
     
     def disable_usb_scan(self):
         """
@@ -311,7 +311,7 @@ class UiPanel(wx.Panel):
         Returns: 
             None
         """
-        self.logPan.disable_usb_scan()
+        self.cpanel.logPan.disable_usb_scan()
     
     def get_loop_param(self):
         """

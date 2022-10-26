@@ -67,7 +67,6 @@ class PortWindow(wx.Window):
         self.top = top
 
         self.type = list(cdata.keys())[0]
-        print(cdata)
         self.cdata = cdata
         self.parent = parent
 

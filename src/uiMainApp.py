@@ -122,7 +122,7 @@ class UiMainFrame (wx.Frame):
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
                           VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(1100, 710))
+                          size=wx.Size(980, 780))
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
@@ -423,11 +423,19 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.SelectSUT, id=ID_MENU_SUT2)
         self.toolMenu.Enable(ID_MENU_GRAPH, False)
 
+    # def increaseSize(self):
+    #     self.Refresh()
+    #     self.SetMaxSize((1200, 710))
+    #     self.Layout()
+        
+
+
     def SelectSUT(self, event):
         obj = event.GetEventObject()
         self.suts["nodes"]["sut1"] = True if obj.MenuItems[0].IsChecked() else False
         self.suts["nodes"]["sut2"] = True if obj.MenuItems[1].IsChecked() else False
         self.update_slog_panel()
+        # self.increaseSize()
 
     def SelectSUT1(self):
         self.suts["nodes"]["sut1"] = True if self.sl1menu.IsChecked() else False
@@ -721,9 +729,14 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        wx.BeginBusyCursor()
+
         self.print_on_log("Search Switches ...\n")
         self.dev_list.clear()
         self.dev_list = searchswitch.get_switches()
+
+        if (wx.IsBusy()):
+            wx.EndBusyCursor()
 
         # self.dev_list = devControl.search_device(self)
         self.dev_list = self.dev_list["switches"]

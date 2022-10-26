@@ -470,7 +470,7 @@ class Dev2301Window(wx.Window):
         else:
             # Here port off command
             self.port_off_cmd(port)
-        self.port_led_update(port-1, stat)
+        
 
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
@@ -499,6 +499,7 @@ class Dev2301Window(wx.Window):
             outstr = outstr.replace('4', '4 ON')
             outstr = outstr[:-2] + "; Other Ports are OFF\n"
             self.top.print_on_log(outstr)
+            self.port_led_update(pno-1, True)
 
           
     def port_off_cmd(self, pno):
@@ -518,6 +519,7 @@ class Dev2301Window(wx.Window):
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
             self.top.print_on_log(outstr)
+            self.port_led_update(pno-1, False)
 
     def set_speed(self, speed):
         """
