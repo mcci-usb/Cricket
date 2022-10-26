@@ -106,7 +106,7 @@ class LogWindow(wx.Window):
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.wait_flg = False
         
-        self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hbox1.Add(self.st_delay, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 18)
@@ -122,7 +122,7 @@ class LogWindow(wx.Window):
         self.hbox.Add(30,0,0)
 
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | 
+        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_LEFT | 
                                          wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(45,0,0)
         self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , 

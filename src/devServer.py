@@ -77,6 +77,7 @@ class ServerCc:
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None
+
     def close(self):
         """
         ServerCC connection is close
@@ -88,6 +89,7 @@ class ServerCc:
             None
         """  
         self.socket.close()
+        
         
 class StayAccept(threading.Thread):
     """A class StayAccept with init method"""

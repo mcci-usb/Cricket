@@ -50,7 +50,6 @@ NODEKEY = "_items"
 ##############################################################################
 
 def filterTextNodes(inpDE):
-    
     fnodes = []
     for elem in inpDE.childNodes:
         if elem.nodeType == DOM_ELEMENT:
@@ -71,7 +70,6 @@ def checkDataType(inpDE):
     return False
 
 def pickArrayElementFromItem(inpDE):
-    
     dtypeIdx = None
     for idx, elem in enumerate(inpDE):
         if(elem.nodeName == "key"):
@@ -87,7 +85,6 @@ def pickArrayElementFromItem(inpDE):
 # Function to calculate number of buses
 # Number of buses = number of Dict elements in the imAE
 def getTotalBuses(imAE):
-    
     fnodes = filterTextNodes(imAE)
     rnodes = []
     for ie in fnodes:
@@ -96,7 +93,6 @@ def getTotalBuses(imAE):
     return rnodes
 
 def getBusProperties(sbe):
-    
     busparam = []
     busidx = []
     rnodes = filterTextNodes(sbe)
@@ -115,14 +111,12 @@ def getBusProperties(sbe):
     return busparam
 
 def getTotalBusNames(tbe):
-    
     busparam = []
     for ide in tbe:
         busparam.append(getBusProperties(ide))
     return busparam
 
 def getBusHubPtrs(sbe):
-    
     sbushubptrs = []
     busidx = None
     hae = None
@@ -144,15 +138,12 @@ def getBusHubPtrs(sbe):
     return sbushubptrs
 
 def getTotalBusHubPtrs(tbe):
-    
     tbushubptrs = []
     for ide in tbe:
         tbushubptrs.append(getBusHubPtrs(ide))
     return tbushubptrs
 
 def fetchNameAndItem(she):
-    
-    #print(she)
     nhe = None
     chn = None
     nameidx = None
@@ -174,7 +165,6 @@ def fetchNameAndItem(she):
     return nodename, nhe
 
 def getDictNodeFromArray(inpDN):
-    
     dnode = None
     rnodes = filterTextNodes(inpDN)
     for idx, elem in enumerate(rnodes):
@@ -182,14 +172,10 @@ def getDictNodeFromArray(inpDN):
             dnode = elem
     return dnode
 
-
 def getBusHubs(sbhptr):
-    
     sbushubs = []
     if(len(sbhptr) == 0):
-        # print("No Hub Ptrs found")
         return sbushubs
-    # print("Hub Ptrs found")
     
     # Hub pointer is a Dict Element which may contains nested hubs and ports
     # In which there should be a name key and item key which is optional
@@ -214,9 +200,7 @@ def getBusHubs(sbhptr):
             sbushubs.append(hname)
     return sbushubs
 
-
 def scan_tb():
-    
     buses = []  # contains Dict Elements
     busNames = [] # [["bus0 busname", "deviceName", "UID", "Vendor Name"],["bus1 busname", "deviceName", "UID", "Vendor Name"]]
     busHubPtrs = [] # [[bus_0 hub1, hub2,...,hubn],[bus_1 hub1, hub2,...,hubn]]

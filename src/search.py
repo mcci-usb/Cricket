@@ -30,7 +30,6 @@ import time
 import os
 
 # Own modules
-import control2101 as d2101
 from uiGlobals import *
 
 ##############################################################################

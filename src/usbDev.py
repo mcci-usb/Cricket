@@ -27,6 +27,7 @@ from distutils.dep_util import newer
 # Own modules
 import getusb
 import getTb
+import getusb4
 
 from uiGlobals import *
 
@@ -49,6 +50,32 @@ def get_tb_tree():
     newdict = getTb.scan_tb()
     return newdict
 
+def get_usbandusb4_tree():
+    return getusb4.scan_usbandusb4()
+
+def get_u4_tree_change(top, updtlist):
+    adlist, rmlist = getusb4.get_tree_change(top.masterList, updtlist)
+    
+    strout = ""
+    
+    if(len(adlist) == 0 and len(rmlist) == 0):
+        # No device added removed from port, then print "No change"
+        strout = ("No Change\n")
+    
+    if(len(rmlist)):
+        # Usb removed from the port, then print "Removed"
+        strout = strout + "Removed\n"
+        for dev in rmlist:
+            strout = strout + dev + "\n"
+    if(len(adlist)):   
+        # Usb Added from the port, then print "Added"
+        strout = strout + "Added\n"
+        for dev in adlist:
+            strout = strout + dev + "\n"
+    
+    top.print_on_log(strout)
+
+
 def get_tb_tree_change(top, newdict):
     olddict = top.get_tb_list()
     if len(olddict) == 0:
@@ -64,10 +91,8 @@ def get_tb_tree_change(top, newdict):
     keynl = list(olist.keys())
     
     adlist = [i for i in keynl if i not in keyol]
-    # print("adlist:", adlist)
     rmlist = [i for i in keyol if i not in keynl]
-    # print("rmlist:",rmlist)
-
+    
     resd = {}
 
     for bus in keyol:
@@ -75,33 +100,12 @@ def get_tb_tree_change(top, newdict):
         nl = newdict[bus]
         ind = {}
         alist = [i for i in nl if i not in ol]
-        # print("alist:", alist)
         rlist = [i for i in ol if i not in nl]
         ind["added"] = alist
         ind["removed"] = rlist
         resd[bus] = ind
 
-    print("TB Tree change\n")
-    print(resd)
-
-    # addCnt = 0
-    # rmdCnt = 0
-    # strout = ""
-
-    # for idict in resd:
-    #     addCnt = addCnt + len(resd[idict]["added"])
-    #     rmdCnt = rmdCnt + len(resd[idict]["removed"])
-
-    # if(addCnt == 0 and rmdCnt == 0):
-    #     # No device added removed from port, then print "No change"
-    #     strout = ("TB No Change\n")
     
-    # if(addCnt > 0):
-    #     strout = ("TB Added: "+str(addCnt)+"\n")
-
-    # if(rmdCnt > 0):
-    #     strout = strout + ("TB Removed: "+str(rmdCnt)+"\n")
-
     addLst = []
     rmdLst = []
     strout = ""

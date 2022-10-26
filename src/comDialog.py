@@ -23,7 +23,13 @@
 #       Module created
 ##############################################################################
 # Lib imports
+from random import choices
+from matplotlib import style
 import wx
+
+import os
+import sys
+from sys import platform
 
 # Own modules
 import search
@@ -75,28 +81,54 @@ class ComWindow(wx.Window):
         self.parent = parent
         self.wait_flg = True
 
+        # print("I am Com dialog: ", self.top.dev_list)
+
         self.dlist = []
+        self.clist = []
+        self.switchlist = []
+        self.addswitchlist = []
+        
+        # self.switchlist = self.addswitchlist
 
         self.btn_scan = wx.Button(self, ID_BTN_DEV_SCAN, "Search",
-                                  size=(57,25))
+                                  size=(77,25))
 
-        self.cb_device = wx.ComboBox(self,
-                                     size=(135, -1),
-                                     choices=self.dlist,
-                                     style=wx.CB_DROPDOWN)
+        # self.fst_lb = wx.ComboBox(self,
+        #                              size=(135, -1),
+        #                              choices=self.dlist,
+        #                              style=wx.CB_DROPDOWN)
         
-        self.btn_connect = wx.Button(self, ID_BTN_CONNECT, "Connect", 
-                                     size=(80,-1))
+        # self.fst_lb = wx.ListCtrl(self, size=(160, 25))
+        # self.fst_lb = wx.ListCtrl(self, size=(160, 30))
 
+        self.fst_lb = wx.ListBox(self, size=(160, 120), style=wx.LB_EXTENDED, choices = self.dlist)
+
+        self.scnd_lb = wx.ListBox(self, size=(160,120), style=wx.LB_MULTIPLE, choices = self.clist)
+        
+        self.btn_add = wx.Button(self, ID_BTN_CONNECT, "ADD", size = (50,-1))
+        
+        self.btn_connect = wx.Button(self, ID_BTN_ADD, "Connect", 
+                                     size=(80,-1))
+        
+        
+        self.btn_top = wx.BoxSizer(wx.HORIZONTAL)
         self.szr_top = wx.BoxSizer(wx.HORIZONTAL)
         
         wx.BoxSizer(wx.HORIZONTAL)
+
+        self.btn_top.AddMany([
+            (165,10,0),
+            (self.btn_scan, 0, wx.LEFT),
+            (10,50,0)
+        ])
         
         self.szr_top.AddMany([
             (10,50,0),
-            (self.btn_scan, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER),
+            (self.fst_lb, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
             (10,50,0),
-            (self.cb_device, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
+            (self.btn_add, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
+            (10,50,0),
+            (self.scnd_lb, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
             (10,50,0),
             (self.btn_connect, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
             (10,50,0)
@@ -105,6 +137,8 @@ class ComWindow(wx.Window):
         self.vbox = wx.BoxSizer(wx.VERTICAL)
 
         self.vbox.AddMany([
+            (10,10,0),
+            (self.btn_top, 0, wx.EXPAND | wx.ALL),
             (10,10,0),
             (self.szr_top, 0, wx.EXPAND | wx.ALL),
             (10,10,0)
@@ -115,6 +149,7 @@ class ComWindow(wx.Window):
         # Set size of frame
         self.vbox.Fit(self)
         self.Layout()
+
         
         # Tooltips display text over an widget elements
         # Set tooltip for switching search button.
@@ -122,16 +157,31 @@ class ComWindow(wx.Window):
                                             "MCCI USB Switch(3141, 3201, 2101,2301)"))  
         # Bind the button event to handler
         self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
+
+        #Add list from scan list to add list
+        self.btn_add.Bind(wx.EVT_BUTTON, self.DeviceAdd)
         # Bind the button event to handler
         self.btn_connect.Bind(wx.EVT_BUTTON, self.ConnectDevice)
+
         self.btn_connect.Disable()   
         # The Timer class allows you to execute code at specified intervals.
         self.timer_lp = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.SearchTimer, self.timer_lp)
 
         EVT_RESULT(self, self.SearchEvent)
-        self.timer_lp.Start(1500)
+        # self.timer_lp.Start(1500)
+        self.load_initial()
 
+    def load_initial(self):
+        
+        for i in range(len(self.top.dev_list)):
+            lt = self.top.dev_list[i]["model"]+"("+ self.top.dev_list[i]["port"] +")"
+            self.fst_lb.Append([lt])
+
+        if(len(self.top.dev_list)):
+            self.fst_lb.Select(0)
+            self.btn_connect.Enable()
+    
     def SearchTimer(self, evt):
         """
         while Searching the Device timer start.
@@ -150,7 +200,7 @@ class ComWindow(wx.Window):
     def ScanDevice(self, evt):
         """
         Scan the list of connected devices over the USB bus
-
+        
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -192,23 +242,24 @@ class ComWindow(wx.Window):
         dev_list = devlist["devices"]
         if(len(dev_list) == 0):
             self.top.print_on_log("No Devices found\n")
-            self.cb_device.Clear()
+            self.fst_lb.Clear()
         else:
             key_list = []
             val_list = []
-
+            
             for i in range(len(dev_list)):
                 key_list.append(dev_list[i]["port"])
                 val_list.append(dev_list[i]["model"])
         
-            self.cb_device.Clear()
+            self.fst_lb.Clear()
             for i in range(len(key_list)):
                 str1 = val_list[i]+"("+key_list[i]+")"
-                self.cb_device.Append(str1)
+                print("str1-----:", str1)
+                self.fst_lb.Append([str1])
                 self.top.print_on_log(str1+"\n")
 
             if(len(key_list)):
-                self.cb_device.SetSelection(0)
+                self.fst_lb.Select(0)
                 self.btn_connect.Enable()
                 # Device is found update in status bar Model(s) found
                 self.top.UpdateSingle("Switch(s) found", 3)
@@ -216,6 +267,24 @@ class ComWindow(wx.Window):
                 self.btn_connect.Disable()
                 # Device is not found update in status bar No Models found
                 self.top.UpdateSingle("No Switch found", 3)
+    
+    def DeviceAdd(self, evt):
+        
+        ilist = self.fst_lb.GetItems()
+        slist = self.fst_lb.GetSelections()
+        
+
+        flist = []
+        temp_list = []
+        self.top.switch_list.clear()
+        for i in slist:
+            if i not in temp_list:
+                temp_list.append(ilist[i])
+                self.top.switch_list.append(ilist[i])
+
+                self.scnd_lb.Clear()
+                self.scnd_lb.AppendItems(self.top.switch_list)
+
    
     def ConnectDevice(self, evt):
         """
@@ -230,12 +299,12 @@ class ComWindow(wx.Window):
         Returns:
             None
         """
+        self.parent.EndModal(True)
         self.btn_connect.Disable()
-        self.connect_device()
-        #self.btn_connect.Enable()
-        self.top.set_mode(MODE_MANUAL)
-    
-    def connect_device(self):    
+        self.top.add_switch_dialogs()
+       
+
+    def connect_device(self):
         """
         Establish the connection with selected Model
 
@@ -244,11 +313,13 @@ class ComWindow(wx.Window):
             instance of the class,and is used to access variables
             that belongs to the class.
         Returns:
-            None
+            Nones
         """
         # Combo box, device list is disable
-        self.cb_device.Disable()
+        # self.fst_lb.Disable()
+        self.scnd_lb.Disable()
         self.top.selPort, devname = self.get_selected_com()
+        print("Hello")
         if devname == DEVICES[DEV_2301]:
             self.top.selBaud = 9600
         else:
@@ -259,7 +330,7 @@ class ComWindow(wx.Window):
                 break
         if devControl.connect_device(self.top):
             self.device_connected()
-
+    
     def get_selected_com(self):
         """
         Get the selected Com port and Switch Model
@@ -271,7 +342,7 @@ class ComWindow(wx.Window):
         Returns:
             it returns the Com Port and Model in String
         """
-        self.cval = self.cb_device.GetValue()
+        self.cval = self.fst_lb.GetItems()
         txt = self.cval.split("(")
         return txt[1].replace(")",""), txt[0]
 
@@ -382,9 +453,6 @@ class ComDialog(wx.Dialog):
 
         # Sizes the window to fit its best size.
         self.Fit()
-        # Centre frame using CentreOnParent() function,
-        # Show window in the center of the screen.
-        # Centres the window on its parent.
         self.CenterOnParent(wx.BOTH)
     
     def OnOK (self, evt):

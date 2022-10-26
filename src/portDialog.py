@@ -1,7 +1,7 @@
 
 ##############################################################################
 # 
-# Module: setDialog.py
+# Module: portDialog.py
 #
 # Description:
 #     Dialog to display system setup configuration
@@ -46,7 +46,7 @@ class PortWindow(wx.Window):
     The AboutWindow navigate to MCCI Logo with naming of 
     application UI "Criket",Version and copyright info.  
     """
-    def __init__ (self, parent, top, type):
+    def __init__ (self, parent, top, cdata):
         """
         AboutWindow that contains the about dialog elements.
 
@@ -62,11 +62,13 @@ class PortWindow(wx.Window):
         wx.Window.__init__(self, parent, -1,
                            size=wx.Size(400,300),
                            style=wx.CLIP_CHILDREN,
-                           name=type)
+                           name=list(cdata.keys())[0])
 
         self.top = top
 
-        self.type = type
+        self.type = list(cdata.keys())[0]
+        print(cdata)
+        self.cdata = cdata
         self.parent = parent
 
         self.nwip = None
@@ -91,14 +93,14 @@ class PortWindow(wx.Window):
 
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveSettings)
         
-        self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
         self.hbox_rb.Add(self.rb_nwc, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 40)
         
 
-        self.hbox_portip.Add(self.st_port, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox_portip.Add(self.st_port, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
         self.hbox_portip.Add(self.tc_port, 0, flag=wx.ALIGN_CENTER_VERTICAL |
@@ -134,7 +136,18 @@ class PortWindow(wx.Window):
         # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
+    
     def initDialog(self):
+        if(self.cdata[self.type]["interface"] == "tcp"):
+            self.rb_nwc.SetValue(True)
+        else:
+            self.rb_tc.SetValue(True)
+        self.tc_port.SetValue(self.cdata[self.type]["tcp"]["port"])
+        self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
+
+        
+
+    def initDialog_old(self):
         """
         initiate the dialog box of both SCC and THC 
 
@@ -210,7 +223,7 @@ class PortDialog(wx.Dialog):
     """
     wxWindows application must have a class derived from wx.Dialog.
     """
-    def __init__ (self, parent, top, type):
+    def __init__ (self, parent, top, cdata):
         """
         A AboutDialog is Window an application creates to 
         retrieve Cricket UI Application input.
@@ -224,6 +237,7 @@ class PortDialog(wx.Dialog):
         Returns:
             None
         """
+        type = list(cdata.keys())[0]
         title = "Switch Control Computer - Port"
         if type == "thc":
             title = "Test Host Computer - Port"
@@ -234,7 +248,7 @@ class PortDialog(wx.Dialog):
                            name="Config Dialog")
 
         self.top = top
-        self.win = PortWindow(self, top, type)
+        self.win = PortWindow(self, top, cdata)
 
         # Sizes the window to fit its best size.
         self.Fit()

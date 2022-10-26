@@ -192,19 +192,19 @@ class SetWindow(wx.Window):
 
         self.btn_save = wx.Button(self, -1, 'save', size = (60,25))
 
-        self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox_rb.Add(self.rb_tc, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
         self.hbox_rb.Add(self.rb_nwc, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 40)
         
-        self.hbox_portip.Add(self.st_port, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox_portip.Add(self.st_port, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=20)
 
         self.hbox_portip.Add(self.tc_port, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 33)
 
-        self.hbox_nw.Add(self.btn_scan, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox_nw.Add(self.btn_scan, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=18)
         self.hbox_nw.Add(self.tc_nwcip, 0,flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 20)
@@ -254,22 +254,23 @@ class SetWindow(wx.Window):
         Returns:
             None
         """
-        if self.type == "scc":
-            if self.top.ldata['sccif'] == "network":
-                self.rb_nwc.SetValue(True)
-            else:
-                self.rb_tc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['sccid'])
-            self.tc_port.SetValue(self.top.ldata['sccpn'])
-        else:
-            if(self.top.ldata['thcif'] == "network"):
-                self.rb_nwc.SetValue(True)
-            else:
-                self.rb_tc.SetValue(True)
-            self.tc_nwcip.SetValue(self.top.ldata['thcid'])
-            self.tc_port.SetValue(self.top.ldata['thcpn'])
+        # if self.type == "scc":
+        #     if self.top.ldata['sccif'] == "network":
+        #         self.rb_nwc.SetValue(True)
+        #     else:
+        #         self.rb_tc.SetValue(True)
+        #     self.tc_nwcip.SetValue(self.top.ldata['sccid'])
+        #     self.tc_port.SetValue(self.top.ldata['sccpn'])
+        # else:
+        #     if(self.top.ldata['thcif'] == "network"):
+        #         self.rb_nwc.SetValue(True)
+        #     else:
+        #         self.rb_tc.SetValue(True)
+        #     self.tc_nwcip.SetValue(self.top.ldata['thcid'])
+        #     self.tc_port.SetValue(self.top.ldata['thcpn'])
 
-        self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
+        # self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
+        pass
 
     def ScanNetwork(self, e):
         """

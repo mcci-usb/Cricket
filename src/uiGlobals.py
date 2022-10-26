@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "3.0.0-Pre2"
+APP_VERSION = "3.0.0-Pre3"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -58,6 +58,7 @@ IMG_LOGO = "mcci_logo.png"
 IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
 IMG_WAVE = "wave.png"
+IMG_NOSWITCH = "noswitch.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -77,6 +78,7 @@ wx.RegisterId(ID_MAX)
 # ComWindow Widgets
 ID_BTN_DEV_SCAN = 1000
 ID_BTN_CONNECT = 1001
+ID_BTN_ADD = 1111
 
 # LoopWindow Widgets
 ID_TC_PERIOD = 1002
@@ -122,22 +124,53 @@ ID_BTN_CLEAR = 1046
 ID_BTN_REF = 1047
 ID_BTN_UCLEAR = 1048
 
+# Serial Log Window
+ID_BTN_SL_SAVE = 1049
+ID_BTN_SL_CLEAR = 1050
+ID_BTN_SL_CONFIG = 1051
+ID_BTN_SL_CONNECT = 1052
+
 # Menu for Mac
-ID_MENU_WIN_MIN = 1049
-ID_MENU_WIN_SHOW = 1050
+ID_MENU_WIN_MIN = 1100
+ID_MENU_WIN_SHOW = 1101
 
-ID_MENU_MODEL_CONNECT = 1100
-ID_MENU_MODEL_DISCONNECT = 1101
+ID_MENU_MODEL_CONNECT = 1102
+ID_MENU_MODEL_DISCONNECT = 1103
 
-ID_MENU_CONFIG_UC = 1102
-ID_MENU_CONFIG_SCC = 1103
-ID_MENU_CONFIG_THC = 1104
+ID_MENU_CONFIG_UC = 1104
+ID_MENU_CONFIG_SCC = 1105
+ID_MENU_CONFIG_THC = 1106
 
-ID_MENU_SET_SCC = 1105
-ID_MENU_SET_THC = 1106
+ID_MENU_SET_SCC = 1107
+ID_MENU_SET_THC = 1108
 
-ID_MENU_GRAPH = 1110
-EVT_RESULT_ID = 1100
+ID_MENU_GRAPH = 1109
+
+ID_MENU_SUT = ID_MENU_GRAPH + 1
+ID_MENU_SUT1 = ID_MENU_SUT + 1
+ID_MENU_SUT2 = ID_MENU_SUT1 + 1
+
+ID_MENU_BATCHMODE = ID_MENU_SUT2 + 1
+ID_MENU_SWCONFIG = ID_MENU_BATCHMODE + 1
+
+ID_BTN_3141 = ID_MENU_SWCONFIG + 1
+ID_BTN_3201 = ID_BTN_3141 + 1
+ID_BTN_2101 = ID_BTN_3201 + 1
+
+EVT_RESULT_ID = ID_MENU_SWCONFIG + 1
+EVT_SUT_SL_DATA_ID = EVT_RESULT_ID + 1  # SUT Data arrival 
+EVT_SUT_SL_ERR_ID = EVT_SUT_SL_DATA_ID + 1   # SUT Err Msg arrival
+
+ID_MENU_CONFIG_SL1 = EVT_SUT_SL_ERR_ID + 1
+ID_MENU_CONFIG_SL2 = ID_MENU_CONFIG_SL1 + 1
+
+ID_RBTN_PC = ID_MENU_CONFIG_SL2 + 1
+ID_RBTN_RV = ID_MENU_CONFIG_SL2 + 1
+ID_RBTN_RC = ID_MENU_CONFIG_SL2 + 1
+ID_RBTN_RT = ID_MENU_CONFIG_SL2 + 1
+
+ID_TC_SEQNAME = ID_RBTN_RT + 1
+ID_BTN_SEQSAVE = ID_TC_SEQNAME + 1
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
@@ -157,6 +190,8 @@ usbClass = {0: "Unknown",
             255: "Vendor Specific"}
 
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
+
+portCnt = {"3141": 2, "3201": 4, "2301": 4, "2101": 1}
 
 
 ##############################################################################
