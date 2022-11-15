@@ -9,28 +9,28 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 ## List of Contents
 
-<!-- TOC depthfrom:2 updateonsave:true -->
+<!-- TOC depthfrom:2 updateonsave:false -->
 
 - [List of Contents](#list-of-contents)
 - [About the Application](#about-the-application)
 - [Prerequisites for running or building](#prerequisites-for-running-or-building)
-        - [Windows](#windows)
-        - [Ubuntu](#ubuntu)
-        - [MacOS](#macos)
-        - [Raspberry Pi](#raspberry-pi)
+	- [Windows](#windows)
+	- [Ubuntu](#ubuntu)
+	- [MacOS](#macos)
+	- [Raspberry Pi](#raspberry-pi)
 - [Running the code](#running-the-code)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
 - [Supported Products](#supported-products)
-        - [MCCI Model 3141 USB4® Switch](#mcci-model-3141-usb4%C2%AE-switch)
-        - [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
-        - [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
-        - [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
+	- [MCCI Model 3141 USB4® Switch](#mcci-model-3141-usb4%C2%AE-switch)
+	- [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
+	- [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
+	- [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
 - [Release History](#release-history)
 - [Meta](#meta)
-        - [Copyright and License](#copyright-and-license)
-        - [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
-        - [Trademarks](#trademarks)
+	- [Copyright and License](#copyright-and-license)
+	- [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
+	- [Trademarks](#trademarks)
 
 <!-- /TOC -->
 
