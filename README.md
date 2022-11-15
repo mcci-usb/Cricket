@@ -1,25 +1,27 @@
 # Cricket UI
 
-Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
+This repository contains the source code for Cricket UI, a standalone desktop application for interactivly controlling [MCCI USB Switches](https://store.mcci.com/collections/usb-switches) in a convenient way. The application supports MCCI Model 3141, 3201, 2301 and 2101 USB Switches.
+
+**Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
 <!-- /TOC -->
 [![Git release](https://img.shields.io/badge/release-v2.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.7.0-1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
-
 ## List of Contents
 
 <!-- TOC depthFrom:2 updateOnSave:true -->
 
-- [About Application](#about-application)
+- [About the Application](#about-the-application)
 - [Prerequisites for running or building](#prerequisites-for-running-or-building)
 - [Interpret python source](#interpret-python-source)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [MCCI USB Switch 3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
-- [MCCI USB Switch 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
-- [MCCI USB Switch 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
-- [MCCI USB Switch 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
+- [Supported Products](#supported-products)
+  - [MCCI USB Switch 3141 USB Switch](#To-know-about-MCCI-USB-Model3141)
+  - [MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser](#To-know-about-MCCI-USB-Model3201)
+  - [MCCI USB Switch 2101 USB Connection Exerciser](#To-know-about-MCCI-USB-Model2101)
+  - [MCCI USB Switch 2301 USB Connection Exerciser](#To-know-about-MCCI-USB-Model2301)
 - [Release History](#release-history)
 - [Meta](#meta)
   - [Copyright and License](#Copyright-and-License)
@@ -28,7 +30,7 @@ Simple standalone desktop application for handling MCCI USB Switches in a conven
 
 <!-- /TOC -->
 
-## About Application
+## About the Application
 
 This application is designed to create simple User Interface for USB Switch 3141 3201, 2101 and 2301 to make the user's interaction as simple and efficient as possible.
 
@@ -182,27 +184,25 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To know about MCCI USB Switch 3201
+## Supported Products
 
-MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser 
+### MCCI Model 3141 
 
-* The MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+* The Model 3141 USB4® Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C® receptacles to a single USB-C® plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
+It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB switch 3201](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
- 
-   ![Model3201-typeC](assets/Model3201.png)
-   
- ## To know about MCCI USB Switch 3141
-
-MCCI USB Switch 3141
-
-* The MCCI® USB 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
-The MCCI USB Switch 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
-
- **Link:** For more information, see the product home page at [MCCI USB Switch 3141](https://mcci.com/usb/dev-tools/model-3141/).
+  **Link:** For more information, see the [product home page](https://mcci.com/usb/dev-tools/model-3141/).
  
   ![Model3141-typeC](assets/TypeC3141.PNG)
   
+### MCCI Model 3201 Enhanced Type-C 4-Port USB Switch
+
+The MCCI Model 3201 (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+
+ **Link:** For more information, see the [product home page](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
+ 
+   ![Model3201-typeC](assets/Model3201.png)
+   
 ## To know about MCCI USB Switch 2101
 
 MCCI USB Switch 2101 USB Connection Exerciser
@@ -274,7 +274,7 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
   - Until stopped and Port selection option added to the Loop mode and separate panel for Auto mode added, 
   - adding USB speed info, increase port switching speed.
 
-- v1.2.0 has folloeing changes
+- v1.2.0 has following changes
 
   - Host Controller issue and Delay override
 
@@ -286,11 +286,11 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
   - Initial Release
 
- ## Meta
+## Meta
 
 ### Copyright and License
 
-Except as explicitly noted, content created by MCCI in this repository tree is copyright (C) 2021, MCCI Corporation.
+Except as explicitly noted, content created by MCCI in this repository tree is copyright (C) 2021-2022, MCCI Corporation.
 
 The Cricket UI is released under the terms of the attached [GNU General Public License, version 2](./LICENSE.md). `LICENSE.md` is taken directly from the [FSF website](http://www.gnu.org/licenses/old-licenses/gpl-2.0.md).
 
