@@ -65,10 +65,9 @@ def scan_usb():
 
     backend = None
     # Running Python-application on Windows
-    if sys.platform == 'windows':
-        backend = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
-                   path + "Lib/site-packages/libusb/_platform/_windows/x86"+
-                   "/libusb-1.0.dll")
+    if sys.platform == "win32":
+        backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
+              path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
 
     # Generator object
     usb_devices = usb.core.find(find_all=True, backend=backend) 
