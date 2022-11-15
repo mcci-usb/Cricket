@@ -1,55 +1,59 @@
 # Cricket UI
 
-Simple standalone desktop application for handling MCCI USB Switches in a convenient way. it Supports MCCI USB Switch3141, 3201, 2301 and 2101 USB Connection Exerciser.
+This repository contains the source code for Cricket UI, a standalone desktop application for interactively controlling [MCCI USB Switches](https://store.mcci.com/collections/usb-switches) in a convenient way. The application supports MCCI Model 3141, 3201, 2301 and 2101 USB Switches.
 
-<!-- /TOC -->
+**Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
+
 [![Git release](https://img.shields.io/badge/release-v2.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.7.0-1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
-
 ## List of Contents
 
-<!-- TOC depthFrom:2 updateOnSave:true -->
+<!-- TOC depthfrom:2 updateonsave:false -->
 
-- [About Application](#about-application)
+- [List of Contents](#list-of-contents)
+- [About the Application](#about-the-application)
 - [Prerequisites for running or building](#prerequisites-for-running-or-building)
-- [Interpret python source](#interpret-python-source)
+	- [Windows](#windows)
+	- [Ubuntu](#ubuntu)
+	- [MacOS](#macos)
+	- [Raspberry Pi](#raspberry-pi)
+- [Running the code](#running-the-code)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
-- [MCCI USB Switch 3201 Enhanced type-c connection exerciser](#To-know-about-MCCI-USB-Model3201)
-- [MCCI USB Switch 3141 usb switch](#To-know-about-MCCI-USB-Model3141)
-- [MCCI USB Switch 2101 usb connection exerciser](#To-know-about-MCCI-USB-Model2101)
-- [MCCI USB Switch 2301 usb connection exerciser](#To-know-about-MCCI-USB-Model2301)
+- [Supported Products](#supported-products)
+	- [MCCI Model 3141 USB4® Switch](#mcci-model-3141-usb4%C2%AE-switch)
+	- [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
+	- [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
+	- [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
 - [Release History](#release-history)
 - [Meta](#meta)
-  - [Copyright and License](#Copyright-and-License)
-  - [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
-  - [Trademarks](#trademarks)
+	- [Copyright and License](#copyright-and-license)
+	- [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
+	- [Trademarks](#trademarks)
 
 <!-- /TOC -->
 
-## About Application
+## About the Application
 
-This application is designed to create simple User Interface for USB Switch 3141 3201, 2101 and 2301 to make the user's interaction as simple and efficient as possible.
-
-It is a cross platform GUI application developed by using WxPython.
+This application is a simple user interface for MCCI USB Switches. It supports manual and automated testing of USB hosts and devices, by automatically connecting and disconnecting USB devices and tracking results.
 
 ## Prerequisites for running or building
 
-<strong>On Windows:</strong>
+### Windows
 
 Development environment
 
 * OS - Windows 10 64 bit
 * Python - 3.7.6
-* wxpython - 4.0.7.post2
+* wxPython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 1.16.0
 
-Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install
+Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install.
 
 ```shell
 pip install wxpython==4.0.7.post2
@@ -60,20 +64,20 @@ pip install libusb1
 pip install matplotlib
 ```
 
-<strong>On Linux OS:</strong>
+### Ubuntu
 
 Development environment
 
 * Linux OS - Ubuntu 20.04 64 bit
 * Python - 3.8.2
-* wxpython - 4.0.7.post2
+* wxPython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 3.5
 
-```shell
+```bash
 sudo apt-get update
 sudo apt-get install python3
 sudo apt-get install python3-pip
@@ -86,24 +90,25 @@ sudo pip3 install matplotlib
 ```
 
 Note:
-* If the installation of wxpython is not success, perform `sudo apt-get install build-essential libgtk-3-dev`
-* Some times the installation of wxpython takes longer time (>30 minutes).
 
-<strong>On Mac OS:</strong>
+* If the installation of wxPython does not succeed, try `sudo apt-get install build-essential libgtk-3-dev`
+* Sometimes the installation of wxPython takes a long time (>30 minutes).
+
+### MacOS
 
 Development environment
 
 * Mac OS - Catalina 10.15.7 64 bit
 * Python - 3.6.9
-* wxpython - 4.0.7.post2
+* wxPython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
-* matplotlib - 3.2.2 
+* matplotlib - 3.2.2
 * hidapi - 0.10.1  - Only for Mac OS
 
-```shell
+```bash
 sudo apt-get update
 sudo apt-get install python3
 sudo apt-get install python3-pip
@@ -116,7 +121,7 @@ sudo pip3 install matplotlib
 brew install hidapi - Only for Mac OS
 ```
 
-<strong>On RaspberryPI:</strong>
+### Raspberry Pi
 
 Development environment
 
@@ -129,7 +134,7 @@ Development environment
 * libusb1 - 1.9
 * matplotlib - 1.14.0
 
-```shell
+```bash
 sudo add-apt-repository ppa:swt-techie/wxpython4
 sudo apt-get update
 sudo apt-get install python3-wxgtk4.0
@@ -141,31 +146,36 @@ sudo pip3 install matplotlib
 ```
 
 Note:
-* If the installation of wxpython is not success, perform `sudo apt-get install build-essential libgtk-3-dev`
 
-## Interpret python source
+* If the installation of wxPython does not succeed, try `sudo apt-get install build-essential libgtk-3-dev`
+
+## Running the code
 
 Move to the directory `destdir/src/`
 
 Run the below command
 
-For Windows 
+For Windows:
+
 ```shell
-python main.py  
+python main.py
 ```
 
 For Linux
-```shell
+
+```bash
 python3 main.py
 ```
 
 For Mac
-```shell
+
+```bash
 python3.6 main.py
 ```
 
-For RaspberryPi
-```shell
+For Raspberry Pi
+
+```bash
 python3 main.py
 ```
 
@@ -182,72 +192,67 @@ To update the version for each release
 
 ![UI Preview](assets/CricketUI.png)
 
-## To know about MCCI USB Switch 3201
+## Supported Products
 
-MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser 
+### MCCI Model 3141 USB4® Switch
 
-* The MCCI USB Switch 3201 Enhanced Type-C Connection Exerciser (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+* The Model 3141 USB4 Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C® receptacles to a single USB-C® plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery.
+It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
- **Link:** For more information, see the product home page at [MCCI USB switch 3201](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
- 
-   ![Model3201-typeC](assets/Model3201.png)
-   
- ## To know about MCCI USB Switch 3141
+  **Link:** For more information, see the [product home page](https://mcci.com/usb/dev-tools/model-3141/).
 
-MCCI USB Switch 3141
-
-* The MCCI® USB 3141 USB4™ Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices, as well as older protocols such as Thunderbolt™ 3, USB 3.2 gen2 or gen1, USB 2.0, USB Type-C Alternate Modes, and of course Power Delivery. 
-The MCCI USB Switch 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
-
- **Link:** For more information, see the product home page at [MCCI USB Switch 3141](https://mcci.com/usb/dev-tools/model-3141/).
- 
   ![Model3141-typeC](assets/TypeC3141.PNG)
-  
-## To know about MCCI USB Switch 2101
 
-MCCI USB Switch 2101 USB Connection Exerciser
+### MCCI Model 3201 Enhanced Type-C 4-Port USB Switch
 
-* The MCCI USB 3.0 Connection Exerciser MCCI USB Switch 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.  
+The MCCI Model 3201 (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+
+ **Link:** For more information, see the [product home page](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
+
+   ![Model3201-typeC](assets/Model3201.png)
+
+### MCCI Model 2101 USB Connection Exerciser
+
+The MCCI USB 3.0 Connection Exerciser MCCI USB Switch 2101 automatically connects and disconnects a USB 2.0 or 3.2 gen1 host and device under push-button or software control. Connections can be single-stepped or repeated. The manual modes are useful for debugging attach/detach scenarios.
 The MCCI USB 3141 USB4 Switch automates connect/disconnect of one or two devices to a USB Type-C port. It can be used in stress testing, switching between peripherals (for example, a dock and a display), or any automated reconfiguration of a USB Type-C port
 
  **Link:** For more information, see the product home page at [MCCI USB Switch 2101](https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/).
- 
+
   ![Model3201](assets/Model2101.png)
-  
-  ## To know about MCCI USB Model2301
 
-MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
+### MCCI Model 2301 4-Port USB Connection Exerciser
 
-* The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
+The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
 
  **Link:** For more information, see the product home page at [MCCI USB Switch 2301](https://mcci.com/usb/dev-tools/model-2301/).
 
  ![Model2301](assets/Model2301.png)
 
- ## Release History
+## Release History
+
 - v2.7.0 is a patch release.
   - Cricket UI fails to launch on ubuntu 20.04 and 22.04
 - v2.6.1 is a patch release.
   - update the version tag [#75](https://github.com/mcci-usb/Cricket/commit/60b52983a71e6fd05813e7bd727a9ba21e261eb8)
 - v2.6.0 is a patch release.
   - Device search dialog goes blank until complete the search [#70](https://github.com/mcci-usb/Cricket/commit/7fe8957ab618dff0510e72076c24afb81a85fb51)
-  - App not responding when other com port devices(Non MCCI USB Switchs) attached to the system USB & Slow search for switches [#59](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a) [#65](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a)
+  - App not responding when other com port devices(that are not MCCI USB Switches) are attached to the system USB & Slow search for switches [#59](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a) [#65](https://github.com/mcci-usb/Cricket/commit/829d85818beb533114423fbdb848013c3c66eb0a)
   - Minimizing and maximizing the application [#60](https://github.com/mcci-usb/Cricket/commit/f6bb6a8a79cf8ccf69931c288e1e417574cf8fe4)
   - Disable VBUS V/I monitor if switch doesn't support [#63](https://github.com/mcci-usb/Cricket/commit/2c569d5131f1f04fa3e802f67e04ded35b80b802)
   - misspelling in the log window instead of Switch it was spelled as Swicth [#61](https://github.com/mcci-usb/Cricket/commit/1344384596efdfd3288ef40bea38c8149b2039f6).
 - v2.5.0 is major release it Contains the following changes
   -	Feature added – Plotting of VBUS Volt and Current `VBUS V/I Plotting` [#18 #48 #52](https://github.com/mcci-usb/Cricket/commit/eb30f3b4a2e1da2c21db470315a8489b19d7b87d).
-  - USB Tree view removed and merged with Logwindow `Replaced USB Tree view window to Log Window` [#24](https://github.com/mcci-usb/Cricket/issues/24).
-  - Perform device Search in advance, Device searching automatically or manually seaching the device `USB Switch Scanning` [#30](https://github.com/mcci-usb/Cricket/issues/30).
-  - Auto mode improved (Port selection provided) `Port(s) selection ` [#22](https://github.com/mcci-usb/Cricket/issues/22) also with out port selection start auto popUp window appear ` PopUp window` [#Auto Popupwindow](https://github.com/mcci-usb/Cricket/commit/f44494cc7b4295b10480be373afbf4987dc6383f).
+  - USB Tree view removed and merged with Log Window `Replaced USB Tree view window to Log Window` [#24](https://github.com/mcci-usb/Cricket/issues/24).
+  - Perform device Search in advance, Device searching automatically or manually searching the device `USB Switch Scanning` [#30](https://github.com/mcci-usb/Cricket/issues/30).
+  - Auto mode improved (Port selection provided) `Port(s) selection ` [#22](https://github.com/mcci-usb/Cricket/issues/22) also with out port selection start auto pop-pp window appears `PopUp window` [`#Auto Popupwindow`](https://github.com/mcci-usb/Cricket/commit/f44494cc7b4295b10480be373afbf4987dc6383f).
   - Linux machine IP scanning issue fixed `Scanning ip address from Linux machine ` [#20](https://github.com/mcci-usb/Cricket/issues/20).
   - The word Model replace by MCCI USB Switch `Replace MCCI USB Switch ` [#27](https://github.com/mcci-usb/Cricket/issues/27).
   - UI not responding issued fixed `UI not Responding ` [#28](https://github.com/mcci-usb/Cricket/issues/28).
-  - Do not disable Manage Model>Connect when connected allow the user to directly connect to another switch `Connect menu` [#30](https://github.com/mcci-usb/Cricket/commit/d3077b5b2925553a505955d5721673705438d464). 
+  - Do not disable Manage Model>Connect when connected allow the user to directly connect to another switch `Connect menu` [#30](https://github.com/mcci-usb/Cricket/commit/d3077b5b2925553a505955d5721673705438d464).
   - Enhancement – Highlight the name of the     Switch `Highlet Switch` [#29](https://github.com/mcci-usb/Cricket/issues/29).
   - added Finished count in Loop Mode `Finished Count ` [#23](https://github.com/mcci-usb/Cricket/issues/23).
   - Persistence of last connect `Last device connect `[#43](https://github.com/mcci-usb/Cricket/commit/2bf73805fe274e27fb775b18c4bc639828a60347)
-  - Application gets hung when closing the application by using Mac Using Quit cmd `Quit Commad on Mac` [40](https://github.com/mcci-usb/Cricket/commit/2e34f30771b6dbfcf5c6bc7de9da4db7e0b7f8bb).
+  - Application hangs when closing the application on macOS using Quit command [#40](https://github.com/mcci-usb/Cricket/commit/2e34f30771b6dbfcf5c6bc7de9da4db7e0b7f8bb).
   - click on the settings menu, then click on the "Switch Control Computer" sub menu, this should display a dialog for searching the Computer over the network based on the port assigned for that. But dialog does not appearing `SCC and THC Setting menu search dialog not displayed - In Mac Catalian and Monterey` [#41](https://github.com/mcci-usb/Cricket/commit/e114a2bf9bb13968388f2e898b21dc2c6913edbd).
   - UI panel are not centralized `fixed UI in Central on window` [45](https://github.com/mcci-usb/Cricket/commit/755384805f0d05bce7fff4d0089f664812314f94).
   - Port selection should be disable state once the Auto mode execution get started, then the required ports are should be enabled when auto mode gets stopped `Disable the port selection when auto mode is under execution` [#50](https://github.com/mcci-usb/Cricket/commit/e45dac8e266632c75c72a7e88318fcec9a309f3c)
@@ -255,7 +260,7 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
 
   - Update year in the copy right info `Update copy right info in About dialog` [#53](https://github.com/mcci-usb/Cricket/commit/3530af09d231fc8ae9ffc6f47fd29bcfea5a329e)
 
-- v2.4.0 is major release; changes are significant  to Networking protocol TcpIp.
+- v2.4.0 is major release; changes are significant to networking using TCP/IP.
   - Add new feature support for Three computer System and Two Computer `Two and Three Computer system through Networking ` [#14](https://github.com/mcci-usb/Cricket/pull/14/commits/931f867960b375b07b980b61e39ab32bba4dfb35).
 
 - v2.3.0 is major release has following changes.
@@ -266,31 +271,31 @@ MCCI USB Switch 2301 Type-A USB 3.2 Gen2 Connection Exerciser
   - Python implemented to Pep8 coding standard ` MCCI USB Switch 2301 ` [#5](https://github.com/mcci-usb/Cricket/pull/5).
   - Package release for Raspberry Pi OS ubuntu18.04
 
-- v2.0.0 has major release 
+- v2.0.0 is a major release.
 
   - Interface for USB Switch 2101 added
   - Radio buttons for Port switching replaced by  image added buttons,
   - Duty parameter added in auto mode,
-  - Until stopped and Port selection option added to the Loop mode and separate panel for Auto mode added, 
+  - Until stopped and Port selection option added to the Loop mode and separate panel for Auto mode added,
   - adding USB speed info, increase port switching speed.
 
-- v1.2.0 has folloeing changes
+- v1.2.0 has following changes
 
   - Host Controller issue and Delay override
 
 - v1.0.2 is a changes to menu option
 
-  - Mac Menu Update 
+  - Mac Menu Update
 
 - v1.0.0 initial release of cricket UI
 
   - Initial Release
 
- ## Meta
+## Meta
 
 ### Copyright and License
 
-Except as explicitly noted, content created by MCCI in this repository tree is copyright (C) 2021, MCCI Corporation.
+Except as explicitly noted, content created by MCCI in this repository tree is copyright (C) 2021-2022, MCCI Corporation.
 
 The Cricket UI is released under the terms of the attached [GNU General Public License, version 2](./LICENSE.md). `LICENSE.md` is taken directly from the [FSF website](http://www.gnu.org/licenses/old-licenses/gpl-2.0.md).
 
@@ -306,4 +311,6 @@ For information about MCCI's products, please visit [store.mcci.com](https://sto
 
 ### Trademarks
 
-MCCI and MCCI Catena are registered trademarks of MCCI Corporation. All other marks are the property of their respective owners.
+MCCI and MCCI Catena are registered trademarks of MCCI Corporation. USB4, USB Type-C and USB-C are registered trademarks of USB-IF. All other marks are the property of their respective owners.
+
+<!-- markdownlint-disable-file MD004 -->
