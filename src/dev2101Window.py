@@ -166,6 +166,34 @@ class Dev2101Window(wx.Panel):
         self.Layout()
     
 
+    def read_status(self):
+        """
+        Once Switch 2101 connected, should read port status and update UI
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        res, outbyte = model.read_port(self.top, self.swid)
+        if res == 0:
+            ob = 0
+            if sys.platform == 'darwin':
+                ob = outbyte[1]
+            else:
+                ob = outbyte[0]
+            if( ob == 6):
+                self.rbtn[0].SetBitmap(self.picf)
+            else:
+                self.rbtn[0].SetBitmap(self.picn)
+                if(ob == 5):
+                    self.rbtn_ss1.SetValue(True)
+                elif(ob == 3):
+                    self.rbtn_ss0.SetValue(True)
+        
+
     def update_cport(self, portno):
         self.swtitle = "2101"
         if(len(portno)):
@@ -424,7 +452,8 @@ class Dev2101Window(wx.Panel):
         
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-    
+        self.read_status()
+
     def enable_port_controls(self, stat):
         """
         Enable/Diasble Port Switch
