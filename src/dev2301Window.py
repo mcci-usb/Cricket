@@ -63,7 +63,7 @@ class Dev2301Window(wx.Window):
         self.top = top
         self.swid = portno
 
-        self.swtitle = "MCCI USB Switch 2301"
+        self.swtitle = "2301"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
 
@@ -216,7 +216,7 @@ class Dev2301Window(wx.Window):
         self.timer_vu.Start(50)
 
     def update_cport(self, portno):
-        self.swtitle = "MCCI USB Switch 2301"
+        self.swtitle = "2301"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
         self.swid = portno
@@ -534,8 +534,10 @@ class Dev2301Window(wx.Window):
         """
         if speed == "SS1":
             self.rbtn_ss1.SetValue(True)
+            speed = "SS"
         else:
             self.rbtn_ss0.SetValue(True)
+            speed = "HS"
 
         res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
 

@@ -62,7 +62,7 @@ class Dev3141Window(wx.Panel):
         self.top = top
         self.swid = portno
 
-        self.swtitle = "MCCI USB Switch 3141"
+        self.swtitle = "3141"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
 
@@ -176,7 +176,7 @@ class Dev3141Window(wx.Panel):
         self.enable_controls(True)
 
     def update_cport(self, portno):
-        self.swtitle = "MCCI USB Switch 3141"
+        self.swtitle = "3141"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
         self.swid = portno
@@ -322,8 +322,10 @@ class Dev3141Window(wx.Panel):
     def set_speed(self, speed):
         if speed == "SS1":
             self.rbtn_ss1.SetValue(True)
+            speed = "SS"
         else:
             self.rbtn_ss0.SetValue(True)
+            speed = "HS"
             
         res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
 
@@ -345,7 +347,6 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
-        # cmd = 'port'+' '+str(pno)+'\r\n'
         res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
@@ -355,11 +356,6 @@ class Dev3141Window(wx.Panel):
             self.top.print_on_log(self.swid+": "+outstr)
             self.port_led_update(pno-1, True)
 
-        #     if self.top.mode == MODE_MANUAL:
-        #         self.enable_do_controls(True)
-
-        # res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
-       
     def port_off_cmd(self, pno):
         """
         Send Port OFF Command
@@ -372,16 +368,13 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
-        # cmd = 'port'+' '+'0'+'\r\n'
         res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
             self.top.print_on_log(self.swid+": "+outstr)
             self.port_led_update(pno-1, False)
-        #     self.enable_do_controls(False)
-        # model.send_port_cmd(self.top, self.swid+",on,"+str(0))
-     
+    
     def keep_delay(self):
         """
         Add Delay in Port ON/OFF based on USB option
@@ -524,8 +517,6 @@ class Dev3141Window(wx.Panel):
             speed = "SS"
         res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
 
-        # cmd = 'superspeed'+' '+str(val)+'\r\n'
-        # res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')
@@ -638,7 +629,6 @@ class Dev3141Window(wx.Panel):
         else:
             self.port_led_update(port-1, True)
             self.btnStat[port-1] = True
-
 
     def read_param(self, param):
         if param == "voltage" or param == "current":

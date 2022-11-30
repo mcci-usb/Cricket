@@ -250,6 +250,6 @@ def scan_tb():
             except:
                 pass
     else:
-        print("Data type fail")
+        print("Thunderbolt Data type fail")
 
     return tbdict

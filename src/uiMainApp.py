@@ -26,7 +26,6 @@
 import wx
 import serial
 import webbrowser
-import shelve
 
 # Built-in imports
 import os
@@ -121,17 +120,17 @@ class UiMainFrame (wx.Frame):
         # super(UiMainFrame, self).__init__(parent, title=title)
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
-                          VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(980, 780))
+                          VERSION_STR, pos=wx.Point(0,0),
+                          size=wx.Size(0, 0))
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
 
-        self.SetPosition((80,self.ytop))
+        # self.SetPosition((80,self.ytop))
 
         # self.SetMinSize((630, 710))
         # self.SetMaxSize((630, 710))
-        self.CenterOnScreen()
+        # self.CenterOnScreen()
 
         self.read_configs()
         self.declare_globals()        
@@ -174,18 +173,27 @@ class UiMainFrame (wx.Frame):
         
         self.print_on_log("Reading Configuration ...\n")
 
-        config_data = configdata.read_all_config()
+        self.config_data = configdata.read_all_config()
                 
         self.action = 0
+
+        self.devHand = None
  
         self.print_on_log("Loading Configuration\n")
         
         self.update_config_menu()
         self.update_other_menu()
+        self.update_slog_menu()
 
-        self.Bind(wx.EVT_MENU_HIGHLIGHT, self.OnFocusSUT1, id=ID_MENU_SUT1)
+        # self.Bind(wx.EVT_MENU_HIGHLIGHT, self.OnFocusSUT1, id=ID_MENU_DUT1)
+
+        self.Bind(wx.EVT_MOVE, self.OnMove)
+
+        self.update_slog_panel()
 
         self.timer_auc.Start(2000)
+
+        self.initScreenSize()
 
     def init_usbTreeImage(self):
         # scan and save ThunderBolt USB device
@@ -230,7 +238,7 @@ class UiMainFrame (wx.Frame):
         
         self.myrole = self.config_data["myrole"]
         self.ucConfig = self.config_data["uc"]
-        self.suts = self.config_data["sut"]
+        self.duts = self.config_data["dut"]
         self.ccConfig = self.config_data["cc"]
         self.thcConfig = self.config_data["thc"]
 
@@ -305,8 +313,9 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
 
-    def OnFocusSUT1(self, event):
-        print("\nOn Focus")
+    # def OnFocusSUT1(self, event):
+    #     # On Focus event, not used
+    #     pass
 
     def RunServerEvent(self, event):
         """
@@ -358,14 +367,12 @@ class UiMainFrame (wx.Frame):
 
     def update_slog_menu(self):
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            self.sl1menu.Check(self.suts["nodes"]["sut1"])
-            self.sl2menu.Check(self.suts["nodes"]["sut2"])
-            self.menuBar.Enable(ID_MENU_CONFIG_SL1, True)
-            self.menuBar.Enable(ID_MENU_CONFIG_SL2, True)
+            self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
+            self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
 
         else:
-            self.menuBar.Enable(ID_MENU_CONFIG_SL1, False)
-            self.menuBar.Enable(ID_MENU_CONFIG_SL2, False)
+            self.dutMenuBar.Enable(ID_MENU_DUT1, False)
+            self.dutMenuBar.Enable(ID_MENU_DUT2, False)
 
     def build_menu_bar(self):
         self.menuBar = wx.MenuBar()
@@ -376,9 +383,7 @@ class UiMainFrame (wx.Frame):
         self.toolMenu = wx.Menu()
         self.slogMenu = wx.Menu()
         self.helpMenu = wx.Menu()
-        # self.toolMenu = wx.Menu()
-        self.sutMenu = wx.Menu()
-        
+         
         # If its not darwin or MAC OS
         if sys.platform != 'darwin':
            # Setting up the menu.
@@ -413,39 +418,87 @@ class UiMainFrame (wx.Frame):
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
-        self.sutMenuBar = wx.Menu()
-        self.sutMenuBar.Append(ID_MENU_SUT1, "DUT Log Window-1", kind = ITEM_CHECK)
-        self.sutMenuBar.Append(ID_MENU_SUT2, "DUT Log Window-2", kind = ITEM_CHECK)
-        self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.sutMenuBar)
+        self.dutMenuBar = wx.Menu()
+        self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
+        self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
+        self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
         
         
-        self.Bind(wx.EVT_MENU, self.SelectSUT, id=ID_MENU_SUT1)
-        self.Bind(wx.EVT_MENU, self.SelectSUT, id=ID_MENU_SUT2)
+        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
+        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
         self.toolMenu.Enable(ID_MENU_GRAPH, False)
 
-    # def increaseSize(self):
-    #     self.Refresh()
-    #     self.SetMaxSize((1200, 710))
-    #     self.Layout()
-        
+    def OnMove(self, e):
+        x, y = e.GetPosition()
+        w, h = wx.DisplaySize()
+        sw = self.Size[0]
+        sh = self.Size[1]
+        self.saveScreenSize()
 
+    def initScreenSize(self):
+        dw, dh = wx.DisplaySize()
+        opos = self.config_data["screen"]["pos"]
+        osize = self.config_data["screen"]["size"]
+        if len(opos) == 0 and len(osize) == 0:
+            # Initialization
+            self.SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+            self.CenterOnScreen()
+        else:
+            self.SetPosition((opos[0], opos[1]))
+            self.SetSize((osize[0], osize[1]))
 
-    def SelectSUT(self, event):
+    def saveScreenSize(self):
+        px, py = self.GetPosition()
+        sw, sh = self.GetSize()
+        findict = {"screen": {"pos": [px, py], "size": [sw, sh]}}
+        configdata.updt_screen_size(findict)
+
+    def reSizeScreen(self):
+        # Left and Middle panel are fixed
+        # Only DUT Log Window is optional
+        # Check the screen size before resize it
+        w, h = wx.DisplaySize()
+
+        dw = int(w * 0.97)
+        dh = int(h * 0.95)
+
+        sw = self.Size[0]
+        sh = self.Size[1]
+
+        if(sw >= dw and sh >= dh):
+            # Already in full screen, no change required
+            pass
+        else:
+            reqwidth = 950
+            if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
+                reqwidth = 1420
+                if sw < reqwidth:
+                    self.SetSize((reqwidth, dh))
+            else:
+                self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.CenterOnScreen()
+        self.Layout()
+
+        self.saveScreenSize()
+            
+
+    def SelectDUT(self, event):
         obj = event.GetEventObject()
-        self.suts["nodes"]["sut1"] = True if obj.MenuItems[0].IsChecked() else False
-        self.suts["nodes"]["sut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
         self.update_slog_panel()
-        # self.increaseSize()
+        self.reSizeScreen()
 
-    def SelectSUT1(self):
-        self.suts["nodes"]["sut1"] = True if self.sl1menu.IsChecked() else False
-        self.suts["nodes"]["sut2"] = True if self.sl2menu.IsChecked() else False
-        self.update_slog_panel()
-    
-    def SelectSUT2(self):
-        self.suts["nodes"]["sut1"] = True if self.sl1menu.IsChecked() else False
-        self.suts["nodes"]["sut2"] = True if self.sl2menu.IsChecked() else False
-        self.update_slog_panel()
+
+    def updt_dut_config(self, dutdict):
+        key = list(dutdict.keys())[0]
+        nkeys = list(dutdict[key].keys())
+        for nkey in nkeys:
+            self.duts[key][nkey] = dutdict[key][nkey]
+
+    def get_dut_config(self, dutno):
+        return {dutno: self.duts[dutno]}
 
     def build_com_menu(self):
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
@@ -469,20 +522,6 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_WEB)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_PORT)
 
-    def build_sut_menu(self):
-        nodes = list(self.suts["nodes"].keys())
-        
-        sutnames = []
-        for node in nodes:
-            sutnames.append(self.suts[node]["name"])
-
-
-        self.sl1menu = self.slogMenu.Append(ID_MENU_CONFIG_SL1, 
-                            sutnames[0], kind = ITEM_CHECK)
-        self.sl2menu = self.slogMenu.Append(ID_MENU_CONFIG_SL2, 
-                            sutnames[1], kind = ITEM_CHECK)
-        self.menuBar.Append(self.slogMenu, "&View ")  
-    
     def update_config_menu(self):
         """
         update the Config system menu checked User compuer and 
@@ -500,7 +539,6 @@ class UiMainFrame (wx.Frame):
         self.ccmenu.Check(self.myrole["cc"])
         self.hcmenu.Check(self.myrole["thc"])
 
-    
     def OnClickHelp(self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -783,7 +821,6 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-
         self.saveMenus()
         self.terminateHcServer()
         self.terminateCcServer()
@@ -818,8 +855,9 @@ class UiMainFrame (wx.Frame):
         self.device_disconnected()
         self.selPort = None
         self.con_flg = False
-        #self.devHand.close()
+        
         devControl.disconnect_device(self)
+        
         # Set label button name as Connect
         srlist = []
         srlist.append("Port")
@@ -827,20 +865,20 @@ class UiMainFrame (wx.Frame):
         srlist.append("")
         srlist.append("Disconnected")
         self.UpdateAll(srlist)
+        
         # Print on logwindow
         self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
+        
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
-        self.StoreDevice()
     
-    # Multiple Switches
 
+    # Multiple Switches
     def add_switch_dialogs(self):
         swlist = []
         
         for idx in range(len(self.switch_list)):
-            # nswlist.append(self.switch_list[idx].split('(')[0])
             swname = self.switch_list[idx].split('(')[0]
             swdict = {}
             swdict[swname] = self.switch_list[idx].split('(')[1][:-1]
@@ -1084,6 +1122,41 @@ class UiMainFrame (wx.Frame):
     def read_param(self, swkey, param):
         self.panel.read_param(swkey, param)
 
+    def open_com_port(self, param):
+        inparam = param.split(',')
+        self.devHand = serial.Serial()
+        self.devHand.port = inparam[0]
+        self.devHand.baudrate = int(inparam[1])
+        self.devHand.bytesize = int(inparam[3])
+        self.devHand.parity = serial.PARITY_NONE
+        self.devHand.timeout = 0
+        self.devHand.stopbits = serial. STOPBITS_ONE
+
+        try:
+            self.devHand.open()
+        except:
+            self.panel.PrintLog("Port Open Fail\n")
+    
+    def write_serial(self, param):
+        try:
+            param = param + '\r\n'
+            self.devHand.write(param.encode())
+        except serial.SerialException as e:
+            # print("Serial Write failed: ", str(e))
+            pass
+    
+    def read_serial(self, param):
+        try:
+            rxdata = self.devHand.readline()
+            rxdata = rxdata.rstrip().decode('utf-8')
+            if(rxdata == param):
+                self.panel.PrintLog("Serial Loop Success\n")
+            else:
+                self.panel.PrintLog("Serial Loop failed\n")
+        except serial.SerialException as e:
+            # print("Data Received Failed: ", str(e))
+            pass
+
     def get_usb_tree(self):
         try:
             thControl.get_tree_change(self)
@@ -1144,15 +1217,16 @@ class UiMainFrame (wx.Frame):
         """
         self.con_flg = True
         self.UpdatePort()
+        
         # Device update info
         self.UpdateDevice()
         self.UpdateSingle("Connected", 3)
+        
         # Print on logwindow
         self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                                               +" Connected!\n")
        
         self.panel.device_connected()
-        self.StoreDevice()
         self.update_connect_menu(False)
         self.set_mode(MODE_MANUAL)
         self.update_port_timer()
@@ -1273,51 +1347,10 @@ class UiMainFrame (wx.Frame):
         return
     
     def StoreDevice(self):
-        """
-        Store the device configuration
-        ings
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        # This is also a base class of shelve and it accepts
-        # the filename as it’s parameter not a dict object like others. 
-        # This is the base class of shelve which stores pickled object values 
-        # in dict objects and string objects as key.
-
-        lpath = self.get_user_data_dir()
-        dpath = os.path.join(lpath, "MCCI", "Cricket")
-
-        os.makedirs(dpath, exist_ok=True)
-        fpath = os.path.join(dpath, "CricketSettings.txt")
-        
-        ds = shelve.open(fpath)
-        ds['port'] = self.selPort
-        ds['device'] = self.selDevice
-
-        ds['uc'] = self.ldata['uc']
-        ds['cc'] = self.ldata['cc']
-        ds['hc'] = self.ldata['hc']
-
-        ds['sccif'] = self.ldata['sccif']
-        ds['sccid'] = self.ldata['sccid']
-        ds['sccpn'] = self.ldata['sccpn']
- 
-        ds['ssccif'] = self.ldata['ssccif']
-        ds['ssccpn'] = self.ldata['ssccpn']
-        ds['sthcif'] = self.ldata['sthcif']
-        ds['sthcpn'] = self.ldata['sthcpn']
-
-        ds['thcif'] = self.ldata['thcif']
-        ds['thcid'] = self.ldata['thcid']
-        ds['thcpn'] = self.ldata['thcpn']
-
-        ds['sl1'] = self.ldata['sl1']
-        ds['sl2'] = self.ldata['sl2']
-        ds.close()
+        # This function was removed
+        # Shelve related to store the config data
+        # We have replaced the shelve with the JSON based config file
+        pass
 
     def OnSelectScc (self, event):
         """
@@ -1339,8 +1372,7 @@ class UiMainFrame (wx.Frame):
 
         dlg.ShowModal()
         dlg.Destroy()
-        self.StoreDevice()
-
+    
     def OnSelectThc (self, event):
         """
         if User computer menu ISCHECKED , Test host computer act as THC server
@@ -1360,25 +1392,13 @@ class UiMainFrame (wx.Frame):
 
         dlg.ShowModal()
         dlg.Destroy()
-        self.StoreDevice()
-
 
     def update_slog_panel(self):
         if self.ucmenu.IsChecked() or self.ccmenu.IsChecked():
-            self.panel.update_slog_panel(self.suts)
+            self.panel.update_slog_panel(self.duts)
         else:
             self.panel.update_slog_panel({})
         self.Refresh()
-    
-    def SelectSUTW1(self, event):
-        self.suts["nodes"]["sut1"] = True if self.sl1menu.IsChecked() else False
-        self.suts["nodes"]["sut2"] = True if self.sl2menu.IsChecked() else False
-        self.update_slog_panel()
-        
-    def SelectSUTW2(self, event):
-        self.suts["nodes"]["sut1"] = True if self.sl1menu.IsChecked() else False
-        self.suts["nodes"]["sut2"] = True if self.sl2menu.IsChecked() else False
-        self.update_slog_panel()
         
     def UpdateConfig(self, event):
         self.myrole["uc"] = True if self.ucmenu.IsChecked() else False
@@ -1386,11 +1406,12 @@ class UiMainFrame (wx.Frame):
         self.myrole["thc"] = True if self.hcmenu.IsChecked() else False
 
         self.update_other_menu()
-        self.panel.update_panels(self.myrole, self.suts)
+        self.panel.update_panels(self.myrole, self.duts)
 
     def saveMenus(self):
-        findict = {"myrole": self.myrole, "sut": {"nodes": self.suts["nodes"]}}
+        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
         configdata.set_base_config_data(findict)
+        self.saveScreenSize()
 
     def derive_menu_stat(self):
         ccstat = False
@@ -1469,6 +1490,9 @@ class UiMainFrame (wx.Frame):
             self.menuBar.EnableTop(3, False)
 
     def LoadDevice(self):
+        #  Shelve related config storage function
+        #  Replaced with JSON based config file
+        #  So this function was removed
         pass
 
     def startCcServer(self):
@@ -1489,15 +1513,6 @@ class UiMainFrame (wx.Frame):
             
             self.listencc = devServer.StayAccept(self)
             self.listencc.start()
-
-    def startLogServer(self):
-        if self.logserver == None:
-            self.logserver = logServer.ServerLog("", int(self.ldata['sthcpn']))
-            strin = "Host Computer Listening: "+self.hcserver.bind_addr
-            self.panel.PrintLog(strin+"\n")
-            
-            self.listenhc = thServer.StayAccept(self)
-            self.listenhc.start()
 
     def startHcServer(self):
         """
@@ -1578,8 +1593,6 @@ class UiMainFrame (wx.Frame):
         if self.stype == READ_CONFIG:
             devControl.SetDeviceControl(self)
             thControl.SetDeviceControl(self)
-            # if self.ldata['uc']:
-            #     self.auto_connect()
         elif self.stype == AUTO_CONNECT:
             self.auto_connect_service()
 
@@ -1628,9 +1641,6 @@ class UiMainFrame (wx.Frame):
             dpath = Path(getenv('XDG_DATA_HOME', "~/.local/lib")).expanduser()
         return dpath
 
-    def WhenErrorOccurred(self):
-        print("Error Occurred in Mainwindow")
-
     def action_reset(self):
         self.action = 0
 
@@ -1640,6 +1650,9 @@ class UiMainFrame (wx.Frame):
 
     def action_summary(self):
         self.print_on_log("Total match found : "+str(self.action)+"\n")
+
+    def get_batch_location(self):
+        return self.config_data["batch"]["location"]
 
 def EVT_RESULT(win, func):
     """

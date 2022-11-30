@@ -120,7 +120,7 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("Error")
+            print("USB Read Error")
 
     pdata = masterDict.get("peri")
     
@@ -137,13 +137,15 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("Error")
+            print("USB Read Error")
+
     for i in range(len(hc_list)):
         master_list.append(hc_list[i])
     for i in range(len(hub_list)):
         master_list.append(hub_list[i])
     for i in range(len(per_list)):
         master_list.append(per_list[i])
+
     # Running Python-application on darwin (MacOS)
     if sys.platform == 'darwin':
         xmldoc = os.popen("system_profiler -xml SPUSBDataType")

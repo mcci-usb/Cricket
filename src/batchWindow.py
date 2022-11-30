@@ -29,6 +29,8 @@ from uiGlobals import *
 import os
 
 from wx.lib.scrolledpanel import ScrolledPanel
+
+import configdata
 ##############################################################################
 # Utilities
 ##############################################################################
@@ -52,6 +54,7 @@ class BatchWindow(wx.Window):
             "delay": self.parseDelay,
             "read": self.parseRead,
             "repeat": self.parseRepeat,
+            "serial": self.parseSerial,
             "end": self.parseEnd
         }
 
@@ -61,6 +64,7 @@ class BatchWindow(wx.Window):
             "speed": self.setSpeed,
             "delay": self.executeDelay,
             "read": self.executeOthers,
+            "serial": self.executeSerial,
             "repeat": self.executeRepeat
         }
 
@@ -117,6 +121,9 @@ class BatchWindow(wx.Window):
 
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
+
+        self.bloc = self.top.get_batch_location()
+        self.load_last_file()
     
     def Batch_strat_msg(self, seqName):
         """
@@ -132,7 +139,7 @@ class BatchWindow(wx.Window):
         self.top.print_on_log("Batch Mode start - "+seqName+"\n")
 
     def default(self, nodata):
-        print(nodata)
+        pass
 
     def setSwPath(self, inpath):
         self.swpath = inpath
@@ -153,6 +160,16 @@ class BatchWindow(wx.Window):
             self.top.get_usb_tree()
         else:
             self.top.read_param(self.swpath, incmd)
+
+    def executeSerial(self, incmd):
+        skey = list(incmd.keys())[0]
+        #   self.top.print_on_log("Serial: "+incmd+"\n")
+        if skey == "open":
+            self.top.open_com_port(incmd[skey])
+        elif skey == "write":
+            self.top.write_serial(incmd[skey])
+        elif skey == "read":
+            self.top.read_serial(incmd[skey])
 
     def executeRepeat(self, repeat):
         self.top.print_on_log("Repeat\n")
@@ -252,12 +269,12 @@ class BatchWindow(wx.Window):
         if self.seqIdx >= len(self.finseq):
             self.seqIdx = 0
             self.done += 1
-            self.top.print_on_log("\nCycle Completed: "+str(self.done))
+            self.top.print_on_log("Cycle Completed: "+str(self.done)+"\n")
 
             if self.done >= self.repeat:
                 self.timer.Stop()
                 self.StopBatch()
-                self.top.print_on_log("\nBatch Sequence Completed!")
+                self.top.print_on_log("Batch Sequence Completed!\n")
 
     def executeBatchSeq(self):
         self.done = 0
@@ -271,8 +288,28 @@ class BatchWindow(wx.Window):
         content = self.tc_seq.GetValue()
         self.save_batch(content, "*.txt")
 
+    def updateBatchLocation(self, pathname):
+        configdata.updt_batch_location(pathname)
+
     def LoadBatch(self, event):
-        self.load_file()
+        pathname = self.load_file()
+        self.updateBatchLocation(pathname)
+
+
+    def load_last_file(self):
+        self.tc_bloc.SetValue(self.bloc)
+        try:
+            self.tc_seq.SetValue("")
+            self.mappedSw = {}
+            self.main_flg = False
+            self.end_flg = False
+            self.finseq = []
+            if os.path.exists(self.bloc):
+                with open(self.bloc) as fobj:
+                    for line in fobj:
+                        self.tc_seq.WriteText(line)
+        except IOError:
+            wx.LogError("Can not open file '%s', " % self.bloc)
 
     def load_file(self):
         """
@@ -306,6 +343,7 @@ class BatchWindow(wx.Window):
                         self.tc_seq.WriteText(line)
         except IOError:
             wx.LogError("Can not open file '%s', " % pathname)
+        return pathname
 
     def save_batch (self, contents, extension):
         """
@@ -361,9 +399,9 @@ class BatchWindow(wx.Window):
                 self.mappedSw[oclist[1]] = swpath
                 self.reqSw[swpath] = swtype
             else:
-                print("Error in parsing Switch Mapping, not supporting USB Switch")
+                self.top.print_on_log("\nError in parsing Switch Mapping")
         else:
-            print("Syntax error in mapping '='")
+            self.top.print_on_log("Syntax error in mapping '='")
         
     def parseDelay(self, indata):
         if self.main_flg == True:
@@ -375,7 +413,7 @@ class BatchWindow(wx.Window):
                 pass
 
         else:
-            print("Main keyword should present after declaration")
+            self.top.print_on_log("Main keyword should present after declaration")
 
     def parsePort(self, indata):
         if self.main_flg == True:
@@ -384,7 +422,7 @@ class BatchWindow(wx.Window):
                 if indata[2] == 'SS0' or indata[2] == 'SS1':
                     speed = indata[2]
             except:
-                print("No speed info found")
+                pass
             
             swcode = indata[1].split('.')   
             swname = swcode[0]
@@ -395,7 +433,7 @@ class BatchWindow(wx.Window):
             self.finseq.append({"port": int(portname)})
             
         else:
-            print("Main keyword should present after declaration")
+            self.top.print_on_log("Main keyword should present after declaration")
 
     def parseRead(self, indata):
         rdlist = ["voltage", "current", "USB", ]
@@ -404,6 +442,19 @@ class BatchWindow(wx.Window):
                 self.finseq.append({"read": indata[1]})
         except:
             pass
+
+    def parseSerial(self, indata):
+        rdlist = ["open", "write", "read"]
+        try:
+            if any(indata[1] in s for s in rdlist):
+
+                serset = indata[2].replace('"', '')
+
+                self.finseq.append({"serial": {indata[1]: serset}})
+        except:
+            pass
+
+
 
     def parseRepeat(self, indata):
         if len(indata) == 2:

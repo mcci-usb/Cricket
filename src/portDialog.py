@@ -137,16 +137,6 @@ class PortWindow(wx.Window):
 
     
     def initDialog(self):
-        if(self.cdata[self.type]["interface"] == "tcp"):
-            self.rb_nwc.SetValue(True)
-        else:
-            self.rb_tc.SetValue(True)
-        self.tc_port.SetValue(self.cdata[self.type]["tcp"]["port"])
-        self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
-
-        
-
-    def initDialog_old(self):
         """
         initiate the dialog box of both SCC and THC 
 
@@ -157,19 +147,11 @@ class PortWindow(wx.Window):
         Returns:
             None
         """
-        if self.type == "scc":
-            if self.top.ldata['ssccif'] == "network":
-                self.rb_nwc.SetValue(True)
-            else:
-                self.rb_tc.SetValue(True)
-            self.tc_port.SetValue(self.top.ldata['ssccpn'])
+        if(self.cdata[self.type]["interface"] == "tcp"):
+            self.rb_nwc.SetValue(True)
         else:
-            if(self.top.ldata['sthcif'] == "network"):
-                self.rb_nwc.SetValue(True)
-            else:
-                self.rb_tc.SetValue(True)
-            self.tc_port.SetValue(self.top.ldata['sthcpn'])
-
+            self.rb_tc.SetValue(True)
+        self.tc_port.SetValue(self.cdata[self.type]["tcp"]["port"])
         self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
 
     def SaveSettings(self, e):
@@ -189,7 +171,6 @@ class PortWindow(wx.Window):
         if(rbval):
             iftype = "network"
         
-        #devaddr = self.tc_nwcip.GetValue()
         portno = self.tc_port.GetValue()
 
         if self.type == "scc":

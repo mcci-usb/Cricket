@@ -133,7 +133,7 @@ def control_port(top, cmd):
             return top.handlers[swid].port_off()
         else:
             return top.handlers[swid].port_on(opr)
-        
+
 def send_speed_cmd(top, cmd):
     if top.devCtrl == "local":
         swid, speed = cmd.split(',')

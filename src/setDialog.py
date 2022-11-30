@@ -24,14 +24,11 @@
 ##############################################################################
 
 # Built-in imports
-import os
 import socket
-import os
 
 # Lib imports
 import wx
 import threading
-import time
 
 # Own modules
 from uiGlobals import *

@@ -12,18 +12,18 @@ import configdata
 
 from uiGlobals import IMG_ICON
 
-class SutConfigDialog(wx.Frame):
-    def __init__(self, top, sut):
+class DutConfigDialog(wx.Frame):
+    def __init__(self, top, dut):
         wx.Frame.__init__(self,None, size=(360,620))
 
         self.SetBackgroundColour("White")
-        self.SetTitle('SUT Config Dialog')
-        self.sut = sut
+        self.SetTitle('DUT Config Dialog')
+        self.dut = dut
         self.top = top
 
-        self.sut_key = list(self.sut.keys())[0]
-        self.sut_type = self.sut[self.sut_key]["interface"]
-        self.sut_settings = self.sut[self.sut_key][self.sut_type]
+        self.dut_key = list(self.dut.keys())[0]
+        self.dut_type = self.dut[self.dut_key]["interface"]
+        self.dut_settings = self.dut[self.dut_key][self.dut_type]
         
         self.vboxParent = wx.BoxSizer(wx.VERTICAL)
         
@@ -45,7 +45,6 @@ class SutConfigDialog(wx.Frame):
         base = os.path.abspath(os.path.dirname(__file__))
         self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
         
-
         self.UpdateData()
 
         self.Show()
@@ -83,18 +82,15 @@ class SutConfigDialog(wx.Frame):
         self.rbtn_tcp = wx.RadioButton(self, -1, label='Network(TCP)')
         self.btn_savetype = wx.Button(self, -1, label='Save', size= (65,25))
         
-        
         self.ihboxdr6 = wx.BoxSizer(wx.HORIZONTAL)
         
         self.ihboxdr6.Add(self.rbtn_ser, flag=wx.LEFT, border=10)
         self.ihboxdr6.Add(self.rbtn_tcp, flag=wx.LEFT, border = 10)
         self.ihboxdr6.Add(self.btn_savetype, flag=wx.LEFT, border=30)
         
-        #self.ihboxdr3.Add(self.tc_UiHlein, flag=wx.LEFT, border = 20)
-        #self.ihboxdr3.Add(self.tc_UVM, flag=wx.LEFT, border = 20)
         self.hboxdr6.Add(self.ihboxdr6, flag=wx.ALIGN_CENTER_VERTICAL)
 
-        self.st_nameSut = wx.StaticText(self, -1, "Name of SUT")
+        self.st_nameSut = wx.StaticText(self, -1, "Name of DUT")
         self.tc_nameSut = wx.TextCtrl(self, -1, " ", size = (135, 23))
         self.ihboxdrn = wx.BoxSizer(wx.HORIZONTAL)
         self.ihboxdrn.Add(self.st_nameSut, flag=wx.LEFT, border=10)
@@ -111,7 +107,7 @@ class SutConfigDialog(wx.Frame):
         self.rbtn_ser.Bind(wx.EVT_RADIOBUTTON, self.OnSerial)
         self.rbtn_tcp.Bind(wx.EVT_RADIOBUTTON, self.OnNetowrk)
 
-        self.tc_nameSut.SetValue(self.sut[self.sut_key]["name"])
+        self.tc_nameSut.SetValue(self.dut[self.dut_key]["name"])
 
 
     def InitTcpConfig(self):
@@ -124,11 +120,8 @@ class SutConfigDialog(wx.Frame):
         self.hboxtcp.Add(self.st_tcp, flag=wx.LEFT, border=10)
 
         self.vboxTcp.AddMany([
-            # (self.hboxdr1, 1, wx.EXPAND | wx.ALL, 5),
             (self.hboxtcp, 1, wx.EXPAND | wx.ALL, 5),
         ])
-
-
 
     def InitSerialConfig(self):
         ab = wx.StaticBox(self, -1, "COM Port Settings", size = (400, 200))
@@ -176,7 +169,6 @@ class SutConfigDialog(wx.Frame):
         self.ihboxdr3.Add(self.st_databits, flag=wx.LEFT, border=30)
         self.ihboxdr3.Add(self.cb_Databits, flag=wx.LEFT, border = 10)
         self.hboxdr3.Add(self.ihboxdr3, flag=wx.ALIGN_CENTER_VERTICAL)
-
         
         self.ihboxdr4 = wx.BoxSizer(wx.HORIZONTAL)
         self.st_Parity = wx.StaticText(self, -1, "Parity ", size = (60, 15))
@@ -189,14 +181,12 @@ class SutConfigDialog(wx.Frame):
                                      size=(65,-1),
                                      style = wx.TE_PROCESS_ENTER, choices=cb_sbits)
         
-
         self.ihboxdr4.Add(self.st_Parity, flag=wx.LEFT, border=10)
         self.ihboxdr4.Add(self.cb_Parity, flag=wx.LEFT, border = 10)
         self.ihboxdr4.Add(self.st_StopBits, flag=wx.LEFT, border=30)
         self.ihboxdr4.Add(self.cb_StopBits, flag=wx.LEFT, border = 10)
         self.hboxdr4.Add(self.ihboxdr4, flag=wx.ALIGN_CENTER_VERTICAL)
         
-
         self.ihboxdrx = wx.BoxSizer(wx.HORIZONTAL)
         self.st_pechar = wx.StaticText(self, -1, "Parity Error Char.")
         self.cb_pechar = wx.ComboBox(self,
@@ -206,15 +196,12 @@ class SutConfigDialog(wx.Frame):
         self.ihboxdrx.Add(self.cb_pechar, flag=wx.LEFT, border = 10)
         self.hboxdrx.Add(self.ihboxdrx, flag=wx.ALIGN_CENTER_VERTICAL)
 
-        
-
         self.ihboxdr5 = wx.BoxSizer(wx.HORIZONTAL)
         self.btn_saveser = wx.Button(self, -1, "Save", size = (65, 25))
         self.ihboxdr5.Add(self.btn_saveser, flag=wx.LEFT, border = 140)
         self.hboxdr5.Add(self.ihboxdr5, flag=wx.ALIGN_CENTER_VERTICAL )
 
         self.vboxSerial.AddMany([
-            # (self.hboxdr1, 1, wx.EXPAND | wx.ALL, 5),
             (self.hboxdr2, 1, wx.EXPAND | wx.ALL, 5),
             (self.hboxdr3,1,wx.EXPAND | wx.ALL, 5),
             (self.hboxdr4,1,wx.EXPAND | wx.ALL, 5),
@@ -222,15 +209,7 @@ class SutConfigDialog(wx.Frame):
             (self.hboxdr5,1,wx.EXPAND | wx.ALL, 5),
         ])
 
-        self.btn_saveser.Bind(wx.EVT_BUTTON, self.SaveSerial)
-
         self.InitSelectionCtrl()
-
-
-
-    def InitNetworkConfig(self):
-        pass
-
 
     def InitDataToWatch(self):
         self.hboxdr7 = wx.BoxSizer(wx.HORIZONTAL)
@@ -239,7 +218,6 @@ class SutConfigDialog(wx.Frame):
 
         cb_action = ["stop sequence", "count match"]
 
-        
         ca = wx.StaticBox(self, -1, "Data to Watch", size = (400, 200))
         self.vboxLog = wx.StaticBoxSizer(ca, wx.VERTICAL)
 
@@ -269,11 +247,15 @@ class SutConfigDialog(wx.Frame):
 
         self.btn_savedtow.Bind(wx.EVT_BUTTON, self.SaveDataToWatch)
 
-        faultList = self.sut[self.sut_key]["faultseq"]
-        action = self.sut[self.sut_key]["action"]
+        faultList = None
+        action = None
+        try:
+            faultList = self.dut[self.dut_key]["faultseq"]
+            action = self.dut[self.dut_key]["action"]
+        except:
+            action = "None"
 
         self.cb_action.SetValue(action)
-        
 
         faultstr = []
         for fault in faultList:
@@ -282,66 +264,53 @@ class SutConfigDialog(wx.Frame):
         mystr = ','.join(map(str, faultstr))
 
         self.tc_data.SetValue(mystr)
-        # 1TB - HDD, 128GB- SSD, 8GB-RAM, 4GB-GP, ASUS - 2018 model, core-i5, 8th gen - 25k (128 W), 15inch -
-        # 75k 
-
 
     def InitSelectionCtrl(self):
-        serkeys = list(self.sut_settings.keys())
+        serkeys = list(self.dut_settings.keys())
         if(len(serkeys) == 0):
-            # self.sut_settings = self.sut["sut"]["default"][self.sut_type]
-            self.sut_settings = self.sut[self.sut_key]["default"]["serial"]
+            self.dut_settings = self.dut[self.dut_key]["default"]["serial"]
               
-
-        self.cb_switch.SetValue(self.sut_settings["port"])
-        self.cb_baud.SetValue(self.sut_settings["baud"])
-        self.cb_Parity.SetValue(self.sut_settings["parity"])
-        self.cb_Databits.SetValue(str(self.sut_settings["databits"]))
-        self.cb_pechar.SetValue(self.sut_settings["parerrcheck"])
-        self.cb_StopBits.SetValue(str(self.sut_settings["stopbits"]))
+        self.cb_switch.SetValue(self.dut_settings["port"])
+        self.cb_baud.SetValue(self.dut_settings["baud"])
+        self.cb_Parity.SetValue(self.dut_settings["parity"])
+        self.cb_Databits.SetValue(str(self.dut_settings["databits"]))
+        self.cb_pechar.SetValue(self.dut_settings["parerrcheck"])
+        self.cb_StopBits.SetValue(str(self.dut_settings["stopbits"]))
         
         self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshConfig)
         self.btn_saveser.Bind(wx.EVT_BUTTON, self.SaveConfig)
 
-    
     def SaveTypeName(self, event):
         type = "tcp"
         name = self.tc_nameSut.GetValue()
         if(self.rbtn_ser.GetValue()):
             type = "serial"
 
-        self.sut[self.sut_key]["name"] = name
-        self.sut[self.sut_key]["interface"] = type
+        self.dut[self.dut_key]["name"] = name
+        self.dut[self.dut_key]["interface"] = type
         
-        configdata.set_sut_base_data(self.sut)
+        configdata.set_sut_base_data(self.dut)
         
-
-    def SaveSerial(self, event):
-        print("Save Serial Config")
-
-
     def SaveDataToWatch(self, event):
         fadata = self.tc_data.GetValue()
         fault_list = re.findall(r'"([^"]*)"', fadata)
 
         action = self.cb_action.GetValue()
     
-        findict = {self.sut_key : {"faultseq": fault_list, "action": action}}
+        findict = {self.dut_key : {"faultseq": fault_list, "action": action}}
         
         configdata.set_sut_watch_data(findict)
+        self.top.updt_dut_config(findict)
 
     def UpdateData(self):
         
-        if(self.sut_type == "serial"):
+        if(self.dut_type == "serial"):
             self.rbtn_ser.SetValue(True)
             self.vboxParent.Hide(self.vboxTcp)
         else:
             self.rbtn_tcp.SetValue(True)
             self.vboxParent.Hide(self.vboxSerial)
-            # self.vboxSerial.Hide()
-        pass
-
-        
+                
     def OnSerial(self, event):
         btn = event.GetEventObject()
     
@@ -368,12 +337,13 @@ class SutConfigDialog(wx.Frame):
         strsb = self.cb_StopBits.GetValue()
         strpec = self.cb_pechar.GetValue()
 
-        sutconfig = {"port": strcom, "baud": strbr, "databits": strdb, 
+        dutconfig = {"port": strcom, "baud": strbr, "databits": strdb, 
                      "parity": strpar, "stopbits": strsb, "parerrcheck": strpec}
 
-        findict = {self.sut_key : {"serial": sutconfig}}
+        findict = {self.dut_key : {"serial": dutconfig}}
     
         configdata.set_sut_config_data(findict)
+        self.top.updt_dut_config(findict)
            
     def RefreshConfig(self, e):
         self.cb_list = self.filter_port()

@@ -30,14 +30,12 @@ from uiGlobals import *
 from datetime import datetime
 
 import wx
-import threading
 
 import configdata
-# from sutConfigDialogOld import *
-from sutConfigDialog import *
+from dutConfigDialog import *
 import serial.tools.list_ports
 
-import sutThread
+import dutThread
 import queue
 
 from threading import Thread
@@ -49,14 +47,14 @@ ERR3 = "osTimerNew() failed"
 ################################ Evt Listener ################################
 def EVT_RESULT(win, func):
     """Define Result Event."""
-    win.Connect(-1, -1, EVT_SUT_SL_DATA_ID, func)
+    win.Connect(-1, -1, EVT_DUT_SL_DATA_ID, func)
 
 class ResultEvent(wx.PyEvent):
     """Simple event to carry arbitrary result data."""
     def __init__(self, data):
         """Init Result Event."""
         wx.PyEvent.__init__(self)
-        self.SetEventType(EVT_SUT_SL_DATA_ID)
+        self.SetEventType(EVT_DUT_SL_DATA_ID)
         self.data = data 
 
 ###################### Thread to Look for data in the queue ###################
@@ -77,7 +75,7 @@ class TestThread(Thread):
     def run(self):
         """Run Worker Thread."""
         # This is the code executing in the new thread.
-        wx.PostEvent(self.wxObject, ResultEvent("\nBegin SUT Monitoring..."))
+        wx.PostEvent(self.wxObject, ResultEvent("\nBegin DUT Monitoring..."))
         
         while(self.run_flg):
             var = None
@@ -86,24 +84,18 @@ class TestThread(Thread):
             except queue.Empty:
                 pass
             else:
-                # print(var)
-                # if(var.find(ERR1) != -1 or var.find(ERR2) != -1 or var.find(ERR3) != -1):
-                #     wx.PostEvent(self.wxObject, ResultEvent("Error Squence found"))
-                # else:
-                #     wx.PostEvent(self.wxObject, ResultEvent(var))
                 wx.PostEvent(self.wxObject, ResultEvent(var))
             time.sleep(0.01)
-        wx.PostEvent(self.wxObject, ResultEvent("\nExit SUT Monitoring..."))
+        wx.PostEvent(self.wxObject, ResultEvent("\nExit DUT Monitoring..."))
 
     def stop(self):
         self.run_flg = False
 
 
-
 ##############################################################################
 # Utilities
 ##############################################################################
-class SutLogWindow(wx.Window):
+class DutLogWindow(wx.Window):
     """
     A class logWindow with init method
 
@@ -128,6 +120,7 @@ class SutLogWindow(wx.Window):
 
         self.top = top
         self.sut = sut
+        self.parent = parent
 
         key = list(self.sut.keys())[0]
 
@@ -139,6 +132,8 @@ class SutLogWindow(wx.Window):
         sb = wx.StaticBox(self, -1, self.name)
 
         self.con_flg = False
+        self.devHand = serial.Serial()
+        self.port_flg = False
 
         self.totline = 0
 
@@ -195,12 +190,12 @@ class SutLogWindow(wx.Window):
             ])
 
         self.plist = self.filter_port()
-        # print(self.plist)
-
-        self.btn_config.Bind(wx.EVT_BUTTON, self.OnSutConfig)
+        
+        self.btn_config.Bind(wx.EVT_BUTTON, self.OnDutConfig)
         self.btn_connect.Bind(wx.EVT_BUTTON, self.OnSutConnect)
         self.btn_clear.Bind(wx.EVT_BUTTON, self.OnSutClear)
         self.btn_save.Bind(wx.EVT_BUTTON, self.OnSutSave)
+        
         # Set size of frame
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
@@ -212,11 +207,9 @@ class SutLogWindow(wx.Window):
 
         if self.sutType == "serial":
             self.print_com_config()
-        # self.save_config_data()
-
+        
         self.queue = queue.Queue(0)
         self.mySut = None
-       # self.myser = myserial.mySerial(self.queue)
         self.mythread = None
         EVT_RESULT(self, self.updateDisplay)
 
@@ -260,7 +253,6 @@ class SutLogWindow(wx.Window):
         return cdata
 
     def read_config_data(self):
-        # self.sutConfig = configdata.read_config(self.fpath)
         sutset = list(self.sutSettings.keys())
         
         if(len(sutset) == 0):
@@ -269,25 +261,55 @@ class SutLogWindow(wx.Window):
     def get_config_data(self):
         return self.sutSettings
 
+    def updt_dut_config(self, dutdict):
+        self.top.updt_dut_config(dutdict)
+
     def save_config_data(self, cdata):
         configdata.save_config(self.fpath, cdata)
         self.sutSettings = cdata
-
-    def OnSutConfig(self, e):
-        dlg = SutConfigDialog(self, self.sut)
+    
+    def OnDutConfig(self, e):
+        dutno = list(self.sut.keys())[0]
+        self.sut = self.top.get_dut_config(dutno)
+        dlg = DutConfigDialog(self, self.sut)
         dlg.Show()
+
+    def openComPort(self):
+        self.name = list(self.sut.keys())[0]
+        self.dutn = self.sut[self.name]
+        self.itype = self.dutn["interface"]
+        self.sconfig = self.dutn[self.itype]
+        
+        try:
+            self.devHand.port = self.sconfig["port"]
+            self.devHand.baudrate = self.sconfig["baud"]
+            self.devHand.bytesize = serial.EIGHTBITS
+            self.devHand.parity = serial.PARITY_NONE
+            self.devHand.timeout = 0
+            self.devHand.stopbits = serial. STOPBITS_ONE
+        
+            self.devHand.open()
+            self.port_flg = True
+        except:
+            self.print_on_log("\nCouldn't open the port-Top")
+            self.port_flg = False
 
     def OnSutConnect(self, e):
         if(not self.con_flg):
-            self.mythread = TestThread(self, self.queue)
-            self.mySut = sutThread.SutThread(self.com_port_stopped, self.top, self.queue, self.sut)
-        
-            # self.scb.SetValue("Thread started!")
-            self.mySut.start()
-            self.con_flg = True
-            self.btn_connect.SetLabel("Disconnect")
+            self.openComPort()
+            if(self.port_flg):
+                self.mythread = TestThread(self, self.queue)
+                self.mySut = dutThread.DutThread(self.com_port_stopped, self.top, self.queue, self.sut, self.devHand)
+                self.mySut.start()
+                self.con_flg = True
+                self.btn_connect.SetLabel("Disconnect")
         else:
             self.con_flg = False
+            if self.port_flg:
+                try:
+                    self.devHand.close()
+                except:
+                    self.print_on_log("\nTop-Error in Port Closing")
             self.btn_connect.SetLabel("Connect")
             self.mySut.stop()
             self.mythread.stop()
@@ -297,18 +319,22 @@ class SutLogWindow(wx.Window):
         self.totline = 0
 
     def com_port_stopped(self):
-        self.mySut = None
-        self.mySut = sutThread.SutThread(self.com_port_stopped, self.top, self.queue, self.sut)
-        self.mySut.start()
-        self.con_flg = True
-        self.btn_connect.SetLabel("Disconnect")
-
+        self.mySut.stop()
+        self.openComPort()
+        if(self.port_flg):
+            self.mySut = None
+            self.mySut = dutThread.SutThread(self.com_port_stopped, self.top, self.queue, self.sut, self.devHand)
+            self.mySut.start()
+            self.con_flg = True
+            self.btn_connect.SetLabel("Disconnect")
+        else:
+            self.print_on_log("\nCouldn't Open the COM Port")
+            self.btn_connect.SetLabel("Connect")
+            self.con_flg = False
 
     def OnSutSave(self, e):
-        title = ("Save the Log!")
-        msg = ("Sorry, not implemented!")
-        dlg = wx.MessageDialog(self, msg, title, wx.OK)
-        dlg.ShowModal()
+        content = self.scb.GetValue()
+        self.top.save_file(content, "*.txt")
 
     def updateDisplay(self, msg):
         """
@@ -317,5 +343,3 @@ class SutLogWindow(wx.Window):
         self.totline += 1
         t = msg.data
         self.scb.AppendText("%s" % t)
-        self.btn_save.SetLabel(str(self.totline))
-        

@@ -22,6 +22,7 @@
 #       Module created
 ##############################################################################
 #Lib imports
+import sys
 import wx
 
 # Built-in imports
@@ -74,7 +75,7 @@ class Dev2101Window(wx.Panel):
         self.top = top
         self.swid = portno
 
-        self.swtitle = "MCCI USB Switch 2101"
+        self.swtitle = "2101"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
 
@@ -163,15 +164,16 @@ class Dev2101Window(wx.Panel):
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
+    
 
     def update_cport(self, portno):
-        self.swtitle = "MCCI USB Switch 2101"
+        self.swtitle = "2101"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
         self.swid = portno
         self.sb.SetLabel(self.swtitle)
         self.Layout()
-
+        
     def OnOffPort (self, e):
         """
         Event Handler for Port On and Off
@@ -422,7 +424,7 @@ class Dev2101Window(wx.Panel):
         
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-
+    
     def enable_port_controls(self, stat):
         """
         Enable/Diasble Port Switch

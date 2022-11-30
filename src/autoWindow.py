@@ -485,8 +485,8 @@ class AutoWindow(wx.Window):
         self.interval = int(self.get_interval())
         self.duty = int(self.get_duty())
 
-        self.OnTime = self.interval* (self.duty/100)
-        self.OffTime = self.interval - self.OnTime
+        self.OnTime = int(self.interval* (self.duty/100))
+        self.OffTime = int(self.interval - self.OnTime)
     
     def get_auto_param(self):
         """

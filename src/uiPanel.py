@@ -122,8 +122,8 @@ class UiPanel(wx.Panel):
                 action = self.parent.action_count()
                 self.cpanel.PrintLog("Match found : "+str(action)+", "+event.data["match"]+"\n")
 
-    def update_slog_panel(self, suts):
-        self.rpanel.update_slog_panel(suts)
+    def update_slog_panel(self, duts):
+        self.rpanel.update_slog_panel(duts)
         self.Layout()
 
     def show_selected(self, swstr):
@@ -455,8 +455,14 @@ class UiPanel(wx.Panel):
         """
         self.comPan.auto_connect()
 
-    def WhenErrorOccurred(self):
-        print("UiPanel Error Occurred")
+    def updt_dut_config(self, dutno):
+        self.parent.updt_dut_config(dutno)
+
+    def get_dut_config(self, dutno):
+        return self.parent.get_dut_config(dutno)
+
+    def save_file(self, content, ftype):
+        self.parent.save_file(content, ftype)
 
 def EVT_RESULT(win, func):
-        win.Connect(-1, -1, EVT_SUT_SL_ERR_ID, func) 
+        win.Connect(-1, -1, EVT_DUT_SL_ERR_ID, func) 
