@@ -640,6 +640,23 @@ class Dev3201Window(wx.Window):
         else:
             self.enable_controls(False)
 
+    
+    def read_port_status(self, stat):
+        if stat:
+            time.sleep(1)
+            res, outstr = model.read_port_status(self.top, self.swid)
+            print("Read Port Status: ", res, outstr)
+
+            pstat = False
+            if res == 0:
+                port = int(outstr)
+                if port > 0:
+                    port = port - 1
+                    pstat = True
+                    self.btnStat[port] = True
+                self.port_led_update(port, pstat)
+
+
     def enable_controls(self, stat):
         """
         Enable/Disable All Widgets of 3201,
@@ -658,6 +675,7 @@ class Dev3201Window(wx.Window):
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
         self.enable_va_controls(stat)
+        self.read_port_status(stat)
     
     def enable_port_controls(self, stat):
         """
@@ -788,6 +806,7 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
+        print("3201 Device Connected!!!!")
         if(self.con_flg):
             time.sleep(1)
             res, outstr = model.read_port_cmd(self.top)

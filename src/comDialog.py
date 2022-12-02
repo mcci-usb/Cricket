@@ -27,18 +27,12 @@ from random import choices
 from matplotlib import style
 import wx
 
-import os
-import sys
 from sys import platform
 
 # Own modules
-import search
 from uiGlobals import *
 
 import devControl
-import json
-import timeit
-import threading
 
 ##############################################################################
 # Utilities

@@ -428,6 +428,20 @@ class Dev3141Window(wx.Panel):
             self.enable_controls(True)
         else:
             self.enable_controls(False)
+
+    def read_port_status(self, stat):
+        if stat:
+            res, outstr = model.read_port_status(self.top, self.swid)
+            print("Read Port Status: ", res, outstr)
+            
+            pstat = False
+            if res == 0:
+                port = int(outstr)
+                if port > 0:
+                    port = port - 1
+                    pstat = True
+                    self.btnStat[port] = True
+                self.port_led_update(port, pstat)
             
     def enable_controls(self, stat):
         """
@@ -446,6 +460,7 @@ class Dev3141Window(wx.Panel):
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
         self.enable_do_controls(stat)
+        self.read_port_status(stat) 
        
     def enable_port_controls(self, stat):
         """

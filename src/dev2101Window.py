@@ -186,8 +186,10 @@ class Dev2101Window(wx.Panel):
                 ob = outbyte[0]
             if( ob == 6):
                 self.rbtn[0].SetBitmap(self.picf)
+                self.btnStat[0] = False
             else:
                 self.rbtn[0].SetBitmap(self.picn)
+                self.btnStat[0] = True
                 if(ob == 5):
                     self.rbtn_ss1.SetValue(True)
                 elif(ob == 3):

@@ -39,7 +39,6 @@ from wx.core import ITEM_CHECK
 # Own modules
 from uiGlobals import *
 
-import getusb
 import getTb
 from copy import deepcopy
 
@@ -60,8 +59,6 @@ import devServer
 
 import thControl
 import thServer
-
-import search
 
 import configdata
 
@@ -155,8 +152,7 @@ class UiMainFrame (wx.Frame):
         self.init_statusBar()
 
         self.define_events()
-        EVT_RESULT(self, self.RunServerEvent)
-
+        
         # Timer for monitor the connected devices
         self.timer_lp = wx.Timer(self)
         # Bind the timer event to handler
@@ -317,28 +313,6 @@ class UiMainFrame (wx.Frame):
     #     # On Focus event, not used
     #     pass
 
-    def RunServerEvent(self, event):
-        """
-        serching the port event handling indicates 
-        server is connecting that port
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: searching the event with server.
-        Returns:
-            None
-        """
-        if event.data is None:
-            self.print_on_log("\nNo Server Event")
-        else:
-            if event.data == "search":
-                self.print_on_log("\nSearch Event")
-                self.dev_list.clear()
-                self.dev_list = search.search_port(self.usbHand)
-            else:
-                self.print_on_log("\nUnknown Server Event")
-            self.usbHand.ready = True
 
     def auto_connect(self):
         """
@@ -1146,6 +1120,26 @@ class UiMainFrame (wx.Frame):
             pass
     
     def read_serial(self, param):
+        res = False
+        try:
+            rxdata = self.devHand.readline()
+            # rxdata = rxdata.decode("Ascii").strip()
+            try:
+                rxdata = rxdata.rstrip().decode('utf-8')
+            except:
+                self.panel.PrintLog("Serial Parsing Error\n")
+                return False
+            if(rxdata == param):
+                self.panel.PrintLog("Serial Loop Success\n")
+                return True
+            else:
+                self.panel.PrintLog("Serial Loop failed\n")
+                return False
+        except serial.SerialException as e:
+            # print("Data Received Failed: ", str(e))
+            return False
+
+    def read_serial_old(self, param):
         try:
             rxdata = self.devHand.readline()
             rxdata = rxdata.rstrip().decode('utf-8')
@@ -1610,7 +1604,8 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
             if self.con_flg:
                 self.timer_lp.Stop()
-                plist = search.check_port(self.usbHand)
+                # plist = search.check_port(self.usbHand)
+                plist = None
                 if self.selPort in plist:
                     self.timer_lp.Start(700)
                 else:

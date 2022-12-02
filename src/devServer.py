@@ -28,10 +28,8 @@
 
 import socket
 import threading
-import time
 import wx
 import json
-import search
 
 from uiGlobals import *
 

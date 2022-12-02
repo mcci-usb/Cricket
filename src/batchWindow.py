@@ -82,9 +82,12 @@ class BatchWindow(wx.Window):
         self.end_flg = False
         self.swpath = None
         self.repeat = 0
-        self.done = 0
         self.seqIdx = 0
         self.tdelay = 500
+
+        self.done = 0
+        self.cdpass = 0
+        self.cdfail = 0
         
         self.InitTopHbox()
         self.InitSeqBox()
@@ -169,7 +172,11 @@ class BatchWindow(wx.Window):
         elif skey == "write":
             self.top.write_serial(incmd[skey])
         elif skey == "read":
-            self.top.read_serial(incmd[skey])
+            res = self.top.read_serial(incmd[skey])
+            if res == True:
+                self.cdpass = self.cdpass + 1
+            else:
+                self.cdfail = self.cdfail + 1
 
     def executeRepeat(self, repeat):
         self.top.print_on_log("Repeat\n")
@@ -249,12 +256,17 @@ class BatchWindow(wx.Window):
         self.btn_start.SetLabel("Stop")
 
         self.done = 0
+        self.cdpass = 0
+        self.cdfail = 0
+
         self.seqIdx = 0
         self.totSeq = len(self.finseq)
         self.tdelay = 500
 
+        self.top.print_on_log("\n######################################")
         self.top.print_on_log("\nBatch Mode Starting!")
         self.top.print_on_log("\nRepeat Count: "+str(self.repeat))
+        self.top.print_on_log("\n######################################\n\n")
 
         if(self.timer.IsRunning() == False):
             self.timer.Start(self.tdelay)
@@ -269,12 +281,16 @@ class BatchWindow(wx.Window):
         if self.seqIdx >= len(self.finseq):
             self.seqIdx = 0
             self.done += 1
-            self.top.print_on_log("Cycle Completed: "+str(self.done)+"\n")
+            resstr = "Cycle Completed: "+str(self.done)+";   Pass: "\
+                     +str(self.cdpass)+";   Fail: "+str(self.cdfail)+"\n\n"
+            # self.top.print_on_log("Cycle Completed: "+str(self.done)+"\n")
+            self.top.print_on_log(resstr)
 
             if self.done >= self.repeat:
                 self.timer.Stop()
                 self.StopBatch()
-                self.top.print_on_log("Batch Sequence Completed!\n")
+                self.top.print_on_log("Batch Sequence Completed!")
+                self.top.print_on_log("\n######################################\n\n")
 
     def executeBatchSeq(self):
         self.done = 0

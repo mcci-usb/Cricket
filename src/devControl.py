@@ -26,9 +26,6 @@
 # Built-in imports
 
 import devClient as devnw
-import search
-import socket
-import json
 
 from cricketlib import searchswitch
 
@@ -177,7 +174,7 @@ def send_status_cmd(top, swid):
             top.ccflag = False
             return-1, "No CC"
 
-def read_port_cmd(top):
+def read_port_status(top, swid):
     """
     reading the port coammand
     Args:
@@ -187,7 +184,7 @@ def read_port_cmd(top):
         return findict: status in dict
     """
     if top.devCtrl == "local":
-        return top.devHand.read_port_cmd()
+        return top.handlers[swid].get_port_status()
     elif top.devCtrl == "network":
         resdict = devnw.read_port_cmd(top.ldata['sccid'],
                                 int(top.ldata['ssccpn']))

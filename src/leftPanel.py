@@ -1,6 +1,6 @@
 ##############################################################################
 # 
-# Module: getusb.py
+# Module: leftPanel.py
 #
 # Description:
 #     Scan the USB bus and get the list of devices attached

@@ -23,7 +23,6 @@
 ##############################################################################
 
 import threading
-import serial
 import time
 import wx
 

@@ -27,6 +27,8 @@ import wx
 # Built-in imports
 import os
 
+import time
+
 # Own modules
 import devControl as model
 import thControl
@@ -270,7 +272,7 @@ class Dev2301Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = model.send_volts_cmd(self.top)
+        res, outstr = model.send_volts_cmd(self.top, self.swid)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -310,7 +312,7 @@ class Dev2301Window(wx.Window):
             None
         """
         strin = "--"
-        res, outstr = model.send_amps_cmd(self.top)
+        res, outstr = model.send_amps_cmd(self.top, self.swid)
         if res < 0:
             outstr = "Comm Error\n"
         else:
@@ -627,6 +629,21 @@ class Dev2301Window(wx.Window):
         else:
             self.enable_controls(False)
 
+    def read_port_status(self, stat):
+        if stat:
+            time.sleep(1)
+            res, outstr = model.read_port_status(self.top, self.swid)
+            print("Read Port Status: ", res, outstr)
+            
+            pstat = False
+            if res == 0:
+                port = int(outstr)
+                if port > 0:
+                    port = port - 1
+                    pstat = True
+                    self.btnStat[port] = True
+                self.port_led_update(port, pstat)
+
     def enable_controls(self, stat):
         """
         Enable/Disable All Widgets of 2301,
@@ -644,7 +661,8 @@ class Dev2301Window(wx.Window):
             stat = False
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-        self.enable_va_controls(stat)   
+        self.enable_va_controls(stat)
+        self.read_port_status(stat) 
     
     def enable_port_controls(self, stat):
         """

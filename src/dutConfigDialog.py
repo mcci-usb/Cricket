@@ -2,9 +2,7 @@ from random import choice, choices
 import wx
 
 import serial.tools.list_ports
-import json
 import os
-import sys
 from sys import platform
 import re
 

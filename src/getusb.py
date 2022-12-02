@@ -31,6 +31,7 @@ import usb.util
 from usb.backend import libusb1
 
 import xml.dom.minidom
+import platform
 
 ##############################################################################
 # Utilities
@@ -65,10 +66,22 @@ def scan_usb():
 
     backend = None
     # Running Python-application on Windows
-    if sys.platform == 'windows':
-        backend = usb.backend.libusb1.get_backend(find_library=lambda x: ""+ 
-                   path + "Lib/site-packages/libusb/_platform/_windows/x86"+
-                   "/libusb-1.0.dll")
+    if sys.platform == 'win32':
+        pver = platform.architecture()
+        if pver[0] == '64bit':
+            backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
+            path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
+            print("64bit NBA")
+        else:
+            backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
+            path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x86\\libusb-1.0.dll")
+            print("32bit NBA")
+        
+    usb_devices = []
+    try:
+        usb_devices = usb.core.find(find_all=True, backend=backend)
+    except:
+        print("No Back End Avail Error!")
 
     # Generator object
     usb_devices = usb.core.find(find_all=True, backend=backend) 

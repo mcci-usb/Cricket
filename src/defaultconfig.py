@@ -1,3 +1,27 @@
+##############################################################################
+# 
+# Module: defaultconfig.py
+#
+# Description:
+#     Scan the USB bus and get the list of devices attached
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#    V3.0.0 Wed Oct 12 2022 17:00:00   Seenivasan V
+#       Module created
+################################################################################
+
 config_data = {
        "name": "Cricket", 
        "version": "1.0.0", 
