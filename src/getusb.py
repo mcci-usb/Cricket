@@ -40,16 +40,21 @@ def scan_usb():
     Scan the USB bus for the list of plugged devices
     Required for device tree view changes
     
+    Note: Runs for Linux and Mac. 
+
     Args:
         No arguments
         
     Returns:
         None
     """
+
     # List of Host controllers
     hc_list = []
+
     # List connected hub
     hub_list = []
+
     #List connected peripheral
     per_list = []
     master_list = []
@@ -58,19 +63,14 @@ def scan_usb():
 
     masterDict = {} 
     
-    # Create path and executable path
-    path = sys.executable
-
-    path = path.replace("python.exe", "")
+    usb_devices = []
 
     backend = None
-    # Running Python-application on Windows
-    if sys.platform == "win32":
-        backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
-              path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
 
-    # Generator object
-    usb_devices = usb.core.find(find_all=True, backend=backend) 
+    try:
+        usb_devices = usb.core.find(find_all=True, backend=backend)
+    except:
+        print("No Back End Avail Error!")
 
     # Here attached a list of Host controlloers, list of Hub,
     # List of periperals info with specific vid, pid.
@@ -119,7 +119,7 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("Error")
+            print("USB Read Error")
 
     pdata = masterDict.get("peri")
     
@@ -136,13 +136,15 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("Error")
+            print("USB Read Error")
+
     for i in range(len(hc_list)):
         master_list.append(hc_list[i])
     for i in range(len(hub_list)):
         master_list.append(hub_list[i])
     for i in range(len(per_list)):
         master_list.append(per_list[i])
+
     # Running Python-application on darwin (MacOS)
     if sys.platform == 'darwin':
         xmldoc = os.popen("system_profiler -xml SPUSBDataType")

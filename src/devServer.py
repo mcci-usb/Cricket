@@ -28,10 +28,8 @@
 
 import socket
 import threading
-import time
 import wx
 import json
-import search
 
 from uiGlobals import *
 
@@ -73,10 +71,11 @@ class ServerCc:
             self.socket.listen(5)
         except:
             print("Server Init failed")
-        #print('Server Listeneing port: ' + host + ':' + str(port))
+            
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None
+
     def close(self):
         """
         ServerCC connection is close
@@ -88,6 +87,7 @@ class ServerCc:
             None
         """  
         self.socket.close()
+        
         
 class StayAccept(threading.Thread):
     """A class StayAccept with init method"""
