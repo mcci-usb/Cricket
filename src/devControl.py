@@ -88,7 +88,7 @@ def search_device(top):
             findict["devices"] = []
             return findict
 
-def connect_device(top,swdict):
+def connect_device(top, swdict):
     if top.devCtrl == "local":
         swname = list(swdict.keys())
         port = list(swdict.values())

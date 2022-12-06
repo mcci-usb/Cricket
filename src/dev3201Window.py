@@ -288,7 +288,7 @@ class Dev3201Window(wx.Window):
                 self.fv = iv/100
                 outstr = str(self.fv) + "V"
                 self.update_volts(outstr)
-        self.top.print_on_log("Volts : "+outstr+"\n")
+        # self.top.print_on_log("Volts : "+outstr+"\n")
 
 
     def AmpsCmd(self, evt):
@@ -336,7 +336,7 @@ class Dev3201Window(wx.Window):
                 outstr = ss + str(self.fa) + "A"
 
             self.update_amps(outstr)
-        self.top.print_on_log("Amps : "+outstr+"\n")
+        # self.top.print_on_log("Amps : "+outstr+"\n")
     
     def PortSpeedChanged(self, e):
         """
@@ -424,13 +424,11 @@ class Dev3201Window(wx.Window):
         # Check voltage
         if(self.top.vgraph):
             self.get_voltage()
-            #self.top.vnew = True
             self.top.vdata = self.fv
         
         # Check amps
         if(self.top.agraph):
             self.get_amps()
-            #self.top.anew = True
             self.top.adata = self.fa
         
         self.timer_vu.Start()
@@ -645,8 +643,7 @@ class Dev3201Window(wx.Window):
         if stat:
             time.sleep(1)
             res, outstr = model.read_port_status(self.top, self.swid)
-            print("Read Port Status: ", res, outstr)
-
+            
             pstat = False
             if res == 0:
                 port = int(outstr)
@@ -806,7 +803,6 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        print("3201 Device Connected!!!!")
         if(self.con_flg):
             time.sleep(1)
             res, outstr = model.read_port_cmd(self.top)

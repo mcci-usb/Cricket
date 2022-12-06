@@ -275,7 +275,7 @@ class MidPanel(wx.Panel):
         """
         return self.autoPan.get_auto_param()
     
-    def set_period(self, strval):
+    def set_loop_param(self, onTime, offTime):
         """
         Set the period for Loop Window
 
@@ -287,7 +287,7 @@ class MidPanel(wx.Panel):
         Returns:
             return None
         """
-        self.loopPan.set_period(strval)
+        self.loopPan.set_loop_param(onTime, offTime)
 
     def set_port_list(self, ports):
         """

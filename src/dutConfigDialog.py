@@ -288,6 +288,7 @@ class DutConfigDialog(wx.Frame):
         self.dut[self.dut_key]["interface"] = type
         
         configdata.set_sut_base_data(self.dut)
+        self.save_done_dialog("DUT name saved")
         
     def SaveDataToWatch(self, event):
         fadata = self.tc_data.GetValue()
@@ -299,6 +300,7 @@ class DutConfigDialog(wx.Frame):
         
         configdata.set_sut_watch_data(findict)
         self.top.updt_dut_config(findict)
+        self.save_done_dialog("Data config saved")
 
     def UpdateData(self):
         
@@ -342,6 +344,8 @@ class DutConfigDialog(wx.Frame):
     
         configdata.set_sut_config_data(findict)
         self.top.updt_dut_config(findict)
+
+        self.save_done_dialog("Serial config saved")
            
     def RefreshConfig(self, e):
         self.cb_list = self.filter_port()
@@ -355,3 +359,8 @@ class DutConfigDialog(wx.Frame):
 
     def read_config_data(self):
         return self.top.get_config_data()
+
+    def save_done_dialog(self, msg):
+        title = ("DUT Config Dialog")
+        dlg = wx.MessageDialog(self, msg, title, wx.OK)
+        dlg.ShowModal()

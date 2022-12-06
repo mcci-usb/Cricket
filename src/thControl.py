@@ -43,17 +43,6 @@ def SetDeviceControl(top):
     Return:
        None
     """  
-    # if not top.ldata['hc']:
-    #     if top.ldata['thcif'] == 'serial':
-    #         # serial not implemented
-    #         top.thCtrl = "serial"
-    #         pass
-    #     else:
-    #         top.thCtrl = "network"
-    #         #OpenNetwork(top)
-    # else:
-    #     top.thCtrl = "local"
-
     if top.myrole['uc'] == True:
         if top.myrole['thc'] == True:
             top.thCtrl = "local"

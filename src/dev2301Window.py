@@ -417,14 +417,10 @@ class Dev2301Window(wx.Window):
         # Check voltage
         if(self.top.vgraph):
             self.get_voltage()
-            #self.top.vnew = True
-            #self.top.vdata = fv
         
         # Check amps
         if(self.top.agraph):
             self.get_amps()
-            #self.top.anew = True
-            #self.top.adata = self.fa
         
         self.timer_vu.Start()
       
@@ -633,7 +629,6 @@ class Dev2301Window(wx.Window):
         if stat:
             time.sleep(1)
             res, outstr = model.read_port_status(self.top, self.swid)
-            print("Read Port Status: ", res, outstr)
             
             pstat = False
             if res == 0:

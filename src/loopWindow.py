@@ -124,9 +124,9 @@ class LoopWindow(wx.Window):
             ])
 
         
-        self.st_per   = wx.StaticText(self, -1, "Period ", size=(-1,15), 
+        self.st_per   = wx.StaticText(self, -1, "ON Time", size=(-1,15), 
                                       style = wx.ALIGN_LEFT)
-        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "2000", size=(50,-1), 
+        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "1000", size=(50,-1), 
                                     style = wx.TE_CENTRE |
                                     wx.TE_PROCESS_ENTER,
                                     validator=NumericValidator(), 
@@ -135,7 +135,7 @@ class LoopWindow(wx.Window):
                                      style = wx.ALIGN_CENTER)
 
         self.hb_peri.AddMany([
-            ((30,0), 0, wx.EXPAND),
+            ((22,0), 0, wx.EXPAND),
             (self.st_per, 0, wx.EXPAND),
             ((23,0), 0, wx.EXPAND),
             (self.tc_per, 0, wx.EXPAND),
@@ -145,20 +145,20 @@ class LoopWindow(wx.Window):
             ])
 
 
-        self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(-1,15), 
+        self.st_duty   = wx.StaticText(self, -1, "OFF Time", size=(-1,15), 
                                        style = wx.ALIGN_LEFT)
-        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
+        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "1000", size=(50,-1), 
                                      style = wx.TE_CENTRE | 
                                      wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
-        self.st_ps   = wx.StaticText(self, -1, "%", size=(-1,15), 
+        self.st_ps   = wx.StaticText(self, -1, "ms", size=(-1,15), 
                                      style = wx.ALIGN_CENTER)
 
         self.hb_duty.AddMany([
-            ((35,0), 0, wx.EXPAND),
+            ((20,0), 0, wx.EXPAND),
             (self.st_duty, 0, wx.EXPAND),
-            ((25,0), 0, wx.EXPAND),
+            ((20,0), 0, wx.EXPAND),
             (self.tc_duty, 0, wx.EXPAND),
             ((10,0), 0, wx.EXPAND),
             (self.st_ps, 0, wx.EXPAND),
@@ -216,15 +216,12 @@ class LoopWindow(wx.Window):
         # The wx.TextCtrl period entering upto '5' Digits
         self.tc_per.SetMaxLength(5)
         # The wx.TextCtrl duty entering upto '2' Digits
-        self.tc_duty.SetMaxLength(2)
+        self.tc_duty.SetMaxLength(5)
         # The wx.TextCtrl Repeat entering upto '3' Digits
         self.tc_cycle.SetMaxLength(3)
         # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
 
-        self.con_flg = True
-        
-        
         self.bs_vbox = wx.BoxSizer(wx.VERTICAL)
         
         # The Timer class allows you to execute 
@@ -441,7 +438,7 @@ class LoopWindow(wx.Window):
                 return False
         return True
     
-    def get_period(self):
+    def get_on_time(self):
         """
         Read the period of Loop Mode
         Args:
@@ -463,22 +460,7 @@ class LoopWindow(wx.Window):
         self.tc_per.SetValue(str(pval))
         return self.tc_per.GetValue()
   
-    def set_period(self, strval):
-        """
-        Set Period Called by USB Tree Window when
-        there is a need to override the period
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: values in strings
-        Returns:
-            None
-        """
-        # Set the  value of str to True
-        self.tc_per.SetValue(strval)
-     
-    def get_duty(self):
+    def get_off_time(self):
         """
         Get Duty value of loop mode
         Args:
@@ -530,13 +512,10 @@ class LoopWindow(wx.Window):
         Returns:
             None
         """
-        self.period = int(self.get_period())
-        self.duty = int(self.get_duty())
+        self.OnTime = int(self.get_on_time())
+        self.OffTime = int(self.get_off_time())
         self.cycle = int(self.get_cycle())
 
-        self.OnTime = self.period * (self.duty/100)
-        self.OffTime = self.period - self.OnTime
-    
     def get_loop_param(self):
         """
         Get the loop mode parameters
@@ -548,7 +527,11 @@ class LoopWindow(wx.Window):
             OnTime, OffTime, and Duty in String format
         """
         self.get_all_three()
-        return self.OnTime, self.OffTime, self.duty
+        return self.OnTime, self.OffTime
+
+    def set_loop_param(self, onTime, offTime):
+        self.tc_per.SetValue(str(onTime))
+        self.tc_duty.SetValue(str(offTime))
 
     def start_loop(self):
         """
@@ -690,7 +673,7 @@ class LoopWindow(wx.Window):
             self.cb_cycle.Disable()
             if self.top.mode != MODE_LOOP:
                 self.btn_start.Disable()
-        if not self.con_flg:
+        if not self.top.con_flg:
             self.btn_start.Disable()
     
     def set_port_list(self, port):

@@ -361,16 +361,16 @@ class LogWindow(wx.Window):
             None
         """
         if(self.get_delay_status()):
-            onTime, offTime, duty = self.top.get_loop_param()
-            if(int(onTime) >= int(offTime)):
-                if(int(offTime) < int(self.get_enum_delay())):
-                    duty = 100 - duty
-                    ndly = int((int(self.get_enum_delay())*100)/duty)
-                    self.top.set_period(str(ndly))
-            else:
-                if(int(onTime) < int(self.get_enum_delay())):
-                    ndly = int((int(self.get_enum_delay())*100)/duty)
-                    self.top.set_period(str(ndly))
+            update_flg = False
+            onTime, offTime = self.top.get_loop_param()
+            if(int(onTime) < int(self.get_enum_delay())):
+                onTime = self.get_enum_delay()
+                update_flg = True
+            if(int(offTime) < int(self.get_enum_delay())):
+                offTime = self.get_enum_delay()
+                update_flg = True
+            if update_flg:
+                self.top.set_loop_param(onTime, offTime)
 
             onTime, offTime, duty = self.top.get_auto_param()
             if(int(onTime) >= int(offTime)):

@@ -31,7 +31,6 @@ import usb.util
 from usb.backend import libusb1
 
 import xml.dom.minidom
-import platform
 
 ##############################################################################
 # Utilities
@@ -41,16 +40,21 @@ def scan_usb():
     Scan the USB bus for the list of plugged devices
     Required for device tree view changes
     
+    Note: Runs for Linux and Mac. 
+
     Args:
         No arguments
         
     Returns:
         None
     """
+
     # List of Host controllers
     hc_list = []
+
     # List connected hub
     hub_list = []
+
     #List connected peripheral
     per_list = []
     master_list = []
@@ -59,32 +63,14 @@ def scan_usb():
 
     masterDict = {} 
     
-    # Create path and executable path
-    path = sys.executable
-
-    path = path.replace("python.exe", "")
+    usb_devices = []
 
     backend = None
-    # Running Python-application on Windows
-    if sys.platform == 'win32':
-        pver = platform.architecture()
-        if pver[0] == '64bit':
-            backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
-            path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
-            print("64bit NBA")
-        else:
-            backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
-            path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x86\\libusb-1.0.dll")
-            print("32bit NBA")
-        
-    usb_devices = []
+
     try:
         usb_devices = usb.core.find(find_all=True, backend=backend)
     except:
         print("No Back End Avail Error!")
-
-    # Generator object
-    usb_devices = usb.core.find(find_all=True, backend=backend) 
 
     # Here attached a list of Host controlloers, list of Hub,
     # List of periperals info with specific vid, pid.

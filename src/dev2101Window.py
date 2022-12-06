@@ -179,11 +179,7 @@ class Dev2101Window(wx.Panel):
         """
         res, outbyte = model.read_port(self.top, self.swid)
         if res == 0:
-            ob = 0
-            if sys.platform == 'darwin':
-                ob = outbyte[1]
-            else:
-                ob = outbyte[0]
+            ob = outbyte[1]
             if( ob == 6):
                 self.rbtn[0].SetBitmap(self.picf)
                 self.btnStat[0] = False

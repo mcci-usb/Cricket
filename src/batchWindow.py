@@ -222,6 +222,7 @@ class BatchWindow(wx.Window):
 
         self.btn_start.Bind(wx.EVT_BUTTON, self.OnClickBatch)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveBatch)
+        self.btn_start.Disable()
 
     def OnClickBatch(self, event):
         if self.batch_flg:
@@ -324,8 +325,10 @@ class BatchWindow(wx.Window):
                 with open(self.bloc) as fobj:
                     for line in fobj:
                         self.tc_seq.WriteText(line)
+                self.btn_start.Enable()
         except IOError:
             wx.LogError("Can not open file '%s', " % self.bloc)
+            self.btn_start.Disable()
 
     def load_file(self):
         """
@@ -357,8 +360,10 @@ class BatchWindow(wx.Window):
                 with open(pathname) as fobj:
                     for line in fobj:
                         self.tc_seq.WriteText(line)
+                self.btn_start.Enable()
         except IOError:
             wx.LogError("Can not open file '%s', " % pathname)
+            self.btn_start.Disable()
         return pathname
 
     def save_batch (self, contents, extension):
@@ -407,11 +412,13 @@ class BatchWindow(wx.Window):
     
     def parseSwMacro(self, oclist):
         devlist = ["3141", "3201", "2301", "2101"]
-        swtype = oclist[4].replace('"','')
-        swpath = oclist[3].replace('"', '')
-        swpath = swpath.replace(',', '')
+    
+        swpath = oclist[3].replace(',', '')
+        swpath = swpath[1:][:-1]
+        swtype = oclist[4][1:][:-1]
+
         if oclist[2] == "=":
-            if any(swtype in s for s in devlist):
+            if swtype in devlist:
                 self.mappedSw[oclist[1]] = swpath
                 self.reqSw[swpath] = swtype
             else:

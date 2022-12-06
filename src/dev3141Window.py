@@ -432,7 +432,6 @@ class Dev3141Window(wx.Panel):
     def read_port_status(self, stat):
         if stat:
             res, outstr = model.read_port_status(self.top, self.swid)
-            print("Read Port Status: ", res, outstr)
             
             pstat = False
             if res == 0:

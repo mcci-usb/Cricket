@@ -132,12 +132,6 @@ class AutoWindow(wx.Window):
         self.cb_p4 = wx.CheckBox(self, -1, "4")
         self.cb_p4.Disable()
 
-        # self.hb_port.Add(self.cb_port, 0, flag = wx.LEFT, border=5)
-        # self.hb_port.Add(self.cb_p1, 0, flag = wx.LEFT, border=20)
-        # self.hb_port.Add(self.cb_p2, 0, flag = wx.LEFT, border=20)
-        # self.hb_port.Add(self.cb_p3, 0, flag = wx.LEFT, border=20)
-        # self.hb_port.Add(self.cb_p4, 0, flag = wx.LEFT, border=20)
-
         self.hb_port.AddMany([
             ((40,0), 0, wx.EXPAND),
             (self.cb_port, 0, wx.EXPAND),

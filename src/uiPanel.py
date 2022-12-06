@@ -339,7 +339,7 @@ class UiPanel(wx.Panel):
         """
         return self.cpanel.get_auto_param()
     
-    def set_period(self, strval):
+    def set_loop_param(self, onTime, offTime):
         """
         Set the period for Loop Window
 
@@ -351,7 +351,7 @@ class UiPanel(wx.Panel):
         Returns:
             return None
         """
-        self.loopPan.set_period(strval)
+        self.cpanel.set_loop_param(onTime, offTime)
 
     def set_port_list(self, ports):
         """
