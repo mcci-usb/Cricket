@@ -28,7 +28,8 @@ import wx
 import thControl
 
 from uiGlobals import *
-import control2101 as d2101
+import devControl as model
+
 ##############################################################################
 # Utilities
 ##############################################################################
@@ -77,51 +78,136 @@ class LoopWindow(wx.Window):
 
         self.dlist = []
 
+        self.swid = None
+        self.swkey = None
+
         self.portno = 0
 
+        # Oct 08 2022
+        self.hb_sw = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_port = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_peri = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_duty = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_repe = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_finc = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_btn = wx.BoxSizer(wx.HORIZONTAL)
+
+
+        self.st_switch   = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_LEFT)
+        
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(145,-1),
+                                     style = wx.TE_PROCESS_ENTER)
+
+        self.hb_sw.AddMany([
+            (self.st_switch, 0, wx.EXPAND),
+            ((20,0), 1, wx.EXPAND),
+            (self.cb_switch, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.st_port   = wx.StaticText(self, -1, "Select Port", size=(-1,15), 
+                                      style = wx.ALIGN_LEFT)
         self.cb_psel = wx.ComboBox(self,
                                      size=(53,-1),
                                      style = wx.TE_PROCESS_ENTER)
-        self.st_port   = wx.StaticText(self, -1, "Port ", size=(50,15), 
-                                      style = wx.ALIGN_RIGHT)
-     
+
         
-        self.st_per   = wx.StaticText(self, -1, "Period ", size=(50,15), 
-                                      style = wx.ALIGN_RIGHT)
-        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "2000", size=(50,-1), 
+        self.hb_port.AddMany([
+            ((10,0), 0, wx.EXPAND),
+            (self.st_port, 0, wx.EXPAND),
+            ((25,0), 0, wx.EXPAND),
+            (self.cb_psel, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+        
+        self.st_per   = wx.StaticText(self, -1, "ON Time", size=(-1,15), 
+                                      style = wx.ALIGN_LEFT)
+        self.tc_per   = wx.TextCtrl(self, ID_TC_PERIOD, "1000", size=(50,-1), 
                                     style = wx.TE_CENTRE |
                                     wx.TE_PROCESS_ENTER,
                                     validator=NumericValidator(), 
                                     name="ON/OFF period")
-        self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
+        self.st_ms   = wx.StaticText(self, -1, "ms", size=(-1,15), 
                                      style = wx.ALIGN_CENTER)
 
-        self.st_duty   = wx.StaticText(self, -1, "Duty ", size=(50,15), 
-                                       style = wx.ALIGN_RIGHT)
-        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
+        self.hb_peri.AddMany([
+            ((22,0), 0, wx.EXPAND),
+            (self.st_per, 0, wx.EXPAND),
+            ((23,0), 0, wx.EXPAND),
+            (self.tc_per, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.st_ms, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.st_duty   = wx.StaticText(self, -1, "OFF Time", size=(-1,15), 
+                                       style = wx.ALIGN_LEFT)
+        self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "1000", size=(50,-1), 
                                      style = wx.TE_CENTRE | 
                                      wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
-        self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
+        self.st_ps   = wx.StaticText(self, -1, "ms", size=(-1,15), 
                                      style = wx.ALIGN_CENTER)
 
-        self.st_cycle   = wx.StaticText(self, -1, "Repeat ", size=(50,15), 
-                                        style = wx.ALIGN_RIGHT)
+        self.hb_duty.AddMany([
+            ((20,0), 0, wx.EXPAND),
+            (self.st_duty, 0, wx.EXPAND),
+            ((20,0), 0, wx.EXPAND),
+            (self.tc_duty, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.st_ps, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.st_cycle   = wx.StaticText(self, -1, "Repeat", size=(-1,15), 
+                                        style = wx.ALIGN_LEFT)
         self.tc_cycle   = wx.TextCtrl(self, ID_TC_CYCLE, "20", size=(50,-1), 
                                       style = wx.TE_CENTRE |
                                       wx.TE_PROCESS_ENTER,
                                       validator=NumericValidator(), 
                                       name="ON/OFF period")
-        self.st_cnt   = wx.StaticText(self, -1, "", size=(15,10), 
-                                      style = wx.ALIGN_CENTER)
+        
         self.cb_cycle = wx.CheckBox (self, -1, label = 'Until Stopped')
-        self.st_repeat_cnt   = wx.StaticText(self, -1, "Finished Count", size=(-1,-1))
+        
+
+        self.hb_repe.AddMany([
+            ((26,0), 0, wx.EXPAND),
+            (self.st_cycle, 0, wx.EXPAND),
+            ((24,0), 0, wx.EXPAND),
+            (self.tc_cycle, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.cb_cycle, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.st_finicnt   = wx.StaticText(self, -1, "Finished Count", size=(-1,-1))
         self.st_cnt_port   = wx.StaticText(self, -1, "----", size=(-1, -1), 
                                       style = wx.ALIGN_CENTER)
 
+        self.hb_finc.AddMany([
+            (self.st_finicnt, 0, wx.EXPAND),
+            ((20,0), 0, wx.EXPAND),
+            (self.st_cnt_port, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
         self.btn_start = wx.Button(self, ID_BTN_START, "Start", size=(60,25))
-        
+        self.hb_btn.AddMany([
+            ((-1,0), 1, wx.EXPAND),
+            (self.btn_start, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
         self.tc_per.SetToolTip(wx.ToolTip("ON/OFF Interval. Min: 1 sec, "
                                           "Max: 60 sec"))
         self.btn_start.SetToolTip(wx.ToolTip("ON/OFF a selected port for a "
@@ -130,98 +216,80 @@ class LoopWindow(wx.Window):
         # The wx.TextCtrl period entering upto '5' Digits
         self.tc_per.SetMaxLength(5)
         # The wx.TextCtrl duty entering upto '2' Digits
-        self.tc_duty.SetMaxLength(2)
+        self.tc_duty.SetMaxLength(5)
         # The wx.TextCtrl Repeat entering upto '3' Digits
         self.tc_cycle.SetMaxLength(3)
         # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
-        
-        # Creates BoxSizer in horizontal
-        self.bs_psel = wx.BoxSizer(wx.HORIZONTAL)
-        self.bs_pers = wx.BoxSizer(wx.HORIZONTAL)
-        self.bs_duty = wx.BoxSizer(wx.HORIZONTAL)
-        self.bs_cycle = wx.BoxSizer(wx.HORIZONTAL)
-        self.bs_cnt = wx.BoxSizer(wx.HORIZONTAL)
-        self.bs_btn = wx.BoxSizer(wx.HORIZONTAL)
-        
-        self.bs_psel.Add(40,0,0)
-        self.bs_psel.Add(self.st_port,0, wx.ALIGN_CENTER)
-        self.bs_psel.Add(15,20,0)
-        self.bs_psel.Add(self.cb_psel,0, wx.ALIGN_CENTER | 
-                         wx.ALIGN_CENTER_VERTICAL)
-        self.bs_psel.Add(40,0,0)
 
-        self.bs_pers.Add(40,0,0)
-        self.bs_pers.Add(self.st_per,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_pers.Add(15,20,0)  #height changed here
-        self.bs_pers.Add(self.tc_per,0, wx.ALIGN_CENTER | 
-                         wx.ALIGN_CENTER_VERTICAL)
-        self.bs_pers.Add(0,20,0)
-        self.bs_pers.Add(self.st_ms,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_pers.Add(40,0,0)
-
-        self.bs_duty.Add(40,0,0)
-        self.bs_duty.Add(self.st_duty,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_duty.Add(15,50,0)
-        self.bs_duty.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
-                         wx.ALIGN_CENTER_VERTICAL)
-        self.bs_duty.Add(0,50,0)
-        self.bs_duty.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_duty.Add(40,0,0)
-
-        self.bs_cycle.Add(40,0,0)
-        self.bs_cycle.Add(self.st_cycle,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_cycle.Add(15,50,0)
-        self.bs_cycle.Add(self.tc_cycle,0, wx.ALIGN_CENTER_VERTICAL)
-        self.bs_cycle.Add(1,0,0)
-
-        self.bs_cnt.Add(40, 0, 0)
-        self.bs_cnt.Add(self.st_repeat_cnt, 0,  flag=wx.LEFT | 
-                        wx.ALIGN_CENTER_VERTICAL, border=0)
-        self.bs_cnt.Add(25, 50, 0)
-        self.bs_cnt.Add(self.st_cnt_port,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border = 0)
-        self.bs_cnt.Add(1,0,0)
-
-        self.bs_btn.Add(self.btn_start,0, flag = wx.ALIGN_CENTER_HORIZONTAL)
-        self.bs_cycle.Add(10,0,0)
-        self.bs_cycle.Add(self.cb_cycle, 0, wx.ALIGN_LEFT | 
-                                            wx.ALIGN_CENTER_VERTICAL,
-                                            border = 0)
-        self.bs_cycle.Add(5,10,0)
-
-        # Create static box with naming of Loop Mode
-        sb = wx.StaticBox(self, -1, "Loop Mode")
-        
-        self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
+        self.bs_vbox = wx.BoxSizer(wx.VERTICAL)
         
         # The Timer class allows you to execute 
         # Code at specified intervals.
-        self.timer = wx.Timer(self)
+        self.timer = wx.Timer(self)  
         self.timer_usb = wx.Timer(self)
 
-        self.bs_vbox.AddMany([
-            (self.bs_psel,1, wx.EXPAND),
-            (self.bs_pers, 1, wx.EXPAND),
-            (self.bs_duty, 1, wx.EXPAND),
-            (self.bs_cycle, 1, wx.EXPAND),
-            (self.bs_cnt, 1, wx.EXPAND),
-            (0,10,0),
-            (self.bs_btn, 0, wx.ALIGN_CENTER_HORIZONTAL),
-            (0,10,0)
+
+        self.hb_outer = wx.BoxSizer(wx.HORIZONTAL)
+        self.vb_contnr = wx.BoxSizer(wx.VERTICAL)
+
+        self.vb_contnr.AddMany([
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_sw, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_port, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_peri, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_duty, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_repe, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_finc, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND),
+            (self.hb_btn, 0, wx.EXPAND),
+            ((0,20), 1, wx.EXPAND)
             ])
+
+  
+        self.hb_outer.AddMany([
+            ((-1,0), 1, wx.EXPAND),
+            (self.vb_contnr, 1, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND),
+            ])
+
+
         # Bind the button event to handler
         self.btn_start.Bind(wx.EVT_BUTTON, self.StartAuto)
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
+
+        self.cb_switch.Bind(wx.EVT_COMBOBOX, self.SwitchChange, self.cb_switch)
         
         # Set size of frame
-        self.SetSizer(self.bs_vbox)
-        self.bs_vbox.Fit(self)
+        self.SetSizer(self.hb_outer)
+        self.hb_outer.Fit(self)
         self.Layout()
 
         self.enable_controls(True)
+
+    def update_sw_selector(self, swdict):
+        self.cb_switch.Clear()
+        for key, val in swdict.items():
+            swstr = ""+val+"("+key+")"
+            self.cb_switch.Append(swstr)
+        self.cb_switch.SetSelection(0)
+        self.Update_port_count()
+
+    def Update_port_count(self):
+        self.swid = self.cb_switch.GetValue()
+        self.swkey = self.swid.split("(")[1][:-1]
+        swname = self.swid.split("(")[0]
+        self.set_port_list(portCnt[swname])
+
+    def SwitchChange(self, evt):
+        self.Update_port_count()
 
     def StartAuto(self, evt):
         """
@@ -247,6 +315,7 @@ class LoopWindow(wx.Window):
             self.get_all_three()
             if(self.usb_dly_warning() and self.onoff_dly_warning()):
                 #function of start loop
+                self.top.action_reset()
                 self.start_loop()
 
     def TimerServ(self, evt):
@@ -280,6 +349,7 @@ class LoopWindow(wx.Window):
                             # once duty cycle is over
                             self.top.print_on_log("Loop Mode Completed\n")
                             self.stop_loop()
+                            self.top.action_summary()
                         else:    
                             self.timer.Start(self.OffTime)
                     else:    
@@ -368,7 +438,7 @@ class LoopWindow(wx.Window):
                 return False
         return True
     
-    def get_period(self):
+    def get_on_time(self):
         """
         Read the period of Loop Mode
         Args:
@@ -390,22 +460,7 @@ class LoopWindow(wx.Window):
         self.tc_per.SetValue(str(pval))
         return self.tc_per.GetValue()
   
-    def set_period(self, strval):
-        """
-        Set Period Called by USB Tree Window when
-        there is a need to override the period
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: values in strings
-        Returns:
-            None
-        """
-        # Set the  value of str to True
-        self.tc_per.SetValue(strval)
-     
-    def get_duty(self):
+    def get_off_time(self):
         """
         Get Duty value of loop mode
         Args:
@@ -457,13 +512,10 @@ class LoopWindow(wx.Window):
         Returns:
             None
         """
-        self.period = int(self.get_period())
-        self.duty = int(self.get_duty())
+        self.OnTime = int(self.get_on_time())
+        self.OffTime = int(self.get_off_time())
         self.cycle = int(self.get_cycle())
 
-        self.OnTime = self.period * (self.duty/100)
-        self.OffTime = self.period - self.OnTime
-    
     def get_loop_param(self):
         """
         Get the loop mode parameters
@@ -475,7 +527,11 @@ class LoopWindow(wx.Window):
             OnTime, OffTime, and Duty in String format
         """
         self.get_all_three()
-        return self.OnTime, self.OffTime, self.duty
+        return self.OnTime, self.OffTime
+
+    def set_loop_param(self, onTime, offTime):
+        self.tc_per.SetValue(str(onTime))
+        self.tc_duty.SetValue(str(offTime))
 
     def start_loop(self):
         """
@@ -554,7 +610,8 @@ class LoopWindow(wx.Window):
         Returns:
             None
         """
-        self.top.port_on(portno, stat)
+        self.top.port_on(self.swkey, portno, stat)
+        # self.top.panel.lpanel.p
         # Getting delay status
         if(self.top.get_delay_status()):
             self.keep_delay()

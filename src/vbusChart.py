@@ -561,7 +561,6 @@ class VbusChart(wx.Frame):
             return
         
         pathname = dlg.GetPath()
-        #print("File Path: ", pathname)
         try:
             with open(pathname, 'r') as csvfile:
                 csvReader = csv.reader(csvfile)

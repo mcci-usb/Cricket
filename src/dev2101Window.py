@@ -22,6 +22,7 @@
 #       Module created
 ##############################################################################
 #Lib imports
+import sys
 import wx
 
 # Built-in imports
@@ -56,7 +57,7 @@ class Dev2101Window(wx.Panel):
     the Dev2101Window navigate to Super speed and High speed enable 
     or disable options.
     """
-    def __init__(self, parent, top):
+    def __init__(self, parent, top, portno):
         """
         Device specific functions and UI for interfacing Model 2101 with GUI
         Args:
@@ -72,14 +73,20 @@ class Dev2101Window(wx.Panel):
         
         self.parent = parent
         self.top = top
+        self.swid = portno
+
+        self.swtitle = "2101"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
+
         # Port command for SuperSpeed
-        self.portcmd = SS_CONNECT
+        self.portcmd = "ss"
         # Call this to give the sizer a minimal size.
         self.SetMinSize((280, 140))
         # Create a staticbox naming as  Model2101 
-        sb = wx.StaticBox(self, -1, "MCCI USB Switch 2101")
+        self.sb = wx.StaticBox(self, -1, self.swtitle)
         # BoxSizer fixed with Vertical
-        self.vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
+        self.vbox = wx.StaticBoxSizer(self.sb,wx.VERTICAL)
         # BoxSizer fixed with Horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -103,6 +110,8 @@ class Dev2101Window(wx.Panel):
         self.duty = 0
         self.OnTime = 0
         self.OffTime = 0
+
+        self.con_flg = None
 
         self.On_flg = False
         self.auto_flg = False
@@ -129,7 +138,7 @@ class Dev2101Window(wx.Panel):
                                       wx.ALIGN_CENTER_VERTICAL, border = 20)
         self.hbox2.Add(self.rbtn_ss0, flag=wx.RIGHT | wx.LEFT | 
                                       wx.ALIGN_CENTER_VERTICAL |
-                                      wx.ALIGN_RIGHT, border=18)
+                                      wx.ALIGN_LEFT, border=18)
 
         self.tog_flg = False
         self.pulse_flg = False
@@ -148,12 +157,49 @@ class Dev2101Window(wx.Panel):
         # Bind the button event to handler
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p1)
         
+        self.con_flg = True
         self.enable_controls(True)
+        
         # Set size of frame
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
+    
 
+    def read_status(self):
+        """
+        Once Switch 2101 connected, should read port status and update UI
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        res, outbyte = model.read_port(self.top, self.swid)
+        if res == 0:
+            ob = outbyte[1]
+            if( ob == 6):
+                self.rbtn[0].SetBitmap(self.picf)
+                self.btnStat[0] = False
+            else:
+                self.rbtn[0].SetBitmap(self.picn)
+                self.btnStat[0] = True
+                if(ob == 5):
+                    self.rbtn_ss1.SetValue(True)
+                elif(ob == 3):
+                    self.rbtn_ss0.SetValue(True)
+        
+
+    def update_cport(self, portno):
+        self.swtitle = "2101"
+        if(len(portno)):
+            self.swtitle += " ("+portno+")"
+        self.swid = portno
+        self.sb.SetLabel(self.swtitle)
+        self.Layout()
+        
     def OnOffPort (self, e):
         """
         Event Handler for Port On and Off
@@ -258,11 +304,14 @@ class Dev2101Window(wx.Panel):
             None
         """  
         if(stat):
-            self.port_on_cmd(port)
+            if port == 0:
+                stat = False
+                self.port_off_cmd(port)
+            else:
+                self.port_on_cmd(port)
         else:
             self.port_off_cmd(port)
-        self.port_led_update(port-1, stat)
-
+        
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
@@ -280,10 +329,10 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """ 
-        model.control_port(self.top, self.portcmd)
-        # print port ON 
-        self.top.print_on_log("Port ON\n")
-        self.port_led_update(port, True)
+        res, outstr = model.control_port(self.top, self.swid+","+self.portcmd)
+        if res == 0:
+            self.top.print_on_log(self.swid+": Port ON\n")
+            self.port_led_update(port, True)
        
     def port_off_cmd(self, port):
         """
@@ -298,9 +347,42 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        model.control_port(self.top, DEV_DISCONNECT)
-        self.top.print_on_log("Port OFF\n")
-        self.port_led_update(port, False)
+
+        res, outstr = model.control_port(self.top, self.swid+",off")
+        if res == 0:
+            self.top.print_on_log(self.swid+": Port OFF\n")
+            self.port_led_update(port, False)
+
+    
+    def set_speed(self, speed):
+        if(speed == "SS1"):
+            self.top.print_on_log("Super Speed Enabled\n")
+            self.portcmd = "ss"
+            self.rbtn_ss1.SetValue(True)
+        else:
+            self.top.print_on_log("Super Speed Disabled\n")
+            self.portcmd = "hs"
+            self.rbtn_ss0.SetValue(True)
+
+
+    def speed_cmd(self,val):
+        """
+        Port Command update based on Speed Selection in 2101
+        Args:
+            self: The self parameter is a reference to the current
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            val: port command update based on Speed Selection. 
+        Returns:
+            None
+        """
+        if(val == 1):
+            self.top.print_on_log("Super Speed Enabled\n")
+            self.portcmd = "ss"
+        
+        else:
+            self.top.print_on_log("Super Speed Disabled\n")
+            self.portcmd = "hs"
            
     def keep_delay(self):
         """
@@ -363,11 +445,12 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-        if not self.top.con_flg:
+        if not self.con_flg:
             stat = False
         
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
+        self.read_status()
 
     def enable_port_controls(self, stat):
         """
@@ -382,7 +465,7 @@ class Dev2101Window(wx.Panel):
             None
         """              
 
-        stat = self.top.con_flg
+        stat = self.con_flg
         if(stat):
             self.btn_p1.Enable()
         else:
@@ -406,24 +489,6 @@ class Dev2101Window(wx.Panel):
         else:
             self.rbtn_ss0.Disable()
             self.rbtn_ss1.Disable()        
-       
-    def speed_cmd(self,val):
-        """
-        Port Command update based on Speed Selection in 2101
-        Args:
-            self: The self parameter is a reference to the current
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            val: port command update based on Speed Selection. 
-        Returns:
-            None
-        """
-        if(val == 1):
-            self.top.print_on_log("Super Speed Enabled\n")
-            self.portcmd = SS_CONNECT
-        else:
-            self.top.print_on_log("Super Speed Disabled\n")
-            self.portcmd = HS_CONNECT
        
     def device_connected(self):
         """
@@ -453,3 +518,9 @@ class Dev2101Window(wx.Panel):
             self.auto_flg = False
             self.btn_auto.SetLabel("Start")
             self.timer.Stop()
+
+    def read_param(self, param):
+        if param == "voltage" or param == "current":
+            self.top.print_on_log("Switch 2101 wouldn't support "+param+ "Command\n")
+        elif param == "port":
+            self.top.print_on_log("Switch 2101 - Read port status\n")

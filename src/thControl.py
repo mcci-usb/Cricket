@@ -29,6 +29,7 @@ import thClient as thnw
 import usbDev as thlocal
 import socket
 import json
+import sys
 
 from uiGlobals import *
 
@@ -42,16 +43,12 @@ def SetDeviceControl(top):
     Return:
        None
     """  
-    if not top.ldata['hc']:
-        if top.ldata['thcif'] == 'serial':
-            # serial not implemented
-            top.thCtrl = "serial"
-            pass
+    if top.myrole['uc'] == True:
+        if top.myrole['thc'] == True:
+            top.thCtrl = "local"
         else:
             top.thCtrl = "network"
-            #OpenNetwork(top)
-    else:
-        top.thCtrl = "local"
+
 
 def ResetDeviceControl(top):
     """
@@ -79,8 +76,22 @@ def get_tree_change(top):
 
     """
     if top.thCtrl == "local":
-        dl, newlist = thlocal.get_usb_tree()
-        thlocal.get_tree_change(top, dl, newlist)
+        if sys.platform.startswith("win"):
+            updtu4list = thlocal.get_usbandusb4_tree()
+            if len(top.masterList) == 0:
+                for dev in updtu4list:
+                    top.masterList.append(dev)
+            thlocal.get_u4_tree_change(top, updtu4list)
+            top.save_usb_list(updtu4list)
+
+        else:
+            dl, newlist = thlocal.get_usb_tree()
+            thlocal.get_tree_change(top, dl, newlist)
+            
+            if sys.platform == "darwin":
+                newdict = thlocal.get_tb_tree()
+                thlocal.get_tb_tree_change(top, newdict)
+
     elif top.thCtrl == "network":
         resdict = thnw.get_usb_tree(top.ldata['thcid'],
                                 int(top.ldata['sthcpn']))

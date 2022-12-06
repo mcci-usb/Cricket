@@ -106,7 +106,7 @@ class LogWindow(wx.Window):
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.wait_flg = False
         
-        self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
+        self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hbox1.Add(self.st_delay, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 18)
@@ -122,7 +122,7 @@ class LogWindow(wx.Window):
         self.hbox.Add(30,0,0)
 
         self.hbox.Add(30,0,0)
-        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_RIGHT | 
+        self.hbox.Add(self.btn_clear, 0, wx.ALIGN_LEFT | 
                                          wx.ALIGN_CENTER_VERTICAL)
         self.hbox.Add(45,0,0)
         self.hbox.Add(self.btn_save, 1, flag=wx.RIGHT , 
@@ -361,16 +361,16 @@ class LogWindow(wx.Window):
             None
         """
         if(self.get_delay_status()):
-            onTime, offTime, duty = self.top.get_loop_param()
-            if(int(onTime) >= int(offTime)):
-                if(int(offTime) < int(self.get_enum_delay())):
-                    duty = 100 - duty
-                    ndly = int((int(self.get_enum_delay())*100)/duty)
-                    self.top.set_period(str(ndly))
-            else:
-                if(int(onTime) < int(self.get_enum_delay())):
-                    ndly = int((int(self.get_enum_delay())*100)/duty)
-                    self.top.set_period(str(ndly))
+            update_flg = False
+            onTime, offTime = self.top.get_loop_param()
+            if(int(onTime) < int(self.get_enum_delay())):
+                onTime = self.get_enum_delay()
+                update_flg = True
+            if(int(offTime) < int(self.get_enum_delay())):
+                offTime = self.get_enum_delay()
+                update_flg = True
+            if update_flg:
+                self.top.set_loop_param(onTime, offTime)
 
             onTime, offTime, duty = self.top.get_auto_param()
             if(int(onTime) >= int(offTime)):

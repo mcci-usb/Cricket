@@ -85,6 +85,12 @@ class AutoWindow(wx.Window):
 
         self.dlist = []
 
+        self.con_flg = None
+
+        self.swid = None
+        self.swkey = None
+
+    
         self.portno = 0
         self.cbPorts = []
         self.psel = []
@@ -92,8 +98,31 @@ class AutoWindow(wx.Window):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
 
-        self.cb_port = wx.StaticText(self, -1, "Port")
+        
+        # Oct 08 2022
+        self.hb_sw = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_port = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_intv = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_duty = wx.BoxSizer(wx.HORIZONTAL)
+        self.hb_btn = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.st_switch  = wx.StaticText(self, -1, "Select Switch ", size=(-1, -1), 
+                                      style = wx.ALIGN_LEFT)
+        self.cb_switch = wx.ComboBox(self,
+                                     size=(155,-1),
+                                     style = wx.TE_PROCESS_ENTER)
 
+        # self.hb_sw.Add(self.st_switch, 0, flag = wx.LEFT | wx.Top, border=5)
+        # self.hb_sw.Add(self.cb_switch, 0, flag = wx.LEFT | wx.Top, border=5)
+        self.hb_sw.AddMany([
+            (self.st_switch, 0, wx.EXPAND),
+            ((20,0), 1, wx.EXPAND),
+            (self.cb_switch, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.cb_port = wx.StaticText(self, -1, "Port")
         self.cb_p1 = wx.CheckBox(self, -1, "1")
         self.cb_p1.Disable()     
         self.cb_p2 = wx.CheckBox(self, -1, "2")
@@ -103,6 +132,20 @@ class AutoWindow(wx.Window):
         self.cb_p4 = wx.CheckBox(self, -1, "4")
         self.cb_p4.Disable()
 
+        self.hb_port.AddMany([
+            ((40,0), 0, wx.EXPAND),
+            (self.cb_port, 0, wx.EXPAND),
+            ((28,0), 0, wx.EXPAND),
+            (self.cb_p1, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.cb_p2, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.cb_p3, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.cb_p4, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
         self.cbPorts.append(self.cb_p1)
         self.cbPorts.append(self.cb_p2)
         self.cbPorts.append(self.cb_p3)
@@ -110,26 +153,54 @@ class AutoWindow(wx.Window):
 
         self.st_si   = wx.StaticText(self, -1, "Interval",
                                      style = wx.ALIGN_CENTER_VERTICAL | 
-                                     wx.ALIGN_RIGHT, size=(60,-1))
+                                     wx.ALIGN_LEFT, size=(-1,-1))
         self.tc_ival   = wx.TextCtrl(self, ID_TC_INTERVAL, "1000", 
                                      size=(50,-1), style = wx.TE_CENTRE |
                                      wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
-        self.st_ms   = wx.StaticText(self, -1, "ms", size=(30,15), 
+        self.st_ms   = wx.StaticText(self, -1, "ms", size=(-1,15), 
                                      style = wx.ALIGN_CENTER)
-        self.st_duty   = wx.StaticText(self, -1, "Duty", 
+
+        self.hb_intv.AddMany([
+            ((20,0), 0, wx.EXPAND),
+            (self.st_si, 0, wx.EXPAND),
+            ((30,0), 0, wx.EXPAND),
+            (self.tc_ival, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.st_ms, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
+
+        self.st_duty   = wx.StaticText(self, -1, "    Duty", 
                                        style = wx.ALIGN_CENTER_VERTICAL | 
-                                       wx.ALIGN_RIGHT, size=(60,-1))
+                                       wx.ALIGN_LEFT, size=(-1,-1))
         self.tc_duty   = wx.TextCtrl(self, ID_TC_DUTY, "50", size=(50,-1), 
                                      style = wx.TE_CENTRE |
                                      wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 
                                      name="ON/OFF period")
-        self.st_ps   = wx.StaticText(self, -1, "%", size=(30,15), 
+        self.st_ps   = wx.StaticText(self, -1, "%", size=(-1,15), 
                                      style = wx.ALIGN_CENTER)
 
+
+        self.hb_duty.AddMany([
+            ((20,0), 0, wx.EXPAND),
+            (self.st_duty, 0, wx.EXPAND),
+            ((30,0), 0, wx.EXPAND),
+            (self.tc_duty, 0, wx.EXPAND),
+            ((10,0), 0, wx.EXPAND),
+            (self.st_ps, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
+
         self.btn_auto = wx.Button(self, ID_BTN_AUTO, "Auto", size=(60,25))
+        self.hb_btn.AddMany([
+            ((-1,0), 1, wx.EXPAND),
+            (self.btn_auto, 0, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND)
+            ])
 
         # The wx.TextCtrl interval value length limit entering upto '5' Digits
         self.tc_ival.SetMaxLength(5)
@@ -143,53 +214,38 @@ class AutoWindow(wx.Window):
         self.btn_auto.SetToolTip(wx.ToolTip("On/Off each Port "
                                             "for a interval until stop"))
         # Create static box with naming of Auto Mode
-        sb = wx.StaticBox(self, -1, "Auto Mode")
+        # sb = wx.StaticBox(self, -1, "Auto Mode")
         # Creates a boxsizer is vertical
-        self.bs_vbox = wx.StaticBoxSizer(sb,wx.VERTICAL)
-        # Creates a boxsizer is horizontal
-        self.hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.hbox0.Add(self.cb_port, 0, flag=wx.LEFT | 
-                        wx.ALIGN_CENTER_VERTICAL, border=50)
-        self.hbox0.Add(self.cb_p1, 0, flag=wx.ALIGN_CENTER | 
-                       wx.LEFT, border=22)
-        self.hbox0.Add(self.cb_p2, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 10)
-        self.hbox0.Add(self.cb_p3,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=20)
-        self.hbox0.Add(self.cb_p4,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=10)
-        self.hbox1.Add(self.st_si, 0, flag=wx.ALIGN_RIGHT | wx.LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL, border=12)
-        self.hbox1.Add(self.tc_ival, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 18)
-        self.hbox1.Add(self.st_ms, flag=wx.ALIGN_LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL)
-        self.hbox1.Add(self.btn_auto, 0, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 20)
-        self.hbox2.Add(self.st_duty, flag=wx.LEFT |  wx.ALIGN_RIGHT |
-                       wx.ALIGN_CENTER_VERTICAL, border=12)
-        self.hbox2.Add(self.tc_duty,0, wx.ALIGN_CENTER | 
-                       wx.LEFT, border=18)
-        self.hbox2.Add(self.st_ps,0, wx.ALIGN_CENTER_VERTICAL)
+        self.hb_outer = wx.BoxSizer(wx.HORIZONTAL)
+        self.vb_contnr = wx.BoxSizer(wx.VERTICAL)
 
-        self.bs_vbox.AddMany([
-            (0,10,0),
-            (self.hbox0, 1, wx.EXPAND | wx.ALL),
-            (0,10,0),
-            (self.hbox1, 1, wx.EXPAND | wx.ALL),
-            (0,10,0),
-            (self.hbox2, 1, wx.EXPAND),
-            (0,10,0)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+        self.vb_contnr.Add(self.hb_sw, 0, wx.EXPAND)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+        self.vb_contnr.Add(self.hb_port, 0, wx.EXPAND)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+        self.vb_contnr.Add(self.hb_intv, 0, wx.EXPAND)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+        self.vb_contnr.Add(self.hb_duty, 0, wx.EXPAND)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+        self.vb_contnr.Add(self.hb_btn, 0, wx.EXPAND)
+        self.vb_contnr.Add((0,-1), 1, wx.EXPAND)
+
+        self.hb_outer.AddMany([
+            ((-1,0), 1, wx.EXPAND),
+            (self.vb_contnr, 1, wx.EXPAND),
+            ((-1,0), 1, wx.EXPAND),
             ])
+
+
         # Set size of frame
-        self.SetSizer(self.bs_vbox)
+        self.SetSizer(self.hb_outer)
         # Set size of frame
-        self.bs_vbox.Fit(self)
+        self.hb_outer.Fit(self)
         self.Layout()
         
+        self.cb_switch.Bind(wx.EVT_COMBOBOX, self.SwitchChange, self.cb_switch)
         # Bind the button event to handler
         self.btn_auto.Bind(wx.EVT_BUTTON, self.OprAuto)
         # Bind the timer event to handler
@@ -202,6 +258,25 @@ class AutoWindow(wx.Window):
         self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p4)
 
         self.enable_controls(True)
+
+    def update_sw_selector(self, swdict):
+        self.cb_switch.Clear()
+        for key, val in swdict.items():
+            swstr = ""+val+"("+key+")"
+            self.cb_switch.Append(swstr)
+        self.cb_switch.SetSelection(0)
+        self.Update_port_count()
+        self.con_flg = True
+
+
+    def Update_port_count(self):
+        self.swid = self.cb_switch.GetValue()
+        self.swkey = self.swid.split("(")[1][:-1]
+        swname = self.swid.split("(")[0]
+        self.set_port_count(portCnt[swname])
+    
+    def SwitchChange(self, evt):
+        self.Update_port_count()
 
     def OprAuto(self, evt):
         """
@@ -354,7 +429,7 @@ class AutoWindow(wx.Window):
         Returns:
             None
         """
-        self.top.port_on(portno, stat)
+        self.top.port_on(self.swkey, portno, stat)
         if(self.top.get_delay_status()):
             self.keep_delay()
             
@@ -404,8 +479,8 @@ class AutoWindow(wx.Window):
         self.interval = int(self.get_interval())
         self.duty = int(self.get_duty())
 
-        self.OnTime = self.interval* (self.duty/100)
-        self.OffTime = self.interval - self.OnTime
+        self.OnTime = int(self.interval* (self.duty/100))
+        self.OffTime = int(self.interval - self.OnTime)
     
     def get_auto_param(self):
         """
@@ -622,7 +697,7 @@ class AutoWindow(wx.Window):
             self.tc_ival.Disable()
             # Text control duty is Disable
             self.tc_duty.Disable()
-        if not self.top.con_flg:
+        if not self.con_flg:
             # Auto Button is Disable
             self.btn_auto.Disable()
 
@@ -724,4 +799,3 @@ class AutoWindow(wx.Window):
             self.cb_p2.SetValue(True)
             self.cb_p3.SetValue(True)
             self.cb_p4.SetValue(True)
-            

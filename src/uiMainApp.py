@@ -26,7 +26,6 @@
 import wx
 import serial
 import webbrowser
-import shelve
 
 # Built-in imports
 import os
@@ -39,15 +38,9 @@ from wx.core import ITEM_CHECK
 
 # Own modules
 from uiGlobals import *
-import dev3141Window
-import dev3201Window
-import dev2101Window
-import dev2301Window
-import loopWindow
-import logWindow
-import autoWindow
 
-import getusb
+import getTb
+from copy import deepcopy
 
 from aboutDialog import *
 from comDialog import *
@@ -55,17 +48,27 @@ from setDialog import *
 from portDialog import *
 #from ccServer import *
 
+# import panels
+from uiPanel import *
+
+
 import vbusChart
 
 import devControl
-import serialDev
-import control2101
 import devServer
 
 import thControl
 import thServer
 
-import search
+import configdata
+
+from cricketlib import searchswitch
+
+from cricketlib import switch3141
+from cricketlib import switch3201
+from cricketlib import switch2101
+from cricketlib import switch2301
+
 
 ##############################################################################
 # Utilities
@@ -94,409 +97,6 @@ class MultiStatus (wx.StatusBar):
         # Sets the widths of the fields in the status bar.
         self.SetStatusWidths([-2, -2, -2, -2, -10])
 
-class UiPanel(wx.Panel):
-    """
-    A class UiPanel with init method
-    the UiPanel navigate to UIApp name
-    """ 
-    def __init__(self, parent):
-        """
-        Uipanel created
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-        Returns:
-            None
-        """
-        super(UiPanel, self).__init__(parent)
-
-        wx.GetApp().SetAppName("Cricket")
-
-        self.parent = parent
-        # set back ground colour White
-        self.SetBackgroundColour('White')
-
-        self.font_size = DEFAULT_FONT_SIZE
-
-        # MAC OS X
-        if platform == "darwin":
-            self.font_size = MAC_FONT_SIZE
-        # Sets the font for this window
-        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL,
-                             False,'MS Shell Dlg 2'))
-
-        self.logPan = logWindow.LogWindow(self, parent)
-        self.loopPan = loopWindow.LoopWindow(self, parent)
-        #self.comPan = comWindow.ComWindow(self, parent)
-        self.autoPan = autoWindow.AutoWindow(self, parent)
-        
-        self.dev3141Pan = dev3141Window.Dev3141Window(self, parent)
-        self.dev3201Pan = dev3201Window.Dev3201Window(self, parent)
-        self.dev2101Pan = dev2101Window.Dev2101Window(self, parent)
-        self.dev2301Pan = dev2301Window.Dev2301Window(self, parent)
-
-        self.devObj = []  
-        # Device panel added
-        self.devObj.append(self.dev3141Pan)
-        self.devObj.append(self.dev3201Pan)
-        self.devObj.append(self.dev2101Pan)
-        self.devObj.append(self.dev2301Pan)
-
-        
-        # Creating Sizers
-        self.vboxdl = wx.BoxSizer(wx.VERTICAL)
-        self.vboxdl.Add(self.dev3141Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev3201Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev2301Pan, 0, wx.EXPAND)
-        self.vboxdl.Add(self.dev2101Pan, 0, wx.EXPAND)
-
-        self.vboxdl.Add(0, 10, 0)
-        self.vboxdl.Add(self.autoPan, 1, wx.EXPAND)
-
-        self.hboxdl = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxdl.Add(self.vboxdl, 1 ,wx.ALIGN_LEFT | wx.EXPAND)
-        self.hboxdl.Add((20,0), 0, wx.EXPAND)
-        self.hboxdl.Add(self.loopPan, 0, wx.EXPAND)
-        
-        self.vboxl = wx.BoxSizer(wx.VERTICAL)
-        self.vboxl.Add((0,20), 0, wx.EXPAND)
-        self.vboxl.Add(self.hboxdl, 0 ,wx.ALIGN_LEFT | wx.EXPAND)
-        self.vboxl.Add((0,10), 0, 0)
-        self.vboxl.Add(self.logPan, 1, wx.EXPAND)
-        self.vboxl.Add((0,20), 0, wx.EXPAND)
-
-
-       # BoxSizer fixed with Horizontal
-        self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxm.Add((20,0), 1, wx.EXPAND)
-        self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
-        self.hboxm.Add((20,0), 1, wx.EXPAND)
-        # self.hboxm.Add(self.vboxr, 1, wx.EXPAND)
-        # self.hboxm.Add((20,0), 1, wx.EXPAND)
-        
-        # Set size of frame
-        self.SetSizer(self.hboxm)
-        
-        # Setting Layouts
-        self.SetAutoLayout(True)
-        self.hboxm.Fit(self)
-        self.Layout()
-
-    def update_uc_panels(self):
-        """
-        Here updated the user computer panel depend on the connecting 
-        Model devices.
-        also termianate the switching Control Compter server,
-        and terminate the Test Host Computer server,
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-        Returns:
-            None
-        """
-        self.vboxl.Show(self.vboxl)
-        self.vboxl.Show(self.hboxdl)
-        #self.hboxm.Show(self.vboxr)
-        self.vboxdl.Hide(self.dev2301Pan)
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev3141Pan)
-        self.logPan.show_usb_ctrls(True)
-        self.vboxl.Show(self.logPan)
-        self.Layout()
-        self.parent.terminateCcServer()
-        self.parent.terminateHcServer()
- 
-    def update_server_panel(self):
-        """
-        here USB tree window and Log window update the on selection server
-        with SCC and THC servers.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        #self.hboxm.Hide(self.vboxr)
-        self.logPan.show_usb_ctrls(False)
-        self.vboxl.Show(self.logPan)
-        self.hboxm.Show(self.vboxl)
-        self.vboxl.Hide(self.hboxdl)
-        self.Layout()
-
-    def update_cc_panels(self):
-        """
-        when selecting Switching Control Computer server menu,
-        its starts the Siwting control computer server.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.parent.startCcServer()
-        
-    def update_hc_panels(self):
-        """
-        when selecting Test Host Computer server menu,
-        its starts the Test Host computer server.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.parent.startHcServer()
-    
-    def remove_all_panels(self):
-        """
-        Remove or Hide the the logwinodow and USB Tree view window.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.hboxm.Hide(self.vboxl)
-        #self.hboxm.Hide(self.vboxr)
-        self.Layout()
-
-    def remove_dev_panels(self):
-        """
-        Remove or Hide the the all Model 3141, 3201, 2101, 2301 windows panels.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.vboxdl.Hide(self.dev2301Pan)
-        self.vboxdl.Hide(self.dev3201Pan)
-        self.vboxdl.Hide(self.dev3141Pan)
-        self.vboxdl.Hide(self.dev2101Pan)
-
-    def PrintLog(self, strin):
-        """
-        print data/status on logwindow 
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strin: data in String format
-        Returns:
-            None
-        """
-        self.logPan.print_on_log(strin)
-    
-    def get_enum_delay(self):
-        """
-        Get the USB Enumaration delay 
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            String - USB Enumeration delay 
-        """
-        return self.logPan.get_enum_delay()
-      
-    def get_delay_status(self):
-        """
-        Get the status of USB device Enumeration delay check box
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            Boolean - Status of the delay check box
-        """
-        return self.logPan.get_delay_status()
-    
-    def get_interval(self):
-        """
-        Get the interval parameter of Auto Mode
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            String - Auto Mode interval
-        """
-        return self.autoPan.get_interval()
-    
-    def set_interval(self, strval):
-        """
-        Update/Set the Auto Mode interval
-
-        Args: 
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: interval value in Sting format
-        Returns:
-            None
-        """
-        self.autoPan.set_interval(strval)
-    
-    def disable_usb_scan(self):
-        """
-        Disable the USB device scan by uncheck the check box
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            None
-        """
-        self.logPan.disable_usb_scan()
-    
-    def get_loop_param(self):
-        """
-        Get the Loop Window prameters
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            return None
-        """
-        return self.loopPan.get_loop_param()
-    
-    def get_auto_param(self):
-        """
-        Get the Auto Window prameters
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            return None
-        """
-        return self.autoPan.get_auto_param()
-    
-    def set_period(self, strval):
-        """
-        Set the period for Loop Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            strval: Period value in String format
-        Returns:
-            return None
-        """
-        self.loopPan.set_period(strval)
-
-    def set_port_list(self, ports):
-        """
-        Set the ports list for Loop Window and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            ports: upated the ports list
-        Returns:
-            return None
-        """
-        self.loopPan.set_port_list(ports)
-        self.autoPan.set_port_count(ports)
-    
-    def port_on(self, port, stat):
-        """
-        Port On/Off command from Loop and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            port: device port number
-            stat: port on status will updated 
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].port_on(port, stat)
-    
-    def update_controls(self, mode):
-        """
-        Update the controls based on the mode
-        
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            mode: mode controls
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].update_controls(mode)
-        self.loopPan.update_controls(mode)
-        self.autoPan.update_controls(mode)
-        self.logPan.update_controls(mode)
-    
-    def device_connected(self):
-        """
-        Once device connected, Model Window get updated with selected Model
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        for dev in range(len(DEVICES)):
-            if dev == self.parent.selDevice:
-                self.vboxdl.Show(self.devObj[self.parent.selDevice])
-            else:
-                self.vboxdl.Hide(self.devObj[dev])
-        self.Layout()
-        self.devObj[self.parent.selDevice].device_connected()
-    
-    def device_disconnected(self):
-        """
-        Once device disconnected, disable all controls in Model, Loop 
-        and Auto Window
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.devObj[self.parent.selDevice].device_disconnected()
-        self.loopPan.device_disconnected()
-        self.autoPan.device_disconnected()
-    
-    def auto_connect(self):
-        """
-        Once application loaded, initiate the auto connect 
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.comPan.auto_connect()
-
 class UiMainFrame (wx.Frame):
     """
     A UiMainFrame is a window of size and position usually changed by user
@@ -517,19 +117,117 @@ class UiMainFrame (wx.Frame):
         # super(UiMainFrame, self).__init__(parent, title=title)
         wx.Frame.__init__(self, None, id = wx.ID_ANY,
                           title = "MCCI "+APP_NAME+" UI - "+
-                          VERSION_STR, pos=wx.Point(80,5),
-                          size=wx.Size(630, 710))
+                          VERSION_STR, pos=wx.Point(0,0),
+                          size=wx.Size(0, 0))
         self.ytop = DEFAULT_YPOS
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
 
-        self.SetPosition((80,self.ytop))
+        self.read_configs()
+        self.declare_globals()        
 
-        # self.SetMinSize((630, 710))
-        # self.SetMaxSize((630, 710))
-        self.CenterOnScreen()
+        self.panel = UiPanel(self)
+        self.darwin_dependent()
+       
+        self.build_menu_bar()
+        self.build_config_menu()
+        self.build_set_menu()
+        self.build_com_menu()
+        self.build_tool_menu()
+        self.build_help_menu()
+        
+        self.SetMenuBar(self.menuBar)
+        
+        self.menuBar = self.GetMenuBar()
+        self.update_connect_menu(True)
 
+        self.init_statusBar()
 
+        self.define_events()
+        
+        base = os.path.abspath(os.path.dirname(__file__))
+        self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
+        self.Show()
+
+        self.init_usbTreeImage()
+        
+        self.print_on_log("Reading Configuration ...\n")
+
+        self.config_data = configdata.read_all_config()
+                
+        self.action = 0
+
+        self.devHand = None
+ 
+        self.print_on_log("Loading Configuration\n")
+        
+        self.update_config_menu()
+        self.update_other_menu()
+        self.update_slog_menu()
+
+        self.Bind(wx.EVT_MOVE, self.OnMove)
+
+        self.update_slog_panel()
+
+        self.initScreenSize()
+
+        self.init_connect()
+
+    def init_usbTreeImage(self):
+        # scan and save ThunderBolt USB device
+        if sys.platform == "darwin":
+            tbList = getTb.scan_tb()
+            self.save_tb_list(tbList)
+    
+    def init_statusBar(self):
+         # Create the statusbar
+        self.statusbar = MultiStatus(self)
+        self.SetStatusBar(self.statusbar)
+        self.UpdateAll(["Port", "", ""])
+    
+    def darwin_dependent(self):
+        if sys.platform == 'darwin':
+            self.winMenu = wx.Menu()
+            self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
+            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW,
+                                       "&Cricket\tAlt+Ctrl+1")
+            self.winMenu.Check(ID_MENU_WIN_SHOW, True) 
+
+            self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
+            self.Bind(wx.EVT_ICONIZE, self.OnIconize)
+            self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
+
+    def build_config_menu(self):
+        # config menu
+        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, 
+                            "User Computer", kind = ITEM_CHECK)
+        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, 
+                            "Switch Control Computer", kind = ITEM_CHECK)
+        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC,
+                            "Test Host Computer", kind = ITEM_CHECK)
+
+        # Diable all the three menus for single computer setup
+        self.menuBar.Enable(ID_MENU_CONFIG_UC, False)
+        self.menuBar.Enable(ID_MENU_CONFIG_SCC, False)
+        self.menuBar.Enable(ID_MENU_CONFIG_THC, False)
+
+    def build_set_menu(self):
+        # Set Menu   
+        self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
+        self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
+    
+    def read_configs(self):
+        self.config_data = configdata.read_all_config()
+        
+        self.myrole = self.config_data["myrole"]
+        self.ucConfig = self.config_data["uc"]
+        self.duts = self.config_data["dut"]
+        self.ccConfig = self.config_data["cc"]
+        self.thcConfig = self.config_data["thc"]
+
+       
+
+    def declare_globals(self):
         self.init_flg = True
 
         self.ldata = {}
@@ -554,13 +252,14 @@ class UiMainFrame (wx.Frame):
         self.hcclient = None
         self.listenhc = None
 
-        self.devHand = serialDev.SerialDev(self)
-
-        self.usbHand = control2101.Dev2101(self)
+        self.logserver = None
+        self.logclient = None
+        self.listenlog = None
 
         self.mode = MODE_MANUAL
 
         self.con_flg = False
+        self.fault_flg = False
         self.vdata = None
         self.adata = None
         self.vgraph = False
@@ -569,68 +268,98 @@ class UiMainFrame (wx.Frame):
         self.stype = READ_CONFIG
 
         self.dev_list = []
+        self.switch_list = []
 
         self.masterList = []
-        
-        self.panel = UiPanel(self)
-        
+        self.tbMasterList = None
+
+        self.handlers = {}
+        self.swuidict ={}
+
+        self.swobjmap = {"3141": switch3141.Switch3141, "3201": switch3201.Switch3201, 
+                          "2101": switch2101.Switch2101, "2301": switch2301.Switch2301}
+
+    def define_events(self):
+        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
+        self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
+        self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+
+        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ucmenu)
+        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ccmenu)
+        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.hcmenu)
+
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
+        self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
+        self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
+        self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
+        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+
+        self.Bind(wx.EVT_CLOSE, self.OnAppClose)
+
+        self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
+
+    # def OnFocusSUT1(self, event):
+    #     # On Focus event, not used
+    #     pass
+
+    def init_connect(self):
+        devControl.SetDeviceControl(self)
+        thControl.SetDeviceControl(self)
+        # if self.myrole["uc"] == True:
+        #     self.auto_connect()
+
+    def auto_connect(self):
+        wx.BeginBusyCursor()
+
+        self.print_on_log("Search Switches ...\n")
+        self.dev_list.clear()
+        self.dev_list = searchswitch.get_switches()
+
+        if (wx.IsBusy()):
+            wx.EndBusyCursor()
+
+        self.dev_list = self.dev_list["switches"]
+
+        if(len(self.dev_list) > 1):
+            self.print_on_log("Many Switches found ...\n")
+        elif(len(self.dev_list) == 1):
+            self.print_on_log("Switch found ...\n")
+            swname = self.dev_list[0]["model"]
+            swid = self.dev_list[0]["port"]
+            devControl.connect_device(self, {swname: swid})
+            self.panel.add_switches(self.swuidict)
+            self.update_loop_swselector()
+            self.set_mode(MODE_MANUAL)
+            self.print_on_log("Switch "+swname+" ("+swid+") connected!\n")
+        else:
+            self.print_on_log("No Switches found ...\n")
+
+   
+    def update_slog_menu(self):
+        if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
+            self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
+            self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
+
+        else:
+            self.dutMenuBar.Enable(ID_MENU_DUT1, False)
+            self.dutMenuBar.Enable(ID_MENU_DUT2, False)
+
+    def build_menu_bar(self):
         self.menuBar = wx.MenuBar()
-        
+
+        self.configMenu = wx.Menu()
+        self.comMenu = wx.Menu()
+        self.setMenu = wx.Menu()
+        self.toolMenu = wx.Menu()
+        self.slogMenu = wx.Menu()
+        self.helpMenu = wx.Menu()
+         
         # If its not darwin or MAC OS
         if sys.platform != 'darwin':
            # Setting up the menu.
            self.fileMenu = wx.Menu()
            # fileMenu.Append(ID_MENU_FILE_NEW,   "&New Window\tCtrl+N")
            self.fileMenu.Append(ID_MENU_FILE_CLOSE, "&Close \tAlt+F4")
-
-        self.comMenu = wx.Menu()
-        self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
-        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
-
-        # config menu
-        self.configMenu = wx.Menu()        
-        self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, 
-                            "User Computer", kind = ITEM_CHECK)
-        self.ccmenu = self.configMenu.Append(ID_MENU_CONFIG_SCC, 
-                            "Switch Control Computer", kind = ITEM_CHECK)
-        self.hcmenu = self.configMenu.Append(ID_MENU_CONFIG_THC,
-                            "Test Host Computer", kind = ITEM_CHECK)
-
-        # Set Menu   
-        self.setMenu = wx.Menu()
-        self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
-        self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
-
-        self.volsAmps = wx.Menu()
-        base = os.path.abspath(os.path.dirname(__file__))
-        qmiamps = wx.MenuItem(self.volsAmps, ID_MENU_GRAPH, "VBUS V/I Plot")
-
-        qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
-        self.volsAmps.Append(qmiamps)
-
-        # Creating the help menu
-        self.helpMenu = wx.Menu()
-        self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit Model 3141")
-        self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
-        self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
-        self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
-        self.helpMenu.AppendSeparator()
-        self.helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
-        self.helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
-        self.helpMenu.AppendSeparator()
-        
-        # MAC OS X
-        if sys.platform == 'darwin':
-            self.helpMenu.Append(wx.ID_ABOUT, "About Cricket")
-        else:
-            self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
-        
-        if sys.platform == 'darwin':
-            self.winMenu = wx.Menu()
-            self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
-            self.winMenu.AppendCheckItem(ID_MENU_WIN_SHOW,
-                                       "&Cricket\tAlt+Ctrl+1")
-            self.winMenu.Check(ID_MENU_WIN_SHOW, True) 
 
         # Create menubar
         if sys.platform != 'darwin':
@@ -641,31 +370,120 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.configMenu, "&Config System")
         self.menuBar.Append(self.setMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&MCCI USB Switch")
-        self.menuBar.Append(self.volsAmps, "&VBUS V/I Monitor")
+
+        self.menuBar.Append(self.toolMenu, "&Tools")
+
+        # MAC OS X
+        if sys.platform == 'darwin':
+            self.helpMenu.Append(wx.ID_ABOUT, "About Cricket")
+        else:
+            self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
+        
         self.menuBar.Append(self.helpMenu,    "&Help")
 
-        # First we create a menubar object.
-        self.SetMenuBar(self.menuBar)
-        self.menuBar.EnableTop(4, False)
-        
-        # set menubar
-        self.menuBar = self.GetMenuBar()
-        self.update_connect_menu(True)
+    
+    def build_tool_menu(self):
+        base = os.path.abspath(os.path.dirname(__file__))
+        qmiamps = wx.MenuItem(self.toolMenu, ID_MENU_GRAPH, "VBUS V/I Plot")
+        qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
+        self.toolMenu.Append(qmiamps)
 
-        # Create the statusbar
-        self.statusbar = MultiStatus(self)
-        self.SetStatusBar(self.statusbar)
-        self.UpdateAll(["Port", "", ""])
+        self.dutMenuBar = wx.Menu()
+        self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
+        self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
+        self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
         
-        # Set events to Menu
-        # Self.Bind(wx.EVT_MENU, self.MenuHandler)
-        self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
-        self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
-        self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+        
+        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
+        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
+        self.toolMenu.Enable(ID_MENU_GRAPH, False)
 
-        self.Bind(wx.EVT_MENU, self.SelectUC, self.ucmenu)
-        self.Bind(wx.EVT_MENU, self.SelectCC, self.ccmenu)
-        self.Bind(wx.EVT_MENU, self.SelectHC, self.hcmenu)
+    def OnMove(self, e):
+        x, y = e.GetPosition()
+        w, h = wx.DisplaySize()
+        sw = self.Size[0]
+        sh = self.Size[1]
+        self.saveScreenSize()
+
+    def initScreenSize(self):
+        dw, dh = wx.DisplaySize()
+        opos = self.config_data["screen"]["pos"]
+        osize = self.config_data["screen"]["size"]
+        if len(opos) == 0 and len(osize) == 0:
+            # Initialization
+            self.SetSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+            self.CenterOnScreen()
+        else:
+            self.SetPosition((opos[0], opos[1]))
+            self.SetSize((osize[0], osize[1]))
+
+    def saveScreenSize(self):
+        px, py = self.GetPosition()
+        sw, sh = self.GetSize()
+        findict = {"screen": {"pos": [px, py], "size": [sw, sh]}}
+        configdata.updt_screen_size(findict)
+
+    def reSizeScreen(self):
+        # Left and Middle panel are fixed
+        # Only DUT Log Window is optional
+        # Check the screen size before resize it
+        w, h = wx.DisplaySize()
+
+        dw = int(w * 0.97)
+        dh = int(h * 0.95)
+
+        sw = self.Size[0]
+        sh = self.Size[1]
+
+        if(sw >= dw and sh >= dh):
+            # Already in full screen, no change required
+            pass
+        else:
+            reqwidth = 950
+            if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
+                reqwidth = 1420
+                if sw < reqwidth:
+                    self.SetSize((reqwidth, dh))
+            else:
+                self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.CenterOnScreen()
+        self.Layout()
+
+        self.saveScreenSize()
+            
+
+    def SelectDUT(self, event):
+        obj = event.GetEventObject()
+        self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.update_slog_panel()
+        self.reSizeScreen()
+
+
+    def updt_dut_config(self, dutdict):
+        key = list(dutdict.keys())[0]
+        nkeys = list(dutdict[key].keys())
+        for nkey in nkeys:
+            self.duts[key][nkey] = dutdict[key][nkey]
+
+    def get_dut_config(self, dutno):
+        return {dutno: self.duts[dutno]}
+
+    def build_com_menu(self):
+        self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
+        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
+        
+    def build_help_menu(self):
+        # Creating the help menu
+        self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit MCCI USB Switch 3141")
+        self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
+        self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
+        self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
+        self.helpMenu.AppendSeparator()
+        self.helpMenu.Append(ID_MENU_HELP_WEB, "MCCI Website")
+        self.helpMenu.Append(ID_MENU_HELP_PORT, "MCCI Support Portal")
+        self.helpMenu.AppendSeparator()
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
@@ -673,116 +491,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_WEB)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_PORT)
-        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
-        self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
-        self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
-        self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
-        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
 
-        self.Bind(wx.EVT_CLOSE, self.OnAppClose)
-
-        self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
-        EVT_RESULT(self, self.RunServerEvent)
-
-        # Timer for monitor the connected devices
-        self.timer_lp = wx.Timer(self)
-        # Bind the timer event to handler
-        self.Bind(wx.EVT_TIMER, self.DeviceMonitor, self.timer_lp)
-        
-        self.timer_auc = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.TriggerConnections, self.timer_auc)
-
-        if sys.platform == 'darwin':
-            self.Bind(wx.EVT_MENU, self.OnAboutWindow, id=wx.ID_ABOUT)
-            self.Bind(wx.EVT_ICONIZE, self.OnIconize)
-            self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
-
-        base = os.path.abspath(os.path.dirname(__file__))
-        self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
-        self.Show()
-        
-        td, usbList = getusb.scan_usb()
-        self.save_usb_list(usbList)
-        self.update_usb_status(td)
-        self.print_on_log("Reading Configuration ...\n")
-
-        try:
-            self.LoadDevice()
-            
-        except:
-            self.ldata['port'] = None
-            self.ldata['device'] = None
-            
-            self.ldata['uc'] = True
-            self.ldata['cc'] = True
-            self.ldata['hc'] = True
-            
-            self.ldata['sccif'] = "network"
-            self.ldata['sccid'] = "No host"
-            self.ldata['sccpn'] = "2021"
-            
-            self.ldata['thcif'] = "network"
-            self.ldata['thcid'] = "No host"
-            self.ldata['thcpn'] = "2022"
-
-            self.ldata['ssccif'] = "network"
-            self.ldata['ssccpn'] = "2021"
-            
-            self.ldata['sthcif'] = "network"
-            self.ldata['sthcpn'] = "2022"
-
-        self.print_on_log("Loading Configuration\n")
-        self.update_config_menu()
-        self.update_settings_menu()
-        self.timer_auc.Start(2000)
-
-    def RunServerEvent(self, event):
-        """
-        serching the port event handling indicates 
-        server is connecting that port
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: searching the event with server.
-        Returns:
-            None
-        """
-        if event.data is None:
-            self.print_on_log("\nNo Server Event")
-        else:
-            if event.data == "search":
-                self.print_on_log("\nSearch Event")
-                self.dev_list.clear()
-                self.dev_list = search.search_port(self.usbHand)
-            else:
-                self.print_on_log("\nUnknown Server Event")
-
-    def auto_connect(self):
-        """
-        Do connect device automatically if the last connected device is 
-        available
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        if(self.ldata['port'] != None and self.ldata['device'] != None):
-            self.print_on_log("Auto connecting initiated ...\n")
-            self.selPort = self.ldata['port']
-            self.selDevice = self.ldata['device']
-            self.stype = AUTO_CONNECT
-            self.timer_auc.Start(500)
-    
-    def auto_connect_service(self):        
-        if devControl.connect_device(self):
-            self.device_connected()
-        else:
-            self.print_on_log("Auto connection failed\n")
-                
     def update_config_menu(self):
         """
         update the Config system menu checked User compuer and 
@@ -796,22 +505,10 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        test = 0x03
-        if self.ldata['uc']:
-            self.ucmenu.Check(True)
-        else:
-            self.ucmenu.Check(False)
+        self.ucmenu.Check(self.myrole["uc"])
+        self.ccmenu.Check(self.myrole["cc"])
+        self.hcmenu.Check(self.myrole["thc"])
 
-        if self.ldata['cc']:
-            self.ccmenu.Check(True)
-        else:
-            self.ccmenu.Check(False)
-
-        if self.ldata['hc']:
-            self.hcmenu.Check(True)
-        else:
-            self.hcmenu.Check(False)
-    
     def OnClickHelp(self, event):
         """
         Virtual event handlers, overide them in your derived class
@@ -953,6 +650,7 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        self.saveMenus()
         self.terminateHcServer()
         self.terminateCcServer()
         self.Destroy()
@@ -971,6 +669,7 @@ class UiMainFrame (wx.Frame):
             None
         """ 
         # Close this window
+        self.saveMenus()
         self.terminateHcServer()
         self.terminateCcServer()
         self.Close(True)
@@ -1038,10 +737,35 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        self.print_on_log("Search Devices ...\n")
-        dlg = ComDialog(self, self)
-        dlg.ShowModal()
-        dlg.Destroy()
+        wx.BeginBusyCursor()
+
+        self.print_on_log("Search Switches ...\n")
+        self.dev_list.clear()
+        self.dev_list = searchswitch.get_switches()
+
+        if (wx.IsBusy()):
+            wx.EndBusyCursor()
+
+        # self.dev_list = devControl.search_device(self)
+        self.dev_list = self.dev_list["switches"]
+        
+        if(len(self.dev_list) > 1):
+            self.print_on_log("Switches found ...\n")
+            dlg = ComDialog(self, self)
+            dlg.ShowModal()
+            dlg.Destroy()
+        elif(len(self.dev_list) == 1):
+            self.print_on_log("Switch found ...\n")
+            swname = self.dev_list[0]["model"]
+            swid = self.dev_list[0]["port"]
+            devControl.connect_device(self, {swname: swid})
+            self.panel.add_switches(self.swuidict)
+            self.update_loop_swselector()
+            self.set_mode(MODE_MANUAL)
+            self.print_on_log("Switch "+swname+" ("+swid+") connected!\n")
+        else:
+            self.print_on_log("No Switches found ...\n")
+        self.Refresh()
 
     def OnDisconnect (self, event):
         """
@@ -1067,7 +791,7 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-
+        self.saveMenus()
         self.terminateHcServer()
         self.terminateCcServer()
         wx.Exit()
@@ -1101,8 +825,9 @@ class UiMainFrame (wx.Frame):
         self.device_disconnected()
         self.selPort = None
         self.con_flg = False
-        #self.devHand.close()
+        
         devControl.disconnect_device(self)
+        
         # Set label button name as Connect
         srlist = []
         srlist.append("Port")
@@ -1110,13 +835,59 @@ class UiMainFrame (wx.Frame):
         srlist.append("")
         srlist.append("Disconnected")
         self.UpdateAll(srlist)
+        
         # Print on logwindow
         self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
                               +" Disconnected!\n")
+        
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
-        self.StoreDevice()
-            
+    
+
+    # Multiple Switches
+    def add_switch_dialogs(self):
+        swlist = []
+        
+        for idx in range(len(self.switch_list)):
+            swname = self.switch_list[idx].split('(')[0]
+            swdict = {}
+            swdict[swname] = self.switch_list[idx].split('(')[1][:-1]
+            swlist.append(swdict)
+
+        for swdict in swlist:
+            devControl.connect_device(self, swdict)
+
+        self.panel.add_switches(self.swuidict)
+        self.update_loop_swselector()
+        self.set_mode(MODE_MANUAL)
+
+        self.Refresh()
+        self.device_connected()
+
+    def add_switch_dialogs_batch(self, swDict):
+        swlist = []
+
+        swkeys = list(swDict.keys())
+
+        for swkey in swkeys:
+            swdict = {swDict[swkey] : swkey }
+            swlist.append(swdict)
+
+        for swdict in swlist:
+            devControl.connect_device(self, swdict)
+
+        self.panel.add_switches(self.swuidict)
+        self.update_loop_swselector()
+        self.set_mode(MODE_MANUAL)
+
+        self.Refresh()
+
+    def update_loop_swselector(self):
+        # update selected switch list loop panel's switch selector
+        self.panel.cpanel.autoPan.update_sw_selector(self.swuidict)
+        self.panel.cpanel.loopPan.update_sw_selector(self.swuidict)
+    
+    
     def save_usb_list(self, mlist):
         """
         Keep USB device list in a list - reference list
@@ -1130,7 +901,10 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.masterList = mlist[:]  
-    
+
+    def save_tb_list(self, mlist):
+        self.tbMasterList = deepcopy(mlist)
+        
     def get_usb_list(self):
         """
         Get usb device list
@@ -1143,6 +917,9 @@ class UiMainFrame (wx.Frame):
             masterList- Added or removed device list
         """
         return self.masterList
+
+    def get_tb_list(self):
+        return self.tbMasterList
     
     def print_on_log(self, strin):
         """
@@ -1210,7 +987,7 @@ class UiMainFrame (wx.Frame):
         """
         return self.panel.get_auto_param()
     
-    def set_period(self, strval):
+    def set_loop_param(self, onTime, offTime):
         """
         Set Loop Mode period
 
@@ -1222,7 +999,7 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        self.panel.set_period(strval)
+        self.panel.set_loop_param(onTime, offTime)
     
     def set_port_list(self, ports):
         """
@@ -1279,6 +1056,7 @@ class UiMainFrame (wx.Frame):
             None
         """
         self.mode = mode
+        self.con_flg = True
         self.panel.update_controls(mode)
     
     def disable_usb_scan(self):
@@ -1294,7 +1072,7 @@ class UiMainFrame (wx.Frame):
         """
         self.panel.disable_usb_scan()
 
-    def port_on(self, port, stat):
+    def port_on(self, swkey, port, stat):
         """
         Port ON/OFF command from Loop Window
 
@@ -1307,8 +1085,100 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        self.panel.port_on(port, stat)
+        self.panel.port_on(swkey, port, stat, len(self.swuidict))
+
+    def set_speed(self, swkey, speed):
+        self.panel.set_speed(swkey, speed)
+
+    def read_param(self, swkey, param):
+        self.panel.read_param(swkey, param)
+
+    def open_com_port(self, param):
+        inparam = param.split(',')
+        self.devHand = serial.Serial()
+        self.devHand.port = inparam[0]
+        self.devHand.baudrate = int(inparam[1])
+        self.devHand.bytesize = int(inparam[3])
+        self.devHand.parity = serial.PARITY_NONE
+        self.devHand.timeout = 0
+        self.devHand.stopbits = serial. STOPBITS_ONE
+
+        try:
+            self.devHand.open()
+        except:
+            self.panel.PrintLog("Port Open Fail\n")
     
+    def write_serial(self, param):
+        try:
+            param = param + '\r\n'
+            self.devHand.write(param.encode())
+        except serial.SerialException as e:
+            pass
+    
+    def read_serial(self, param):
+        try:
+            rxdata = self.devHand.readline()
+            try:
+                rxdata = rxdata.rstrip().decode('utf-8')
+            except:
+                self.panel.PrintLog("Serial Parsing Error\n")
+                return False
+            if(rxdata == param):
+                self.panel.PrintLog("Serial Loop Success\n")
+                return True
+            else:
+                self.panel.PrintLog("Serial Loop failed\n")
+                return False
+        except serial.SerialException as e:
+            return False
+
+    def get_usb_tree(self):
+        try:
+            thControl.get_tree_change(self)
+        except:
+            self.print_on_log("USB Read Error!")
+
+    def compareReqSw(self, swDict, exist_sw):
+        swkeys = list(swDict.keys())
+        swvals = list(swDict.values())
+
+        avail = {}
+        for pair in exist_sw:
+            avail[pair["port"]] = pair["model"]
+
+        for port in swkeys:
+            try:
+                if swDict[port] != avail[port]:
+                    return False
+            except:
+                return False
+        return True
+    
+    def createBatchPanel(self, swDict):
+        exist_sw = []
+        try:
+            exist_sw = self.dev_list
+        except:
+            exist_sw = []
+
+        if len(exist_sw) < len(swDict):
+            self.print_on_log("Batch Mode - Search Switches ...\n")
+            self.SetCursor(wx.Cursor(wx.CURSOR_WAIT))
+            self.dev_list.clear()
+            self.dev_list = searchswitch.get_switches()
+            self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
+            try:
+                self.dev_list = self.dev_list["switches"]
+                if self.compareReqSw(swDict, self.dev_list):
+                    self.add_switch_dialogs_batch(swDict)
+                    return True
+                else:
+                    return False
+            except:
+                return False
+        else:
+            return True
+
     def device_connected(self):
         """
         intervalCalled by COM Window when devide get connected
@@ -1320,34 +1190,20 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        self.con_flg = True
-        self.UpdatePort()
-        # Device update info
-        self.UpdateDevice()
-        self.UpdateSingle("Connected", 3)
-        # Print on logwindow
-        self.print_on_log("MCCI USB Switch "+DEVICES[self.selDevice]
-                                              +" Connected!\n")
-       
-        self.panel.device_connected()
-        self.StoreDevice()
-        self.update_connect_menu(False)
+        self.enable_graph_menu()
         self.set_mode(MODE_MANUAL)
-        self.update_port_timer()
-        self.enable_graph_menu(True)
-    
-    def enable_graph_menu(self, status):
-        if status == False:
-            self.menuBar.EnableTop(4, False)
-        else:
-            if DEVICES[self.selDevice] == "3141":
-                self.menuBar.EnableTop(4, False)
-            elif DEVICES[self.selDevice] == "3201":
-                self.menuBar.EnableTop(4, True)
-            elif DEVICES[self.selDevice] == "2101":
-                self.menuBar.EnableTop(4, False)
-            elif DEVICES[self.selDevice] == "2301":
-                self.menuBar.EnableTop(4, True)
+        # self.panel.device_connected()
+
+    def enable_graph_menu(self):
+        cdevices =  list(self.swuidict.values())
+        if len(cdevices) > 0:
+            self.set_mode(MODE_MANUAL)
+            if '3201' in cdevices:
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
+            elif '2301' in cdevices:
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
+            else:
+                self.toolMenu.Enable(ID_MENU_GRAPH, False)
 
     def update_connect_menu(self, status):
         """
@@ -1384,7 +1240,7 @@ class UiMainFrame (wx.Frame):
         """
         self.panel.device_disconnected()
         self.update_connect_menu(True)
-        self.enable_graph_menu(False)
+        self.enable_graph_menu()
     
     def update_usb_status(self, dl):
         """
@@ -1451,48 +1307,10 @@ class UiMainFrame (wx.Frame):
         return
     
     def StoreDevice(self):
-        """
-        Store the device configuration
-        ings
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        # This is also a base class of shelve and it accepts
-        # the filename as it’s parameter not a dict object like others. 
-        # This is the base class of shelve which stores pickled object values 
-        # in dict objects and string objects as key.
-
-        lpath = self.get_user_data_dir()
-        dpath = os.path.join(lpath, "MCCI", "Cricket")
-
-        os.makedirs(dpath, exist_ok=True)
-        fpath = os.path.join(dpath, "CricketSettings.txt")
-        
-        ds = shelve.open(fpath)
-        ds['port'] = self.selPort
-        ds['device'] = self.selDevice
-
-        ds['uc'] = self.ldata['uc']
-        ds['cc'] = self.ldata['cc']
-        ds['hc'] = self.ldata['hc']
-
-        ds['sccif'] = self.ldata['sccif']
-        ds['sccid'] = self.ldata['sccid']
-        ds['sccpn'] = self.ldata['sccpn']
- 
-        ds['ssccif'] = self.ldata['ssccif']
-        ds['ssccpn'] = self.ldata['ssccpn']
-        ds['sthcif'] = self.ldata['sthcif']
-        ds['sthcpn'] = self.ldata['sthcpn']
-
-        ds['thcif'] = self.ldata['thcif']
-        ds['thcid'] = self.ldata['thcid']
-        ds['thcpn'] = self.ldata['thcpn']
-        ds.close()
+        # This function was removed
+        # Shelve related to store the config data
+        # We have replaced the shelve with the JSON based config file
+        pass
 
     def OnSelectScc (self, event):
         """
@@ -1510,12 +1328,11 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked():
             dlg = SetDialog(self, self, "scc")
         else:
-            dlg = PortDialog(self, self, "scc")
+            dlg = PortDialog(self, self, {"cc": self.ccConfig})
 
         dlg.ShowModal()
         dlg.Destroy()
-        self.StoreDevice()
-
+    
     def OnSelectThc (self, event):
         """
         if User computer menu ISCHECKED , Test host computer act as THC server
@@ -1531,161 +1348,53 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked():
             dlg = SetDialog(self, self, "thc")
         else:
-            dlg = PortDialog(self, self, "thc")
+            dlg = PortDialog(self, self, {"thc": self.thcConfig})
 
         dlg.ShowModal()
         dlg.Destroy()
-        self.StoreDevice()
 
-    def SelectUC(self, event):
-        """
-        if select User computer menu ISCHECKED its act as User computer UI.
-        if UNCHECKED Switching control computer and Test host computer,
-        its automatically setting menu SCC, THC enabled.s
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns: event hanlding connecitng UC menu
-            None
-        """
-        if self.ucmenu.IsChecked():
-            self.ldata['uc'] = True
+    def update_slog_panel(self):
+        if self.ucmenu.IsChecked() or self.ccmenu.IsChecked():
+            self.panel.update_slog_panel(self.duts)
         else:
-            self.ldata['uc'] = False
-        self.StoreDevice()
-        self.update_settings_menu()
+            self.panel.update_slog_panel({})
+        self.Refresh()
+        
+    def UpdateConfig(self, event):
+        self.myrole["uc"] = True if self.ucmenu.IsChecked() else False
+        self.myrole["cc"] = True if self.ccmenu.IsChecked() else False
+        self.myrole["thc"] = True if self.hcmenu.IsChecked() else False
 
-    def SelectCC(self, event):
-        """
-        if select Switch control computer menu ISCHECKED its act as SCC server.
-        if UNCHECKED User computer and Test host computer,
-        its automatically setting menu SCC is enable THC is Disable
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns: event hanlding connecitng SCC menu
-            None
-        """
-        if self.ccmenu.IsChecked():
-            self.ldata['cc'] = True
+        self.update_other_menu()
+        self.panel.update_panels(self.myrole, self.duts)
+
+    def saveMenus(self):
+        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
+        configdata.set_base_config_data(findict)
+        self.saveScreenSize()
+
+    def derive_menu_stat(self):
+        ccstat = False
+        hcstat = False
+        sutstat = False
+        if(self.myrole["uc"]):
+            if(not self.myrole["cc"]):
+                ccstat = True
+            if(not self.myrole["thc"]):
+                hcstat = True
         else:
-            self.ldata['cc'] = False
-        self.StoreDevice()
-        self.update_settings_menu()
+            ccstat = True
+            hcstat = True
+            
+        if(self.myrole["uc"] or self.myrole["cc"]):
+            sutstat = True
+        return [ccstat, hcstat, sutstat]
 
-    def SelectHC(self, event):
-        """
-        if select Test host computer menu ISCHECKED its act as THC server.
-        if UNCHECKED User computer and SCC computer,
-        its automatically setting menu THC is enable SCC is Disable
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns: event hanlding connecitng THC menu
-            None
-        """
-        if self.hcmenu.IsChecked():
-            self.ldata['hc'] = True
-        else:
-            self.ldata['hc'] = False
-        self.StoreDevice()
-        self.update_settings_menu()
-
-    def update_settings_menu(self):
-        """
-        if UC menu ISCHECKED and SCC menu ISCHECKED
-         the Setting menu SCC is Disabled.
-        if UC menu ISCHECKED and SCC menu UNCHECKED 
-         the Setting menu SCC is enabled.
-        if UC menu ISCHECKED and THC menu ISCHECKED
-         the Setting menu THC is Disabled.
-        if UC menu ISCHECKED and THC menu UNCHECKED 
-        the Setting menu THC is enabled.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns: event hanlding connecitng SCC menu
-            None
-        """
-        if self.ucmenu.IsChecked():
-            if self.ccmenu.IsChecked():
-                self.update_scc_menu(False)
-            else:
-                self.update_scc_menu(True)
-            if self.hcmenu.IsChecked():
-                self.update_thc_menu(False)
-            else:
-                self.update_thc_menu(True)
-        else:
-            if self.ccmenu.IsChecked():
-                self.update_scc_menu(True)
-            else:
-                self.update_scc_menu(False)
-            if self.hcmenu.IsChecked():
-                self.update_thc_menu(True)
-            else:
-                self.update_thc_menu(False)
-
-        self.update_manage_model(self.ucmenu.IsChecked())
-
-        if self.ucmenu.IsChecked():
-            self.panel.update_uc_panels()
-        else:
-            if self.ccmenu.IsChecked() or self.hcmenu.IsChecked():
-                self.panel.update_server_panel()
-                if self.ccmenu.IsChecked():
-                    self.panel.update_cc_panels()
-                if self.hcmenu.IsChecked():
-                    self.panel.update_hc_panels()
-            else:
-                self.panel.remove_all_panels()
-
-    def update_settings_menu_old(self):
-        """
-        if UC menu checked  and SCC menu unchecked the
-         scc menu not checked then update setting SCC enabled.
-        if UC menu ISCHECKED and THC menu ISCHECKED 
-        the Setting menu THC is Disabled.
-        if UC menu ISCHECKED and THC menu UNCHECKED
-         the Setting menu THC is enabled.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            None
-        """
-        if self.ucmenu.IsChecked() and not self.ccmenu.IsChecked():
-            self.update_scc_menu(True)
-        else:
-            self.update_scc_menu(False)
-
-        if self.ucmenu.IsChecked() and not self.hcmenu.IsChecked():
-            self.update_thc_menu(True)
-        else:
-            self.update_thc_menu(False)
-
-        self.update_manage_model(self.ucmenu.IsChecked())
-
-        if self.ucmenu.IsChecked():
-            self.panel.update_uc_panels()
-        else:
-            if self.ccmenu.IsChecked() or self.hcmenu.IsChecked():
-                self.panel.update_server_panel()
-                if self.ccmenu.IsChecked():
-                    self.panel.update_cc_panels()
-                if self.hcmenu.IsChecked():
-                    self.panel.update_hc_panels()
-            else:
-                self.panel.remove_all_panels()
+    def update_other_menu(self):
+        [ccstat, hcstat, sutstat] = self.derive_menu_stat()
+        self.update_scc_menu(ccstat)
+        self.update_thc_menu(hcstat)
+        self.update_manage_model(self.myrole["uc"])
 
     def update_scc_menu(self, status):
         """
@@ -1741,45 +1450,10 @@ class UiMainFrame (wx.Frame):
             self.menuBar.EnableTop(3, False)
 
     def LoadDevice(self):
-        """
-        load the device list for last device disconnect 
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-
-        lpath = self.get_user_data_dir()
-        dpath = os.path.join(lpath, "MCCI", "Cricket")
-
-        os.makedirs(dpath, exist_ok=True)
-        fpath = os.path.join(dpath, "CricketSettings.txt")
-        
-        ds = shelve.open(fpath)
-        self.ldata['port'] = ds['port']
-        self.ldata['device'] = ds['device']
-        
-        self.ldata['uc'] = ds['uc']
-        self.ldata['cc'] = ds['cc']
-        self.ldata['hc'] = ds['hc']
-        
-        self.ldata['sccif'] = ds['sccif']
-        self.ldata['sccid'] = ds['sccid']
-        self.ldata['sccpn'] = ds['sccpn']
-
-        self.ldata['thcif'] = ds['thcif']
-        self.ldata['thcid'] = ds['thcid']
-        self.ldata['thcpn'] = ds['thcpn']
-
-        self.ldata['ssccif'] = ds['ssccif']
-        self.ldata['ssccpn'] = ds['ssccpn']
-
-        self.ldata['sthcif'] = ds['sthcif']
-        self.ldata['sthcpn'] = ds['sthcpn']
-
-        ds.close()
+        #  Shelve related config storage function
+        #  Replaced with JSON based config file
+        #  So this function was removed
+        pass
 
     def startCcServer(self):
         """
@@ -1857,56 +1531,6 @@ class UiMainFrame (wx.Frame):
             del self.ccserver
             self.ccserver = None
 
-    def update_port_timer(self):
-        """
-        updating the Port timer in all switching model
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns: 
-            None
-        """
-
-        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
-            if(not self.timer_lp.IsRunning()):
-                self.timer_lp.Start(700)
-        else:
-            self.timer_lp.Stop()
-
-    def TriggerConnections(self, e):
-        self.timer_auc.Stop()
-        if self.stype == READ_CONFIG:
-            devControl.SetDeviceControl(self)
-            thControl.SetDeviceControl(self)
-            if self.ldata['uc']:
-                self.auto_connect()
-        elif self.stype == AUTO_CONNECT:
-            self.auto_connect_service()
-
-    def DeviceMonitor(self, e):
-        """
-        updating the Disconnect window when plug out the Device
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:event assign with button
-        Returns: 
-            None
-        """
-        if self.ucmenu.IsChecked() and self.ccmenu.IsChecked():
-            if self.con_flg:
-                self.timer_lp.Stop()
-                plist = search.check_port(self.usbHand)
-                if self.selPort in plist:
-                    self.timer_lp.Start(700)
-                else:
-                    self.con_flg = False
-                    # Print the message
-                    wx.MessageBox("MCCI USB Switch Disconnected !", "Port Error", wx.OK)
-                    self.device_no_response()
-                
     def get_user_data_dir(self):
         """
         getting usr directory path, code and installer executes in Local Path
@@ -1928,6 +1552,19 @@ class UiMainFrame (wx.Frame):
         else:
             dpath = Path(getenv('XDG_DATA_HOME', "~/.local/lib")).expanduser()
         return dpath
+
+    def action_reset(self):
+        self.action = 0
+
+    def action_count(self):
+        self.action += 1
+        return self.action
+
+    def action_summary(self):
+        self.print_on_log("Total match found : "+str(self.action)+"\n")
+
+    def get_batch_location(self):
+        return self.config_data["batch"]["location"]
 
 def EVT_RESULT(win, func):
     """
