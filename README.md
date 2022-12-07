@@ -253,7 +253,7 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
 
 ## Release History
 
-- v3.0.0 is major release
+- v3.0.0 is major release  it Contains the following changes
   - supporting of Thunderbolt device tree view [#78](https://github.com/mcci-usb/Cricket/commit/c0c5404794678247bcc943e77c2266a53113c875)
   - DUT related issues [#90](https://github.com/mcci-usb/Cricket/commit/7c2e7b2e1c6ebee246b30b06c7e637b8977fc314)
   - Connecting to switch with manual control doesn't reflect switch state [#64](https://github.com/mcci-usb/Cricket/commit/26e89016305b4793a1ba2b845c927dae74b9e0cb)
