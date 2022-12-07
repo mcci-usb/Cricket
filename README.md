@@ -4,7 +4,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v2.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v2.7.0-1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
+[![Git release](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v3.0.0-1-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v2.6.0...master)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -14,23 +14,26 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 - [List of Contents](#list-of-contents)
 - [About the Application](#about-the-application)
 - [Prerequisites for running or building](#prerequisites-for-running-or-building)
-	- [Windows](#windows)
-	- [Ubuntu](#ubuntu)
-	- [MacOS](#macos)
-	- [Raspberry Pi](#raspberry-pi)
+  - [Windows](#windows)
+  - [Ubuntu](#ubuntu)
+  - [MacOS](#macos)
+  - [Raspberry Pi](#raspberry-pi)
+- [Cricket API Library](cricket-api-library)
+  - [How to use the package](#how-to-use-the-package)
 - [Running the code](#running-the-code)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
 - [Supported Products](#supported-products)
-	- [MCCI Model 3141 USB4® Switch](#mcci-model-3141-usb4%C2%AE-switch)
-	- [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
-	- [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
-	- [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
+  - [MCCI Model 3141 USB4 Switch](#mcci-model-3141-usb4-switch)
+  - [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
+
+  - [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
+  - [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
 - [Release History](#release-history)
 - [Meta](#meta)
-	- [Copyright and License](#copyright-and-license)
-	- [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
-	- [Trademarks](#trademarks)
+  - [Copyright and License](#copyright-and-license)
+  - [Support Open Source Hardware and Software](#support-open-source-hardware-and-software)
+  - [Trademarks](#trademarks)
 
 <!-- /TOC -->
 
@@ -49,8 +52,7 @@ Development environment
 * wxPython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
-* libusb - 1.0.22b9
-* libusb1 - 1.8
+* hidapi - 0.10.1
 * matplotlib - 1.16.0
 
 Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install.
@@ -59,8 +61,7 @@ Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and
 pip install wxpython==4.0.7.post2
 pip install pyserial
 pip install pyusb
-pip install libusb
-pip install libusb1
+pip install hidapi == 0.10.1
 pip install matplotlib
 ```
 
@@ -75,6 +76,7 @@ Development environment
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
+* hidapi - 0.10.1
 * matplotlib - 3.5
 
 ```bash
@@ -86,6 +88,7 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
+sudo pip3 install hidapi == 0.10.1
 sudo pip3 install matplotlib
 ```
 
@@ -132,6 +135,7 @@ Development environment
 * pyusb - 1.1.1
 * libusb - 1.0.23b7
 * libusb1 - 1.9
+* hidapi - 0.10.1
 * matplotlib - 1.14.0
 
 ```bash
@@ -142,12 +146,31 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
+sudo pip3 install hidapi==0.10.1
 sudo pip3 install matplotlib
 ```
 
 Note:
 
 * If the installation of wxPython does not succeed, try `sudo apt-get install build-essential libgtk-3-dev`
+
+## Cricket API Library
+
+`cricketlib` api is a python library, this libabry intract with `Cricket UI`
+
+* download the cricketlib fro here [crickelib](https://github.com/mcci-usb/cricketlib)
+
+* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package)
+
+```shell
+python setup.py install
+```
+
+Please navigate to dist/ directory and you will find the files .egg file. Example: cricketapi-1.0.0-py3.7.egg
+
+### How to use the package
+
+here provide the REAMDME.md information about cricket lib please follow the instrunctions [README](https://github.com/mcci-usb/cricketlib#package-usage)
 
 ## Running the code
 
@@ -230,6 +253,14 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
 
 ## Release History
 
+- v3.0.0 is major release
+  - supporting of Thunderbolt device tree view [#78](https://github.com/mcci-usb/Cricket/commit/c0c5404794678247bcc943e77c2266a53113c875)
+  - DUT related issues [#90](https://github.com/mcci-usb/Cricket/commit/7c2e7b2e1c6ebee246b30b06c7e637b8977fc314)
+  - Connecting to switch with manual control doesn't reflect switch state [#64](https://github.com/mcci-usb/Cricket/commit/26e89016305b4793a1ba2b845c927dae74b9e0cb)
+  - Read port status [#91](https://github.com/mcci-usb/Cricket/commit/9276c52454e9f99fdcfcce17e0ed984e02ac1a6d)
+  - Alternate duty cycle calculation [#92](https://github.com/mcci-usb/Cricket/commit/38fedac7fee8d47e6630a9ce78d566b2a2cd06ef)
+
+- v2.7.1 is a patch release
 - v2.7.0 is a patch release.
   - Cricket UI fails to launch on ubuntu 20.04 and 22.04
 - v2.6.1 is a patch release.
@@ -241,17 +272,17 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
   - Disable VBUS V/I monitor if switch doesn't support [#63](https://github.com/mcci-usb/Cricket/commit/2c569d5131f1f04fa3e802f67e04ded35b80b802)
   - misspelling in the log window instead of Switch it was spelled as Swicth [#61](https://github.com/mcci-usb/Cricket/commit/1344384596efdfd3288ef40bea38c8149b2039f6).
 - v2.5.0 is major release it Contains the following changes
-  -	Feature added – Plotting of VBUS Volt and Current `VBUS V/I Plotting` [#18 #48 #52](https://github.com/mcci-usb/Cricket/commit/eb30f3b4a2e1da2c21db470315a8489b19d7b87d).
+  - Feature added – Plotting of VBUS Volt and Current `VBUS V/I Plotting` [#18 #48 #52](https://github.com/mcci-usb/Cricket/commit/eb30f3b4a2e1da2c21db470315a8489b19d7b87d).
   - USB Tree view removed and merged with Log Window `Replaced USB Tree view window to Log Window` [#24](https://github.com/mcci-usb/Cricket/issues/24).
   - Perform device Search in advance, Device searching automatically or manually searching the device `USB Switch Scanning` [#30](https://github.com/mcci-usb/Cricket/issues/30).
-  - Auto mode improved (Port selection provided) `Port(s) selection ` [#22](https://github.com/mcci-usb/Cricket/issues/22) also with out port selection start auto pop-pp window appears `PopUp window` [`#Auto Popupwindow`](https://github.com/mcci-usb/Cricket/commit/f44494cc7b4295b10480be373afbf4987dc6383f).
-  - Linux machine IP scanning issue fixed `Scanning ip address from Linux machine ` [#20](https://github.com/mcci-usb/Cricket/issues/20).
-  - The word Model replace by MCCI USB Switch `Replace MCCI USB Switch ` [#27](https://github.com/mcci-usb/Cricket/issues/27).
-  - UI not responding issued fixed `UI not Responding ` [#28](https://github.com/mcci-usb/Cricket/issues/28).
+  - Auto mode improved (Port selection provided) `Port(s) selection` [#22](https://github.com/mcci-usb/Cricket/issues/22) also with out port selection start auto pop-pp window appears `PopUp window` [`#Auto Popupwindow`](https://github.com/mcci-usb/Cricket/commit/f44494cc7b4295b10480be373afbf4987dc6383f).
+  - Linux machine IP scanning issue fixed `Scanning ip address from Linux machine` [#20](https://github.com/mcci-usb/Cricket/issues/20).
+  - The word Model replace by MCCI USB Switch `Replace MCCI USB Switch` [#27](https://github.com/mcci-usb/Cricket/issues/27).
+  - UI not responding issued fixed `UI not Responding` [#28](https://github.com/mcci-usb/Cricket/issues/28).
   - Do not disable Manage Model>Connect when connected allow the user to directly connect to another switch `Connect menu` [#30](https://github.com/mcci-usb/Cricket/commit/d3077b5b2925553a505955d5721673705438d464).
   - Enhancement – Highlight the name of the     Switch `Highlet Switch` [#29](https://github.com/mcci-usb/Cricket/issues/29).
-  - added Finished count in Loop Mode `Finished Count ` [#23](https://github.com/mcci-usb/Cricket/issues/23).
-  - Persistence of last connect `Last device connect `[#43](https://github.com/mcci-usb/Cricket/commit/2bf73805fe274e27fb775b18c4bc639828a60347)
+  - added Finished count in Loop Mode `Finished Count` [#23](https://github.com/mcci-usb/Cricket/issues/23).
+  - Persistence of last connect `Last device connect`[#43](https://github.com/mcci-usb/Cricket/commit/2bf73805fe274e27fb775b18c4bc639828a60347)
   - Application hangs when closing the application on macOS using Quit command [#40](https://github.com/mcci-usb/Cricket/commit/2e34f30771b6dbfcf5c6bc7de9da4db7e0b7f8bb).
   - click on the settings menu, then click on the "Switch Control Computer" sub menu, this should display a dialog for searching the Computer over the network based on the port assigned for that. But dialog does not appearing `SCC and THC Setting menu search dialog not displayed - In Mac Catalian and Monterey` [#41](https://github.com/mcci-usb/Cricket/commit/e114a2bf9bb13968388f2e898b21dc2c6913edbd).
   - UI panel are not centralized `fixed UI in Central on window` [45](https://github.com/mcci-usb/Cricket/commit/755384805f0d05bce7fff4d0089f664812314f94).
@@ -261,7 +292,7 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
   - Update year in the copy right info `Update copy right info in About dialog` [#53](https://github.com/mcci-usb/Cricket/commit/3530af09d231fc8ae9ffc6f47fd29bcfea5a329e)
 
 - v2.4.0 is major release; changes are significant to networking using TCP/IP.
-  - Add new feature support for Three computer System and Two Computer `Two and Three Computer system through Networking ` [#14](https://github.com/mcci-usb/Cricket/pull/14/commits/931f867960b375b07b980b61e39ab32bba4dfb35).
+  - Add new feature support for Three computer System and Two Computer `Two and Three Computer system through Networking` [#14](https://github.com/mcci-usb/Cricket/pull/14/commits/931f867960b375b07b980b61e39ab32bba4dfb35).
 
 - v2.3.0 is major release has following changes.
   - Add support for MCCI Switch 2301 USB Connection Exerciser ` MCCI USB Switch 2301 ` [#4](https://github.com/mcci-usb/Cricket/pull/4).
