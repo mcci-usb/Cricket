@@ -18,7 +18,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
   - [Ubuntu](#ubuntu)
   - [MacOS](#macos)
   - [Raspberry Pi](#raspberry-pi)
-- [Cricket API Library](cricket-api-library)
+- [Cricket API Library](#cricket-api-library)
   - [How to use the package](#how-to-use-the-package)
 - [Running the code](#running-the-code)
 - [Version change process](#version-change-process)
