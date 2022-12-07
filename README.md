@@ -18,6 +18,8 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
   - [Ubuntu](#ubuntu)
   - [MacOS](#macos)
   - [Raspberry Pi](#raspberry-pi)
+- [Cricket API Library](cricket-api-library)
+  - [How to use the package](#how-to-use-the-package)
 - [Running the code](#running-the-code)
 - [Version change process](#version-change-process)
 - [GUI Preview](#gui-preview)
@@ -151,6 +153,24 @@ sudo pip3 install matplotlib
 Note:
 
 * If the installation of wxPython does not succeed, try `sudo apt-get install build-essential libgtk-3-dev`
+
+## Cricket API Library
+
+`cricketlib` api is a python library, this libabry intract with `Cricket UI`
+
+* download the cricketlib fro here [crickelib](https://github.com/mcci-usb/cricketlib)
+
+* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package)
+
+```shell
+python setup.py install
+```
+
+Please navigate to dist/ directory and you will find the files .egg file. Example: cricketapi-1.0.0-py3.7.egg
+
+### How to use the package
+
+here provide the REAMDME.md information about cricket lib please follow the instrunctions [README](https://github.com/mcci-usb/cricketlib#package-usage)
 
 ## Running the code
 
