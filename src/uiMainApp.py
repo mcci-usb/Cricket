@@ -1133,6 +1133,7 @@ class UiMainFrame (wx.Frame):
             return False
 
     def get_usb_tree(self):
+        # thControl.get_tree_change(self)
         try:
             thControl.get_tree_change(self)
         except:

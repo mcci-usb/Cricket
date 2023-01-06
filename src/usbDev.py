@@ -87,34 +87,24 @@ def get_tb_tree_change(top, newdict):
     nlist = newdict
     olist = olddict
 
-    keyol = list(nlist.keys())
-    keynl = list(olist.keys())
+    keyol = list(olist.keys())
+    keynl = list(nlist.keys())
     
     adlist = [i for i in keynl if i not in keyol]
     rmlist = [i for i in keyol if i not in keynl]
-    
-    resd = {}
+    print("ADLIST:",adlist)
+    print("rmlist:",rmlist)
 
-    for bus in keyol:
-        ol = olddict[bus]
-        nl = newdict[bus]
-        ind = {}
-        alist = [i for i in nl if i not in ol]
-        rlist = [i for i in ol if i not in nl]
-        ind["added"] = alist
-        ind["removed"] = rlist
-        resd[bus] = ind
-
+    addLst = {}
+    rmdLst = {}
     
-    addLst = []
-    rmdLst = []
+    for adl in adlist:
+        addLst[adl] = nlist[adl]
+    
+    for rml in rmlist:
+        rmdLst[rml] = olist[rml]
+            
     strout = ""
-
-    for idict in resd:
-        for elem in resd[idict]["added"]:
-            addLst.append(elem)
-        for elem in resd[idict]["removed"]:
-            rmdLst.append(elem)
 
     if(len(addLst) == 0 and len(rmdLst) == 0):
         # No device added removed from port, then print "No change"
@@ -122,16 +112,17 @@ def get_tb_tree_change(top, newdict):
     
     if(len(addLst) > 0):
         strout = strout + "Thunderbolt Added\n"
-        for elem in addLst:
-            strout = strout + elem + "\n"
+        aklist = list(addLst.keys())
+        for akl in aklist:
+            strout = strout + addLst[akl]['name'] +'('+akl+ '), Speed: '+ addLst[akl]['speed'] + "\n"
 
     if(len(rmdLst) > 0):
         strout = strout + "Thunderbolt Removed\n"
-        for elem in rmdLst:
-            strout = strout + elem + "\n"
-
+        rklist = list(rmdLst.keys())
+        for rkl in rklist:
+            strout = strout + rmdLst[rkl]['name'] +'('+rkl+ '), Speed: '+rmdLst[rkl]['speed'] + "\n"
+    print("strout:",strout)
     top.print_on_log(strout)
-
 
 def get_tree_change(top, dl, newlist):
     """
