@@ -67,6 +67,13 @@ def read_config(fpath):
     return cdata
 
 
+def load_default_config():
+    cdata = defaultconfig.config_data
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+    return cdata
+
+
 def read_all_config():
     cdata = None
     fpath = get_file_path()
@@ -74,8 +81,7 @@ def read_all_config():
         with open(fpath, 'r') as open_file:
             cdata = json.load(open_file)
     except:
-        cdata = defaultconfig.config_data
-        save_config(fpath, cdata)
+        cdata = load_default_config()
     return cdata
 
 def set_sut_base_data(gdata):

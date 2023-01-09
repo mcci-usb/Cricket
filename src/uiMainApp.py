@@ -217,16 +217,39 @@ class UiMainFrame (wx.Frame):
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
     
     def read_configs(self):
+        mpkeys = ['myrole', 'uc', 'cc', 'thc', 'dut']
         self.config_data = configdata.read_all_config()
+        klist = list(self.config_data.keys())
+        cerr_flg = False
+        for ikey in mpkeys:
+            if ikey not in klist:
+                cerr_flg = True
+                break
+
+        if cerr_flg != True:
+            klist = list(self.config_data['dut'].keys())
+            dutkeys = ['nodes', 'dut1', 'dut2']
+            cerr_flg = False
+            for ikey in dutkeys:
+                if ikey not in klist:
+                    cerr_flg = True
+                    break
+        if cerr_flg == True:
+            self.config_data = configdata.load_default_config()
         
-        self.myrole = self.config_data["myrole"]
-        self.ucConfig = self.config_data["uc"]
-        self.duts = self.config_data["dut"]
-        self.ccConfig = self.config_data["cc"]
-        self.thcConfig = self.config_data["thc"]
-
-       
-
+        try:
+            self.myrole = self.config_data["myrole"]
+            self.ucConfig = self.config_data["uc"]
+            self.ccConfig = self.config_data["cc"]
+            self.thcConfig = self.config_data["thc"]
+            self.duts = self.config_data["dut"]
+        except:
+            title = ("Configuration read error!")
+            msg = ("The application would not work "
+                    "as expected")
+            dlg = wx.MessageDialog(self, msg, title, wx.OK)
+            dlg.ShowModal()
+ 
     def declare_globals(self):
         self.init_flg = True
 
@@ -339,7 +362,6 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
             self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
             self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
-
         else:
             self.dutMenuBar.Enable(ID_MENU_DUT1, False)
             self.dutMenuBar.Enable(ID_MENU_DUT2, False)
