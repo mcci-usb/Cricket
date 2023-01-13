@@ -89,7 +89,6 @@ class Dev3201Window(wx.Window):
         self.timer_usb = wx.Timer(self)
         self.timer_va = wx.Timer(self)
         self.timer_vu = wx.Timer(self)
-        self.timer_safe = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
         
@@ -203,8 +202,6 @@ class Dev3201Window(wx.Window):
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
         self.Bind(wx.EVT_TIMER, self.GraphTimer, self.timer_vu)
-        self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
-        
         # Bind the button event to handler
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p1)
@@ -461,10 +458,6 @@ class Dev3201Window(wx.Window):
             else:
                 self.btnStat[i] = False
     
-    def SafeTimer(self, e):
-        self.timer_safe.Stop()
-        self.usb_flg = False
-    
     def port_on(self, port, stat):
         """
         Port ON/OFF in Auto and Loop Mode, while in Loop Mode
@@ -481,13 +474,6 @@ class Dev3201Window(wx.Window):
         if self.top.con_flg == False:
             return
         if(stat):
-            if self.top.mode == MODE_MANUAL:
-                res, outstr = model.read_port_status(self.top, self.swid)
-                if res == 0:
-                    rport = int(outstr)
-                    if rport > 0:
-                        self.port_off_cmd(rport)
-                        time.sleep(1)
             # Here port on command
             self.port_on_cmd(port)
         else:
@@ -498,9 +484,6 @@ class Dev3201Window(wx.Window):
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
-            else:
-                self.timer_safe.Start(1000)
-                self.usb_flg = True
 
         self.enable_ss_controls(port, stat)
     
