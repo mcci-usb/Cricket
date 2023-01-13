@@ -26,7 +26,6 @@ import wx
 
 # Built-in imports
 import os
-import time
 
 # Own modules
 import devControl as model
@@ -84,7 +83,6 @@ class Dev3141Window(wx.Panel):
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
         self.timer_do = wx.Timer(self)
-        self.timer_safe = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 170))
         # Create a staticbox naming as  Model2101
@@ -169,7 +167,6 @@ class Dev3141Window(wx.Panel):
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.DoTimer, self.timer_do)
-        self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
 
         self.rbtn = []
         self.rbtn.append(self.btn_p1)
@@ -206,9 +203,9 @@ class Dev3141Window(wx.Panel):
         # Returns the identifier associated with,
         # This event, such as a button command id.
         cbi = co.GetId()
-        # self.port_on_manual(cbi)
-        if self.top.mode == MODE_MANUAL and not self.usb_flg:
-            self.port_on_manual(cbi)
+        self.port_on_manual(cbi)
+        # if self.top.mode == MODE_MANUAL and not self.usb_flg:
+        #     self.port_on_manual(cbi)
     
     def PortSpeedChanged(self, e):
         """
@@ -241,7 +238,7 @@ class Dev3141Window(wx.Panel):
     def UsbTimer(self, e):
         """
         Timer Event for USB Tree View Changes
-        Args:self.usb_flg
+        Args:
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
@@ -276,10 +273,6 @@ class Dev3141Window(wx.Panel):
         self.timer_do.Stop()
         # Check orientation
         self.get_orientation()
-
-    def SafeTimer(self, e):
-        self.timer_safe.Stop()
-        self.usb_flg = False
 
     def port_on_manual(self, port):
         """
@@ -318,13 +311,6 @@ class Dev3141Window(wx.Panel):
             None
         """
         if(stat):
-            if self.top.mode == MODE_MANUAL:
-                res, outstr = model.read_port_status(self.top, self.swid)
-                if res == 0:
-                    rport = int(outstr)
-                    if rport > 0:
-                        self.port_off_cmd(rport)
-                        time.sleep(1)
             self.port_on_cmd(port)
         else:
             self.port_off_cmd(port)
@@ -332,9 +318,6 @@ class Dev3141Window(wx.Panel):
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
-            else:
-                self.timer_safe.Start(1000)
-                self.usb_flg = True
 
     def set_speed(self, speed):
         if speed == "SS1":
