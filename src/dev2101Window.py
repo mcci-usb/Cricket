@@ -27,7 +27,7 @@ import wx
 
 # Built-in imports
 import os
-
+import time
 # Own modules
 import thControl
 import devControl as model
@@ -145,6 +145,7 @@ class Dev2101Window(wx.Panel):
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+        self.timer_safe = wx.Timer(self)
 
         self.vbox.AddMany([
             (self.hbox1, 1, wx.EXPAND | wx.ALL),
@@ -152,6 +153,7 @@ class Dev2101Window(wx.Panel):
             ])
         # Bind the button event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
+        self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
         # Bind the button event to handler
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
         # Bind the button event to handler
@@ -315,6 +317,13 @@ class Dev2101Window(wx.Panel):
         if(self.top.mode == MODE_MANUAL):
             if(self.top.get_delay_status()):
                 self.keep_delay()
+            else:
+                self.timer_safe.Start(1000)
+                self.usb_flg = True
+    
+    def SafeTimer(self, e):
+        self.timer_safe.Stop()
+        self.usb_flg = False
      
     def port_on_cmd(self, port):
         """
