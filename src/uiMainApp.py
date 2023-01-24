@@ -46,6 +46,7 @@ from aboutDialog import *
 from comDialog import *
 from setDialog import *
 from portDialog import *
+from warningMessage import *
 #from ccServer import *
 
 # import panels
@@ -123,9 +124,9 @@ class UiMainFrame (wx.Frame):
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
 
-        self.read_configs()
         self.declare_globals()        
-
+        self.read_configs()
+        
         self.panel = UiPanel(self)
         self.darwin_dependent()
        
@@ -173,6 +174,8 @@ class UiMainFrame (wx.Frame):
 
         self.init_connect()
 
+        # self.show_warning_dlg()
+
     def init_usbTreeImage(self):
         # scan and save ThunderBolt USB device
         if sys.platform == "darwin":
@@ -215,18 +218,43 @@ class UiMainFrame (wx.Frame):
         # Set Menu   
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
+        # self.setMenu.Append(ID_MENU_SET_WARNING, "Warning")
     
     def read_configs(self):
+        mpkeys = ['myrole', 'uc', 'cc', 'thc', 'dut']
         self.config_data = configdata.read_all_config()
+        klist = list(self.config_data.keys())
+        cerr_flg = False
+        for ikey in mpkeys:
+            if ikey not in klist:
+                cerr_flg = True
+                break
+
+        if cerr_flg != True:
+            klist = list(self.config_data['dut'].keys())
+            dutkeys = ['nodes', 'dut1', 'dut2']
+            cerr_flg = False
+            for ikey in dutkeys:
+                if ikey not in klist:
+                    cerr_flg = True
+                    break
+        if cerr_flg == True:
+            self.config_data = configdata.load_default_config()
         
-        self.myrole = self.config_data["myrole"]
-        self.ucConfig = self.config_data["uc"]
-        self.duts = self.config_data["dut"]
-        self.ccConfig = self.config_data["cc"]
-        self.thcConfig = self.config_data["thc"]
-
-       
-
+        try:
+            self.myrole = self.config_data["myrole"]
+            self.ucConfig = self.config_data["uc"]
+            self.ccConfig = self.config_data["cc"]
+            self.thcConfig = self.config_data["thc"]
+            self.duts = self.config_data["dut"]
+            self.wdialog = self.config_data["wdialog"]
+        except:
+            title = ("Configuration read error!")
+            msg = ("The application would not work "
+                    "as expected")
+            dlg = wx.MessageDialog(self, msg, title, wx.OK)
+            dlg.ShowModal()
+ 
     def declare_globals(self):
         self.init_flg = True
 
@@ -235,6 +263,7 @@ class UiMainFrame (wx.Frame):
         self.devCtrl = None
         self.thCtrl = None
 
+        self.wdialog = False
         self.ccflag = False
 
         self.selPort = {}
@@ -283,6 +312,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
         self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+        # self.Bind(wx.EVT_MENU, self.OnWarningWindow, id=ID_MENU_SET_WARNING)
 
         self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ucmenu)
         self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ccmenu)
@@ -339,7 +369,6 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
             self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
             self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
-
         else:
             self.dutMenuBar.Enable(ID_MENU_DUT1, False)
             self.dutMenuBar.Enable(ID_MENU_DUT2, False)
@@ -451,7 +480,6 @@ class UiMainFrame (wx.Frame):
         self.Layout()
 
         self.saveScreenSize()
-            
 
     def SelectDUT(self, event):
         obj = event.GetEventObject()
@@ -636,6 +664,11 @@ class UiMainFrame (wx.Frame):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    # def OnWarningWindow(self, event):
+    #     dlg = WarningDialog(self, self)
+    #     dlg.ShowModal()
+    #     dlg.Destroy()
     
     def OnAppClose (self, event):
         """
@@ -692,7 +725,7 @@ class UiMainFrame (wx.Frame):
         else:
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         event.Skip()
- 
+    
     def OnHideWindow (self, event):
         """
         Event Handler hide the window
@@ -766,6 +799,9 @@ class UiMainFrame (wx.Frame):
         else:
             self.print_on_log("No Switches found ...\n")
         self.Refresh()
+
+        if not self.wdialog:
+            self.show_warning_dlg()
 
     def OnDisconnect (self, event):
         """
@@ -1133,6 +1169,7 @@ class UiMainFrame (wx.Frame):
             return False
 
     def get_usb_tree(self):
+        # thControl.get_tree_change(self)
         try:
             thControl.get_tree_change(self)
         except:
@@ -1565,6 +1602,16 @@ class UiMainFrame (wx.Frame):
 
     def get_batch_location(self):
         return self.config_data["batch"]["location"]
+
+    def show_warning_dlg(self):
+        dlg = WarningDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+    
+    def show_warning_dlg_new(self):
+        # warning dialog
+        wx.MessageBox('Operation could not be completed', 'Warning', wx.OK | wx.ICON_INFORMATION)
+
 
 def EVT_RESULT(win, func):
     """
