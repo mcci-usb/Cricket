@@ -58,5 +58,6 @@ config_data = {
                                    "tcp": {}}}
        },
        "batch" : {"location": ""},
-       "screen": {"pos": [], "size": []}
+       "screen": {"pos": [], "size": []},
+       "wdialog": False
 }
