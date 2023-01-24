@@ -253,6 +253,12 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
 
 ## Release History
 
+- v3.1.0 is patch release it contains the following changes
+  - Added for TB4 speed Support in Mac [#96 Support TB4 speed](https://github.com/mcci-usb/Cricket/commit/273f01cb61966654b09ddd80f9b2cbbd88d67c4d)
+  - Showing of warning dialog in batch mode [#99](https://github.com/mcci-usb/Cricket/commit/a51470a69123ab6b89b3abf7501c1ceee7b1f441)
+  - Increase of minimum delay from 500 msec to 1000 msec [#100](https://github.com/mcci-usb/Cricket/commit/9c8029d657ab46589acc1217d6ad1a95b3f8cbd5)
+  - Add delay when switch ports[#98](https://github.com/mcci-usb/Cricket/commit/4237cd4baec8a19552d527c3c9d6be07d972c73d)
+
 - v3.0.0 is major release  it Contains the following changes
   - Incorrect view showing in Log window while using USB4 hub [#77](https://github.com/mcci-usb/Cricket/commit/1d78e766a38564262e1964d315f60cccc76324ca)
   - supporting of Thunderbolt device tree view [#78](https://github.com/mcci-usb/Cricket/commit/c0c5404794678247bcc943e77c2266a53113c875)
