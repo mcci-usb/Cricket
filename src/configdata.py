@@ -156,3 +156,9 @@ def updt_screen_size(gdata):
     cdata["screen"] = gdata["screen"]
     fpath = get_file_path()
     save_config(fpath, cdata)
+
+def updt_warning_dialog(gdata):
+    cdata = read_all_config()
+    cdata["wdialog"] = gdata["wdialog"]
+    fpath = get_file_path()
+    save_config(fpath, cdata)

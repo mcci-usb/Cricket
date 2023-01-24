@@ -46,6 +46,7 @@ from aboutDialog import *
 from comDialog import *
 from setDialog import *
 from portDialog import *
+from warningMessage import *
 #from ccServer import *
 
 # import panels
@@ -173,6 +174,8 @@ class UiMainFrame (wx.Frame):
 
         self.init_connect()
 
+        # self.show_warning_dlg()
+
     def init_usbTreeImage(self):
         # scan and save ThunderBolt USB device
         if sys.platform == "darwin":
@@ -215,6 +218,7 @@ class UiMainFrame (wx.Frame):
         # Set Menu   
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
+        # self.setMenu.Append(ID_MENU_SET_WARNING, "Warning")
     
     def read_configs(self):
         mpkeys = ['myrole', 'uc', 'cc', 'thc', 'dut']
@@ -243,6 +247,7 @@ class UiMainFrame (wx.Frame):
             self.ccConfig = self.config_data["cc"]
             self.thcConfig = self.config_data["thc"]
             self.duts = self.config_data["dut"]
+            self.wdialog = self.config_data["wdialog"]
         except:
             title = ("Configuration read error!")
             msg = ("The application would not work "
@@ -306,6 +311,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
         self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
+        # self.Bind(wx.EVT_MENU, self.OnWarningWindow, id=ID_MENU_SET_WARNING)
 
         self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ucmenu)
         self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ccmenu)
@@ -473,7 +479,6 @@ class UiMainFrame (wx.Frame):
         self.Layout()
 
         self.saveScreenSize()
-            
 
     def SelectDUT(self, event):
         obj = event.GetEventObject()
@@ -658,6 +663,11 @@ class UiMainFrame (wx.Frame):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
+
+    # def OnWarningWindow(self, event):
+    #     dlg = WarningDialog(self, self)
+    #     dlg.ShowModal()
+    #     dlg.Destroy()
     
     def OnAppClose (self, event):
         """
@@ -714,7 +724,7 @@ class UiMainFrame (wx.Frame):
         else:
             self.winMenu.Check(ID_MENU_WIN_SHOW, True)
         event.Skip()
- 
+    
     def OnHideWindow (self, event):
         """
         Event Handler hide the window
@@ -788,6 +798,9 @@ class UiMainFrame (wx.Frame):
         else:
             self.print_on_log("No Switches found ...\n")
         self.Refresh()
+
+        if not self.wdialog:
+            self.show_warning_dlg()
 
     def OnDisconnect (self, event):
         """
@@ -1588,6 +1601,16 @@ class UiMainFrame (wx.Frame):
 
     def get_batch_location(self):
         return self.config_data["batch"]["location"]
+
+    def show_warning_dlg(self):
+        dlg = WarningDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+    
+    def show_warning_dlg_new(self):
+        # warning dialog
+        wx.MessageBox('Operation could not be completed', 'Warning', wx.OK | wx.ICON_INFORMATION)
+
 
 def EVT_RESULT(win, func):
     """

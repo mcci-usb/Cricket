@@ -238,7 +238,103 @@ class BatchWindow(wx.Window):
         self.btn_start.SetLabel("Start")
         # The mode set as Manual Mode.
         self.top.set_mode(MODE_MANUAL)
+
+    def check_each_sw(self, swseq):
+        dlist = []
+        klist = []
+        plist = []
+        for item in swseq:
+            if 'port' in item:
+                klist.append('port')
+                plist.append(item['port'])
+            elif 'delay' in item:
+                klist.append('delay')
+                dlist.append(item['delay'])
+
+        mindly = min(dlist)
+        maxdly = max(dlist)
+        if mindly <= 999 or maxdly <= 999:
+            return {"result": "error", "message": "minumum delay should be 1000 msec"}
         
+        for i in range(len(klist)-1):
+            if klist[i] == "port":
+                if klist[i+1] == "delay" and klist[i-1] == "delay":
+                    continue
+                else:
+                    return {"result": "error", "message": "port switching not surrounded with delay"}
+
+        for i in range(len(plist)-1):
+            if plist[i] != 0:
+                if (plist[i+1] == 0 or plist[i+1] == plist[i]) and (plist[i-1] == 0 or plist[i-1] == plist[i]):
+                    continue
+                else:
+                    return {"result": "error", "message": "Port ON not surrounded with Port OFF"}
+        return {"result": "success"}
+
+
+    def checkSafeSwitching(self):
+        # Filterout switch, port, delay
+        mykilist = ["switch", "port", "delay"]
+        mynewlist = []
+        
+        for item in self.finseq:
+            ikey = list(item.keys())[0]
+            if ikey in mykilist:
+                mynewlist.append(item)
+        
+        # adding of consecutive delay in the list
+        myanlist = []
+        for item in mynewlist:
+            # nkey = list(item.keys())[0]
+            if "delay" in item.keys():
+                if "delay" in myanlist[-1].keys():
+                    myanlist[-1]["delay"] += item["delay"]
+                else:
+                    myanlist.append(item)
+            else:
+                myanlist.append(item)
+        
+        # converting list as dict
+        myndict = {}
+
+        for item in myanlist:
+            if "switch" in item.keys():
+                kval = item["switch"]
+                myndict[kval] = []
+
+        lsw = None
+        for item in myanlist:
+            if "switch" in item.keys():
+                kval = item["switch"] 
+                lsw = kval
+            elif "port" in item.keys():
+                myndict[lsw].append(item)
+            else:
+                for mk in myndict.keys():
+                    myndict[mk].append(item)
+        
+        # Check each dict element for
+        resdict = None
+        for item in myndict:
+            resdict = self.check_each_sw(myndict[item])
+            if resdict["result" ] == "error":
+                break
+        
+        if resdict["result"] == "success":
+            return True
+        else:
+            title = ("Port ON/OFF time warning! For Device safety")
+            msg = ("Batch script warning! - \n"
+                       + resdict["message"] +
+                       "\nClick Yes if you wish to continue"
+                       "\nClick No to exit the batch mode")
+            dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
+            if(dlg.ShowModal() == wx.ID_YES):
+                return True
+            else:
+                return False
+
+      
     def StartBatch(self):
         self.mappedSw = {}
         self.reqSw = {}
@@ -246,11 +342,11 @@ class BatchWindow(wx.Window):
         self.end_flg = False
         self.finseq = []
         self.parseBatchSeq()
-        
-        if self.top.createBatchPanel(self.reqSw):
-            self.runBatchSeq()
-        else:
-            wx.MessageBox('Could not find the Switch as per sequence', 'Warning', wx.OK | wx.ICON_WARNING)
+        if self.checkSafeSwitching():
+            if self.top.createBatchPanel(self.reqSw):
+                self.runBatchSeq()
+            else:
+                wx.MessageBox('Could not find the Switch as per sequence', 'Warning', wx.OK | wx.ICON_WARNING)
         
     def runBatchSeq(self):
         self.batch_flg = True
@@ -314,6 +410,10 @@ class BatchWindow(wx.Window):
 
 
     def load_last_file(self):
+        if self.bloc == None:
+            self.btn_start.Disable()
+            return
+        
         self.tc_bloc.SetValue(self.bloc)
         try:
             self.tc_seq.SetValue("")

@@ -628,7 +628,7 @@ class AutoWindow(wx.Window):
     
     def onoff_dly_warning(self):
         """
-        Check ON/OFF Time interval if it is < 500 msec popup a warning message
+        Check ON/OFF Time interval if it is < 1000 msec popup a warning message
 
         Args:
             self: The self parameter is a reference to the current 
@@ -639,10 +639,10 @@ class AutoWindow(wx.Window):
             False - when wish to exit the Auto mode
         """ 
         self.get_all_three()
-        if (self.OnTime < 500 or self.OffTime < 500):
+        if (self.OnTime < 1000 or self.OffTime < 1000):
             title = ("Port ON/OFF time warning!")
             msg = ("For Device safety, it is recommended to keep "
-                       "Port ON/OFF time > 500 msec."
+                       "Port ON/OFF time > 1000 msec."
                        "\nClick Yes if you wish to continue"
                        "\nClick No to exit the Auto mode")
             dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
