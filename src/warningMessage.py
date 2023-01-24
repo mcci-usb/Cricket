@@ -154,13 +154,12 @@ class warningWindow(wx.Window):
         # self.GetParent().OnOK(evt)
     
     def OnCheckBox(self, evt):
-        print("Checkbox")
+        pass
         
     
     def OnClose(self, evt):
         dlgchoice = False
         if(self.chk_box.GetValue() == True):
-            print("Don't show this warning msg again")
             dlgchoice = True
         configdata.updt_warning_dialog({"wdialog": dlgchoice})    
         self.GetParent().OnOK(evt)

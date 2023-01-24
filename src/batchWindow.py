@@ -328,7 +328,7 @@ class BatchWindow(wx.Window):
                        + resdict["message"] +
                        "\nClick Yes if you wish to continue"
                        "\nClick No to exit the batch mode")
-            dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES)
+            dlg = wx.MessageDialog(self, msg, title, wx.NO|wx.YES|wx.ICON_WARNING)
             if(dlg.ShowModal() == wx.ID_YES):
                 return True
             else:
