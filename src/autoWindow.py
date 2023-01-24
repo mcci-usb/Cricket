@@ -154,7 +154,7 @@ class AutoWindow(wx.Window):
         self.st_si   = wx.StaticText(self, -1, "Interval",
                                      style = wx.ALIGN_CENTER_VERTICAL | 
                                      wx.ALIGN_LEFT, size=(-1,-1))
-        self.tc_ival   = wx.TextCtrl(self, ID_TC_INTERVAL, "1000", 
+        self.tc_ival   = wx.TextCtrl(self, ID_TC_INTERVAL, "2000", 
                                      size=(50,-1), style = wx.TE_CENTRE |
                                      wx.TE_PROCESS_ENTER,
                                      validator=NumericValidator(), 

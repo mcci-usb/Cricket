@@ -124,9 +124,9 @@ class UiMainFrame (wx.Frame):
         if sys.platform == 'darwin':
             self.ytop = YPOS_MAC
 
-        self.read_configs()
         self.declare_globals()        
-
+        self.read_configs()
+        
         self.panel = UiPanel(self)
         self.darwin_dependent()
        
@@ -263,6 +263,7 @@ class UiMainFrame (wx.Frame):
         self.devCtrl = None
         self.thCtrl = None
 
+        self.wdialog = False
         self.ccflag = False
 
         self.selPort = {}

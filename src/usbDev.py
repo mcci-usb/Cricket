@@ -92,9 +92,7 @@ def get_tb_tree_change(top, newdict):
     
     adlist = [i for i in keynl if i not in keyol]
     rmlist = [i for i in keyol if i not in keynl]
-    print("ADLIST:",adlist)
-    print("rmlist:",rmlist)
-
+    
     addLst = {}
     rmdLst = {}
     
@@ -121,7 +119,6 @@ def get_tb_tree_change(top, newdict):
         rklist = list(rmdLst.keys())
         for rkl in rklist:
             strout = strout + rmdLst[rkl]['name'] +'('+rkl+ '), Speed: '+rmdLst[rkl]['speed'] + "\n"
-    print("strout:",strout)
     top.print_on_log(strout)
 
 def get_tree_change(top, dl, newlist):

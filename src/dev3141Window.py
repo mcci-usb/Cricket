@@ -68,6 +68,7 @@ class Dev3141Window(wx.Panel):
             self.swtitle += " ("+portno+")"
 
         self.pcnt = 0
+        self.rport = 0
 
         self.duty = 0
         self.OnTime = 0
@@ -85,6 +86,7 @@ class Dev3141Window(wx.Panel):
         self.timer_usb = wx.Timer(self)
         self.timer_do = wx.Timer(self)
         self.timer_safe = wx.Timer(self)
+        self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 170))
         # Create a staticbox naming as  Model2101
@@ -170,6 +172,7 @@ class Dev3141Window(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.DoTimer, self.timer_do)
         self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
+        self.Bind(wx.EVT_TIMER, self.PortOnTimer, self.timer_port)
 
         self.rbtn = []
         self.rbtn.append(self.btn_p1)
@@ -281,6 +284,11 @@ class Dev3141Window(wx.Panel):
         self.timer_safe.Stop()
         self.usb_flg = False
 
+    def PortOnTimer(self, e):
+        self.timer_port.Stop()
+        self.port_on_cmd(self.rport)
+
+
     def port_on_manual(self, port):
         """
         Port ON in Manual Mode
@@ -324,8 +332,12 @@ class Dev3141Window(wx.Panel):
                     rport = int(outstr)
                     if rport > 0:
                         self.port_off_cmd(rport)
-                        time.sleep(1)
-            self.port_on_cmd(port)
+                        self.rport = port
+                        self.timer_port.Start(1000)
+                    else:
+                        self.port_on_cmd(port)
+            else:
+                self.port_on_cmd(port)
         else:
             self.port_off_cmd(port)
         

@@ -74,8 +74,7 @@ class Dev3201Window(wx.Window):
         self.con_flg = None
 
         self.pcnt = 0
-
-        self.rpon = 0
+        self.rport = 0
 
         self.duty = 0
         self.OnTime = 0
@@ -92,7 +91,7 @@ class Dev3201Window(wx.Window):
         self.timer_va = wx.Timer(self)
         self.timer_vu = wx.Timer(self)
         self.timer_safe = wx.Timer(self)
-        self.timer_pon = wx.Timer(self)
+        self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
         
@@ -207,7 +206,7 @@ class Dev3201Window(wx.Window):
         self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
         self.Bind(wx.EVT_TIMER, self.GraphTimer, self.timer_vu)
         self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
-        self.Bind(wx.EVT_TIMER, self.PonTimer, self.timer_pon)
+        self.Bind(wx.EVT_TIMER, self.PortOnTimer, self.timer_port)
         
         # Bind the button event to handler
         self.Bind(wx.EVT_RADIOBUTTON, self.PortSpeedChanged)
@@ -469,9 +468,9 @@ class Dev3201Window(wx.Window):
         self.timer_safe.Stop()
         self.usb_flg = False
 
-    def PonTimer(self, e):
-        self.timer_pon.Stop()
-        self.port_on_cmd(self.rpon)
+    def PortOnTimer(self, e):
+        self.timer_port.Stop()
+        self.port_on_cmd(self.rport)
 
 
     def port_on(self, port, stat):
@@ -496,8 +495,8 @@ class Dev3201Window(wx.Window):
                     rport = int(outstr)
                     if rport > 0:
                         self.port_off_cmd(rport)
-                        self.rpon = port
-                        self.timer_pon.Start(1000)
+                        self.rport = port
+                        self.timer_port.Start(1000)
                     else:
                         self.port_on_cmd(port)
             # Here port on command
