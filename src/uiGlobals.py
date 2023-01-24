@@ -59,6 +59,7 @@ IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
 IMG_WAVE = "wave.png"
 IMG_NOSWITCH = "noswitch.png"
+IMG_WARNING ="Warning.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -121,6 +122,8 @@ ID_BTN_AMPS = 1044
 # About Dialog
 ID_ABOUT_IMAGE = 1045
 
+ID_WARNING_IMAGE = 1140
+
 # Log Window
 ID_BTN_CLEAR = 1046
 
@@ -147,8 +150,10 @@ ID_MENU_CONFIG_THC = 1106
 
 ID_MENU_SET_SCC = 1107
 ID_MENU_SET_THC = 1108
+ID_MENU_SET_WARNING = 1109
 
-ID_MENU_GRAPH = 1109
+
+ID_MENU_GRAPH = 1110
 
 ID_MENU_DUT1 = ID_MENU_GRAPH + 1
 ID_MENU_DUT2 = ID_MENU_DUT1 + 1
@@ -174,6 +179,8 @@ ID_RBTN_RT = ID_MENU_CONFIG_SL2 + 1
 
 ID_TC_SEQNAME = ID_RBTN_RT + 1
 ID_BTN_SEQSAVE = ID_TC_SEQNAME + 1
+
+
 
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
