@@ -44,6 +44,7 @@ from copy import deepcopy
 
 from aboutDialog import *
 from comDialog import *
+from firmwareUpdate import *
 from setDialog import *
 from portDialog import *
 from warningMessage import *
@@ -328,6 +329,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
+        self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
+
 
     # def OnFocusSUT1(self, event):
     #     # On Focus event, not used
@@ -417,6 +420,9 @@ class UiMainFrame (wx.Frame):
         qmiamps = wx.MenuItem(self.toolMenu, ID_MENU_GRAPH, "VBUS V/I Plot")
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
+
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
+        self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
         self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
@@ -666,10 +672,10 @@ class UiMainFrame (wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
-    # def OnWarningWindow(self, event):
-    #     dlg = WarningDialog(self, self)
-    #     dlg.ShowModal()
-    #     dlg.Destroy()
+    def OnFirmwareUpdateWindow(self, event):
+        dlg = FirmwareDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
     
     def OnAppClose (self, event):
         """

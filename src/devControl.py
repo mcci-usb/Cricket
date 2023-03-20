@@ -61,6 +61,10 @@ def ResetDeviceControl(top):
     if top.ccclient != None:
         top.thread.close()
         top.ccclient.close()
+    
+def get_avail_ports(top):
+    dev_list = searchswitch.get_avail_ports()
+    return dev_list
             
 def search_device(top):
     """
