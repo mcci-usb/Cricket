@@ -511,7 +511,7 @@ class BatchWindow(wx.Window):
         return
     
     def parseSwMacro(self, oclist):
-        devlist = ["3141", "3201", "2301", "2101"]
+        devlist = ["3141","3142", "3201", "2301", "2101"]
     
         swpath = oclist[3].replace(',', '')
         swpath = swpath[1:][:-1]

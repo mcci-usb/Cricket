@@ -69,6 +69,7 @@ from cricketlib import switch3141
 from cricketlib import switch3201
 from cricketlib import switch2101
 from cricketlib import switch2301
+from cricketlib import switch3142
 
 
 ##############################################################################
@@ -305,7 +306,7 @@ class UiMainFrame (wx.Frame):
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141, "3201": switch3201.Switch3201, 
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, 
                           "2101": switch2101.Switch2101, "2301": switch2301.Switch2301}
 
     def define_events(self):

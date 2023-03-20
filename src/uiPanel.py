@@ -39,6 +39,7 @@ from dev2101Window import Dev2101Window
 from dev3141Window import Dev3141Window
 from dev3201Window import Dev3201Window
 from dev2301Window import Dev2301Window
+from dev3142Window import Dev3142Window
 
 
 class UiPanel(wx.Panel):
@@ -231,6 +232,7 @@ class UiPanel(wx.Panel):
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxdl.Hide(self.dev3142Pan)
         self.vboxdl.Hide(self.dev2101Pan)
 
     def PrintLog(self, strin):

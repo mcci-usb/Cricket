@@ -167,6 +167,7 @@ class MidPanel(wx.Panel):
         self.vboxdl.Hide(self.dev2301Pan)
         self.vboxdl.Hide(self.dev3201Pan)
         self.vboxdl.Hide(self.dev3141Pan)
+        self.vboxdl.Hide(self.dev3142Pan)
         self.vboxdl.Hide(self.dev2101Pan)
 
     def PrintLog(self, strin):
