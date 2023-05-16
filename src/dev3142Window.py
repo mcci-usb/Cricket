@@ -67,6 +67,13 @@ class Dev3142Window(wx.Panel):
         if(len(portno)):
             self.swtitle += " ("+portno+")"
 
+        self.fv = None
+        # self.ib = None
+        self.fa = None
+        # self.inval = None
+
+        self.con_flg = None
+
         self.pcnt = 0
         self.rport = 0
 
@@ -84,22 +91,15 @@ class Dev3142Window(wx.Panel):
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+        self.timer_va = wx.Timer(self)
+        self.timer_vu = wx.Timer(self)
         self.timer_do = wx.Timer(self)
         self.timer_safe = wx.Timer(self)
         self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 170))
         # Create a staticbox naming as  Model2101
-        self.sb = wx.StaticBox(self, -1, self.swtitle)
-
-        self.vbox = wx.StaticBoxSizer(self.sb,wx.VERTICAL)
-        # BoxSizer fixed with Horizontal
-        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox5 = wx.BoxSizer (wx.HORIZONTAL)
+    
         
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (-1,-1))
@@ -122,10 +122,30 @@ class Dev3142Window(wx.Panel):
                                     size=(-1, -1))
         
         self.btnStat = [False, False]
+        self.stlbl_volts = wx.StaticText(self, -1, "Bus Volts :", 
+                                                   size=(-1,-1))
+        self.st_volts   = wx.StaticText(self, -1, " --- ", 
+                                        style = wx.ALIGN_CENTER_VERTICAL)
+        self.stlbl_amps = wx.StaticText(self, -1, "Bus Current:",
+                                                   size=(-1,-1))
+        self.st_amps   = wx.StaticText(self, -1, " --- ", 
+                                       style = wx.ALIGN_CENTER_VERTICAL, 
+                                       size=(-1,-1))
+        self.sb = wx.StaticBox(self, -1, self.swtitle)
 
+        self.vbox = wx.StaticBoxSizer(self.sb,wx.VERTICAL)
+        # BoxSizer fixed with Horizontal
+        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox5 = wx.BoxSizer (wx.HORIZONTAL)
 
         self.hboxp1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxp1.Add(self.st_p1,0, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=0)
@@ -149,6 +169,15 @@ class Dev3142Window(wx.Panel):
 
         self.hbox3.Add(self.stlbl_do, flag=wx.LEFT, border=20 )
         self.hbox3.Add(self.st_do, flag= wx.LEFT, border=10)
+        self.hbox5.Add(self.stlbl_volts, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border=20 )
+        self.hbox5.Add(self.st_volts, flag=wx.LEFT |
+                       wx.ALIGN_CENTER_VERTICAL)
+        self.hbox5.Add(self.stlbl_amps, flag=wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL |
+                       wx.ALIGN_LEFT, border=20)
+        self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
+       
                 
         self.vbox.AddMany([
             (0,20,0),
@@ -156,11 +185,14 @@ class Dev3142Window(wx.Panel):
             (0,15,0),
             (self.hbox2, 1, wx.EXPAND),
             (0,10,0),
-            (self.hbox3, 1, wx.EXPAND)
+            (self.hbox3, 1, wx.EXPAND),
+            (0,10,0),
+            (self.hbox5, 1, wx.EXPAND)
             ])
 
         # Set size of frame
         self.SetSizer(self.vbox)
+        self.SetAutoLayout(True)
         self.vbox.Fit(self)
         self.Layout()
         
@@ -171,6 +203,8 @@ class Dev3142Window(wx.Panel):
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.DoTimer, self.timer_do)
+        self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
+        self.Bind(wx.EVT_TIMER, self.GraphTimer, self.timer_vu)
         self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
         self.Bind(wx.EVT_TIMER, self.PortOnTimer, self.timer_port)
 
@@ -180,6 +214,7 @@ class Dev3142Window(wx.Panel):
 
         self.con_flg = True
         self.enable_controls(True)
+        self.timer_vu.Start(50)
 
     def update_cport(self, portno):
         self.swtitle = "3142"
@@ -190,19 +225,7 @@ class Dev3142Window(wx.Panel):
         self.Layout()
     
     def OnOffPort (self, e):
-        """
-        Event Handler for Port On and Off
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:The event parameter in the dev3142Window method is an 
-            object specific to a particular event type.
-            event hanlder for OnOffPort switch
-        Returns:
-            None
-        """
+    
         # Returns the object (usually a window) associated,
         # With the event, if any.
         co = e.GetEventObject()
@@ -214,19 +237,7 @@ class Dev3142Window(wx.Panel):
             self.port_on_manual(cbi)
     
     def PortSpeedChanged(self, e):
-        """
-        Event handler for Speed change Radio buttons.
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:The event parameter in the dev3142Window method is an 
-            object specific to a particular event type.
-            Event Handler for Port Speed Change
-        Returns:
-            None
-        """
+        
         # Returns the object (usually a window) associated
         # With the event, if any
         rb = e.GetEventObject()
@@ -242,18 +253,7 @@ class Dev3142Window(wx.Panel):
             self.speed_cmd(0)
 
     def UsbTimer(self, e):
-        """
-        Timer Event for USB Tree View Changes
-        Args:self.usb_flg
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:The event parameter in the dev3142Window method is an 
-            object specific to a particular event type.
-            Timer Event for USB Tree View Changes
-        Returns:
-            None
-        """
+       
         self.timer_usb.Stop()
         try:
             thControl.get_tree_change(self.top)
@@ -261,24 +261,73 @@ class Dev3142Window(wx.Panel):
             # To print on usb tree view change "USB Read Error!"
             self.top.print_on_log("USB Read Error!")
         self.usb_flg = False
-  
-    def DoTimer(self, e):
-        """
-        Timer event to get device orientation after port On/Off
+
+    def VoltsCmd(self, evt):
         
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:The event parameter in the dev3142Window method is an 
-            object specific to a particular event type.
-            event handler to orientation
-        Returns:
-            None
-        """
+        self.get_voltage()
+    
+    def get_voltage(self):
+        strin = "***"
+        res, outstr = model.send_volts_cmd(self.top, self.swid)
+        if res < 0:
+            outstr = "Comm Error\n"
+        else:
+            outstr.replace(' ', '')
+            if outstr != "":
+                vstr = outstr.split('\r')
+                nvstr = vstr[0].replace(' V', '')
+                iv = float(nvstr)
+                self.fv = iv
+                outstr = str(self.fv) + "V"
+                self.update_volts(outstr)
+        
+    def AmpsCmd(self, evt):
+        self.get_amps()
+    
+    def get_amps(self):
+        strin = "---"
+        res, outstr = model.send_amps_cmd(self.top, self.swid)
+        if res < 0:
+            outstr = "Comm Error\n"
+        else:
+            outstr.replace(' ', '')
+            if outstr != "":
+                astr = outstr.split('\n')
+                sstr = astr[0].replace(' mA', '')
+                ia = int(sstr)
+                self.fa =  ia/1000
+                ss = ""
+                if(sstr == '1'):
+                    ss = "-"
+                outstr = ss + str(self.fa) + " A"
+                self.update_amps(outstr)
+        
+    def GraphTimer(self, e):
+        
+        self.timer_vu.Stop()
+        # Check voltage
+        if(self.top.vgraph):
+            self.get_voltage()
+            self.top.vdata = self.fv
+        
+        # Check amps
+        if(self.top.agraph):
+            self.get_amps()
+            self.top.adata = self.fa
+            # self.top.adata = self.fa
+        
+        self.timer_vu.Start()
+  
+    def DoTimer(self, e): 
         self.timer_do.Stop()
-        # Check orientation
         self.get_orientation()
+    
+    def VaTimer(self, e):
+        self.timer_va.Stop()
+        # Check voltage
+        self.get_voltage()
+        # Check amps
+        self.get_amps()
 
     def SafeTimer(self, e):
         self.timer_safe.Stop()
@@ -287,7 +336,6 @@ class Dev3142Window(wx.Panel):
     def PortOnTimer(self, e):
         self.timer_port.Stop()
         self.port_on_cmd(self.rport)
-
 
     def port_on_manual(self, port):
         """
@@ -308,8 +356,10 @@ class Dev3142Window(wx.Panel):
                 self.port_on(port+1, self.btnStat[port])
                 if(self.btnStat[port]):
                    self.timer_do.Start(3000)
+                   self.timer_va.Start(3000)
                 else:
                    self.timer_do.Stop()
+                   self.timer_va.Stop()
             else:
                 self.btnStat[i] = False
       
@@ -325,6 +375,8 @@ class Dev3142Window(wx.Panel):
         Returns:
             None
         """
+        if self.top.con_flg == False:
+            return
         if(stat):
             if self.top.mode == MODE_MANUAL:
                 res, outstr = model.read_port_status(self.top, self.swid)
@@ -460,6 +512,7 @@ class Dev3142Window(wx.Panel):
 
     def read_port_status(self, stat):
         if stat:
+            time.sleep(1)
             res, outstr = model.read_port_status(self.top, self.swid)
             
             pstat = False
@@ -488,6 +541,7 @@ class Dev3142Window(wx.Panel):
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
         self.enable_do_controls(stat)
+        self.enable_va_controls(stat)
         self.read_port_status(stat) 
        
     def enable_port_controls(self, stat):
@@ -543,6 +597,10 @@ class Dev3142Window(wx.Panel):
             None
         """
         pass
+
+    def enable_va_controls(self,stat):
+        pass
+
     
     def speed_cmd(self,val):
         """
@@ -615,6 +673,11 @@ class Dev3142Window(wx.Panel):
             None
         """
         self.st_do.SetLabel(str)
+    def update_volts(self, str):
+        self.st_volts.SetLabel(str)
+    
+    def update_amps(self, str):
+        self.st_amps.SetLabel(str)
     
     def device_connected(self):
         """
@@ -672,9 +735,12 @@ class Dev3142Window(wx.Panel):
         else:
             self.port_led_update(port-1, True)
             self.btnStat[port-1] = True
-
+   
     def read_param(self, param):
-        if param == "voltage" or param == "current":
+        if param == "voltage":
+            self.get_voltage()
+        elif param == "current":
+            self.get_amps()
+        
+        else:
             self.top.print_on_log("Switch 3142 wouldn't support "+param+ "Command\n")
-        elif param == "port":
-            self.top.print_on_log("Switch 3142 - Read port status\n")

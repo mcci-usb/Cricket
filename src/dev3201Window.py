@@ -314,16 +314,7 @@ class Dev3201Window(wx.Window):
         self.get_amps()
     
     def get_amps(self):
-        """
-        Get device amps and display 
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
+        
         strin = "---"
         res, outstr = model.send_amps_cmd(self.top, self.swid)
         if res < 0:
@@ -340,7 +331,6 @@ class Dev3201Window(wx.Window):
                 if(sstr == '1'):
                     ss = "-"
                 outstr = ss + str(self.fa) + "A"
-
             self.update_amps(outstr)
         # self.top.print_on_log("Amps : "+outstr+"\n")
     
@@ -395,19 +385,7 @@ class Dev3201Window(wx.Window):
         self.usb_flg = False
     
     def VaTimer(self, e):
-        """
-        Timer Event to update volts and amps of 3201
-
-        Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e:The event parameter in the dev3201 method is an 
-            object specific to a particular event type.
-            event handler to orientation
-        Returns:
-            None
-        """
+        
         self.timer_va.Stop()
         # Check voltage
         self.get_voltage()

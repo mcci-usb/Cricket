@@ -1,9 +1,9 @@
 ##############################################################################
 # 
-# Module: dev3141Window.py
+# Module: dev3142Window.py
 #
 # Description:
-#     Device specific functions and UI for interfacing Model 3141 with GUI
+#     Device specific functions and UI for interfacing Model 3142 with GUI
 #
 # Copyright notice:
 #     This file copyright (c) 2020 by
@@ -40,14 +40,14 @@ PORTS = 2
 ##############################################################################
 class Dev3141Window(wx.Panel):
     """
-    A class dev3141Window with init method
+    A class dev3142Window with init method
 
-    the dev3141Window navigate to Super speed and High speed enable 
+    the dev3142Window navigate to Super speed and High speed enable 
     or disable options.
     """
     def __init__(self, parent, top, portno):
         """
-        Device specific functions and UI for interfacing Model 3141 with GUI 
+        Device specific functions and UI for interfacing Model 3142 with GUI 
         Args:
             self: The self parameter is a reference to the current 
             instance of the class,and is used to access variables
@@ -67,6 +67,11 @@ class Dev3141Window(wx.Panel):
         if(len(portno)):
             self.swtitle += " ("+portno+")"
 
+        self.fv = None
+        self.fa = None
+
+        self.con_flg = None
+
         self.pcnt = 0
         self.rport = 0
 
@@ -84,22 +89,15 @@ class Dev3141Window(wx.Panel):
         # The Timer class allows you to execute code at specified intervals.
         self.timer = wx.Timer(self)
         self.timer_usb = wx.Timer(self)
+        self.timer_va = wx.Timer(self)
+        self.timer_vu = wx.Timer(self)
         self.timer_do = wx.Timer(self)
         self.timer_safe = wx.Timer(self)
         self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 170))
         # Create a staticbox naming as  Model2101
-        self.sb = wx.StaticBox(self, -1, self.swtitle)
-
-        self.vbox = wx.StaticBoxSizer(self.sb,wx.VERTICAL)
-        # BoxSizer fixed with Horizontal
-        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox5 = wx.BoxSizer (wx.HORIZONTAL)
+    
         
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (-1,-1))
@@ -122,10 +120,30 @@ class Dev3141Window(wx.Panel):
                                     size=(-1, -1))
         
         self.btnStat = [False, False]
+        self.stlbl_volts = wx.StaticText(self, -1, "Bus Voltage :", 
+                                                   size=(-1,-1))
+        self.st_volts   = wx.StaticText(self, -1, " --- ", 
+                                        style = wx.ALIGN_CENTER_VERTICAL)
+        self.stlbl_amps = wx.StaticText(self, -1, "Bus Current:",
+                                                   size=(-1,-1))
+        self.st_amps   = wx.StaticText(self, -1, " --- ", 
+                                       style = wx.ALIGN_CENTER_VERTICAL, 
+                                       size=(-1,-1))
+        self.sb = wx.StaticBox(self, -1, self.swtitle)
 
+        self.vbox = wx.StaticBoxSizer(self.sb,wx.VERTICAL)
+        # BoxSizer fixed with Horizontal
+        self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hbox5 = wx.BoxSizer (wx.HORIZONTAL)
 
         self.hboxp1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxp1.Add(self.st_p1,0, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=0)
@@ -149,6 +167,15 @@ class Dev3141Window(wx.Panel):
 
         self.hbox3.Add(self.stlbl_do, flag=wx.LEFT, border=20 )
         self.hbox3.Add(self.st_do, flag= wx.LEFT, border=10)
+        self.hbox5.Add(self.stlbl_volts, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border=20 )
+        self.hbox5.Add(self.st_volts, flag=wx.LEFT |
+                       wx.ALIGN_CENTER_VERTICAL)
+        self.hbox5.Add(self.stlbl_amps, flag=wx.LEFT | 
+                       wx.ALIGN_CENTER_VERTICAL |
+                       wx.ALIGN_LEFT, border=20)
+        self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
+       
                 
         self.vbox.AddMany([
             (0,20,0),
@@ -156,7 +183,9 @@ class Dev3141Window(wx.Panel):
             (0,15,0),
             (self.hbox2, 1, wx.EXPAND),
             (0,10,0),
-            (self.hbox3, 1, wx.EXPAND)
+            (self.hbox3, 1, wx.EXPAND),
+            (0,10,0),
+            (self.hbox5, 1, wx.EXPAND)
             ])
 
         # Set size of frame
@@ -171,6 +200,8 @@ class Dev3141Window(wx.Panel):
         # Bind the timer event to handler
         self.Bind(wx.EVT_TIMER, self.UsbTimer, self.timer_usb)
         self.Bind(wx.EVT_TIMER, self.DoTimer, self.timer_do)
+        self.Bind(wx.EVT_TIMER, self.VaTimer, self.timer_va)
+        self.Bind(wx.EVT_TIMER, self.GraphTimer, self.timer_vu)
         self.Bind(wx.EVT_TIMER, self.SafeTimer, self.timer_safe)
         self.Bind(wx.EVT_TIMER, self.PortOnTimer, self.timer_port)
 
@@ -180,6 +211,7 @@ class Dev3141Window(wx.Panel):
 
         self.con_flg = True
         self.enable_controls(True)
+        self.timer_vu.Start(50)
 
     def update_cport(self, portno):
         self.swtitle = "3141"
@@ -197,7 +229,7 @@ class Dev3141Window(wx.Panel):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3141Window method is an 
+            e:The event parameter in the dev3142Window method is an 
             object specific to a particular event type.
             event hanlder for OnOffPort switch
         Returns:
@@ -221,7 +253,7 @@ class Dev3141Window(wx.Panel):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3141Window method is an 
+            e:The event parameter in the dev3142Window method is an 
             object specific to a particular event type.
             Event Handler for Port Speed Change
         Returns:
@@ -248,7 +280,7 @@ class Dev3141Window(wx.Panel):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3141Window method is an 
+            e:The event parameter in the dev3142Window method is an 
             object specific to a particular event type.
             Timer Event for USB Tree View Changes
         Returns:
@@ -261,6 +293,123 @@ class Dev3141Window(wx.Panel):
             # To print on usb tree view change "USB Read Error!"
             self.top.print_on_log("USB Read Error!")
         self.usb_flg = False
+
+        #--------------------------------------------------------
+    def VoltsCmd(self, evt):
+        """
+        Send the device voltage command
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:The event parameter in the dev3201Window method is an 
+            object specific to a particular event type.
+            Event Handler for Volts Button
+        Returns:
+            None
+        """
+        self.get_voltage()
+    
+    def get_voltage(self):
+        """
+        Get device voltage and display 
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        strin = "------"
+        res, outstr = model.send_volts_cmd(self.top, self.swid)
+        if res < 0:
+            outstr = "Comm Error\n"
+        else:
+            outstr.replace(' ', '')
+            if outstr != "":
+                vstr = outstr.split('\n')
+                iv = int(vstr[0])
+                self.fv = iv/100
+                outstr = str(self.fv) + "V"
+                print("V", outstr)
+                self.update_volts(outstr)
+        
+    def AmpsCmd(self, evt):
+        """
+        Send the device amps command
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            evt:The event parameter in the dev3201Window method is an 
+            object specific to a particular event type.
+            Event Handler for Amps Button
+        Returns:
+            None
+        """
+        self.get_amps()
+    
+    def get_amps(self):
+        """
+        Get device amps and display 
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+        Returns:
+            None
+        """
+        strin = "-----"
+        res, outstr = model.send_amps_cmd(self.top, self.swid)
+        if res < 0:
+            outstr = "Comm Error\n"
+        else:
+            outstr.replace(' ', '')
+            if outstr != "":
+                astr = outstr.split('\n')
+                sstr = astr[0][:1]
+                rstr = astr[0][1:]
+                ia = int(rstr) 
+                self.fa =  ia/100 
+                ss = ""
+                if(sstr == '1'):
+                    ss = "-"
+                outstr = ss + str(self.fa) + "A"
+                print("A", outstr)
+
+            self.update_amps(outstr)
+        # self.top.print_on_log("Amps : "+outstr+"\n")
+    
+    def GraphTimer(self, e):
+        """
+        once start the volts and amps plotting timer start from here.
+
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e: event handling of volts and amps.
+        Returns:
+            None
+       """
+        self.timer_vu.Stop()
+        # Check voltage
+        if(self.top.vgraph):
+            self.get_voltage()
+            self.top.vdata = self.fv
+        
+        # Check amps
+        if(self.top.agraph):
+            self.get_amps()
+            self.top.adata = self.fa
+        
+        self.timer_vu.Start()
+
+        #-------------------------------------------------------
   
     def DoTimer(self, e):
         """
@@ -270,7 +419,7 @@ class Dev3141Window(wx.Panel):
             self:The self parameter is a reference to the current 
             instance of the class,and is used to access variables
             that belongs to the class.
-            e:The event parameter in the dev3141Window method is an 
+            e:The event parameter in the dev3142Window method is an 
             object specific to a particular event type.
             event handler to orientation
         Returns:
@@ -279,6 +428,29 @@ class Dev3141Window(wx.Panel):
         self.timer_do.Stop()
         # Check orientation
         self.get_orientation()
+    
+    #---------------------------------------------------------------
+    def VaTimer(self, e):
+        """
+        Timer Event to update volts and amps of 3201
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            e:The event parameter in the dev3201 method is an 
+            object specific to a particular event type.
+            event handler to orientation
+        Returns:
+            None
+        """
+        self.timer_va.Stop()
+        # Check voltage
+        self.get_voltage()
+        # Check amps
+        self.get_amps()
+
+    #---------------------------------------------------------------
 
     def SafeTimer(self, e):
         self.timer_safe.Stop()
@@ -488,6 +660,7 @@ class Dev3141Window(wx.Panel):
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
         self.enable_do_controls(stat)
+        self.enable_va_controls(stat)
         self.read_port_status(stat) 
        
     def enable_port_controls(self, stat):
@@ -543,10 +716,14 @@ class Dev3141Window(wx.Panel):
             None
         """
         pass
+
+    def enable_va_controls(self,stat):
+        pass
+
     
     def speed_cmd(self,val):
         """
-        Speed change command to Model3141 Device
+        Speed change command to Model3142 Device
         Args:
             self: The self parameter is a reference to the current
             instance of the class,and is used to access variables
@@ -616,6 +793,15 @@ class Dev3141Window(wx.Panel):
         """
         self.st_do.SetLabel(str)
     
+#-------------------------------------------------------
+    def update_volts(self, str):
+        self.st_volts.SetLabel(str)
+    
+    def update_amps(self, str):
+        self.st_amps.SetLabel(str)
+
+#-------------------------------------------------------
+    
     def device_connected(self):
         """
         Called by Com Window When Device Connected
@@ -637,7 +823,7 @@ class Dev3141Window(wx.Panel):
                 self.enable_controls(True)
                 self.top.set_port_list(PORTS)
             else:
-                self.top.print_on_log("No response from 3141,\
+                self.top.print_on_log("No response from 3142,\
                                        please connect again!\n")
                 self.enable_controls(False) 
       
@@ -672,9 +858,21 @@ class Dev3141Window(wx.Panel):
         else:
             self.port_led_update(port-1, True)
             self.btnStat[port-1] = True
-
+    
+    ############### VOLTAGE CURRENT ############
+       
+    
+    ################################################################
     def read_param(self, param):
-        if param == "voltage" or param == "current":
-            self.top.print_on_log("Switch 3141 wouldn't support "+param+ "Command\n")
-        elif param == "port":
-            self.top.print_on_log("Switch 3141 - Read port status\n")
+        if param == "voltage":
+            self.get_voltage()
+        elif param == "current":
+            self.get_amps()
+        
+        else:
+            self.top.print_on_log("Switch 3142 wouldn't support "+param+ "Command\n")
+    # def read_param(self, param):
+    #     if param == "voltage" or param == "current":
+    #         self.top.print_on_log("Switch 3142 wouldn't support "+param+ "Command\n")
+    #     elif param == "port":
+    #         self.top.print_on_log("Switch 3142 - Read port status\n")

@@ -432,7 +432,7 @@ class UiMainFrame (wx.Frame):
         
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
-        self.toolMenu.Enable(ID_MENU_GRAPH, False)
+        self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
         x, y = e.GetPosition()
@@ -1240,14 +1240,17 @@ class UiMainFrame (wx.Frame):
 
     def enable_graph_menu(self):
         cdevices =  list(self.swuidict.values())
+        print(cdevices)
         if len(cdevices) > 0:
             self.set_mode(MODE_MANUAL)
-            if '3201' in cdevices:
+            if '3142' in cdevices:
                 self.toolMenu.Enable(ID_MENU_GRAPH, True)
             elif '2301' in cdevices:
                 self.toolMenu.Enable(ID_MENU_GRAPH, True)
+            elif '3201' in cdevices:
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
             else:
-                self.toolMenu.Enable(ID_MENU_GRAPH, False)
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def update_connect_menu(self, status):
         """
@@ -1266,7 +1269,7 @@ class UiMainFrame (wx.Frame):
         """
         if status:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
         else:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
