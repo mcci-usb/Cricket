@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
+#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -44,6 +44,7 @@ from copy import deepcopy
 
 from aboutDialog import *
 from comDialog import *
+from firmwareUpdate import *
 from setDialog import *
 from portDialog import *
 from warningMessage import *
@@ -69,6 +70,7 @@ from cricketlib import switch3141
 from cricketlib import switch3201
 from cricketlib import switch2101
 from cricketlib import switch2301
+from cricketlib import switch3142
 
 
 ##############################################################################
@@ -305,7 +307,7 @@ class UiMainFrame (wx.Frame):
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141, "3201": switch3201.Switch3201, 
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, 
                           "2101": switch2101.Switch2101, "2301": switch2301.Switch2301}
 
     def define_events(self):
@@ -327,6 +329,8 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
+        self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
+
 
     # def OnFocusSUT1(self, event):
     #     # On Focus event, not used
@@ -417,6 +421,9 @@ class UiMainFrame (wx.Frame):
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
+        self.toolMenu.Append(self.fware)
+
         self.dutMenuBar = wx.Menu()
         self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
         self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
@@ -425,7 +432,7 @@ class UiMainFrame (wx.Frame):
         
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
-        self.toolMenu.Enable(ID_MENU_GRAPH, False)
+        self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
         x, y = e.GetPosition()
@@ -665,10 +672,10 @@ class UiMainFrame (wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
-    # def OnWarningWindow(self, event):
-    #     dlg = WarningDialog(self, self)
-    #     dlg.ShowModal()
-    #     dlg.Destroy()
+    def OnFirmwareUpdateWindow(self, event):
+        dlg = FirmwareDialog(self, self)
+        dlg.ShowModal()
+        dlg.Destroy()
     
     def OnAppClose (self, event):
         """
@@ -1233,14 +1240,17 @@ class UiMainFrame (wx.Frame):
 
     def enable_graph_menu(self):
         cdevices =  list(self.swuidict.values())
+        print(cdevices)
         if len(cdevices) > 0:
             self.set_mode(MODE_MANUAL)
-            if '3201' in cdevices:
+            if '3142' in cdevices:
                 self.toolMenu.Enable(ID_MENU_GRAPH, True)
             elif '2301' in cdevices:
                 self.toolMenu.Enable(ID_MENU_GRAPH, True)
+            elif '3201' in cdevices:
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
             else:
-                self.toolMenu.Enable(ID_MENU_GRAPH, False)
+                self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def update_connect_menu(self, status):
         """
@@ -1259,7 +1269,7 @@ class UiMainFrame (wx.Frame):
         """
         if status:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, False)
+            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
         else:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
             self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)

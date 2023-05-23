@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
+#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 from matplotlib.pyplot import switch_backend
@@ -28,6 +28,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 
 from dev2101Window import Dev2101Window
 from dev3141Window import Dev3141Window
+from dev3142Window import Dev3142Window
 from dev3201Window import Dev3201Window
 from dev2301Window import Dev2301Window
 from noSwWindow import NoSwWindow
@@ -54,7 +55,7 @@ class LeftPanel(ScrolledPanel):
 
         self.swobj = []
 
-        self.swobjmap = {"3141": Dev3141Window, "3201": Dev3201Window, "2301": Dev2301Window, "2101": Dev2101Window}
+        self.swobjmap = {"3141": Dev3141Window,"3142":Dev3142Window,"3201": Dev3201Window, "2301": Dev2301Window, "2101": Dev2101Window}
 
         self.multiswobj = {}
 

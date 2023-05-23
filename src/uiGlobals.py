@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V2.6.0 Wed Apr 20 2022 17:00:00   Seenivasan V
+#     V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "3.1.0"
+APP_VERSION = "4.0.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -44,11 +44,12 @@ DEV_3141    = 0
 DEV_3201    = 1
 DEV_2101    = 2
 DEV_2301    = 3
+DEV_3142    = 4
 
 
 BAUDRATE = [115200, 115200, 0, 9600]
 
-DEVICES    = ["3141", "3201", "2101", "2301"]
+DEVICES    = ["3141","3142", "3201", "2101", "2301"]
 
 READ_CONFIG = 0
 AUTO_CONNECT = 1
@@ -154,6 +155,7 @@ ID_MENU_SET_WARNING = 1109
 
 
 ID_MENU_GRAPH = 1110
+ID_3141_FIRMWARE = 1234
 
 ID_MENU_DUT1 = ID_MENU_GRAPH + 1
 ID_MENU_DUT2 = ID_MENU_DUT1 + 1
@@ -201,7 +203,7 @@ usbClass = {0: "Unknown",
 
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
 
-portCnt = {"3141": 2, "3201": 4, "2301": 4, "2101": 1}
+portCnt = {"3141": 2,"3142":2, "3201": 4, "2301": 4, "2101": 1}
 
 
 ##############################################################################
@@ -209,7 +211,7 @@ portCnt = {"3141": 2, "3201": 4, "2301": 4, "2101": 1}
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-22\nMCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-23\nMCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 
