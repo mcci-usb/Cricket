@@ -34,7 +34,6 @@ import numpy as np
 from mpl_toolkits.axisartist.axislines import Subplot
 from matplotlib.ticker import (MultipleLocator)
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Cursor
 import csv
 
 # Own modules
@@ -486,7 +485,7 @@ class VbusChart(wx.Frame):
             self.ax.set_ylabel(r"Volts (V)", fontsize=8, color='tab:red')
             self.ax.set_title("VBUS V/I Plot", fontsize=10)
            
-            self.ax2.set_ylabel('Amps', fontsize=8, color='tab:green')
+            self.ax2.set_ylabel('Amps(A)', fontsize=8, color='tab:green')
             self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
             self.ax2.axhline(0, color='blue', linestyle='--',linewidth=0.5)
 
@@ -496,7 +495,7 @@ class VbusChart(wx.Frame):
             self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
             
         elif self.achart:
-            self.ax.set_ylabel(r"Amps", fontsize=8, color='tab:green')
+            self.ax.set_ylabel(r"Amps(A)", fontsize=8, color='tab:green')
             self.ax.set_title("VBUS Amp Plot", fontsize=10)
             self.ax.axhline(0, color='blue', linestyle='--', linewidth=0.5)
             
