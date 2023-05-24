@@ -26,7 +26,7 @@ from random import choices
 from matplotlib import style
 import wx
 import os
-from sys import platform
+import sys
 import serial.tools.list_ports
 
 # Own modules
@@ -244,7 +244,7 @@ class firmwareWindow(wx.Window):
         if self.fw_seq == DO_RESET:
             self.sw.do_reset()
             self.fw_seq = READ_AVAIL_PORTS
-            self.timer_fu.Start(500)
+            self.timer_fu.Start(1500)
         elif self.fw_seq == READ_AVAIL_PORTS:
             plist = devControl.get_avail_ports(self.top)
             self.fw_port = self.get_avrdude(plist)
@@ -326,12 +326,9 @@ class firmwareWindow(wx.Window):
                     self.set_address()
                     self.timer_fu.Start(100)
                 else:
-                    print("\nProgram finished")
                     self.flash_flg = True
                     self.read_lfuse()
                     self.timer_fu.Start(100)
-                    # self.leave_prog_mode()
-                    # self.timer_fu.Start(100)
         elif self.fw_seq == LEAVE_PROGMODE:
             if self.parse_set_address():
                 self.exit_boot_loader()
@@ -353,7 +350,6 @@ class firmwareWindow(wx.Window):
             except:
                 mybarr.append(0xFF)
             self.byte_addr += 1
-        # print(mybarr)
         self.write_avr_hba(mybarr)
         self.fw_seq = WRITE_BLOCK
 
@@ -638,11 +634,14 @@ class firmwareWindow(wx.Window):
 
     def get_avrdude(self, plist):
         for port in plist:
-            hwid = port[0]
-            print(hwid)
-            strlst = hwid.split('SER')[1].split('LOCATION')[0].rstrip(' ')
-            if len(strlst) == 1 and '=' in strlst:
-                return port[1]
+            if sys.platform == "win32": 
+                hwid = port[0]
+                strlst = hwid.split('SER')[1].split('LOCATION')[0].rstrip(' ')
+                if len(strlst) == 1 and '=' in strlst:
+                    return port[1]
+            else:
+                if port[2].rstrip(' ') == "USB IO board":
+                    return port[1]
         return None
 
     def SearchTimer(self, evt):
@@ -731,10 +730,6 @@ class firmwareWindow(wx.Window):
         else:
             print("File Not available")
 
-        # self.fst_lb.GetValue()
-       
-        # self.sw.do_reset()
-            
     def update_cancel(self, event):
         self.fw_seq = READ_AVAIL_PORTS
         self.timer_fu.Start(500)
