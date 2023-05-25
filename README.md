@@ -273,7 +273,7 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
 
 ## Release History
 
-- 4.0.0 is major release  it Contains the following changes
+- v4.0.0 is major release  it Contains the following changes
   - Added support for MCCI USB Switch 3142 [#103 Cricket UI Supports Swicth3142](https://github.com/mcci-usb/Cricket/commit/b7acf28e340d8c7cdda6a4772055c1362488447b).
 
   - Firmware update feature added for 3141 and 3142[#104 Add firmware update support through USB Serial for 3141 and 3142 USB Swicth](https://github.com/mcci-usb/Cricket/commit/6fea68935fb8f227c62df145e48d15ba307f0d72).
