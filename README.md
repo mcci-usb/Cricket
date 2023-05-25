@@ -1,10 +1,10 @@
 # Cricket UI
 
-This repository contains the source code for Cricket UI, a standalone desktop application for interactively controlling [MCCI USB Switches](https://store.mcci.com/collections/usb-switches) in a convenient way. The application supports MCCI Model 3141, 3201, 2301 and 2101 USB Switches.
+This repository contains the source code for Cricket UI, a standalone desktop application for interactively controlling [MCCI USB Switches](https://store.mcci.com/collections/usb-switches) in a convenient way. The application supports MCCI Model 3141,3142, 3201, 2301 and 2101 USB Switches.
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v3.0.0-7-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/v3.0.0-Pre2...master)
+[![Git release](https://img.shields.io/badge/release-v4.0.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v4.0.0-4-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/version400...master)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -26,6 +26,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 - [Supported Products](#supported-products)
   - [MCCI Model 3141 USB4 Switch](#mcci-model-3141-usb4-switch)
   - [MCCI Model 3201 Enhanced Type-C 4-Port USB Switch](#mcci-model-3201-enhanced-type-c-4-port-usb-switch)
+  - [MCCI Model 3142 USB4 Switch](#mcci-model-3142-usb4-switch)
 
   - [MCCI Model 2101 USB Connection Exerciser](#mcci-model-2101-usb-connection-exerciser)
   - [MCCI Model 2301 4-Port USB Connection Exerciser](#mcci-model-2301-4-port-usb-connection-exerciser)
@@ -52,7 +53,7 @@ Development environment
 * wxPython - 4.0.7.post2
 * pyserial - 3.4
 * pyusb - 1.0.2
-* hidapi - 0.10.1
+* hidapi - 0.11.2
 * matplotlib - 1.16.0
 
 Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and install.
@@ -61,7 +62,7 @@ Download [python3.7.6](https://www.python.org/downloads/release/python-376/) and
 pip install wxpython==4.0.7.post2
 pip install pyserial
 pip install pyusb
-pip install hidapi == 0.10.1
+pip install hidapi == 0.11.2
 pip install matplotlib
 ```
 
@@ -76,7 +77,7 @@ Development environment
 * pyusb - 1.0.2
 * libusb - 1.0.22b9
 * libusb1 - 1.8
-* hidapi - 0.10.1
+* hidapi - 0.11.2
 * matplotlib - 3.5
 
 ```bash
@@ -88,7 +89,7 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
-sudo pip3 install hidapi == 0.10.1
+sudo pip3 install hidapi == 0.11.2
 sudo pip3 install matplotlib
 ```
 
@@ -109,7 +110,7 @@ Development environment
 * libusb - 1.0.22b9
 * libusb1 - 1.8
 * matplotlib - 3.2.2
-* hidapi - 0.10.1  - Only for Mac OS
+* hidapi - 0.11.2
 
 ```bash
 sudo apt-get update
@@ -135,7 +136,7 @@ Development environment
 * pyusb - 1.1.1
 * libusb - 1.0.23b7
 * libusb1 - 1.9
-* hidapi - 0.10.1
+* hidapi - 0.11.2
 * matplotlib - 1.14.0
 
 ```bash
@@ -146,7 +147,7 @@ sudo pip3 install pyserial
 sudo pip3 install pyusb
 sudo pip3 install libusb
 sudo pip3 install libusb1
-sudo pip3 install hidapi==0.10.1
+sudo pip3 install hidapi==0.11.2
 sudo pip3 install matplotlib
 ```
 
@@ -158,15 +159,26 @@ Note:
 
 `cricketlib` api is a python library, this libabry intract with `Cricket UI`
 
-* download the cricketlib fro here [crickelib](https://github.com/mcci-usb/cricketlib)
+* download the cricketlib from here [crickelib](https://github.com/mcci-usb/cricketlib)
 
-* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package)
+* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package) in Windows OS.
 
 ```shell
 python setup.py install
 ```
+* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package) in Linux OS
 
-Please navigate to dist/ directory and you will find the files .egg file. Example: cricketapi-1.0.0-py3.7.egg
+```shell
+sudo python3 setup.py install
+```
+* To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package) in MacOS
+
+```shell
+sudo python3 setup.py install
+```
+
+
+Please navigate to dist/ directory and you will find the files .egg file. Example: cricketapi-1.0.6-py3.7.egg
 
 ### How to use the package
 
@@ -228,11 +240,19 @@ It can be used in stress testing, switching between peripherals (for example, a 
 
 ### MCCI Model 3201 Enhanced Type-C 4-Port USB Switch
 
-The MCCI Model 3201 (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
+* The MCCI Model 3201 (MUTT ConnEX-C) plugs and unplugs up to 4 devices for automated testing of USB Type-C® products. Developed in conjunction with Microsoft, the 3201 is upward compatible with the MCCI Model 3101/Model 3201 Connection Exercisers and the Microsoft MUTT ConnEx-C, but has a number of significant enhancements and improvements.
 
  **Link:** For more information, see the [product home page](https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/)
 
    ![Model3201-typeC](assets/Model3201.png)
+
+### MCCI Model 3142 USB4 Switch
+
+* The MCCI® Model 3142 USB4 Switch is a computer-controlled programmable 2:1 switch, connecting two USB Type-C® receptacles to a single Type-C plug. It is compatible with USB4 hosts and devices at signaling rates up to 40 gigabits/second, as well as other protocols such as Thunderbolt™ 4, Thunderbolt™ 3, USB 3.2, USB 2.0, USB Type-C Alternate Modes, and of course USB Power Delivery. It also supports Extended Power Range (EPR) sources and sinks, allowing it to be used with source and sinks at up to 48V at 5A.
+
+**Link:** For more information, see the product home page at [MCCI USB4 Switch 3142](https://store.mcci.com/products/model3142?variant=41002882072687).
+
+  ![Model3142](assets/Model3142.png)
 
 ### MCCI Model 2101 USB Connection Exerciser
 
@@ -252,6 +272,13 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+- 4.0.0 is major release  it Contains the following changes
+  - Added support for MCCI USB Switch 3142 [#103 Cricket UI Supports Swicth3142](https://github.com/mcci-usb/Cricket/commit/b7acf28e340d8c7cdda6a4772055c1362488447b).
+
+  - Firmware update feature added for 3141 and 3142[#104 Add firmware update support through USB Serial for 3141 and 3142 USB Swicth](https://github.com/mcci-usb/Cricket/commit/6fea68935fb8f227c62df145e48d15ba307f0d72).
+
+  - USB VBUS VI Plot improved[#105 Adding VI chart support for Switch3142](https://github.com/mcci-usb/Cricket/commit/c1009b093b1615b04c87700c341fce090daab548) .
 
 - v3.1.0 is patch release it contains the following changes
   - Added for TB4 speed Support in Mac [#96 Support TB4 speed](https://github.com/mcci-usb/Cricket/commit/273f01cb61966654b09ddd80f9b2cbbd88d67c4d)
