@@ -24,6 +24,8 @@
 # Lib imports
 import wx
 
+import autoUpdate
+
 ##############################################################################
 # GLOBAL VARIABLES
 ##############################################################################
@@ -218,6 +220,31 @@ VERSION_STR = "Version "+APP_VERSION
 ##############################################################################
 # GLOBAL FUNCTIONS
 ##############################################################################
+
+def check_version():
+    app = wx.App(False)
+    # print("new version avaliblle")
+    repo_owner = "vinaynmcci"
+    repo_name = "autoupdate"
+    access_token = "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"
+    latest_version = autoUpdate.check_for_update(repo_owner, repo_name, access_token)
+
+    dlg = wx.Dialog(None, title="Cricket UI")
+    update_info = wx.StaticText(dlg, label="You are using the latest version of Cricket UI", style=wx.ALIGN_CENTER)
+
+    if latest_version:
+        if latest_version > VERSION_STR:
+            update_info.SetLabel(f"A new version ({latest_version}) is available! Click OK to update.")
+            
+        else:
+            update_info.SetLabel("You are using the latest version.")
+    
+    dlg.SetSize(300, 150)
+    dlg.ShowModal()
+    dlg.Destroy()
+    app.MainLoop()
+check_version()
+
 class NumericValidator(wx.Validator):
     """
     Validator associated NumericValidator Control.
