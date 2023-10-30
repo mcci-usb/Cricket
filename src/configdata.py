@@ -162,3 +162,19 @@ def updt_warning_dialog(gdata):
     cdata["wdialog"] = gdata["wdialog"]
     fpath = get_file_path()
     save_config(fpath, cdata)
+
+def updt_portal_credentials(gdata):
+    cdata = read_all_config()
+    cdata["msudp"] = gdata["msudp"]
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+
+def read_msudp_config():
+    cdata = None
+    fpath = get_file_path()
+    try:
+        with open(fpath, 'r') as open_file:
+            cdata = json.load(open_file)
+    except:
+        cdata = load_default_config()
+    return cdata["msudp"]

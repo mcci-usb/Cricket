@@ -125,6 +125,13 @@ class UiPanel(wx.Panel):
 
     def update_slog_panel(self, duts):
         self.rpanel.update_slog_panel(duts)
+        # print("Trigger Add SUT Dialog")
+        # self.rpanel.update_slog_panel(type="dut", dudata=duts)
+        self.Layout()
+
+    def update_usb4_tree_panel(self):
+        print("Trigger Add USB4 Tree Dialog")
+        self.rpanel.update_usb_tree_panel()
         self.Layout()
 
     def show_selected(self, swstr):

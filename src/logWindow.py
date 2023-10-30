@@ -285,11 +285,13 @@ class LogWindow(wx.Window):
         Returns:
             None
         """
+        # thControl.get_tree_change(self.top)
         try:
             thControl.get_tree_change(self.top)
         except:
             # print message
-            self.print_on_log("rror!")
+            print("EXCEPT:")
+            self.print_on_log("USB Read Error!")
         self.wait_flg = False
         self.btn_ref.Enable()
     
