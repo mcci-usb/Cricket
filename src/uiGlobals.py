@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.0.0"
+APP_VERSION = "4.1.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -60,7 +60,7 @@ IMG_BTN_ON = "btn_on.png"
 IMG_BTN_OFF = "btn_off.png"
 IMG_WAVE = "wave.png"
 IMG_NOSWITCH = "noswitch.png"
-IMG_WARNING ="Warning.png"
+IMG_WARNING ="warning.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8

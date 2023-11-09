@@ -49,6 +49,7 @@ from setDialog import *
 from portDialog import *
 from warningMessage import *
 #from ccServer import *
+import updateDialog as updtDlg
 
 # import panels
 from uiPanel import *
@@ -176,7 +177,12 @@ class UiMainFrame (wx.Frame):
 
         self.init_connect()
 
-        # self.show_warning_dlg()
+        # Check for the latest version
+        update = updtDlg.check_version()
+        if update != None:
+            dlg = updtDlg.UpdateDialog(self, self, update)
+            dlg.ShowModal()
+            dlg.Destroy()
 
     def init_usbTreeImage(self):
         # scan and save ThunderBolt USB device
