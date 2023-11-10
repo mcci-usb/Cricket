@@ -77,20 +77,10 @@ def get_tree_change(top):
     """
     if top.thCtrl == "local":
         if sys.platform.startswith("win"):
-            updtu4list = thlocal.get_usbandusb4_tree()
-            if len(top.masterList) == 0:
-                for dev in updtu4list:
-                    top.masterList.append(dev)
-            thlocal.get_u4_tree_change(top, updtu4list)
-            top.save_usb_list(updtu4list)
-
-        else:
             dl, newlist = thlocal.get_usb_tree()
             thlocal.get_tree_change(top, dl, newlist)
-            
-            if sys.platform == "darwin":
-                newdict = thlocal.get_tb_tree()
-                thlocal.get_tb_tree_change(top, newdict)
+        else:
+            pass
 
     elif top.thCtrl == "network":
         resdict = thnw.get_usb_tree(top.ldata['thcid'],

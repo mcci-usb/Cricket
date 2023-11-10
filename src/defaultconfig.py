@@ -59,5 +59,6 @@ config_data = {
        },
        "batch" : {"location": ""},
        "screen": {"pos": [], "size": []},
-       "wdialog": False
+       "wdialog": False,
+       "msudp": {"uname": "mcci", "pwd": "mcci"}
 }

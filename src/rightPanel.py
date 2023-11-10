@@ -26,6 +26,7 @@
 import wx
 
 from dutLogWindow import DutLogWindow
+from usb4TreeWindow import Usb4TreeWindow
 
 class RightPanel(wx.Panel):
     def __init__(self, parent):
@@ -37,11 +38,14 @@ class RightPanel(wx.Panel):
 
         self.slobj = []
 
+        self.objtype = []
+
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.main_sizer)
 
         self.main_sizer.Fit(self)
         self.Layout()
+
 
     def update_slog_panel(self, duts):
 
@@ -64,6 +68,15 @@ class RightPanel(wx.Panel):
             self.main_sizer.Add(slobj, 1, wx.EXPAND, 5)
             self.main_sizer.Add((0,10), 0, wx.EXPAND)
             
+        self.main_sizer.Add((0,20), 0, wx.EXPAND)
+        self.Layout()
+
+    
+    def update_usb_tree_panel(self):
+        self.main_sizer.Clear(True)
+        self.main_sizer.Add((0,20), 0, wx.EXPAND)
+        self.main_sizer.Add(Usb4TreeWindow(self, self.parent), 1, wx.EXPAND, 5)
+        self.main_sizer.Add((0,10), 0, wx.EXPAND)
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
         self.Layout()
 

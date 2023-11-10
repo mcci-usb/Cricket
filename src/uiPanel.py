@@ -127,6 +127,10 @@ class UiPanel(wx.Panel):
         self.rpanel.update_slog_panel(duts)
         self.Layout()
 
+    def update_usb4_tree_panel(self):
+        self.rpanel.update_usb_tree_panel()
+        self.Layout()
+
     def show_selected(self, swstr):
         self.cpanel.show_selected(swstr)
 

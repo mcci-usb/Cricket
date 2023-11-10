@@ -27,6 +27,7 @@ from distutils.dep_util import newer
 # Own modules
 import getusb
 import getTb
+# import getusb4
 import getusb4
 
 from uiGlobals import *
@@ -44,14 +45,22 @@ def get_usb_tree():
         None
     """
     dl, newlist = getusb.scan_usb()
+    myusb4 = getusb4.Usb4speedScan()
+    myusb4.connect()
+    myu4list = myusb4.get_result()
+    # print(myu4list)
+    # print(mystr)
+    # dl4, newlist4 
+    for item in myu4list:
+        newlist.append(item)
     return dl, newlist
+
+
 
 def get_tb_tree():
     newdict = getTb.scan_tb()
     return newdict
 
-def get_usbandusb4_tree():
-    return getusb4.scan_usbandusb4()
 
 def get_u4_tree_change(top, updtlist):
     adlist, rmlist = getusb4.get_tree_change(top.masterList, updtlist)
@@ -184,39 +193,74 @@ def get_tree_change(top, dl, newlist):
     # Print the device list USB Device Tree Window
     top.print_on_log(strout)
 
-def get_usb_device_info(udlist):
-    """
-    Show VID, PID and Speed info of added/removed USB devices 
 
-    Args:
-        udlist: USB device list which are removed/added recently
-    Returns:
-        strdev: String which contains the VID, PID and Speed info of the USB 
-        device list
-    """
-    dlist = get_usb_class(udlist)
+
+def get_usb_device_info(udlist):
+    usb3_list = []
+    usb4_list = []
+
+
+    for dev in udlist:
+        if dev["type"] == "usb3":
+            usb3_list.append(dev)
+        elif dev["type"] == "usb4":
+            usb4_list.append(dev)
+
     cnt = 0
     strdev = ""
-    for dev in udlist:
+    for dev3 in usb3_list:
+        
         try:
-            s = ','
-            strin = s.join(dlist[cnt])
-            cnt = cnt + 1
-            hvid = ("%X"%int(dev.get('vid'))).zfill(4)
-            hpid = ("%X"%int(dev.get('pid'))).zfill(4)
-            vpid = " (VID_"+hvid+"; PID_"+hpid+"; "+usbSpeed.get(
-                      dev.get('speed')-1)+")"
-            strdev = strdev + str(cnt)+ ". " + strin + vpid + "\n"
+            hvid = ("%X" % int(dev3.get('vid'))).zfill(4)
+            hpid = ("%X" % int(dev3.get('pid'))).zfill(4)
+            # vpid = " (VID_" + hvid + "; PID_" + hpid + ")"
+            vpid = " (VID_"+hvid+"; PID_"+hpid+"; "+usbSpeed.get(dev3.get('speed')-1)+")"
+
+            usb_class = get_usb_class([dev3])  # Call to get_usb_class function
+            # strdev = strdev + f"{cnt + 1}. {vpid}({', '.join(usb_class[0])})\n"
+            strdev = strdev + f"{cnt + 1}. {', '.join(usb_class[0])}({vpid}) \n"
+            
+            cnt += 1
         except:
-            cnt = cnt + 1
-            hvid = ("%X"%int(dev.get('vid'))).zfill(4)
-            hpid = ("%X"%int(dev.get('pid'))).zfill(4)
-            vpid = " (VID_"+hvid+"; PID_"+hpid+")"
-            strdev = strdev + str(cnt)+ ". " + vpid + " Device Error\n"
-    
+            hvid = ("%X" % int(dev3.get('vid'))).zfill(4)
+            hpid = ("%X" % int(dev3.get('pid'))).zfill(4)
+            vpid = " (VID_" + hvid + "; PID_" + hpid + ") USB3 Device Error\n"
+            strdev = strdev + str(cnt + 1) + ". " + vpid + "\n"
+            cnt += 1
+
+    for dev4 in usb4_list:
+        try:
+            hvid = ("%X" % int(dev4.get('vid'))).zfill(4)
+            hpid = ("%X" % int(dev4.get('pid'))).zfill(4)
+            hcls = dev4.get('ufpCLS')
+            hnlw = dev4.get('ufpNLW')
+
+
+            htls = dev4.get('ufpTLS')
+            htlw = dev4.get('ufpTLW')
+
+            hmn = dev4.get('mname')
+            # vpid = f"{hmn} (VID_{hvid}; PID_{hpid}; SPEED_{htls} x {htlw}; CURRENT_{hcls} x {hnlw}))"
+            vpid = f"{hmn} (VID_{hvid}; PID_{hpid}; SPEED_{htls} x {htlw}))"
+
+            strdev = strdev + f"{cnt + 1}. {vpid}\n"
+            cnt += 1
+        except:
+            hvid = ("%X" % int(dev4.get('vid'))).zfill(4)
+            hpid = ("%X" % int(dev4.get('pid'))).zfill(4)
+            hcls = dev4.get('ufpCLS')
+            htls = dev4.get('ufpTLS')
+            vpid = f" (VID_{hvid}; PID_{hpid}) USB4 Device Error\n"
+            strdev = strdev + f"{cnt + 1}. {vpid}\n"
+            cnt += 1
+
+
     return strdev
+
      
 def get_usb_class(clist):
+
+    
     """
     Get class of the USB device  
 
@@ -227,6 +271,7 @@ def get_usb_class(clist):
     """ 
     nlist = []
     for i in range(len(clist)):
+        # if clist[i].get("type") == 'usb3':
         try:
             nlis = clist[i].get('ifc')
             res = []

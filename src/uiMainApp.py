@@ -336,6 +336,8 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
+        self.Bind(wx.EVT_MENU, self.update_usb4t_panel, id = ID_USB4_TREEVIEW)
+
 
 
     # def OnFocusSUT1(self, event):
@@ -434,6 +436,9 @@ class UiMainFrame (wx.Frame):
         self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
         self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
         self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
+        
+        self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View")
+        self.toolMenu.Append(self.usb4t)
         
         
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
@@ -1412,6 +1417,21 @@ class UiMainFrame (wx.Frame):
         else:
             self.panel.update_slog_panel({})
         self.Refresh()
+    
+    def update_usb4t_panel(self, event):
+
+        if(self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"] == True):
+            title = ("Close DUT Log Window")
+            msg = ("Please close the DUT Log Window"
+                    )
+            dlg = wx.MessageDialog(self, msg, title, wx.OK)
+            dlg.ShowModal()
+        else:
+            self.panel.update_usb4_tree_panel()
+            self.Refresh()
+            self.reSizeScreen()
+
+        # self.panel.update_usb4_tree_panel()
         
     def UpdateConfig(self, event):
         self.myrole["uc"] = True if self.ucmenu.IsChecked() else False

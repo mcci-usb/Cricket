@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.1.0"
+APP_VERSION = "4.2.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -181,6 +181,7 @@ ID_RBTN_RT = ID_MENU_CONFIG_SL2 + 1
 
 ID_TC_SEQNAME = ID_RBTN_RT + 1
 ID_BTN_SEQSAVE = ID_TC_SEQNAME + 1
+ID_USB4_TREEVIEW = ID_BTN_SEQSAVE + 1
 
 
 

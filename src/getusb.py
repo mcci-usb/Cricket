@@ -1,27 +1,3 @@
-##############################################################################
-# 
-# Module: getusb.py
-#
-# Description:
-#     Scan the USB bus and get the list of devices attached
-#
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
-# Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
-#
-# Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
-#       Module created
-##############################################################################
-# Built-in imports
 
 import sys
 import os
@@ -40,21 +16,16 @@ def scan_usb():
     Scan the USB bus for the list of plugged devices
     Required for device tree view changes
     
-    Note: Runs for Linux and Mac. 
-
     Args:
         No arguments
         
     Returns:
         None
     """
-
     # List of Host controllers
     hc_list = []
-
     # List connected hub
     hub_list = []
-
     #List connected peripheral
     per_list = []
     master_list = []
@@ -63,20 +34,26 @@ def scan_usb():
 
     masterDict = {} 
     
-    usb_devices = []
+    # Create path and executable path
+    path = sys.executable
+
+    path = path.replace("python.exe", "")
 
     backend = None
+    # Running Python-application on Windows
+    if sys.platform == "win32":
+        backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
+              path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
 
-    try:
-        usb_devices = usb.core.find(find_all=True, backend=backend)
-    except:
-        print("No Back End Avail Error!")
+    # Generator object
+    usb_devices = usb.core.find(find_all=True, backend=backend) 
 
     # Here attached a list of Host controlloers, list of Hub,
     # List of periperals info with specific vid, pid.
     for d in usb_devices:  # Device object
         if(d.bDeviceClass == 9 and d.port_number == 0):
             tempDict = {}
+            tempDict["type"] = "usb3"
             tempDict["vid"] = str(d.idVendor)
             tempDict["pid"] = str(d.idProduct)
             tempDict["bus"] = str(d.bus)
@@ -85,6 +62,7 @@ def scan_usb():
             hc_list.append(tempDict)
         elif(d.bDeviceClass == 9 and d.port_number != 0):
             tempDict = {}
+            tempDict["type"] = "usb3"
             tempDict["vid"] = str(d.idVendor)
             tempDict["pid"] = str(d.idProduct)
             tempDict["bus"] = str(d.bus)
@@ -92,6 +70,7 @@ def scan_usb():
             hub_list.append(tempDict)
         else:
             tempDict = {}
+            tempDict["type"] = "usb3"
             tempDict["vid"] = str(d.idVendor)
             tempDict["pid"] = str(d.idProduct)
             tempDict["bus"] = str(d.bus)
@@ -119,7 +98,7 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("USB Read Error")
+            print("Error")
 
     pdata = masterDict.get("peri")
     
@@ -136,15 +115,13 @@ def scan_usb():
                 items["ifc"] = sclist
         except:
             # Print message
-            print("USB Read Error")
-
+            print("Error")
     for i in range(len(hc_list)):
         master_list.append(hc_list[i])
     for i in range(len(hub_list)):
         master_list.append(hub_list[i])
     for i in range(len(per_list)):
         master_list.append(per_list[i])
-
     # Running Python-application on darwin (MacOS)
     if sys.platform == 'darwin':
         xmldoc = os.popen("system_profiler -xml SPUSBDataType")
