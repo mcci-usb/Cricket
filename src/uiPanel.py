@@ -125,11 +125,28 @@ class UiPanel(wx.Panel):
 
     def update_slog_panel(self, duts):
         self.rpanel.update_slog_panel(duts)
+        # print("Trigger Add SUT Dialog")
+        # self.rpanel.update_slog_panel(type="dut", dudata=duts)
         self.Layout()
 
-    def update_usb4_tree_panel(self):
-        self.rpanel.update_usb_tree_panel()
+    def init_right_panel(self, pdict):
+        self.rpanel.init_my_panel(pdict)
+
+    def update_right_panel(self, pdict):
+        self.rpanel.update_my_panel(pdict)
+
+    # def init_right_panel(self, pdict):
+    #     self.rpanel.init_my_panel(pdict)
+
+    def update_usb4_tree_panel(self, duts):
+        print("Trigger Add USB4 Tree Dialog")
+        self.rpanel.update_usb_tree_panel(duts)
         self.Layout()
+    
+    def update_usb4_tree(self, msusb4):
+        # print("MSUSB4--------------->>>>>", msusb4)
+        self.rpanel.update_usb4_tree(msusb4)
+
 
     def show_selected(self, swstr):
         self.cpanel.show_selected(swstr)
@@ -252,6 +269,7 @@ class UiPanel(wx.Panel):
             None
         """
         self.cpanel.logPan.print_on_log(strin)
+        self.rpanel.print_on_log(strin)
     
     def get_enum_delay(self):
         """
@@ -467,8 +485,14 @@ class UiPanel(wx.Panel):
     def get_dut_config(self, dutno):
         return self.parent.get_dut_config(dutno)
 
+    def request_dut_close(self, dutname):
+        print("DUT Close Request Received: ", dutname)
+        self.parent.request_dut_close(dutname)
+
+
     def save_file(self, content, ftype):
         self.parent.save_file(content, ftype)
-
+    
+    
 def EVT_RESULT(win, func):
         win.Connect(-1, -1, EVT_DUT_SL_ERR_ID, func) 

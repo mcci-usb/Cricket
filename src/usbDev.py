@@ -47,13 +47,13 @@ def get_usb_tree():
     dl, newlist = getusb.scan_usb()
     myusb4 = getusb4.Usb4speedScan()
     myusb4.connect()
-    myu4list = myusb4.get_result()
+    myu4list, myu4 = myusb4.get_result()
     # print(myu4list)
     # print(mystr)
     # dl4, newlist4 
     for item in myu4list:
         newlist.append(item)
-    return dl, newlist
+    return dl, newlist, myu4
 
 
 

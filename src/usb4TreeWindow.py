@@ -24,6 +24,16 @@
 
 # Lib imports
 import wx
+import wx.adv
+
+import threading
+
+import usbDev
+import thControl
+
+# import wx
+import json
+
 
 # Own modules
 from uiGlobals import *
@@ -32,6 +42,35 @@ from datetime import datetime
 import wx
 
 from wdpLogin import LoginFrame
+
+
+EADR = 'EvtAddDeviceRouter'
+ERDR = 'EvtRemoveDeviceRouter'
+
+PNPDD = 'pnpDeviceDescription'
+MODEL = 'modelName'
+PID = 'productId'
+VID = 'vendorId'
+VNAME = 'vendorName'
+TID = 'topologyId'
+
+DID = 'domainId'
+CLS = 'currentLinkSpeed'
+TLS = 'targetLinkSpeed'
+TLW = 'targetLinkWidth'
+NLW = 'negotiatedLinkWidth'
+
+USB4RR = 'USB4 Root Router'
+USB4R = 'USB4 Router'
+USB4HR = 'USB4(TM) Host Router (Microsoft)'
+TB3R = 'Thunderbolt 3(TM) Router'
+
+IMG_LOGO = "mcci_logo.png"
+
+SPEED_DICT = {"Unknown 0": "0 Gbp/s", "Gen 2": "10 Gbp/s", "Gen 3": "20 Gbp/s"}
+WIDTH_DICT = {"Unknown 0": "0", "Single Lane": "1", "Dual Lane": "2", "Two Single Lanes": "2"}
+
+MAX_LEVEL = 7
 
 ##############################################################################
 # Utilities
@@ -70,29 +109,34 @@ class Usb4TreeWindow(wx.Window):
 
         self.btn_config = wx.Button(self, ID_BTN_SL_CONFIG, "Config",
                                         size=(60, -1))
- 
 
-        self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
-                                         size=(-1,-1))
-        self.scb.SetEditable(False)
-        self.scb.SetBackgroundColour((255,255,255))
         
-        # Tooltips display text over an widget elements
-        # set tooltip for switching interval and auto buttons.
-        # Create BoxSizer as horizontal
+        # self.tree = wx.TreeCtrl(self, style=wx.TR_DEFAULT_STYLE | wx.TR_MULTIPLE)
+        # self.panel = wx.Panel(self)
+        self.tree = wx.TreeCtrl(self,wx.TR_DEFAULT_STYLE)
+        
+        self.root = self.tree.AddRoot("MY COMPUTER USB4 Tree View")
+
+        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnItemSelect, self.tree)
+
+        self.device_item = None
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.wait_flg = False
 
-        self.btn_config.Bind(wx.EVT_BUTTON, self.OnDutConfig)
+        self.btn_config.Bind(wx.EVT_BUTTON, self.OnLoginConfig)
+        # Bind the tooltip event
+        self.tree.Bind(wx.EVT_TREE_ITEM_GETTOOLTIP, self.OnToolTip)
+        
 
         self.hbox.Add(30,0,0)
         self.hbox.Add(self.btn_config, 0, wx.ALIGN_LEFT | 
                                          wx.ALIGN_CENTER_VERTICAL)
-
+       
         self.szr_top = wx.BoxSizer(wx.VERTICAL)
+        
         self.szr_top.AddMany([
             (5,0,0),
-            (self.scb, 1, wx.EXPAND),
+            (self.tree, 1, wx.EXPAND),
             (5,0,0)
             ])
 
@@ -103,12 +147,124 @@ class Usb4TreeWindow(wx.Window):
             (0,0,0)
             ])
 
+        print("USB4 Tree View Layout Added")
+        # self.btn_ref.Bind(wx.EVT_BUTTON, self.RefreshUsbBus)
 
         # Set size of frame
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
         self.Layout()
 
-    def OnDutConfig(self, e):
+
+    def OnItemSelect(self, event):
+        item = event.GetItem()
+        text = self.tree.GetItemText(item)
+        # print("SELECTED ITEM: {text}")
+
+    
+    def print_on_log(self, data):
+        idata = self.get_item_data(data)
+        ldata = self.get_level_data(idata)
+        self.redrawu4tree(idata, ldata)
+
+
+
+    def OnLoginConfig(self, e):
         dlg = LoginFrame(self, self)
         dlg.Show()
+
+    def get_level_data(self, u4tbuf):
+        rkarr = list(u4tbuf.keys())
+        pdict = {}
+        for rkitem in rkarr:
+            lcnt = rkitem.count(',')
+            kl = list(pdict.keys())
+            if 'level'+str(lcnt) in kl:
+                pdict['level'+str(lcnt)].append(rkitem)
+            else:
+                pdict['level'+str(lcnt)] = [rkitem]
+        return pdict
+    
+
+    def redrawu4tree(self, idata, ldata):
+        self.DeleteAllItems()
+        lkeys = list(ldata.keys())
+        if 'level0' in lkeys:
+            lobjdict = self.draw_level0_data(idata, ldata['level0'])
+            for level in range(1,MAX_LEVEL):
+                if 'level'+str(level) in lkeys:
+                    lobjdict = self.draw_leveln_data(idata, ldata['level'+str(level)], lobjdict, level)
+
+    
+    def draw_level0_data(self, ddict, dlist):
+        objdict = {}
+        for l0item in dlist:
+            objdict[l0item] = self.tree.AppendItem(self.root, ""+ddict[l0item]["mname"]+" ("+ddict[l0item]["vname"]+")")
+            device_data = f"VID: {ddict[l0item]['vid']}, PID: {ddict[l0item]['pid']}"
+            self.tree.SetItemData(objdict[l0item], device_data)
+            if len(ddict[l0item]["ports"]) > 1:
+                for pno in ddict[l0item]["ports"]:
+                    objdict[l0item+","+str(pno)] = self.tree.AppendItem(objdict[l0item], "Port-"+str(pno))
+        return objdict
+    
+    
+    def draw_leveln_data(self, ddict, dlist, riobj, lidx):
+        objlist = list(riobj.keys())
+        for item in dlist:
+            if item in objlist:
+                # print("Obj already there: need to edit Label", item)
+                cidx = item.split(',')[lidx]
+                self.tree.SetItemText(riobj[item], "Port-"+cidx+", "+ddict[item]["mname"]+" ("+ddict[item]["vname"]+")")
+                device_data = f"VID: {ddict[item]['vid']}, PID: {ddict[item]['pid']}"
+                self.tree.SetItemData(riobj[item], device_data)
+                if len(ddict[item]["ports"]) > 1:
+                    for pno in ddict[item]["ports"]:
+                        riobj[item+","+str(pno)] = self.tree.AppendItem(riobj[item], "Port-"+str(pno))
+        return riobj
+    
+    
+    def get_item_data(self, msg):
+        usb4e = msg["events"]
+        pu4dict = {}
+
+        for i in range(0, len(usb4e)):
+            if usb4e[i]["eventKind"] == EADR:
+                if PNPDD in usb4e[i] and "ufp" in usb4e[i]:
+                    if not "Root Router" in usb4e[i][PNPDD] and not "Host Router" in usb4e[i][PNPDD]:
+                        mydict = {}
+                        mydict["desc"] = usb4e[i][PNPDD]
+                        mydict["mname"] = usb4e[i][MODEL]
+                        mydict["vname"] = usb4e[i][VNAME]
+                        mydict["vid"] = usb4e[i][VID]
+                        mydict["pid"] = usb4e[i][PID]
+                        mydict["ports"] = []
+
+                        ikeys = list(usb4e[i].keys())
+                        if 'dfps' in ikeys:
+                            plist =  usb4e[i]['dfps']
+                            if len(plist) > 1:
+                                for item in plist:
+                                    mydict["ports"].append(item["portNumber"])
+                        
+                        # u4dict["item"+str(icnt)] = mydict
+                        # icnt = icnt + 1
+                        
+                        tarr = usb4e[i][TID]
+                        tarr = tarr[:tarr.index(0)]
+                        idxstr = ','.join([str(aitem) for aitem in tarr])
+                        pu4dict[idxstr] = mydict
+        return pu4dict
+    
+        
+    def OnToolTip(self, event):
+        item = event.GetItem()
+        item_data = self.tree.GetItemData(item)
+        if item_data:
+            tooltip_text = str(item_data)
+            event.SetToolTip(tooltip_text)
+
+
+    def DeleteAllItems(self):
+        root = self.tree.GetRootItem()
+        if root.IsOk():
+            self.tree.DeleteChildren(root)

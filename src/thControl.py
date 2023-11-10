@@ -77,10 +77,10 @@ def get_tree_change(top):
     """
     if top.thCtrl == "local":
         if sys.platform.startswith("win"):
-            dl, newlist = thlocal.get_usb_tree()
+            dl, newlist, msusb4 = thlocal.get_usb_tree()
             thlocal.get_tree_change(top, dl, newlist)
-        else:
-            pass
+            top.store_usb4_win_info(msusb4)
+            # return msusb4
 
     elif top.thCtrl == "network":
         resdict = thnw.get_usb_tree(top.ldata['thcid'],

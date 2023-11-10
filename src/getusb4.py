@@ -44,6 +44,7 @@ class Usb4speedScan:
         self.connected = False
         self.mystr = "Result Not Found"
         self.u4added = []
+        self.u4all = None
 
         msudpdict = configdata.read_msudp_config()
         self.uname = msudpdict["uname"]
@@ -78,7 +79,7 @@ class Usb4speedScan:
         while(not self.completed):
             
             mydata = None
-        return self.u4added     
+        return self.u4added, self.u4all        
         
 
 
@@ -119,9 +120,10 @@ class Usb4speedScan:
         # pass
     
     def parseresponse(self, msgusb4):
-       
+   
         mystr = ""
         msg = json.loads(msgusb4)
+        self.u4all = msg
         usb4e = msg["events"]
         # print("USB4E:",usb4e)
         self.u4added = []

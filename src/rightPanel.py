@@ -36,9 +36,13 @@ class RightPanel(wx.Panel):
 
         self.parent =  parent
 
+        self.usb4t = None
+
         self.slobj = []
 
         self.objtype = []
+
+        self.objdict = {"dut1": False, "dut2": False, "u4tree": False}
 
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.main_sizer)
@@ -46,23 +50,25 @@ class RightPanel(wx.Panel):
         self.main_sizer.Fit(self)
         self.Layout()
 
+    
+    def init_my_panel(self, pdict):
+        rpdict = pdict["rpanel"]
+        dutdict = pdict["dut"]
+        pkeys = list(rpdict.keys())
 
-    def update_slog_panel(self, duts):
+        for pobj in pkeys:
+            if rpdict[pobj] == True:
+                if(pobj == "u4tree"):
+                    self.slobj.append(Usb4TreeWindow(self, self.parent))
+                    # self.objdict[pbj] = True
+                else:
+                    self.slobj.append(DutLogWindow(self, self.parent, {pobj: dutdict[pobj]}))
+                    # self.objdict[pbj] = True
+        self.display_my_objects()
 
-        if(len(self.slobj) > 0):
-            self.main_sizer.Clear(True)
-
-        self.slobj.clear()
-
-        keylen = list(duts.keys())
-
-        if(len(keylen) > 0):
-            nodes = []
-            for node in duts["nodes"]:
-                if(duts["nodes"][node]):
-                    # nodes.append(suts[node])
-                    self.slobj.append(DutLogWindow(self, self.parent, {node: duts[node]}))
-
+        
+    def display_my_objects(self):
+        self.main_sizer.Clear(True)
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
         for slobj in self.slobj:
             self.main_sizer.Add(slobj, 1, wx.EXPAND, 5)
@@ -71,14 +77,57 @@ class RightPanel(wx.Panel):
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
         self.Layout()
 
+    def update_my_panel(self, pdict):
+        rpdict = pdict["rpanel"]
+        dutdict = pdict["dut"]
+        pkeys = list(pdict["rpanel"].keys())
+
+        self.slobj.clear()
+
+        for pobj in pkeys:
+            if rpdict[pobj] == True:
+                if(pobj == "u4tree"):
+                    self.slobj.append(Usb4TreeWindow(self, self.parent))
+                else:
+                    self.slobj.append(DutLogWindow(self, self.parent, {pobj: dutdict[pobj]}))
+        self.display_my_objects()
+
+
+
+    def update_usb_tree_panel(self, duts):
+        print("Going to add Tree Panel : --->", duts["nodes"])
     
-    def update_usb_tree_panel(self):
+    def update_usb_tree_panel_old(self):
         self.main_sizer.Clear(True)
+        self.slobj.clear()
+        self.slobj.append(Usb4TreeWindow(self, self.parent))
+
+        # self.usb4t = Usb4TreeWindow
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
-        self.main_sizer.Add(Usb4TreeWindow(self, self.parent), 1, wx.EXPAND, 5)
+        self.main_sizer.Add(self.slobj[0], 1, wx.EXPAND, 5)
         self.main_sizer.Add((0,10), 0, wx.EXPAND)
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
         self.Layout()
+    
 
     def add_switches(self, swlist):
         self.Layout()
+    
+    def update_usb4_tree(self, msusb4):
+        print("***************************")
+        
+        if(len(self.slobj) > 0):
+            self.slobj[0].print_on_log(msusb4)
+    
+    def print_on_log(self, data):
+        pass
+        # print("USB4 Tree Right Panel: ", data)
+        # if(len(self.slobj) > 0):
+        #     self.slobj[0].print_on_log(data)
+        # # for item in self.main_sizer.GetChildren():
+        #     obj = item.GetWindow()
+        #     if obj is not None:
+        #         if isinstance(obj, wx.TextCtrl):
+        #             print(obj.GetValue())
+        #     else:
+        #         print("Item does not contain a window.")

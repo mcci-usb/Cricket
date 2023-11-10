@@ -162,6 +162,7 @@ class UiMainFrame (wx.Frame):
         self.action = 0
 
         self.devHand = None
+        self.dutLogWindow = None
  
         self.print_on_log("Loading Configuration\n")
         
@@ -171,7 +172,7 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MOVE, self.OnMove)
 
-        self.update_slog_panel()
+        self.init_right_panel()
 
         self.initScreenSize()
 
@@ -336,7 +337,7 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
-        self.Bind(wx.EVT_MENU, self.update_usb4t_panel, id = ID_USB4_TREEVIEW)
+        # self.Bind(wx.EVT_MENU, self.update_usb4t_panel, id = ID_USB4_TREEVIEW)
 
 
 
@@ -379,11 +380,15 @@ class UiMainFrame (wx.Frame):
    
     def update_slog_menu(self):
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
-            self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
+            # self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
+            # self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
+            self.dutMenuBar.Check(ID_MENU_DUT1, self.config_data["rpanel"]["dut1"])
+            self.dutMenuBar.Check(ID_MENU_DUT2, self.config_data["rpanel"]["dut2"])
+            self.toolMenu.Check(ID_USB4_TREEVIEW, self.config_data["rpanel"]["u4tree"])
         else:
             self.dutMenuBar.Enable(ID_MENU_DUT1, False)
             self.dutMenuBar.Enable(ID_MENU_DUT2, False)
+            self.toolMenu.Check(ID_USB4_TREEVIEW, False)
 
     def build_menu_bar(self):
         self.menuBar = wx.MenuBar()
@@ -437,12 +442,13 @@ class UiMainFrame (wx.Frame):
         self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
         self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
         
-        self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View")
+        self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View", kind = ITEM_CHECK)
         self.toolMenu.Append(self.usb4t)
         
         
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
+        self.Bind(wx.EVT_MENU, self.SelectU4TREE, id=ID_USB4_TREEVIEW)
         self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
@@ -482,17 +488,16 @@ class UiMainFrame (wx.Frame):
         sw = self.Size[0]
         sh = self.Size[1]
 
-        if(sw >= dw and sh >= dh):
-            # Already in full screen, no change required
-            pass
+        reqwidth = 950
+        # if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
+        if self.config_data["rpanel"]["dut1"] or self.config_data["rpanel"]["dut2"] or self.config_data["rpanel"]["u4tree"]:
+            reqwidth = 1420
+            print("ReSize Screen Width: Big")
+            if sw < reqwidth:
+                self.SetSize((reqwidth, dh))
         else:
-            reqwidth = 950
-            if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
-                reqwidth = 1420
-                if sw < reqwidth:
-                    self.SetSize((reqwidth, dh))
-            else:
-                self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
+            print("ReSize Screen Width: Small")
+            self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.CenterOnScreen()
         self.Layout()
@@ -500,12 +505,31 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
 
     def SelectDUT(self, event):
+        print("Uima Trigger to Add DUT ")
         obj = event.GetEventObject()
-        self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
-        self.update_slog_panel()
-        self.reSizeScreen()
+        
+        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.config_data["rpanel"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        self.config_data["rpanel"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
 
+        self.update_right_panel()
+        self.reSizeScreen()
+        
+        # if not self.dutLogWindow.IsShown():
+        #     obj.MenuItems[0].Check(False)
+        #     obj.MenuItems[1].Check(False)
+
+    def SelectU4TREE(self, event):
+        print("UIMP Trigger to Add/Remove USB4 Tree View")
+        obj = event.GetEventObject()
+        
+        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.config_data["rpanel"]["u4tree"] = True if self.usb4t.IsChecked() else False
+        
+        self.update_right_panel()
+        self.reSizeScreen()
 
     def updt_dut_config(self, dutdict):
         key = list(dutdict.keys())[0]
@@ -515,6 +539,13 @@ class UiMainFrame (wx.Frame):
 
     def get_dut_config(self, dutno):
         return {dutno: self.duts[dutno]}
+    
+    def request_dut_close(self, dutname):
+        self.config_data["dut"]["nodes"][dutname] = False
+        self.config_data["rpanel"][dutname] = False
+        self.update_slog_menu()
+        self.update_right_panel()
+        self.reSizeScreen()
 
     def build_com_menu(self):
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
@@ -988,6 +1019,19 @@ class UiMainFrame (wx.Frame):
             return None
         """
         self.panel.PrintLog(strin)
+    def store_usb4_win_info(self, usb4dict):
+        """
+        Show data in Log Window
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: data in String format
+        Returns:
+            return None
+        """
+        self.panel.update_usb4_tree(usb4dict)
     
     def get_enum_delay(self):
         """
@@ -1186,12 +1230,16 @@ class UiMainFrame (wx.Frame):
         except serial.SerialException as e:
             return False
 
-    def get_usb_tree(self):
-        # thControl.get_tree_change(self)
-        try:
-            thControl.get_tree_change(self)
-        except:
-            self.print_on_log("USB Read Error!")
+    # def get_usb_tree(self):
+    #     # thControl.get_tree_change(self)
+    #     try:
+    #         # print("uimainapp_get_usb_tree")
+    #         thControl.get_tree_change(self)
+    #         # print("++++++++++++++++++++++++++:", self.msusb4)
+    #         # print("-----------------:", msusb4)
+    #         self.panel.update_usb4_tree(self.msusb4)
+    #     except:
+    #         self.print_on_log("USB Read Errorxxxx!")
 
     def compareReqSw(self, swDict, exist_sw):
         swkeys = list(swDict.keys())
@@ -1410,29 +1458,20 @@ class UiMainFrame (wx.Frame):
 
         dlg.ShowModal()
         dlg.Destroy()
-
-    def update_slog_panel(self):
-        if self.ucmenu.IsChecked() or self.ccmenu.IsChecked():
-            self.panel.update_slog_panel(self.duts)
-        else:
-            self.panel.update_slog_panel({})
-        self.Refresh()
     
-    def update_usb4t_panel(self, event):
+    def init_right_panel(self):
+        pdict = {"rpanel": self.config_data["rpanel"], "dut": self.config_data["dut"]}
+        self.panel.init_right_panel(pdict)
 
-        if(self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"] == True):
-            title = ("Close DUT Log Window")
-            msg = ("Please close the DUT Log Window"
-                    )
-            dlg = wx.MessageDialog(self, msg, title, wx.OK)
-            dlg.ShowModal()
+    def update_right_panel(self):
+        if self.ucmenu.IsChecked() or self.ccmenu.IsChecked():
+            pdict = {"rpanel": self.config_data["rpanel"], "dut": self.config_data["dut"]}
         else:
-            self.panel.update_usb4_tree_panel()
-            self.Refresh()
-            self.reSizeScreen()
+            pdict = {"rpanel": {"dut1": True, "dut2": True, "u4tree": True}, "dut": {}}
+        self.panel.update_right_panel(pdict)
+        self.Refresh()
 
-        # self.panel.update_usb4_tree_panel()
-        
+     
     def UpdateConfig(self, event):
         self.myrole["uc"] = True if self.ucmenu.IsChecked() else False
         self.myrole["cc"] = True if self.ccmenu.IsChecked() else False
@@ -1442,7 +1481,8 @@ class UiMainFrame (wx.Frame):
         self.panel.update_panels(self.myrole, self.duts)
 
     def saveMenus(self):
-        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
+        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}, "rpanel": self.config_data["rpanel"]}
+        # findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
         configdata.set_base_config_data(findict)
         self.saveScreenSize()
 

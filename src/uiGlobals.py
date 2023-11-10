@@ -202,6 +202,16 @@ usbClass = {0: "Unknown",
             239: "Miscellaneous", 254: "Application Specific",
             255: "Vendor Specific"}
 
+# usbClass = {0: "Unknown",
+#             1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
+#             6: "Image", 7: "Printer", 8: "Mass Storage", 9: "Hub",
+#             10: "CDC-Data", 11: "Smart Card", 13: "Content Security",
+#             14: "Video", 15: "Personal Healthcare", 16: "Audio/Video Devices",
+#             18: "Type-C Bridge", 
+#             220: "Diagnostic Devices", 224: "Wireless Controller", 
+#             239: "Miscellaneous", 254: "Application Specific",
+#             255: "Vendor Specific"}
+
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
 
 portCnt = {"3141": 2,"3142":2, "3201": 4, "2301": 4, "2101": 1}

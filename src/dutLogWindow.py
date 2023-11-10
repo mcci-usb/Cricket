@@ -138,6 +138,9 @@ class DutLogWindow(wx.Window):
         self.totline = 0
 
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
+        
+        self.btn_close = wx.Button(self, ID_BTN_SL_SAVE, "Close",
+                                        size=(60, -1))
 
         self.btn_save = wx.Button(self, ID_BTN_SL_SAVE, "Save",
                                         size=(60, -1))  
@@ -174,6 +177,9 @@ class DutLogWindow(wx.Window):
         self.hbox.Add(20,0,0)
         self.hbox.Add(self.btn_save, 0, wx.ALIGN_LEFT | 
                                          wx.ALIGN_CENTER_VERTICAL)
+        self.hbox.Add(20,0,0)
+        self.hbox.Add(self.btn_close, 0, wx.ALIGN_LEFT | 
+                                         wx.ALIGN_CENTER_VERTICAL)
         
         self.szr_top = wx.BoxSizer(wx.VERTICAL)
         self.szr_top.AddMany([
@@ -195,6 +201,7 @@ class DutLogWindow(wx.Window):
         self.btn_connect.Bind(wx.EVT_BUTTON, self.OnSutConnect)
         self.btn_clear.Bind(wx.EVT_BUTTON, self.OnSutClear)
         self.btn_save.Bind(wx.EVT_BUTTON, self.OnSutSave)
+        self.btn_close.Bind(wx.EVT_BUTTON, self.OnSutclose)
         
         # Set size of frame
         self.SetSizer(self.vbox)
@@ -335,6 +342,14 @@ class DutLogWindow(wx.Window):
     def OnSutSave(self, e):
         content = self.scb.GetValue()
         self.top.save_file(content, "*.txt")
+        
+    def OnSutclose(self, e):
+        print("CLOSE THE SUT WINDOW: ", list(self.sut.keys())[0])
+        self.top.request_dut_close(list(self.sut.keys())[0])
+        # self.parent.update_slog_panel_after_close(self)
+        # self.Destroy()
+        # self.parent.update_slog_panel_after_close(self)
+        # self.Destroy()
 
     def updateDisplay(self, msg):
         """
