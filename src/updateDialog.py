@@ -99,11 +99,26 @@ class AutoUpdate(wx.Window):
 
 
     def ClickOk(self, e):
+        """
+        Opens a web browser with the URL corresponding to the latest version on GitHub.
+
+        Parameters:
+            e (wx.Event): The event triggering the method.
+
+        Note:
+            The method also destroys the parent window after opening the web browser.
+        """
         webbrowser.open("https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/"+self.latest_version)  
         self.parent.Destroy()
         
     
     def ClickCancel(self, e):
+        """
+        Destroys the parent window when the user clicks the "Cancel" button.
+
+        Parameters:
+            e (wx.Event): The event triggering the method.
+        """
         self.parent.Destroy()
         
         
@@ -209,6 +224,14 @@ class UpdateDialog(wx.Dialog):
         self.Layout()
         
 def check_version():
+    """
+    Checks for the latest version of the application on GitHub.
+
+    Returns:
+        str or None: The latest version if available and newer
+        than the current version, otherwise None.
+    """
+    
     api_url = f"https://api.github.com/repos/mcci-usb/Cricket/releases/latest"
     response = requests.get(api_url)
 

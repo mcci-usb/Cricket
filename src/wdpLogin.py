@@ -1,9 +1,47 @@
+##############################################################################
+# 
+# Module: wdpLogin.py
+#
+# Description:
+#     Dialog to display windows device portal Login credentials window.
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V4.2.0 Wed Nov 2023 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
+
 import wx
 import configdata
 
 # from main import Mywin
 
 class LoginFrame(wx.Dialog):
+    """
+    Represents a login window in the wxPython application.
+
+    This class provides a simple login window with a username and password 
+    input for user authentication.
+
+    Parameters:
+        parent (wx.Window): The parent window.
+        top: The top-level object or controller that manages this login window.
+
+    Attributes:
+        panel (wx.Panel): The panel containing the components of the login window.
+        top: The top-level object or controller that manages this login window.
+    """
     def __init__(self, parent, top):
         super(LoginFrame, self).__init__(parent, title="Login Window", size=(350, 280))
         self.panel = wx.Panel(self)
@@ -38,6 +76,13 @@ class LoginFrame(wx.Dialog):
         self.panel.SetSizer(sizer)
 
     def on_save(self, event):
+        """
+            Handles the save event by extracting username and password from text input fields,
+            checking for empty values, updating portal credentials, and closing the window.
+
+            Parameters:
+               event (wx.Event): The save event triggering this method.
+        """
         self.username = self.username_text.GetValue()
         self.password = self.password_text.GetValue()
         if self.username.strip() == '' or self.password.strip() == '':

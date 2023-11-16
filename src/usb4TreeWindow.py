@@ -157,23 +157,49 @@ class Usb4TreeWindow(wx.Window):
 
 
     def OnItemSelect(self, event):
+        """
+        Handles the tree item selection event.
+
+        Parameters:
+            event (wx.TreeEvent): The tree selection event.
+        """
         item = event.GetItem()
         text = self.tree.GetItemText(item)
         # print("SELECTED ITEM: {text}")
 
     
     def print_on_log(self, data):
+        """
+        Prints data on the log and updates the UI tree.
+
+        Parameters:
+            data: The raw data to be processed and displayed.
+        """
         idata = self.get_item_data(data)
         ldata = self.get_level_data(idata)
         self.redrawu4tree(idata, ldata)
 
 
-
     def OnLoginConfig(self, e):
+        """
+        Opens the login configuration dialog.
+
+        Parameters:
+            e: The event triggering the method (not explicitly used).
+        """
         dlg = LoginFrame(self, self)
         dlg.Show()
 
     def get_level_data(self, u4tbuf):
+        """
+        Organizes data based on levels and returns a dictionary.
+
+        Parameters:
+            u4tbuf: The input data dictionary to be processed.
+
+        Returns:
+            dict: A dictionary organizing data items based on their level.
+        """
         rkarr = list(u4tbuf.keys())
         pdict = {}
         for rkitem in rkarr:
@@ -187,6 +213,13 @@ class Usb4TreeWindow(wx.Window):
     
 
     def redrawu4tree(self, idata, ldata):
+        """
+        Redraws the UI tree based on item and level data.
+
+        Parameters:
+            idata: The item data dictionary.
+            ldata: The level data dictionary.
+        """
         self.DeleteAllItems()
         lkeys = list(ldata.keys())
         if 'level0' in lkeys:
@@ -197,6 +230,16 @@ class Usb4TreeWindow(wx.Window):
 
     
     def draw_level0_data(self, ddict, dlist):
+        """
+        Draws level 0 data in the UI tree.
+
+        Parameters:
+            ddict: The item data dictionary.
+            dlist: The list of items at level 0.
+
+        Returns:
+            dict: A dictionary mapping item identifiers to their corresponding UI tree nodes.
+        """
         objdict = {}
         for l0item in dlist:
             objdict[l0item] = self.tree.AppendItem(self.root, ""+ddict[l0item]["mname"]+" ("+ddict[l0item]["vname"]+")")
@@ -209,6 +252,18 @@ class Usb4TreeWindow(wx.Window):
     
     
     def draw_leveln_data(self, ddict, dlist, riobj, lidx):
+        """
+        Draws data for levels greater than 0 in the UI tree.
+
+        Parameters:
+            ddict: The item data dictionary.
+            dlist: The list of items at the current level.
+            riobj: The dictionary of existing UI tree nodes from the previous level.
+            lidx: The index representing the current level.
+
+        Returns:
+            dict: A dictionary mapping updated item identifiers to their corresponding UI tree nodes.
+        """
         objlist = list(riobj.keys())
         for item in dlist:
             if item in objlist:
@@ -224,6 +279,15 @@ class Usb4TreeWindow(wx.Window):
     
     
     def get_item_data(self, msg):
+        """
+        Extracts USB4 item data from the input message.
+
+        Parameters:
+            msg (dict): The input message containing USB4 events.
+
+        Returns:
+            dict: A dictionary mapping unique identifiers to USB4 item data.
+        """
         usb4e = msg["events"]
         pu4dict = {}
 
@@ -257,6 +321,12 @@ class Usb4TreeWindow(wx.Window):
     
         
     def OnToolTip(self, event):
+        """
+        Displays tooltips for tree items based on stored item data.
+
+        Parameters:
+            event (wx.TreeEvent): The tree event triggering the tooltip display.
+        """
         item = event.GetItem()
         item_data = self.tree.GetItemData(item)
         if item_data:
@@ -265,6 +335,14 @@ class Usb4TreeWindow(wx.Window):
 
 
     def DeleteAllItems(self):
+        """
+        Deletes all child items under the root in the tree control.
+
+        Clears the tree control by removing all child items under the root.
+
+        Note: This method does not delete the root item itself.
+
+       """
         root = self.tree.GetRootItem()
         if root.IsOk():
             self.tree.DeleteChildren(root)

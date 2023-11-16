@@ -151,9 +151,23 @@ class BatchWindow(wx.Window):
         self.top.port_on(self.swpath, portNo, True)
     
     def setSpeed(self, inspeed):
+        """
+        Set the speed of the switch.
+
+        Parameters:
+            inspeed (str): The desired speed value.
+
+        """
         self.top.set_speed(self.swpath, inspeed)
 
     def executeDelay(self, indelay):
+        """
+        executing the based on the set delay on log
+
+        Parameters:
+            indelay (str): The desired delay value.
+
+        """
         self.tdelay = indelay
         self.top.print_on_log("Delay: "+str(indelay)+"\n")
 
@@ -179,6 +193,14 @@ class BatchWindow(wx.Window):
                 self.cdfail = self.cdfail + 1
 
     def executeRepeat(self, repeat):
+        """
+        executing the repeated times
+
+        Parameters:
+           repeat: set the paramaeter
+
+        """
+        
         self.top.print_on_log("Repeat\n")
 
     def InitTopHbox(self):
@@ -202,11 +224,16 @@ class BatchWindow(wx.Window):
         self.btn_load.Bind(wx.EVT_BUTTON, self.LoadBatch)
 
     def InitSeqBox(self):
-            self.tc_seq = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
-                                         size=(400,250))
-            self.vbSeq.Add(
-                self.tc_seq, 1, wx.EXPAND
-            )
+        """
+        init sequntial box
+
+        """
+
+        self.tc_seq = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
+                                        size=(400,250))
+        self.vbSeq.Add(
+            self.tc_seq, 1, wx.EXPAND
+        )
     
     def InitBotHbox(self):
         self.btn_start = wx.Button(self, -1, "Start", size=(60,25))
@@ -225,6 +252,17 @@ class BatchWindow(wx.Window):
         self.btn_start.Disable()
 
     def OnClickBatch(self, event):
+        """
+        Handle the event triggered by clicking on the batch button.
+
+        Description:
+            - If batch mode is active, stop the batch, print a message, and stop the timer.
+            - If batch mode is not active, start the batch.
+
+        Parameters:
+            event (wx.Event): The event object representing the button click.
+
+        """
         if self.batch_flg:
             self.StopBatch()
             self.top.print_on_log("\nBatch Mode Stopped!")
@@ -233,6 +271,11 @@ class BatchWindow(wx.Window):
             self.StartBatch()
 
     def StopBatch(self):
+        """
+        Stop Batch Mode.
+    
+
+        """
         self.batch_flg = False
         # The Lablel to set name as Auto
         self.btn_start.SetLabel("Start")
@@ -336,6 +379,10 @@ class BatchWindow(wx.Window):
 
       
     def StartBatch(self):
+        """
+        start batch mode.
+    
+        """
         self.mappedSw = {}
         self.reqSw = {}
         self.main_flg = False
@@ -349,6 +396,9 @@ class BatchWindow(wx.Window):
                 wx.MessageBox('Could not find the Switch as per sequence', 'Warning', wx.OK | wx.ICON_WARNING)
         
     def runBatchSeq(self):
+        """
+        Run batch mode
+        """
         self.batch_flg = True
         self.btn_start.SetLabel("Stop")
 
@@ -369,6 +419,23 @@ class BatchWindow(wx.Window):
             self.timer.Start(self.tdelay)
 
     def TimerServ(self, evt):
+        """
+        Handle the timer event for batch processing.
+
+        Description:
+            - Stop the timer.
+            - Get the command key from the current sequence index.
+            - Execute the command associated with the key using batchdecode dictionary.
+            - Increment the sequence index.
+            - Start the timer with a delay.
+            - Check if the sequence index exceeds the length of the sequence.
+            - If the sequence is completed, reset the index, increment the cycle count, and print results.
+            - Stop the timer if the desired number of cycles is reached.
+
+        Parameters:
+            evt (wx.Event): The timer event triggering the function.
+
+        """
         self.timer.Stop()
         key = list(self.finseq[self.seqIdx])[0]
         self.batchdecode.get(key, self.defaultCmd) (self.finseq[self.seqIdx][key])
@@ -390,6 +457,11 @@ class BatchWindow(wx.Window):
                 self.top.print_on_log("\n######################################\n\n")
 
     def executeBatchSeq(self):
+        """
+        Executing the Batch script sequence.
+    
+
+        """
         self.done = 0
         if self.repeat == 0:
             self.repeat = 1
@@ -398,18 +470,30 @@ class BatchWindow(wx.Window):
         self.totseq = len(self.finseq)
         
     def SaveBatch(self, event):
+        """
+        Save batch script.
+        """
         content = self.tc_seq.GetValue()
         self.save_batch(content, "*.txt")
 
     def updateBatchLocation(self, pathname):
+        """
+        Update batch mode  script location path.
+        """
         configdata.updt_batch_location(pathname)
 
     def LoadBatch(self, event):
+        """
+        Loading the Batch mode from local path.
+        """
         pathname = self.load_file()
         self.updateBatchLocation(pathname)
 
 
     def load_last_file(self):
+        """
+        Loading the last file of batch mode file.
+        """
         if self.bloc == None:
             self.btn_start.Disable()
             return
@@ -511,6 +595,9 @@ class BatchWindow(wx.Window):
         return
     
     def parseSwMacro(self, oclist):
+        """
+        Parse the serial script
+        """
         devlist = ["3141","3142", "3201", "2301", "2101"]
     
         swpath = oclist[3].replace(',', '')
@@ -527,6 +614,9 @@ class BatchWindow(wx.Window):
             self.top.print_on_log("Syntax error in mapping '='")
         
     def parseDelay(self, indata):
+        """
+        Parsing the delay.
+        """
         if self.main_flg == True:
             try:
                 delay = indata[1].replace('ms', '')
@@ -539,6 +629,9 @@ class BatchWindow(wx.Window):
             self.top.print_on_log("Main keyword should present after declaration")
 
     def parsePort(self, indata):
+        """
+        Parsing the port.
+        """
         if self.main_flg == True:
             speed = None
             try:
@@ -559,6 +652,9 @@ class BatchWindow(wx.Window):
             self.top.print_on_log("Main keyword should present after declaration")
 
     def parseRead(self, indata):
+        """
+        Parsing the read of voltage and current.
+        """
         rdlist = ["voltage", "current", "USB", ]
         try:
             if any(indata[1] in s for s in rdlist):
@@ -567,6 +663,20 @@ class BatchWindow(wx.Window):
             pass
 
     def parseSerial(self, indata):
+        """
+        Parse serial commands and add them to the batch sequence.
+
+        Description:
+            - Check if the second element in indata is one of the allowed values ("open", "write", "read").
+            - If yes, extract the serial settings from the third element in indata.
+            - Replace double quotes from the serial settings.
+            - Add the serial command to the batch sequence.
+
+        Parameters:
+            indata (list): List containing serial command details.
+
+        """
+        
         rdlist = ["open", "write", "read"]
         try:
             if any(indata[1] in s for s in rdlist):
@@ -580,6 +690,20 @@ class BatchWindow(wx.Window):
 
 
     def parseRepeat(self, indata):
+        """
+        Parse repeat command and add it to the batch sequence.
+
+        Description:
+            - Check the length of indata.
+            - If the length is 2, try to convert the second element to an integer (rptcnt).
+            - Add the repeat command with rptcnt to the batch sequence.
+            - Update the repeat attribute with rptcnt.
+            - Handle parsing errors with wx.MessageBox.
+
+        Parameters:
+            indata (list): List containing repeat command details.
+
+        """
         if len(indata) == 2:
             try:
                 rptcnt = int(indata[1])
@@ -593,18 +717,60 @@ class BatchWindow(wx.Window):
             wx.MessageBox('Parsing Error, found more argument in repeat, line number', 'Warning', wx.OK | wx.ICON_WARNING)
 
     def parseMain(self, indata):
+        """
+        Set the main flag to True.
+
+        Description:
+            - Set the main flag to True.
+
+        Parameters:
+            indata (list): List containing main command details.
+
+        """
         self.main_flg = True
 
     def parseEnd(self, indata):
+        """
+        Set the end flag to True.
+
+        Description:
+            - Set the end flag to True.
+
+        Parameters:
+            indata (list): List containing end command details.
+
+        """
         self.end_flg = True
 
     def defaultCmd(self, other):
         pass
 
     def port_on(self, portno, stat):
+        """
+        Trigger the port_on method in the top level.
+
+        Description:
+            - Trigger the `port_on` method in the top level with the provided `portno` and `stat` parameters.
+
+        Parameters:
+            portno (str): Port number.
+            stat (bool): Port status.
+
+        """
         self.top.port_on(self.swkey, portno, stat)
 
     def parseBatchSeq(self):
+        """
+        Parse the batch sequence.
+
+        Description:
+            - Initialize an empty list (`finseq`) to store the parsed batch sequence.
+            - Retrieve the number of lines in the text control (`tc_seq`).
+            - Iterate through each line in the text control.
+            - Split each line into a list of strings.
+            - Use the `batchopcode` dictionary to call the corresponding command method with the parsed list.
+        
+        """
         self.finseq = []
         noofline = self.tc_seq.GetNumberOfLines()
         for i in range(0, noofline):

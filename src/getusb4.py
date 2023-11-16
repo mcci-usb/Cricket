@@ -1,3 +1,28 @@
+##############################################################################
+# 
+# Module: getusb4.py
+#
+# Description:
+#     get the usb4 device data.
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation June 2021
+#
+# Revision history:
+#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#       Module created
+##############################################################################
+
+
 import threading
 import websocket
 import base64
@@ -52,6 +77,14 @@ class Usb4speedScan:
         # print(msudpdict)
 
     def connect(self):
+        """
+        Connect to the USB4 speed scanning service.
+
+        Description:
+            - Check if valid credentials are provided.
+            - If the WebSocket thread is not running, start it.
+        
+        """
         if self.uname == None or self.pwd == None:
             print("Please provide valid credentials")
         else:
@@ -68,22 +101,51 @@ class Usb4speedScan:
     #     self.pwd = mydict["pwd"]
 
     def disconnect(self):
+        """
+        Disconnect from the USB4 speed scanning service.
+
+        Description:
+            - Close the WebSocket connection.
+        
+        """
         self.ws.close()
         print("\nDisconnect - Scanning Closed\n")
         self.ws = None
 
     def append_to_scb(self, text):
+        """
+        Append the provided text to the scanning control box.
+
+        Parameters:
+            text (str): The text to be appended to the scanning control box.
+
+        """
         pass
 
     def get_result(self):
+        """
+        Get the results of USB4 speed scanning.
+
+        Returns:
+            tuple: A tuple containing the lists of added USB4 devices (`u4added`) and all USB4 devices (`u4all`).
+
+        """
         while(not self.completed):
             
             mydata = None
         return self.u4added, self.u4all        
         
-
-
     def run_websocket(self):
+        """
+        Run the WebSocket connection for USB4 speed scanning.
+
+        Description:
+            - Encode the credentials in base64.
+            - Define custom headers for basic authentication.
+            - Create a WebSocket connection with custom headers.
+            - Set the `connected` flag to True.
+
+        """
         # Encode the credentials in base64
         credentials = base64.b64encode(f"{self.uname}:{self.pwd}".encode("utf-8")).decode("utf-8")
 
@@ -104,6 +166,19 @@ class Usb4speedScan:
         self.ws.run_forever()
 
     def on_message(self, ws, message):
+        """
+        Handle the incoming message from the WebSocket.
+
+        Description:
+            - Update the text control with the received message.
+            - Close the WebSocket connection.
+            - Set flags to indicate that scanning is closed.
+
+        Parameters:
+            ws (websocket.WebSocketApp): The WebSocket instance.
+            message (str): The received message.
+
+        """
         self.update_text_ctrl(message)
         self.ws.close()
         print("\nScanning Closed\n")
@@ -113,6 +188,13 @@ class Usb4speedScan:
         self.completed = True
 
     def update_text_ctrl(self, message):
+        """
+        Update the text control with the parsed response.
+
+        Parameters:
+            message (str): The received message.
+
+        """
         self.mystr = self.parseresponse(message)
 
     # def parseresponse(self, msgusb4):
@@ -120,6 +202,9 @@ class Usb4speedScan:
         # pass
     
     def parseresponse(self, msgusb4):
+        """
+        parsing the usb4 list json its getting from msgusb4.
+        """
    
         mystr = ""
         msg = json.loads(msgusb4)
@@ -161,6 +246,10 @@ class Usb4speedScan:
         return mystr
                        
     def getremovedDD(self, u4remobj):
+        """
+        remove the Data.
+
+        """
         if len(self.u4added) > 0:
             for i in range(0, len(self.u4added)):
                 if u4remobj[DID] == self.u4added[i][DID]:
