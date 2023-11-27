@@ -562,7 +562,7 @@ class UiMainFrame (wx.Frame):
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
-        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "Model 3141/3142 Firmware Update")
         self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
@@ -801,6 +801,7 @@ class UiMainFrame (wx.Frame):
         """
         # Creating the help menu
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit MCCI USB Switch 3141")
+        self.helpMenu.Append(ID_MENU_HELP_3142, "Visit MCCI USB Switch 3142")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
@@ -810,6 +811,7 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3142)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
@@ -844,26 +846,36 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
+        Link_3141 = "https://mcci.com/usb/dev-tools/model-3141/"
+        Link_3142 = "https://store.mcci.com/collections/usb-switches/products/model3142"
+        Link_3201 = "https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/"
+        Link_2101 = "https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/"
+        Link_2301 = "https://mcci.com/usb/dev-tools/model-2301/"
+        MCCI_portal = "https://mcci.com/"
+        MCCI_HOME  = "https://portal.mcci.com/portal/home"
+        
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
-            webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
-                            new=0, autoraise=True)
+            webbrowser.open(Link_3141, new=0, autoraise=True)
+            
+        if(id == ID_MENU_HELP_3142):
+            webbrowser.open(Link_3142, new=0, autoraise=True)
+            
         elif(id == ID_MENU_HELP_3201):
-            webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"
-                            "-type-c-connection-exerciser/",
-                            new=0, autoraise=True)
+            webbrowser.open(Link_3201, new=0, autoraise=True)
+            
         elif(id == ID_MENU_HELP_2101):
-            webbrowser.open(
-            "https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/",
-                            new=0, autoraise=True)
+            webbrowser.open(Link_2101, new=0, autoraise=True)
+            
         elif(id == ID_MENU_HELP_2301):
-            webbrowser.open("https://mcci.com/usb/dev-tools/model-2301/",
-                            new=0, autoraise=True)       
+            webbrowser.open(Link_2301, new=0, autoraise=True)
+                
         elif(id == ID_MENU_HELP_WEB):
-            webbrowser.open("https://mcci.com/", new=0, autoraise=True)
+            webbrowser.open(MCCI_portal, new=0, autoraise=True)
+            
         elif(id == ID_MENU_HELP_PORT):
-            webbrowser.open("https://portal.mcci.com/portal/home", new=0,
-                            autoraise=True)
+            webbrowser.open(MCCI_HOME, new=0, autoraise=True)
+            
         elif(id == ID_MENU_HELP_ABOUT):
             self.OnAboutWindow(event)
     
