@@ -32,7 +32,6 @@ class WinUsb4TreeParse():
         self.ldata = None
     
     def parse_usb4tb_data(self, usb4data):
-        print("Win USB4 Tree Parsing not implemented!")
         self.idata = None
         self.ldata = None
         self.idata = self.get_item_data(usb4data)

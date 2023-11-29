@@ -165,20 +165,6 @@ class UiPanel(wx.Panel):
         """
         self.rpanel.update_my_panel(pdict)
 
-    def update_usb4_tree_panel(self, duts):
-        """
-        Updates the USB4 tree panel with information about the specified DUTs.
-
-        Parameters:
-            duts (list): List of DUT (Device Under Test) information to be displayed in the USB4 tree panel.
-
-        Notes:
-            - Calls the `update_usb_tree_panel` method of the right panel (`rpanel`) to handle the update.
-            - Performs a layout update after the USB4 tree panel is updated.
-        """
-        self.rpanel.update_usb_tree_panel(duts)
-        self.Layout()
-    
     def update_usb4_tree(self, msusb4):
         """
         Updates the USB4 tree with information from the provided USB4 data.

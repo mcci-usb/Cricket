@@ -183,6 +183,10 @@ class UiMainFrame (wx.Frame):
 
         # Targetting for new release
         self.usbenum = usbenumall.create_usb_device_enumerator()
+        if "msudp" not in self.config_data:
+            self.config_data["msudp"] = {"uname": None, "pwd": None}
+        mslogin = self.config_data["msudp"]
+        self.usbenum.set_login_credentials(mslogin["uname"], mslogin["pwd"])
         # usb_device_enumerator.enumerate_usb_devices()
 
         # Check for the latest version
@@ -494,9 +498,16 @@ class UiMainFrame (wx.Frame):
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
             # self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
             # self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
-            self.dutMenuBar.Check(ID_MENU_DUT1, self.config_data["rpanel"]["dut1"])
-            self.dutMenuBar.Check(ID_MENU_DUT2, self.config_data["rpanel"]["dut2"])
-            self.toolMenu.Check(ID_USB4_TREEVIEW, self.config_data["rpanel"]["u4tree"])
+            if "rpanel" in self.config_data:
+                rpanel = self.config_data["rpanel"]
+                self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
+                self.dutMenuBar.Check(ID_MENU_DUT2, rpanel["dut2"] if "dut2" in rpanel else False)
+                self.toolMenu.Check(ID_USB4_TREEVIEW, rpanel["u4tree"] if "u4tree" in rpanel else False)
+            else:
+                rpanel = {"dut1": False, "dut2": False, "u4tree": False}
+                self.config_data["rpanel"] = rpanel
+                
+                
         else:
             self.dutMenuBar.Enable(ID_MENU_DUT1, False)
             self.dutMenuBar.Enable(ID_MENU_DUT2, False)
@@ -1658,7 +1669,6 @@ class UiMainFrame (wx.Frame):
 
         """
         cdevices =  list(self.swuidict.values())
-        print(cdevices)
         if len(cdevices) > 0:
             self.set_mode(MODE_MANUAL)
             if '3142' in cdevices:
@@ -1860,7 +1870,6 @@ class UiMainFrame (wx.Frame):
 
         """
         findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}, "rpanel": self.config_data["rpanel"]}
-        # findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
         configdata.set_base_config_data(findict)
         self.saveScreenSize()
 

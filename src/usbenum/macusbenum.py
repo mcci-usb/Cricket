@@ -27,6 +27,9 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
         self.usb4tb_json = None
         self.usb4tb_dict = {}
         
+    def set_login_credentials(self, uname, pwd):
+        pass
+        
     def enumerate_usb_devices(self):
         """
         Enumerate both USB 3.0 and USB4 and USB4TB devices.

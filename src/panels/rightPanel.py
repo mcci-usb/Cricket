@@ -93,11 +93,6 @@ class RightPanel(wx.Panel):
                     self.slobj.append(dutLogWindow.DutLogWindow(self, self.parent, {pobj: dutdict[pobj]}))
         self.display_my_objects()
 
-
-
-    def update_usb_tree_panel(self, duts):
-        print("Going to add Tree Panel : --->", duts["nodes"])
-    
     def add_switches(self, swlist):
         self.Layout()
     

@@ -20,6 +20,9 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
         self.pwd = "mcci"
         self.usb4tb_json = None
         self.usb4tb_list = []
+        
+    def set_login_credentials(self, uname, pwd):
+        pass
 
     def enumerate_usb_devices(self):
         """

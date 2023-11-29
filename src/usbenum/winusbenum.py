@@ -44,16 +44,23 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.ws = None
         self.connected = False
         self.completed = False
-        self.uname = "mcci"
-        self.pwd = "mcci"
+        self.uname = None
+        self.pwd = None
         self.usb4tb_json = None
         self.usb4tb_list = []
+        
+    def set_login_credentials(self, uname, pwd):
+        self.uname = uname
+        self.pwd = pwd
 
     def enumerate_usb_devices(self):
         # raise NotImplementedError("Subclasses must implement enumerate_usb_devices")
         self.completed = False
         self.enumerate_usb3_devices()
-        self.enumerate_usb4tb_devices()
+        if self.uname != None and self.pwd != None:
+            self.enumerate_usb4tb_devices()
+        else:
+            self.completed = True
 
     
     def enumerate_usb4tb_devices(self):
@@ -165,7 +172,6 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.completed = True
 
     def on_usb4tb_close(self, ws, scode, msg):
-        print(f"Win USB4 Enumeration closed with status {scode}: {msg}")
         self.completed = True
 
     

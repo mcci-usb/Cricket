@@ -228,6 +228,7 @@ def set_base_config_data(gdata):
     cdata = read_all_config()
     cdata["myrole"] = gdata["myrole"]
     cdata["dut"]["nodes"] = gdata["dut"]["nodes"]
+    cdata["rpanel"] = gdata["rpanel"]
     fpath = get_file_path()
     save_config(fpath, cdata)
 
