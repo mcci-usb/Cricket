@@ -39,12 +39,12 @@ from wx.core import ITEM_CHECK
 # Own modules
 from uiGlobals import *
 
-import getTb
-from copy import deepcopy
+import copy
 
 from aboutDialog import *
 from comDialog import *
-from firmwareUpdate import *
+
+from features.fwupdate import firmwareUpdate
 from setDialog import *
 from portDialog import *
 from warningMessage import *
@@ -55,7 +55,8 @@ import updateDialog as updtDlg
 from uiPanel import *
 
 
-import vbusChart
+# import vbusChart
+from features.viplot import vbusChart
 
 import devControl
 import devServer
@@ -69,10 +70,13 @@ from cricketlib import searchswitch
 
 from cricketlib import switch3141
 from cricketlib import switch3201
-from cricketlib import switch2101
+import sys
+if sys.platform == "win32":
+    from cricketlib import switch2101
 from cricketlib import switch2301
 from cricketlib import switch3142
 
+from usbenum import usbenumall
 
 ##############################################################################
 # Utilities
@@ -178,6 +182,10 @@ class UiMainFrame (wx.Frame):
 
         self.init_connect()
 
+        # Targetting for new release
+        self.usbenum = usbenumall.create_usb_device_enumerator()
+        # usb_device_enumerator.enumerate_usb_devices()
+
         # Check for the latest version
         update = updtDlg.check_version()
         if update != None:
@@ -198,9 +206,10 @@ class UiMainFrame (wx.Frame):
               further use in the USB tree.
         """
         # scan and save ThunderBolt USB device
-        if sys.platform == "darwin":
-            tbList = getTb.scan_tb()
-            self.save_tb_list(tbList)
+        # if sys.platform == "darwin":
+        #     tbList = getTb.scan_tb()
+        #     self.save_tb_list(tbList)
+        pass
     
     def init_statusBar(self):
         """
@@ -381,14 +390,13 @@ class UiMainFrame (wx.Frame):
         self.dev_list = []
         self.switch_list = []
 
-        self.masterList = []
+        self.masterList = None
         self.tbMasterList = None
 
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, 
-                          "2101": switch2101.Switch2101, "2301": switch2301.Switch2301}
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
 
     def define_events(self):
         """
@@ -419,13 +427,6 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
-        # self.Bind(wx.EVT_MENU, self.update_usb4t_panel, id = ID_USB4_TREEVIEW)
-
-
-
-    # def OnFocusSUT1(self, event):
-    #     # On Focus event, not used
-    #     pass
 
     def init_connect(self):
         """
@@ -562,7 +563,7 @@ class UiMainFrame (wx.Frame):
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
-        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "Model 3141/3142 Firmware Update")
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
         self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
@@ -662,11 +663,9 @@ class UiMainFrame (wx.Frame):
         # if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
         if self.config_data["rpanel"]["dut1"] or self.config_data["rpanel"]["dut2"] or self.config_data["rpanel"]["u4tree"]:
             reqwidth = 1420
-            print("ReSize Screen Width: Big")
             if sw < reqwidth:
                 self.SetSize((reqwidth, dh))
         else:
-            print("ReSize Screen Width: Small")
             self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.CenterOnScreen()
@@ -688,7 +687,6 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
 
         """
-        print("Uima Trigger to Add DUT ")
         obj = event.GetEventObject()
         
         # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
@@ -717,7 +715,6 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
 
         """
-        print("UIMP Trigger to Add/Remove USB4 Tree View")
         obj = event.GetEventObject()
         
         # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
@@ -801,7 +798,6 @@ class UiMainFrame (wx.Frame):
         """
         # Creating the help menu
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit MCCI USB Switch 3141")
-        self.helpMenu.Append(ID_MENU_HELP_3142, "Visit MCCI USB Switch 3142")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
@@ -811,7 +807,6 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
-        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3142)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
@@ -846,36 +841,26 @@ class UiMainFrame (wx.Frame):
         Returns:
             None
         """
-        Link_3141 = "https://mcci.com/usb/dev-tools/model-3141/"
-        Link_3142 = "https://store.mcci.com/collections/usb-switches/products/model3142"
-        Link_3201 = "https://mcci.com/usb/dev-tools/3201-enhanced-type-c-connection-exerciser/"
-        Link_2101 = "https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/"
-        Link_2301 = "https://mcci.com/usb/dev-tools/model-2301/"
-        MCCI_portal = "https://mcci.com/"
-        MCCI_HOME  = "https://portal.mcci.com/portal/home"
-        
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
-            webbrowser.open(Link_3141, new=0, autoraise=True)
-            
-        if(id == ID_MENU_HELP_3142):
-            webbrowser.open(Link_3142, new=0, autoraise=True)
-            
+            webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
+                            new=0, autoraise=True)
         elif(id == ID_MENU_HELP_3201):
-            webbrowser.open(Link_3201, new=0, autoraise=True)
-            
+            webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"
+                            "-type-c-connection-exerciser/",
+                            new=0, autoraise=True)
         elif(id == ID_MENU_HELP_2101):
-            webbrowser.open(Link_2101, new=0, autoraise=True)
-            
+            webbrowser.open(
+            "https://mcci.com/usb/dev-tools/2101-usb-connection-exerciser/",
+                            new=0, autoraise=True)
         elif(id == ID_MENU_HELP_2301):
-            webbrowser.open(Link_2301, new=0, autoraise=True)
-                
+            webbrowser.open("https://mcci.com/usb/dev-tools/model-2301/",
+                            new=0, autoraise=True)       
         elif(id == ID_MENU_HELP_WEB):
-            webbrowser.open(MCCI_portal, new=0, autoraise=True)
-            
+            webbrowser.open("https://mcci.com/", new=0, autoraise=True)
         elif(id == ID_MENU_HELP_PORT):
-            webbrowser.open(MCCI_HOME, new=0, autoraise=True)
-            
+            webbrowser.open("https://portal.mcci.com/portal/home", new=0,
+                            autoraise=True)
         elif(id == ID_MENU_HELP_ABOUT):
             self.OnAboutWindow(event)
     
@@ -985,7 +970,7 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
         """
 
-        dlg = FirmwareDialog(self, self)
+        dlg = firmwareUpdate.FirmwareDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
     
@@ -1198,7 +1183,6 @@ class UiMainFrame (wx.Frame):
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
     
-
     # Multiple Switches
     def add_switch_dialogs(self):
         """
@@ -1274,7 +1258,6 @@ class UiMainFrame (wx.Frame):
         self.panel.cpanel.autoPan.update_sw_selector(self.swuidict)
         self.panel.cpanel.loopPan.update_sw_selector(self.swuidict)
     
-    
     def save_usb_list(self, mlist):
         """
         Keep USB device list in a list - reference list
@@ -1297,7 +1280,7 @@ class UiMainFrame (wx.Frame):
             mlist (list): The ThunderBolt device list to be saved.
 
         """
-        self.tbMasterList = deepcopy(mlist)
+        self.tbMasterList = copy.deepcopy(mlist)
         
     def get_usb_list(self):
         """
@@ -1335,6 +1318,7 @@ class UiMainFrame (wx.Frame):
             return None
         """
         self.panel.PrintLog(strin)
+
     def store_usb4_win_info(self, usb4dict):
         """
         Show data in Log Window
@@ -1587,17 +1571,6 @@ class UiMainFrame (wx.Frame):
         except serial.SerialException as e:
             return False
 
-    # def get_usb_tree(self):
-    #     # thControl.get_tree_change(self)
-    #     try:
-    #         # print("uimainapp_get_usb_tree")
-    #         thControl.get_tree_change(self)
-    #         # print("++++++++++++++++++++++++++:", self.msusb4)
-    #         # print("-----------------:", msusb4)
-    #         self.panel.update_usb4_tree(self.msusb4)
-    #     except:
-    #         self.print_on_log("USB Read Errorxxxx!")
-
     def compareReqSw(self, swDict, exist_sw):
         """
         Compares the requested switch configuration with the existing switch configuration.
@@ -1744,9 +1717,9 @@ class UiMainFrame (wx.Frame):
             None
         """
         strUsb = " USB Devices     Host Controller: {d1}     ".\
-                 format(d1=str(dl[0])) + \
-                 "Hub: {d2}     ".format(d2=str(dl[1])) + \
-                 "Peripheral: {d3}".format(d3=str(dl[2]))
+                 format(d1=str(dl["host"])) + \
+                 "Hub: {d2}     ".format(d2=str(dl["hub"])) + \
+                 "Peripheral: {d3}".format(d3=str(dl["peri"]))
         
         self.UpdateSingle(strUsb, 4)
 
