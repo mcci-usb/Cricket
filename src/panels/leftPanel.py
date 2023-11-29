@@ -26,11 +26,12 @@ import wx
 
 from wx.lib.scrolledpanel import ScrolledPanel
 
-from dev2101Window import Dev2101Window
-from dev3141Window import Dev3141Window
-from dev3142Window import Dev3142Window
-from dev3201Window import Dev3201Window
-from dev2301Window import Dev2301Window
+from switches import dev2101Window
+from switches import dev3141Window
+from switches import dev3142Window
+from switches import dev3201Window
+from switches import dev2301Window
+
 from noSwWindow import NoSwWindow
 
 class LeftPanel(ScrolledPanel):
@@ -55,7 +56,7 @@ class LeftPanel(ScrolledPanel):
 
         self.swobj = []
 
-        self.swobjmap = {"3141": Dev3141Window,"3142":Dev3142Window,"3201": Dev3201Window, "2301": Dev2301Window, "2101": Dev2101Window}
+        self.swobjmap = {"3141": dev3141Window.Dev3141Window,"3142": dev3142Window.Dev3142Window,"3201": dev3201Window.Dev3201Window, "2301": dev2301Window.Dev2301Window, "2101": dev2101Window.Dev2101Window}
 
         self.multiswobj = {}
 

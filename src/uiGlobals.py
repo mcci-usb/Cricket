@@ -28,7 +28,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.1.0"
+APP_VERSION = "4.2.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -181,6 +181,8 @@ ID_RBTN_RT = ID_MENU_CONFIG_SL2 + 1
 
 ID_TC_SEQNAME = ID_RBTN_RT + 1
 ID_BTN_SEQSAVE = ID_TC_SEQNAME + 1
+ID_USB4_TREEVIEW = ID_BTN_SEQSAVE + 1
+ID_MENU_HELP_3142 = ID_USB4_TREEVIEW + 1
 
 
 
@@ -200,6 +202,16 @@ usbClass = {0: "Unknown",
             220: "Diagnostic Devices", 224: "Wireless Controller", 
             239: "Miscellaneous", 254: "Application Specific",
             255: "Vendor Specific"}
+
+# usbClass = {0: "Unknown",
+#             1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
+#             6: "Image", 7: "Printer", 8: "Mass Storage", 9: "Hub",
+#             10: "CDC-Data", 11: "Smart Card", 13: "Content Security",
+#             14: "Video", 15: "Personal Healthcare", 16: "Audio/Video Devices",
+#             18: "Type-C Bridge", 
+#             220: "Diagnostic Devices", 224: "Wireless Controller", 
+#             239: "Miscellaneous", 254: "Application Specific",
+#             255: "Vendor Specific"}
 
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
 

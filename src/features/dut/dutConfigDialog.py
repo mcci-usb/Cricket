@@ -38,10 +38,17 @@ class DutConfigDialog(wx.Frame):
         ])
 
         self.SetSizer(self.vboxParent)
-
         self.cb_list = self.filter_port()
+
         base = os.path.abspath(os.path.dirname(__file__))
-        self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
+        iconpath = os.path.abspath(os.path.join(base, os.pardir, os.pardir))
+        icon_file_path = os.path.join(iconpath+"/icons/"+ IMG_ICON)
+
+        # Create a wx.Icon object with the specified icon file path
+        icon = wx.Icon(icon_file_path)
+
+        # Set the icon for the wx.Frame (assuming 'self' is an instance of wx.Frame)
+        self.SetIcon(icon)
         
         self.UpdateData()
 

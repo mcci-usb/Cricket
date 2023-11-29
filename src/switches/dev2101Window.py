@@ -98,8 +98,9 @@ class Dev2101Window(wx.Panel):
         self.st_port = wx.StaticText(self, -1, "Port", size = (40, 15)) 
         
         base = os.path.abspath(os.path.dirname(__file__))
-        self.picf = wx.Bitmap (base+"/icons/"+IMG_BTN_OFF, wx.BITMAP_TYPE_ANY)
-        self.picn = wx.Bitmap (base+"/icons/"+IMG_BTN_ON, wx.BITMAP_TYPE_ANY)
+        iconpath = os.path.abspath(os.path.join(base, os.pardir))  
+        self.picf = wx.Bitmap (iconpath+"/icons/"+IMG_BTN_OFF, wx.BITMAP_TYPE_ANY)
+        self.picn = wx.Bitmap (iconpath+"/icons/"+IMG_BTN_ON, wx.BITMAP_TYPE_ANY)
         
         self.btn_p1 = wx.BitmapButton(self, 0, self.picf,size= (-1,-1))
         self.st_ss   = wx.StaticText(self, -1, "SuperSpeed")

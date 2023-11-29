@@ -251,22 +251,7 @@ class SetWindow(wx.Window):
         Returns:
             None
         """
-        # if self.type == "scc":
-        #     if self.top.ldata['sccif'] == "network":
-        #         self.rb_nwc.SetValue(True)
-        #     else:
-        #         self.rb_tc.SetValue(True)
-        #     self.tc_nwcip.SetValue(self.top.ldata['sccid'])
-        #     self.tc_port.SetValue(self.top.ldata['sccpn'])
-        # else:
-        #     if(self.top.ldata['thcif'] == "network"):
-        #         self.rb_nwc.SetValue(True)
-        #     else:
-        #         self.rb_tc.SetValue(True)
-        #     self.tc_nwcip.SetValue(self.top.ldata['thcid'])
-        #     self.tc_port.SetValue(self.top.ldata['thcpn'])
-
-        # self.st_sysip.SetLabel(str(self.get_network_subnet()[0]))
+        
         pass
 
     def ScanNetwork(self, e):

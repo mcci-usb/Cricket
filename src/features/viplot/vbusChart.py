@@ -74,8 +74,12 @@ class VbusChart(wx.Frame):
         
         self.SetBackgroundColour("white")
 
+        # Get the absolute path of the current script's directory
         base = os.path.abspath(os.path.dirname(__file__))
-        self.SetIcon(wx.Icon(base+"/icons/"+IMG_ICON))
+        iconpath = os.path.abspath(os.path.join(base, os.pardir, os.pardir))
+        icon_file_path = os.path.join(iconpath, "icons", IMG_ICON)
+        icon = wx.Icon(icon_file_path)
+        self.SetIcon(icon)
         self.panel = wx.Panel(self)
 
         self.top_vbox = wx.BoxSizer(wx.VERTICAL)

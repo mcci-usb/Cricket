@@ -260,6 +260,13 @@ class AutoWindow(wx.Window):
         self.enable_controls(True)
 
     def update_sw_selector(self, swdict):
+        """
+        Update the switch selector with the provided switch dictionary.
+
+        Parameters:
+            swdict (dict): A dictionary containing switch information.
+
+        """
         self.cb_switch.Clear()
         for key, val in swdict.items():
             swstr = ""+val+"("+key+")"
@@ -270,12 +277,23 @@ class AutoWindow(wx.Window):
 
 
     def Update_port_count(self):
+        """
+        Update the port count based on the selected switch in the switch selector.
+
+        """
         self.swid = self.cb_switch.GetValue()
         self.swkey = self.swid.split("(")[1][:-1]
         swname = self.swid.split("(")[0]
         self.set_port_count(portCnt[swname])
     
     def SwitchChange(self, evt):
+        """
+        Handle the event triggered by changing the selected switch in the switch selector.
+
+        Parameters:
+            evt (wx.Event): The event object representing the switch selection change.
+
+        """
         self.Update_port_count()
 
     def OprAuto(self, evt):

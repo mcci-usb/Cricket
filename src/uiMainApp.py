@@ -39,12 +39,12 @@ from wx.core import ITEM_CHECK
 # Own modules
 from uiGlobals import *
 
-import getTb
-from copy import deepcopy
+import copy
 
 from aboutDialog import *
 from comDialog import *
-from firmwareUpdate import *
+
+from features.fwupdate import firmwareUpdate
 from setDialog import *
 from portDialog import *
 from warningMessage import *
@@ -55,7 +55,8 @@ import updateDialog as updtDlg
 from uiPanel import *
 
 
-import vbusChart
+# import vbusChart
+from features.viplot import vbusChart
 
 import devControl
 import devServer
@@ -69,10 +70,12 @@ from cricketlib import searchswitch
 
 from cricketlib import switch3141
 from cricketlib import switch3201
+
 from cricketlib import switch2101
 from cricketlib import switch2301
 from cricketlib import switch3142
 
+from usbenum import usbenumall
 
 ##############################################################################
 # Utilities
@@ -162,6 +165,7 @@ class UiMainFrame (wx.Frame):
         self.action = 0
 
         self.devHand = None
+        self.dutLogWindow = None
  
         self.print_on_log("Loading Configuration\n")
         
@@ -171,11 +175,19 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MOVE, self.OnMove)
 
-        self.update_slog_panel()
+        self.init_right_panel()
 
         self.initScreenSize()
 
         self.init_connect()
+
+        # Targetting for new release
+        self.usbenum = usbenumall.create_usb_device_enumerator()
+        if "msudp" not in self.config_data:
+            self.config_data["msudp"] = {"uname": None, "pwd": None}
+        mslogin = self.config_data["msudp"]
+        self.usbenum.set_login_credentials(mslogin["uname"], mslogin["pwd"])
+        # usb_device_enumerator.enumerate_usb_devices()
 
         # Check for the latest version
         update = updtDlg.check_version()
@@ -185,18 +197,49 @@ class UiMainFrame (wx.Frame):
             dlg.Destroy()
 
     def init_usbTreeImage(self):
+        """
+        Initializes the USB tree image by scanning and saving 
+        Thunderbolt USB devices.
+
+        Notes:
+            - This function is platform-specific, 
+              designed for macOS (darwin).
+            - It utilizes the getTb module to scan Thunderbolt USB devices.
+            - The scanned Thunderbolt devices are saved for
+              further use in the USB tree.
+        """
         # scan and save ThunderBolt USB device
-        if sys.platform == "darwin":
-            tbList = getTb.scan_tb()
-            self.save_tb_list(tbList)
+        # if sys.platform == "darwin":
+        #     tbList = getTb.scan_tb()
+        #     self.save_tb_list(tbList)
+        pass
     
     def init_statusBar(self):
+        """
+        Initializes the status bar for the main application window.
+
+       Notes:
+            - The status bar is created using the MultiStatus class.
+            - The initial status is set to display information about ports.
+        """
          # Create the statusbar
         self.statusbar = MultiStatus(self)
         self.SetStatusBar(self.statusbar)
         self.UpdateAll(["Port", "", ""])
     
     def darwin_dependent(self):
+        """
+        Handles platform-specific setup and bindings for macOS (darwin).
+
+        Notes:
+            - Creates a specific menu for the macOS platform.
+            - Binds menu items and events for macOS-specific functionality.
+
+        Dependencies:
+            - Requires the system module (sys).
+            - Assumes the use of wxPython for GUI components.
+
+        """
         if sys.platform == 'darwin':
             self.winMenu = wx.Menu()
             self.winMenu.Append(ID_MENU_WIN_MIN, "&Minimize\tCtrl+M")
@@ -209,6 +252,18 @@ class UiMainFrame (wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnClose, id=wx.ID_EXIT)
 
     def build_config_menu(self):
+        """
+        Builds and configures the settings menu for computer role selection.
+
+        Notes:
+            - Appends checkable items for User Computer (UC), Switch Control Computer (SCC),
+            and Test Host Computer (THC) roles.
+            - Disables all three menu items for single computer setup.
+
+        Dependencies:
+            - Assumes the use of wxPython for GUI components.
+
+        """
         # config menu
         self.ucmenu = self.configMenu.Append(ID_MENU_CONFIG_UC, 
                             "User Computer", kind = ITEM_CHECK)
@@ -223,12 +278,36 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Enable(ID_MENU_CONFIG_THC, False)
 
     def build_set_menu(self):
+        """
+        Builds the settings menu for selecting specific configurations.
+
+        Notes:
+            - Appends menu items for Switch Control Computer (SCC) 
+              and Test Host Computer (THC).
+            - Uncomment the line for Warning menu if needed.
+
+        Dependencies:
+            - Assumes the use of wxPython for GUI components.
+
+        """
         # Set Menu   
         self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
         self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
         # self.setMenu.Append(ID_MENU_SET_WARNING, "Warning")
     
     def read_configs(self):
+        """
+        Reads and initializes the configuration data.
+
+        Notes:
+            - Assumes the existence of 'configdata' module for configuration management.
+            - Uses 'myrole', 'uc', 'cc', 'thc', 'dut' keys in the configuration data.
+            - Sets 'cerr_flg' to True if any of the mandatory keys are missing.
+
+        Dependencies:
+            - Assumes the use of 'configdata' module for configuration management.
+
+        """
         mpkeys = ['myrole', 'uc', 'cc', 'thc', 'dut']
         self.config_data = configdata.read_all_config()
         klist = list(self.config_data.keys())
@@ -264,6 +343,13 @@ class UiMainFrame (wx.Frame):
             dlg.ShowModal()
  
     def declare_globals(self):
+        """
+        Initializes global variables.
+
+        Notes:
+            - Assumes the need for global variables 'init_flg' and 'ldata'.
+
+        """
         self.init_flg = True
 
         self.ldata = {}
@@ -307,16 +393,24 @@ class UiMainFrame (wx.Frame):
         self.dev_list = []
         self.switch_list = []
 
-        self.masterList = []
+        self.masterList = None
         self.tbMasterList = None
 
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, 
-                          "2101": switch2101.Switch2101, "2301": switch2301.Switch2301}
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
 
     def define_events(self):
+        """
+        Defines event bindings for menu items and controls.
+
+        Notes:
+            - Binds menu events for window closure and configuration updates.
+            - Assumes the existence of specific menu item IDs: ID_MENU_FILE_CLOSE,
+            ID_MENU_SET_SCC, ID_MENU_SET_THC, and corresponding configuration menus.
+
+        """
         self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=ID_MENU_FILE_CLOSE)
         self.Bind(wx.EVT_MENU, self.OnSelectScc, id=ID_MENU_SET_SCC)
         self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
@@ -337,18 +431,34 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
 
-
-    # def OnFocusSUT1(self, event):
-    #     # On Focus event, not used
-    #     pass
-
     def init_connect(self):
+        """
+        Initializes device control for Switch Control and Test Host.
+        
+        Notes:
+            - Associates device control with the main application.
+            - Assumes the existence of `devControl` and `thControl` instances.
+            Make sure they are appropriately defined and accessible.
+            - Optionally initiates auto-connection for the User Computer role.
+
+        """
         devControl.SetDeviceControl(self)
         thControl.SetDeviceControl(self)
         # if self.myrole["uc"] == True:
         #     self.auto_connect()
 
     def auto_connect(self):
+        """
+        Automatically searches for switches and updates the device list.
+
+        Notes:
+            - Activates a busy cursor during the search process.
+            - Prints the search progress to the application log.
+            - Assumes the existence of `searchswitch` module for switch discovery.
+            - Modifies the instance attribute `dev_list` with the updated list.
+            - Ends the busy cursor upon completion of the search.
+
+        """
         wx.BeginBusyCursor()
 
         self.print_on_log("Search Switches ...\n")
@@ -376,14 +486,42 @@ class UiMainFrame (wx.Frame):
 
    
     def update_slog_menu(self):
+        """
+        Updates the status log menu based on the selected configuration.
+
+        Notes:
+            - Checks the selected role (UC or CC) to enable or disable specific menu items.
+            - Reflects the state of DUT1, DUT2, and USB4 Tree View in the menu based on the configuration data.
+            - Disables menu items when neither UC nor CC is selected.
+
+        """
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
-            self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
+            # self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
+            # self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
+            if "rpanel" in self.config_data:
+                rpanel = self.config_data["rpanel"]
+                self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
+                self.dutMenuBar.Check(ID_MENU_DUT2, rpanel["dut2"] if "dut2" in rpanel else False)
+                self.toolMenu.Check(ID_USB4_TREEVIEW, rpanel["u4tree"] if "u4tree" in rpanel else False)
+            else:
+                rpanel = {"dut1": False, "dut2": False, "u4tree": False}
+                self.config_data["rpanel"] = rpanel
+                
+                
         else:
             self.dutMenuBar.Enable(ID_MENU_DUT1, False)
             self.dutMenuBar.Enable(ID_MENU_DUT2, False)
+            self.toolMenu.Check(ID_USB4_TREEVIEW, False)
 
     def build_menu_bar(self):
+        """
+        Builds the main menu bar for the application.
+
+        Description:
+            - Creates menus for configuration, communication, settings, tools, status log, and help.
+            - Initializes the menu bar with these menus.
+
+        """
         self.menuBar = wx.MenuBar()
 
         self.configMenu = wx.Menu()
@@ -422,12 +560,20 @@ class UiMainFrame (wx.Frame):
 
     
     def build_tool_menu(self):
+        """
+        Builds the tools menu for the application.
+
+        Description:
+            - Creates menu items for various tools, such as VBUS V/I Plot and 3141-3142 firmware update.
+            - Associates icons with specific tools for visual identification.
+
+        """
         base = os.path.abspath(os.path.dirname(__file__))
         qmiamps = wx.MenuItem(self.toolMenu, ID_MENU_GRAPH, "VBUS V/I Plot")
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
-        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "Model 3141/3142 Firmware Update")
         self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
@@ -435,12 +581,28 @@ class UiMainFrame (wx.Frame):
         self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
         self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
         
+        self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View", kind = ITEM_CHECK)
+        self.toolMenu.Append(self.usb4t)
+        
         
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
         self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
+        self.Bind(wx.EVT_MENU, self.SelectU4TREE, id=ID_USB4_TREEVIEW)
         self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
+        """
+        Handles the window move event.
+
+        Parameters:
+            - e (wx.MoveEvent): The move event containing information about the new window position.
+
+        Description:
+            - Retrieves the current window position.
+            - Obtains the screen size.
+            - Saves the screen size to maintain the application state.
+
+        """
         x, y = e.GetPosition()
         w, h = wx.DisplaySize()
         sw = self.Size[0]
@@ -448,6 +610,16 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
 
     def initScreenSize(self):
+        """
+        Initializes the screen size and position of the main window.
+
+        Description:
+            - Retrieves the display size.
+            - Checks stored configuration data for window position and size.
+            - If no configuration is available, sets a default size and centers the window.
+            - Otherwise, sets the window position and size based on stored configuration.
+
+        """
         dw, dh = wx.DisplaySize()
         opos = self.config_data["screen"]["pos"]
         osize = self.config_data["screen"]["size"]
@@ -460,12 +632,32 @@ class UiMainFrame (wx.Frame):
             self.SetSize((osize[0], osize[1]))
 
     def saveScreenSize(self):
+        """
+        Saves the current screen size and position of the 
+        main window to configuration data.
+
+        Description:
+            - Retrieves the current position (px, py) and size (sw, sh) of the main window.
+            - Creates a dictionary with the screen position and size.
+            - Updates the configuration data with the new screen information.
+
+        """
         px, py = self.GetPosition()
         sw, sh = self.GetSize()
         findict = {"screen": {"pos": [px, py], "size": [sw, sh]}}
         configdata.updt_screen_size(findict)
 
     def reSizeScreen(self):
+        """
+        Resize the main window to a percentage of the display size, maintaining fixed left and middle panels.
+
+        Description:
+            - Retrieves the current display size (w, h).
+            - Calculates new dimensions (dw, dh) as a percentage of the display size.
+            - Checks the current window size (sw, sh).
+            - Resizes the main window if the calculated dimensions are different.
+
+        """
         # Left and Middle panel are fixed
         # Only DUT Log Window is optional
         # Check the screen size before resize it
@@ -477,17 +669,14 @@ class UiMainFrame (wx.Frame):
         sw = self.Size[0]
         sh = self.Size[1]
 
-        if(sw >= dw and sh >= dh):
-            # Already in full screen, no change required
-            pass
+        reqwidth = 950
+        # if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
+        if self.config_data["rpanel"]["dut1"] or self.config_data["rpanel"]["dut2"] or self.config_data["rpanel"]["u4tree"]:
+            reqwidth = 1420
+            if sw < reqwidth:
+                self.SetSize((reqwidth, dh))
         else:
-            reqwidth = 950
-            if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
-                reqwidth = 1420
-                if sw < reqwidth:
-                    self.SetSize((reqwidth, dh))
-            else:
-                self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.CenterOnScreen()
         self.Layout()
@@ -495,29 +684,131 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
 
     def SelectDUT(self, event):
+        """
+        Handle the event triggered by selecting DUT options in the menu.
+
+        Description:
+            - Prints a message indicating the Uima trigger to add DUT.
+            - Retrieves the event object.
+            - Updates DUT configurations based on menu item checks.
+            - Updates the right panel and resizes the screen accordingly.
+
+        Parameters:
+            event (wx.Event): The event object representing the menu selection.
+
+        """
         obj = event.GetEventObject()
-        self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
-        self.update_slog_panel()
+        
+        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.config_data["rpanel"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        self.config_data["rpanel"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+
+        self.update_right_panel()
+        self.reSizeScreen()
+        
+        # if not self.dutLogWindow.IsShown():
+        #     obj.MenuItems[0].Check(False)
+        #     obj.MenuItems[1].Check(False)
+
+    def SelectU4TREE(self, event):
+        """
+        Handle the event triggered by selecting the USB4 Tree View option in the menu.
+
+        Description:
+            - Prints a message indicating the UIMP trigger to add/remove USB4 Tree View.
+            - Retrieves the event object.
+            - Updates USB4 Tree View configuration based on the menu item check.
+            - Updates the right panel and resizes the screen accordingly.
+
+        Parameters:
+            event (wx.Event): The event object representing the menu selection.
+
+        """
+        obj = event.GetEventObject()
+        
+        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        self.config_data["rpanel"]["u4tree"] = True if self.usb4t.IsChecked() else False
+        
+        self.update_right_panel()
         self.reSizeScreen()
 
-
     def updt_dut_config(self, dutdict):
+        """
+        Update the DUT configuration based on the provided dictionary.
+
+        Description:
+            - Extracts the DUT key from the dictionary.
+            - Iterates through the nested keys in the DUT dictionary.
+            - Updates the corresponding values in the application's DUT configuration.
+
+        Parameters:
+            dutdict (dict): A dictionary containing DUT configuration information.
+
+        """
         key = list(dutdict.keys())[0]
         nkeys = list(dutdict[key].keys())
         for nkey in nkeys:
             self.duts[key][nkey] = dutdict[key][nkey]
 
     def get_dut_config(self, dutno):
+        """
+        Get the DUT configuration for a specific DUT.
+
+        Description:
+            - Retrieves and returns the DUT configuration for the specified DUT number.
+
+        Parameters:
+            dutno (str): The DUT number for which to retrieve the configuration.
+
+        Returns:
+            dict: A dictionary containing the configuration for the specified DUT.
+        """
         return {dutno: self.duts[dutno]}
+    
+    def request_dut_close(self, dutname):
+        """
+        Request to close a specific DUT.
+
+        Description:
+            - Updates the configuration data to mark the specified DUT as closed.
+            - Updates the DUT-related menu items and the right panel.
+            - Resizes the screen accordingly.
+
+        Parameters:
+            dutname (str): The name or identifier of the DUT to be closed.
+        """
+        self.config_data["dut"]["nodes"][dutname] = False
+        self.config_data["rpanel"][dutname] = False
+        self.update_slog_menu()
+        self.update_right_panel()
+        self.reSizeScreen()
 
     def build_com_menu(self):
+        """
+        Build the communication menu.
+
+        Description:
+            - Appends menu items for connecting and disconnecting models.
+
+        Menu Items:
+            - "Connect": ID_MENU_MODEL_CONNECT
+            - "Disconnect": ID_MENU_MODEL_DISCONNECT
+        """
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
         self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
         
     def build_help_menu(self):
+        """
+        Build the help menu.
+
+        Description:
+            - Appends menu items to visit different MCCI USB Switch models.
+        """
         # Creating the help menu
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit MCCI USB Switch 3141")
+        self.helpMenu.Append(ID_MENU_HELP_3142, "Visit MCCI USB Switch 3142")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
@@ -527,6 +818,7 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3142)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
@@ -564,6 +856,9 @@ class UiMainFrame (wx.Frame):
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
             webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
+                            new=0, autoraise=True)
+        elif(id == ID_MENU_HELP_3142):
+            webbrowser.open("https://store.mcci.com/collections/usb-switches/products/model3142",
                             new=0, autoraise=True)
         elif(id == ID_MENU_HELP_3201):
             webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"
@@ -679,7 +974,18 @@ class UiMainFrame (wx.Frame):
         dlg.Destroy()
 
     def OnFirmwareUpdateWindow(self, event):
-        dlg = FirmwareDialog(self, self)
+        """
+        Handle the event triggered by selecting the firmware update option in the menu.
+
+        Description:
+            - Initializes and shows the firmware update dialog.
+            - Destroys the dialog after it is closed.
+
+        Parameters:
+            event (wx.Event): The event object representing the menu selection.
+        """
+
+        dlg = firmwareUpdate.FirmwareDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
     
@@ -892,9 +1198,19 @@ class UiMainFrame (wx.Frame):
         self.update_connect_menu(True)
         self.set_mode(MODE_MANUAL)
     
-
     # Multiple Switches
     def add_switch_dialogs(self):
+        """
+        Adds switch dialogs.
+
+        Description:
+            - Iterates through the switch list.
+            - Extracts the switch name and port information from each item in the list.
+            - Appends a dictionary containing the switch name and port information to the swlist.
+
+        Returns:
+            list: A list of dictionaries, each containing the switch name and port information.
+        """
         swlist = []
         
         for idx in range(len(self.switch_list)):
@@ -914,6 +1230,20 @@ class UiMainFrame (wx.Frame):
         self.device_connected()
 
     def add_switch_dialogs_batch(self, swDict):
+        """
+        Adds switch dialogs in batch.
+
+        Description:
+            - Iterates through the switch dictionary.
+            - Creates a dictionary with switch name as the value and switch key as the key.
+            - Appends the created dictionary to the swlist.
+
+        Parameters:
+            swDict (dict): A dictionary containing switch information.
+
+        Returns:
+            list: A list of dictionaries, each containing the switch name and corresponding switch key.
+        """
         swlist = []
 
         swkeys = list(swDict.keys())
@@ -932,10 +1262,16 @@ class UiMainFrame (wx.Frame):
         self.Refresh()
 
     def update_loop_swselector(self):
+        """
+        Updates the switch selector in the loop panel.
+
+        Description:
+            - Calls the update_sw_selector method for both the autoPan and loopPan components.
+
+        """
         # update selected switch list loop panel's switch selector
         self.panel.cpanel.autoPan.update_sw_selector(self.swuidict)
         self.panel.cpanel.loopPan.update_sw_selector(self.swuidict)
-    
     
     def save_usb_list(self, mlist):
         """
@@ -952,7 +1288,14 @@ class UiMainFrame (wx.Frame):
         self.masterList = mlist[:]  
 
     def save_tb_list(self, mlist):
-        self.tbMasterList = deepcopy(mlist)
+        """
+        Saves the ThunderBolt device list.
+
+        Parameters:
+            mlist (list): The ThunderBolt device list to be saved.
+
+        """
+        self.tbMasterList = copy.deepcopy(mlist)
         
     def get_usb_list(self):
         """
@@ -968,6 +1311,13 @@ class UiMainFrame (wx.Frame):
         return self.masterList
 
     def get_tb_list(self):
+        """
+        Returns the saved ThunderBolt device list.
+
+        Returns:
+            list: The ThunderBolt device list.
+
+        """
         return self.tbMasterList
     
     def print_on_log(self, strin):
@@ -983,6 +1333,20 @@ class UiMainFrame (wx.Frame):
             return None
         """
         self.panel.PrintLog(strin)
+
+    def store_usb4_win_info(self, usb4dict):
+        """
+        Show data in Log Window
+
+        Args:
+            self:The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            strin: data in String format
+        Returns:
+            return None
+        """
+        self.panel.update_usb4_tree(usb4dict)
     
     def get_enum_delay(self):
         """
@@ -1137,12 +1501,36 @@ class UiMainFrame (wx.Frame):
         self.panel.port_on(swkey, port, stat, len(self.swuidict))
 
     def set_speed(self, swkey, speed):
+        """
+        Sets the speed for a specific switch.
+
+        Parameters:
+            swkey (str): The key or identifier of the switch.
+            speed (int): The speed to be set for the switch.
+
+        """
         self.panel.set_speed(swkey, speed)
 
     def read_param(self, swkey, param):
+        """
+        Reads a specific parameter for a switch.
+
+        Parameters:
+            swkey (str): The key or identifier of the switch.
+            param (str): The parameter to be read.
+
+        """
         self.panel.read_param(swkey, param)
 
     def open_com_port(self, param):
+        """
+        Opens a communication port based on the specified parameters.
+
+        Parameters:
+            param (str): A string containing the necessary parameters for opening the port,
+            separated by commas. The parameters include port, baudrate, and more.
+
+        """
         inparam = param.split(',')
         self.devHand = serial.Serial()
         self.devHand.port = inparam[0]
@@ -1158,6 +1546,13 @@ class UiMainFrame (wx.Frame):
             self.panel.PrintLog("Port Open Fail\n")
     
     def write_serial(self, param):
+        """
+        Writes data to the opened serial port.
+
+        Parameters:
+            param (str): The data to be written to the serial port.
+
+        """
         try:
             param = param + '\r\n'
             self.devHand.write(param.encode())
@@ -1165,6 +1560,16 @@ class UiMainFrame (wx.Frame):
             pass
     
     def read_serial(self, param):
+        """
+        Reads data from the opened serial port and compares it with the given parameter.
+
+        Parameters:
+            param (str): The expected data to be received from the serial port.
+
+        Returns:
+            bool: True if the received data matches the expected parameter, False otherwise.
+
+        """
         try:
             rxdata = self.devHand.readline()
             try:
@@ -1181,14 +1586,18 @@ class UiMainFrame (wx.Frame):
         except serial.SerialException as e:
             return False
 
-    def get_usb_tree(self):
-        # thControl.get_tree_change(self)
-        try:
-            thControl.get_tree_change(self)
-        except:
-            self.print_on_log("USB Read Error!")
-
     def compareReqSw(self, swDict, exist_sw):
+        """
+        Compares the requested switch configuration with the existing switch configuration.
+
+        Parameters:
+            sw_dict (dict): The dictionary representing the requested switch configuration.
+            exist_sw (list): The list of dictionaries representing the existing switch configuration.
+
+        Returns:
+            bool: True if the requested switch configuration matches the existing switch configuration, False otherwise.
+
+        """
         swkeys = list(swDict.keys())
         swvals = list(swDict.values())
 
@@ -1205,6 +1614,16 @@ class UiMainFrame (wx.Frame):
         return True
     
     def createBatchPanel(self, swDict):
+        """
+        Creates a batch panel based on the requested switch configuration.
+
+        Parameters:
+            sw_dict (dict): The dictionary representing the requested switch configuration.
+
+        Returns:
+            bool: True if the batch panel is successfully created, False otherwise.
+
+        """
         exist_sw = []
         try:
             exist_sw = self.dev_list
@@ -1245,8 +1664,11 @@ class UiMainFrame (wx.Frame):
         # self.panel.device_connected()
 
     def enable_graph_menu(self):
+        """
+        Enables the VBUS V/I Plot menu based on the connected devices.
+
+        """
         cdevices =  list(self.swuidict.values())
-        print(cdevices)
         if len(cdevices) > 0:
             self.set_mode(MODE_MANUAL)
             if '3142' in cdevices:
@@ -1309,9 +1731,9 @@ class UiMainFrame (wx.Frame):
             None
         """
         strUsb = " USB Devices     Host Controller: {d1}     ".\
-                 format(d1=str(dl[0])) + \
-                 "Hub: {d2}     ".format(d2=str(dl[1])) + \
-                 "Peripheral: {d3}".format(d3=str(dl[2]))
+                 format(d1=str(dl["host"])) + \
+                 "Hub: {d2}     ".format(d2=str(dl["hub"])) + \
+                 "Peripheral: {d3}".format(d3=str(dl["peri"]))
         
         self.UpdateSingle(strUsb, 4)
 
@@ -1405,15 +1827,36 @@ class UiMainFrame (wx.Frame):
 
         dlg.ShowModal()
         dlg.Destroy()
+    
+    def init_right_panel(self):
+        """
+        Initializes the right panel with configuration data.
 
-    def update_slog_panel(self):
+        """
+        pdict = {"rpanel": self.config_data["rpanel"], "dut": self.config_data["dut"]}
+        self.panel.init_right_panel(pdict)
+
+    def update_right_panel(self):
+        """
+        Updates the right panel based on the configuration data.
+
+        """
         if self.ucmenu.IsChecked() or self.ccmenu.IsChecked():
-            self.panel.update_slog_panel(self.duts)
+            pdict = {"rpanel": self.config_data["rpanel"], "dut": self.config_data["dut"]}
         else:
-            self.panel.update_slog_panel({})
+            pdict = {"rpanel": {"dut1": True, "dut2": True, "u4tree": True}, "dut": {}}
+        self.panel.update_right_panel(pdict)
         self.Refresh()
-        
+
+     
     def UpdateConfig(self, event):
+        """
+        Updates the configuration based on the menu selection.
+
+        Parameters:
+            event (wx.Event): The event object representing the menu selection.
+
+        """
         self.myrole["uc"] = True if self.ucmenu.IsChecked() else False
         self.myrole["cc"] = True if self.ccmenu.IsChecked() else False
         self.myrole["thc"] = True if self.hcmenu.IsChecked() else False
@@ -1422,11 +1865,22 @@ class UiMainFrame (wx.Frame):
         self.panel.update_panels(self.myrole, self.duts)
 
     def saveMenus(self):
-        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}}
+        """
+        Saves the menu configurations and screen size.
+
+        """
+        findict = {"myrole": self.myrole, "dut": {"nodes": self.duts["nodes"]}, "rpanel": self.config_data["rpanel"]}
         configdata.set_base_config_data(findict)
         self.saveScreenSize()
 
     def derive_menu_stat(self):
+        """
+        Derives the status of the config, switch control, and test host menus based on the current role.
+
+        Returns:
+            list: A list containing boolean values indicating the status of the config, switch control, and test host menus.
+
+        """
         ccstat = False
         hcstat = False
         sutstat = False
@@ -1444,6 +1898,10 @@ class UiMainFrame (wx.Frame):
         return [ccstat, hcstat, sutstat]
 
     def update_other_menu(self):
+        """
+        Updates the config, switch control, and test host menus based on the current role.
+
+        """
         [ccstat, hcstat, sutstat] = self.derive_menu_stat()
         self.update_scc_menu(ccstat)
         self.update_thc_menu(hcstat)
@@ -1607,24 +2065,54 @@ class UiMainFrame (wx.Frame):
         return dpath
 
     def action_reset(self):
+        """
+        Resets the action counter to zero.
+
+        """
         self.action = 0
 
     def action_count(self):
+        """
+        Increments the action counter and returns the updated count.
+
+        Returns:
+            int: The updated action count.
+
+        """
         self.action += 1
         return self.action
 
     def action_summary(self):
+        """
+        Prints a summary message indicating the total number of matches found.
+
+        """
         self.print_on_log("Total match found : "+str(self.action)+"\n")
 
     def get_batch_location(self):
+        """
+        Returns the batch location from the configuration data.
+
+        Returns:
+            str: The batch location.
+
+        """
         return self.config_data["batch"]["location"]
 
     def show_warning_dlg(self):
+        """
+        Displays the warning dialog.
+
+        """
         dlg = WarningDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
     
     def show_warning_dlg_new(self):
+        """
+        Displays a simple warning message box.
+
+        """
         # warning dialog
         wx.MessageBox('Operation could not be completed', 'Warning', wx.OK | wx.ICON_INFORMATION)
 

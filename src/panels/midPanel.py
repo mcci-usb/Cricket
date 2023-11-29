@@ -30,10 +30,11 @@ from sys import platform
 # Own modules
 from uiGlobals import *
 
-import loopWindow
+from features.modes import loopWindow
+from features.modes import autoWindow
+from features.modes import batchWindow
+
 import logWindow
-import autoWindow
-import batchWindow
 
 
 class MidPanel(wx.Panel):
