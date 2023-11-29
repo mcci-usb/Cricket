@@ -94,6 +94,7 @@ class Usb4TreeWindow(wx.Window):
 
         self.top = top
         self.parent = parent
+        self.name = "usb4tree"
 
         self.totline = 0
 
@@ -105,6 +106,8 @@ class Usb4TreeWindow(wx.Window):
 
             self.btn_config = wx.Button(self, ID_BTN_SL_CONFIG, "Config",
                                         size=(60, -1))
+            self.tool_tip = "Provide Windows Device Portal Login Credentials."
+            self.btn_config.SetToolTip(self.tool_tip)
             self.btn_config.Bind(wx.EVT_BUTTON, self.OnLoginConfig)
 
         

@@ -89,7 +89,7 @@ class LogWindow(wx.Window):
         self.btn_save = wx.Button(self, ID_BTN_AUTO, "Save",
                                         size=(60, -1))  
         self.btn_clear = wx.Button(self, ID_BTN_CLEAR, "Clear",
-                                         size=(60, 25))     
+                                         size=(60, -1))     
 
         self.scb = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
                                          size=(-1,-1))
@@ -109,13 +109,13 @@ class LogWindow(wx.Window):
         self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hbox1.Add(self.st_delay, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 18)
+                       wx.LEFT, border = 5)
         self.hbox1.Add(self.tc_delay, flag=wx.ALIGN_LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL, border = 25)
+                       wx.ALIGN_CENTER_VERTICAL, border = 5)
         self.hbox1.Add(self.st_ms, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 1)
         self.hbox1.Add(self.btn_ref,  0, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 20)
+                       wx.LEFT, border = 5)
         
         self.hbox.Add(self.chk_box, 0, wx.ALIGN_LEFT | 
                                        wx.ALIGN_CENTER_VERTICAL)

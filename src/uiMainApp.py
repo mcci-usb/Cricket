@@ -70,9 +70,8 @@ from cricketlib import searchswitch
 
 from cricketlib import switch3141
 from cricketlib import switch3201
-import sys
-if sys.platform == "win32":
-    from cricketlib import switch2101
+
+from cricketlib import switch2101
 from cricketlib import switch2301
 from cricketlib import switch3142
 
@@ -396,7 +395,7 @@ class UiMainFrame (wx.Frame):
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
 
     def define_events(self):
         """
@@ -563,7 +562,7 @@ class UiMainFrame (wx.Frame):
         qmiamps.SetBitmap(wx.Bitmap(base+"/icons/"+IMG_WAVE))
         self.toolMenu.Append(qmiamps)
 
-        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "3141-3142 firmwareupdate")
+        self.fware = wx.MenuItem(self.toolMenu, ID_3141_FIRMWARE, "Model 3141/3142 Firmware Update")
         self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
@@ -798,6 +797,7 @@ class UiMainFrame (wx.Frame):
         """
         # Creating the help menu
         self.abc = self.helpMenu.Append(ID_MENU_HELP_3141, "Visit MCCI USB Switch 3141")
+        self.helpMenu.Append(ID_MENU_HELP_3142, "Visit MCCI USB Switch 3142")
         self.helpMenu.Append(ID_MENU_HELP_3201, "Visit MCCI USB Switch 3201")
         self.helpMenu.Append(ID_MENU_HELP_2101, "Visit MCCI USB Switch 2101")
         self.helpMenu.Append(ID_MENU_HELP_2301, "Visit MCCI USB Switch 2301")
@@ -807,6 +807,7 @@ class UiMainFrame (wx.Frame):
         self.helpMenu.AppendSeparator()
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3141)
+        self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3142)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_3201)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2101)
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_2301)
@@ -844,6 +845,9 @@ class UiMainFrame (wx.Frame):
         id = event.GetId()
         if(id == ID_MENU_HELP_3141):
             webbrowser.open("https://mcci.com/usb/dev-tools/model-3141/",
+                            new=0, autoraise=True)
+        elif(id == ID_MENU_HELP_3142):
+            webbrowser.open("https://store.mcci.com/collections/usb-switches/products/model3142",
                             new=0, autoraise=True)
         elif(id == ID_MENU_HELP_3201):
             webbrowser.open("https://mcci.com/usb/dev-tools/3201-enhanced"

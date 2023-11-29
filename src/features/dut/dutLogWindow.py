@@ -120,6 +120,7 @@ class DutLogWindow(wx.Window):
         self.SetBackgroundColour("White")
         self.SetMinSize((480,330))
 
+        self.name = "dut"
         self.top = top
         self.sut = sut
         self.parent = parent

@@ -101,9 +101,11 @@ class RightPanel(wx.Panel):
     def add_switches(self, swlist):
         self.Layout()
     
-    def update_usb4_tree(self, msusb4): 
-        if(len(self.slobj) > 0):
-            self.slobj[0].update_usb4_tree(msusb4)
+    def update_usb4_tree(self, msusb4):
+        for rpobj in self.slobj:
+            if rpobj.name == "usb4tree":
+                rpobj.update_usb4_tree(msusb4)
+                break
     
     def print_on_log(self, data):
         pass
