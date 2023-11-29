@@ -31,7 +31,7 @@ import threading
 import time
 import wx
 import json
-import usbDev
+import usbChange
 
 keywords = {'Python',
             'wxpython',
@@ -246,7 +246,7 @@ class RequestSync(threading.Thread):
         cmd = reqdict["cmd"]
         if(ctype == "usb"):
             if (cmd == "lsusb"):
-                result = usbDev.get_usb_tree()
+                result = usbChange.get_usb_tree()
                 rdict = {}
                 rdict["data"] = list(result)
                 return rdict
