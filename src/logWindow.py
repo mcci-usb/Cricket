@@ -109,13 +109,13 @@ class LogWindow(wx.Window):
         self.hbox1.Add(self.chk_usb, 0, flag=wx.ALIGN_LEFT | wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hbox1.Add(self.st_delay, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 5)
+                       wx.LEFT, border = 18)
         self.hbox1.Add(self.tc_delay, flag=wx.ALIGN_LEFT | 
-                       wx.ALIGN_CENTER_VERTICAL, border = 5)
+                       wx.ALIGN_CENTER_VERTICAL, border = 25)
         self.hbox1.Add(self.st_ms, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 1)
         self.hbox1.Add(self.btn_ref,  0, flag=wx.ALIGN_CENTER_VERTICAL |
-                       wx.LEFT, border = 5)
+                       wx.LEFT, border = 20)
         
         self.hbox.Add(self.chk_box, 0, wx.ALIGN_LEFT | 
                                        wx.ALIGN_CENTER_VERTICAL)
@@ -168,22 +168,6 @@ class LogWindow(wx.Window):
         Returns:
             None
         """
-        self.scb.SetValue("")
-    
-    def UsbThread(self):
-        """
-        Thread for USB tree view changes
-        Start the USB device scan and list the difference catagorized by 
-        Added and Removed
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-       
         self.scb.SetValue("")
     
     def SaveLogWindow(self, e):
@@ -285,13 +269,13 @@ class LogWindow(wx.Window):
         Returns:
             None
         """
-        # thControl.get_tree_change(self.top)
-        try:
-            thControl.get_tree_change(self.top)
-        except:
-            # print message
-            
-            self.print_on_log("USB Read Error!")
+        thControl.get_tree_change(self.top)
+        # try:
+        #     thControl.get_tree_change(self.top)
+        # except:
+        #     # print message
+        #     self.print_on_log("USB Read Error!")
+
         self.wait_flg = False
         self.btn_ref.Enable()
     
