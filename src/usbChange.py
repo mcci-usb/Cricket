@@ -15,6 +15,7 @@ def get_usb_change(top):
 
     usb3diff = get_usb3_change(top, result["usb3list"])
     usb4diff = get_usb4_change(top, result["usb4tblist"])
+    top.update_usb_status(result["usb3type"])
     prepare_tree_change(top, usb3diff, usb4diff)
 
     if result["usb4tbjson"] != None:
