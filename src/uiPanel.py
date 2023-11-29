@@ -31,16 +31,9 @@ from sys import platform
 from uiGlobals import *
 
 # import panels
-from leftPanel import *
-from rightPanel import *
-from midPanel import *
-
-from dev2101Window import Dev2101Window
-from dev3141Window import Dev3141Window
-from dev3201Window import Dev3201Window
-from dev2301Window import Dev2301Window
-from dev3142Window import Dev3142Window
-
+from panels import leftPanel
+from panels import rightPanel
+from panels import midPanel
 
 class UiPanel(wx.Panel):
     """
@@ -81,15 +74,15 @@ class UiPanel(wx.Panel):
         self.vb_left = wx.BoxSizer(wx.VERTICAL)  # for multiple switches
         self.vb_right = wx.BoxSizer(wx.VERTICAL)  # for serial logs
 
-        self.lpanel = LeftPanel(self, self.parent)
+        self.lpanel = leftPanel.LeftPanel(self, self.parent)
         self.vb_left.Add((0,25), 0, wx.EXPAND)
         self.vb_left.Add(self.lpanel, 1, wx.ALIGN_LEFT | wx.EXPAND)
         self.vb_left.Add((0,10), 0, wx.EXPAND)
 
-        self.cpanel = MidPanel(self, self.parent, "")
+        self.cpanel = midPanel.MidPanel(self, self.parent, "")
         self.vb_center.Add(self.cpanel, 0, wx.ALIGN_LEFT | wx.EXPAND)
 
-        self.rpanel = RightPanel(self)
+        self.rpanel = rightPanel.RightPanel(self)
         self.vb_right.Add(self.rpanel, 1, wx.ALIGN_LEFT | wx.EXPAND)
 
         self.hb_outer.Add((10,0), 0, wx.EXPAND)
@@ -145,8 +138,7 @@ class UiPanel(wx.Panel):
             - Performs a layout update after the panel is updated.
         """
         self.rpanel.update_slog_panel(duts)
-        # print("Trigger Add SUT Dialog")
-        # self.rpanel.update_slog_panel(type="dut", dudata=duts)
+        
         self.Layout()
 
     def init_right_panel(self, pdict):
@@ -173,9 +165,6 @@ class UiPanel(wx.Panel):
         """
         self.rpanel.update_my_panel(pdict)
 
-    # def init_right_panel(self, pdict):
-    #     self.rpanel.init_my_panel(pdict)
-
     def update_usb4_tree_panel(self, duts):
         """
         Updates the USB4 tree panel with information about the specified DUTs.
@@ -187,7 +176,6 @@ class UiPanel(wx.Panel):
             - Calls the `update_usb_tree_panel` method of the right panel (`rpanel`) to handle the update.
             - Performs a layout update after the USB4 tree panel is updated.
         """
-        print("Trigger Add USB4 Tree Dialog")
         self.rpanel.update_usb_tree_panel(duts)
         self.Layout()
     
@@ -201,7 +189,6 @@ class UiPanel(wx.Panel):
         Notes:
             - Calls the `update_usb4_tree` method of the right panel (`rpanel`) to handle the update.
         """
-        # print("MSUSB4--------------->>>>>", msusb4)
         self.rpanel.update_usb4_tree(msusb4)
 
 
@@ -635,7 +622,6 @@ class UiPanel(wx.Panel):
             - Outputs a message indicating the received DUT close request.
             - Calls the `request_dut_close` method of the parent object to handle DUT closure.
         """
-        print("DUT Close Request Received: ", dutname)
         self.parent.request_dut_close(dutname)
 
 
