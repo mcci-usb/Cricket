@@ -254,11 +254,18 @@ class ComWindow(wx.Window):
                 self.top.UpdateSingle("No Switch found", 3)
     
     def DeviceAdd(self, evt):
+        """
+        Handle the event for adding devices.
+
+        Args:
+            evt: The event object.
+
+        Returns:
+            None
+        """
         
         ilist = self.fst_lb.GetItems()
         slist = self.fst_lb.GetSelections()
-        
-
         flist = []
         temp_list = []
         self.top.switch_list.clear()
@@ -403,6 +410,16 @@ class ComWindow(wx.Window):
         self.Layout()
 
 def EVT_RESULT(win, func):
+    """
+    Bind a function to the custom result event.
+
+    Args:
+        win: The window to which the event is connected.
+        func: The function to be called when the event occurs.
+
+    Returns:
+        None
+    """
     win.Connect(-1, -1, EVT_RESULT_ID, func)    
 
 def get_devices(top):

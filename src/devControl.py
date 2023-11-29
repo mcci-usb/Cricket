@@ -117,6 +117,22 @@ def disconnect_device(top):
                                     int(top.ldata['ssccpn']))
 
 def send_port_cmd(top, cmd):
+    """
+    Send a command to control a port.
+
+    Args:
+        top: The object that manages the devices.
+        cmd (str): A command string in the format "swid,opr,pno" where:
+            - swid: Switch ID
+            - opr: Operation ("0" for port_off, other values for port_on)
+            - pno: Port number
+
+    Returns:
+        tuple: A tuple containing the result of the command. If an error occurs,
+        the tuple is (1, "Stop Event occurred!"). Otherwise, the result depends
+        on the specific operations performed by the device handlers.
+    """
+    
     if top.fault_flg == True:
         return (1, "Stop Event occurred!")
     
@@ -128,6 +144,19 @@ def send_port_cmd(top, cmd):
             return top.handlers[swid].port_on(pno)
 
 def control_port(top, cmd):
+    """
+    Control the state of a port.
+
+    Args:
+        top: The object managing the devices.
+        cmd (str): A command string in the format "swid,opr" where:
+            - swid: Switch ID
+            - opr: Operation ("off" to turn off, any other value to turn on)
+
+    Returns:
+        The result of the port control operation. The specific return value
+        depends on the operations performed by the device handlers.
+    """
     if top.devCtrl == "local":
         swid, opr = cmd.split(',')
         if(opr == "off"):
@@ -136,19 +165,65 @@ def control_port(top, cmd):
             return top.handlers[swid].port_on(opr)
 
 def read_port(top, swid):
+    """
+    Read the state of a port.
+
+    Args:
+        top: The object managing the devices.
+        swid: Switch ID for the port to be read.
+
+    Returns:
+        The current state of the specified port. The specific return value
+        depends on the read operation performed by the device handler.
+    """
     if top.devCtrl == "local":
         return top.handlers[swid].read_port()
         
 def send_speed_cmd(top, cmd):
+    """
+    Set the speed for a switch.
+
+    Args:
+        top: The object managing the devices.
+        cmd (str): A command string in the format "swid,speed" where:
+            - swid: Switch ID
+            - speed: The desired speed value
+
+    Returns:
+        The result of the speed setting operation. The specific return value
+        depends on the set_speed operation performed by the device handler.
+    """
     if top.devCtrl == "local":
         swid, speed = cmd.split(',')
         return top.handlers[swid].set_speed(speed)
 
 def send_volts_cmd(top, swid):
+    """
+    Get the voltage level for a switch.
+
+    Args:
+        top: The object managing the devices.
+        swid: Switch ID for which voltage is to be queried.
+
+    Returns:
+        The voltage level of the specified switch. The specific return value
+        depends on the get_volts operation performed by the device handler.
+    """
     if top.devCtrl == "local":
         return top.handlers[swid].get_volts()
 
 def send_amps_cmd(top, swid):
+    """
+    Get the current (amperage) for a switch.
+
+    Args:
+        top: The object managing the devices.
+        swid: Switch ID for which current is to be queried.
+
+    Returns:
+        The current (amperage) of the specified switch. The specific return value
+        depends on the get_amps operation performed by the device handler.
+    """
     if top.devCtrl == "local":
         return top.handlers[swid].get_amps()
 

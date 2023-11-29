@@ -26,10 +26,12 @@
 # Built-in imports
 
 import thClient as thnw
-import usbDev as thlocal
+# import usbDev as thlocal
 import socket
 import json
 import sys
+
+import usbChange as thlocal
 
 from uiGlobals import *
 
@@ -64,7 +66,12 @@ def ResetDeviceControl(top):
         top.clienthc.close()
         top.hcclient.close()
 
+
 def get_tree_change(top):
+    thlocal.get_usb_change(top)
+
+
+def get_tree_change_old(top):
     """
     get the device tree change info throgh network
     Args:
@@ -76,10 +83,15 @@ def get_tree_change(top):
 
     """
     if top.thCtrl == "local":
-        if sys.platform.startswith("win"):
+        if sys.platform == "win32":
             dl, newlist, msusb4 = thlocal.get_usb_tree()
             thlocal.get_tree_change(top, dl, newlist)
             top.store_usb4_win_info(msusb4)
+        elif sys.platform == "darwin":
+            dl, newlist, msusb4 = thlocal.get_usb_tree()
+            # thlocal.get_tree_change(top, dl, newlist)
+            top.store_usb4_win_info(msusb4)
+
             # return msusb4
 
     elif top.thCtrl == "network":
