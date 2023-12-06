@@ -166,17 +166,18 @@ Note:
 ```shell
 python setup.py install
 ```
+
 * To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package) in Linux OS
 
 ```shell
 sudo python3 setup.py install
 ```
+
 * To install the library using below command and [install package](https://github.com/mcci-usb/cricketlib#installing-cricketlib-package) in MacOS
 
 ```shell
 sudo python3 setup.py install
 ```
-
 
 Please navigate to dist/ directory and you will find the files .egg file. Example: cricketapi-1.0.6-py3.7.egg
 
@@ -265,13 +266,26 @@ The MCCI USB 3141 USB4 Switch automates connect/disconnect of one or two devices
 
 ### MCCI Model 2301 4-Port USB Connection Exerciser
 
-The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page at www.mcci.com.
+The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB switch to automate interoperability tests for systems USB 3.2 gen1 or gen2. It uses the supplied Arduino-based controller and electronic switches to electrically plug and unplug any of the four different input ports. The Gen2-capable Type-B plug can be connected to either of two Type-A receptacles, to a Standard-A receptacle (USB 2.0 only), or a Micro-B receptacle (USB 2.0 only). The Type-A Gen2 receptacles support USB 3.2 (gen 1 and gen 2) and USB 2.0 (high speed, full speed and low-speed) devices. The Standard-A receptacle supports USB 2.0 devices. . For more information, see the product home page atwww.mcci.com.
 
  **Link:** For more information, see the product home page at [MCCI USB Switch 2301](https://mcci.com/usb/dev-tools/model-2301/).
 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+- v4.2.0 is patch release it contains the following changes.
+
+  - Add USB4/Thunderbolt4 Tree window [#118 Tree Window](https://github.com/mcci-usb/Cricket/commit/5159c98a7f0423e82ed59ba78499861a431785cc)
+  - Add Support for USB4/TB4 speed infomation[#106 USB4 speed info](https://github.com/mcci-usb/Cricket/commit/d79472781e417970bae08c849dbea74856dcf58c)
+  - Updated Config file [#config file](https://github.com/mcci-usb/Cricket/commit/6ee526e27926f20f60576ece64c448eaac0b8ccb)
+  - Update USB info in status bar[#124](https://github.com/mcci-usb/Cricket/commit/0414a79ab1e50317dda9f0e8bba55af038843256)
+
+- v4.1.0 is patch release it contains the following changes.
+  
+  - added feature for Updated software notification[#113](https://github.com/mcci-usb/Cricket/commit/3bb0094315ac70cb5700a7e718d4a6ba0f947d54)
+
+  - Add support for swtich 3142 in Cricket UI
 
 - v4.0.0 is major release  it Contains the following changes
   - Added support for MCCI USB Switch 3142 [#103 Cricket UI Supports Swicth3142](https://github.com/mcci-usb/Cricket/commit/b7acf28e340d8c7cdda6a4772055c1362488447b).
