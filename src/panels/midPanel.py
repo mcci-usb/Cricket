@@ -154,6 +154,27 @@ class MidPanel(wx.Panel):
         """
         self.hboxm.Hide(self.vboxl)
         self.Layout()
+    
+    def remove_mode_panels(self):
+        self.vboxl.Hide(self.hboxdl)
+        self.hide_usb_enum_controls()
+        self.Layout()
+    
+    def hide_usb_enum_controls(self):
+        
+        self.logPan.show_usb_ctrls(False)
+
+    def show_usb_enum_controls(self):
+        
+        self.logPan.show_usb_ctrls(True)
+
+        self.Layout()
+    
+    
+    def show_mode_panels(self):
+        self.vboxl.Show(self.hboxdl)
+        self.show_usb_enum_controls()
+        self.Layout()
 
     def remove_dev_panels(self):
         """

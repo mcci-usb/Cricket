@@ -177,6 +177,7 @@ class RequestSync(threading.Thread):
         Returns:
             None
         """
+        
         # This message sent to client, when it gets connected with this server
         while self._running:
             try:
@@ -204,17 +205,21 @@ class RequestSync(threading.Thread):
         Returns:
            return result : return searching the device.
         """
+        # print("NW command received: ", reqdict)
         ctype = reqdict["ctype"]
         cmd = reqdict["cmd"]
         if(ctype == "device"):
             if(cmd == "search"):
+                # print("Post Device search event")
                 wx.PostEvent(self.window, ServerEvent("search"))
-                #result = search.search_port(self.window.usbHand)
+                
                 result = None
                 while(1):
-                    if self.window.usbHand.ready:
+                    if not self.window.ucbusy:
                         break
-                self.window.usbHand.ready = False
+                self.window.ucbusy = False
+                
+                # print("Device Search Completed : ", self.window.dev_list)
                 result = self.window.dev_list
                 wx.CallAfter(self.window.panel.PrintLog, "\nDevice Search")
                 return result
@@ -222,12 +227,24 @@ class RequestSync(threading.Thread):
                 itype = reqdict["itype"]
                 result = False
                 if(itype == "serial"):
-                    port = reqdict["port"]
-                    baud = reqdict["baud"]
-                    result = self.window.devHand.open_serial_device(port, int(baud))
-                elif(itype == "usb"):
-                    port = reqdict["port"]
-                    result = self.window.usbHand.select_usb_device(port)
+                    swname = reqdict["swname"]
+                    swport = reqdict["port"]
+                    swhand = self.window.swobjmap[swname](swport)
+                    if(swhand.connect()):
+                        self.window.handlers[swport] = swhand
+                        self.window.swuidict[swport] = swname
+                    result = True
+                        # self.window.scc_connect_device(swname, swport)
+                elif itype == "usb":
+                    swname = "2101"
+                    swport = reqdict["port"]
+                    
+                    swhand = self.window.swobjmap[swname](swport)
+                    swhand.connect()
+                    
+                    self.window.handlers[swport] = swhand
+                    self.window.swuidict[swport] = swname
+                    result = True
                 rdict = {}
                 if result:
                     rdict["data"] = "success"
@@ -249,36 +266,48 @@ class RequestSync(threading.Thread):
             if(itype == "serial"):
                 cmd = reqdict["cmd"]
                 if(cmd == "switch"):
-                    result = self.window.devHand.send_port_cmd(reqdict["stat"])
+                    swport, opr, pno = reqdict["stat"].split(',')
+                    if opr == "ON":
+                        result = self.window.handlers[swport].port_on(int(pno))
+                    else:
+                        result = self.window.handlers[swport].port_off()
                     wx.CallAfter(self.window.panel.PrintLog, reqdict["stat"])
                     rdict = {}
                     rdict["data"] = result
                     return rdict
                 elif(cmd == "read"):
-                    result = self.window.devHand.read_port_cmd()
+                    swport = reqdict["port"]
+                    result = self.window.handlers[swport].get_port_status()
                     rdict = {}
                     rdict["data"] = result
                     return rdict
                 elif(cmd == "status"):
-                    result = self.window.devHand.send_status_cmd()
+                    swport = reqdict["port"]
+                    result = self.window.handlers[swport].get_status()
                     rdict = {}
                     rdict["data"] = result
                     return rdict
                 elif(cmd == "volts"):
-                    result = self.window.devHand.send_volts_cmd()
+                    swport = reqdict["port"]
+                    result = self.window.handlers[swport].get_volts()
                     rdict = {}
                     rdict["data"] = result
                     wx.CallAfter(self.window.panel.PrintLog, "\nVolts")
                     return rdict
                 elif(cmd == "amps"):
-                    result = self.window.devHand.send_amps_cmd()
+                    swport = reqdict["port"]
+                    result = self.window.handlers[swport].get_amps()
                     rdict = {}
                     rdict["data"] = result
                     wx.CallAfter(self.window.panel.PrintLog, "\nAmps")
                     return rdict
             elif(itype == "usb"):
                 cmd = reqdict["cmd"]
-                result = self.window.usbHand.control_port(int(cmd))
+                swport, scmd = cmd.split(',')
+                if scmd == "off":
+                    result = self.window.handlers[swport].port_off()
+                else:
+                    result = self.window.handlers[swport].port_on(scmd)
                 rdict = {}
                 rdict["data"] = str(result)
                 wx.CallAfter(self.window.panel.PrintLog, "\n2101 Port: "+rdict["data"]+"\n")

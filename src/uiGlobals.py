@@ -20,15 +20,15 @@
 # Revision history:
 #     V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
 #       Module created
+#
 ##############################################################################
 # Lib imports
 import wx
-
 ##############################################################################
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.2.0"
+APP_VERSION = "4.3.j2"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -61,6 +61,7 @@ IMG_BTN_OFF = "btn_off.png"
 IMG_WAVE = "wave.png"
 IMG_NOSWITCH = "noswitch.png"
 IMG_WARNING ="warning.png"
+IMG_DISS_ICON = "x_mark.png"
 
 # Font Size
 DEFAULT_FONT_SIZE = 8
@@ -183,6 +184,9 @@ ID_TC_SEQNAME = ID_RBTN_RT + 1
 ID_BTN_SEQSAVE = ID_TC_SEQNAME + 1
 ID_USB4_TREEVIEW = ID_BTN_SEQSAVE + 1
 ID_MENU_HELP_3142 = ID_USB4_TREEVIEW + 1
+ID_MENU_NETWORK = ID_MENU_HELP_3142 + 1
+ID_MENU_SET_NETWORK = ID_MENU_NETWORK + 1
+ID_NETWORK_MENU = ID_MENU_SET_NETWORK + 1
 
 
 

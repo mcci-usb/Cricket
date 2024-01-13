@@ -429,7 +429,7 @@ class Dev3142Window(wx.Panel):
         Returns:
             None
         """
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",ON,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -450,7 +450,7 @@ class Dev3142Window(wx.Panel):
         Returns:
             None
         """
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",OFF,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")

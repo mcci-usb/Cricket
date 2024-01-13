@@ -104,3 +104,6 @@ class RightPanel(wx.Panel):
     
     def print_on_log(self, data):
         pass
+    
+    # def update_slog_panel(self):
+    #     print("slog-panel")

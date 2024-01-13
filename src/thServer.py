@@ -33,6 +33,8 @@ import wx
 import json
 import usbChange
 
+from uiGlobals import *
+
 keywords = {'Python',
             'wxpython',
             'SocketProgramming'
@@ -91,7 +93,7 @@ class ServerHc:
             self.socket.listen(5)
         except:
             print("Server Init failed")
-        #print('Test Host Server Listeneing port: ' + host + ':' + str(port))
+        # print('Test Host Server Listeneing port: ' + host + ':' + str(port))
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None
@@ -246,9 +248,9 @@ class RequestSync(threading.Thread):
         cmd = reqdict["cmd"]
         if(ctype == "usb"):
             if (cmd == "lsusb"):
-                result = usbChange.get_usb_tree()
+                result = usbChange.get_usb_change(self.window)
                 rdict = {}
-                rdict["data"] = list(result)
+                rdict["data"] = result
                 return rdict
         else:
             rdict = {}

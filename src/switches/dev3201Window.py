@@ -95,6 +95,10 @@ class Dev3201Window(wx.Window):
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
         
+        # base = os.path.abspath(os.path.dirname(__file__))
+        # x_mark_bitmap = wx.Bitmap(base + "/icons/x_mark.png", wx.BITMAP_TYPE_ANY)  # Replace "x_mark.png" with the actual filename of your X mark image
+        # self.btn_dis = wx.BitmapButton(self, -1, x_mark_bitmap, size=(-1, -1))
+        
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (-1,-1))
         self.st_p3 = wx.StaticText(self, -1, "Port 3", size = (-1,-1))
@@ -104,6 +108,13 @@ class Dev3201Window(wx.Window):
         iconpath = os.path.abspath(os.path.join(base, os.pardir))  
         self.picf = wx.Bitmap (iconpath+"/icons/"+IMG_BTN_OFF, wx.BITMAP_TYPE_ANY)
         self.picn = wx.Bitmap (iconpath+"/icons/"+IMG_BTN_ON, wx.BITMAP_TYPE_ANY)
+        
+        self.x_mark_bitmap = wx.Bitmap(iconpath + "/icons/"+IMG_DISS_ICON, wx.BITMAP_TYPE_ANY)  # Replace "x_mark.png" with the actual filename of your X mark image
+        self.btn_dis = wx.BitmapButton(self, -1, self.x_mark_bitmap, size=(-1, -1))
+        
+        # self.tooltip_text = "Port Disconnect"
+        self.tooltip_text = f"Disconnect the {self.swtitle}"
+        self.btn_dis.SetToolTip(wx.ToolTip(self.tooltip_text))
 
         self.btn_p1 = wx.BitmapButton(self, 0, self.picf, size= (-1,-1))
         self.btn_p2 = wx.BitmapButton(self, 1, self.picf, size= (-1,-1))
@@ -134,22 +145,32 @@ class Dev3201Window(wx.Window):
         self.hbox5 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxi = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox6 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.hboxdb = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxp1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp3 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp4 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.hboxds = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.hboxdb.Add(self.btn_dis,0, flag=wx.LEFT | 
+                        wx.ALIGN_CENTER_VERTICAL, border=0)
         
         self.hboxp1.Add(self.st_p1,0, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hboxp1.Add(self.btn_p1, flag=wx.LEFT, border = 10)
         
+        
         self.hboxp2.Add(self.st_p2, 0, flag= wx.ALIGN_CENTER_VERTICAL | 
                         wx.LEFT, border = 0)
         self.hboxp2.Add(self.btn_p2, flag=wx.LEFT,  border = 10)
+        
+        # self.hboxp2.Add(self.btn_dis,0, flag=wx.ALIGN_LEFT | wx.ALIGN_TOP, border = 0)
         
         self.hboxp3.Add(self.st_p3, flag=wx.ALIGN_LEFT | wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=0)
@@ -158,6 +179,9 @@ class Dev3201Window(wx.Window):
         self.hboxp4.Add(self.st_p4, 0, flag=wx.ALIGN_LEFT | 
                         wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border = 0)
         self.hboxp4.Add(self.btn_p4, flag=wx.LEFT,  border = 10)
+        
+        
+        self.hboxds.Add(self.hboxdb, flag=wx.LEFT, border=260)
 
         self.hboxs1.Add(self.hboxp1, flag=wx.LEFT, border=20)
         self.hboxs1.Add((0,0), 1, wx.EXPAND)
@@ -188,7 +212,9 @@ class Dev3201Window(wx.Window):
         self.vbox = wx.StaticBoxSizer(self.sb, wx.VERTICAL)
 
         self.vbox.AddMany([
-            (0,10,0),
+            (0,0,0),
+            (self.hboxds, 1, wx.EXPAND),
+            (0,0,0),
             (self.hboxs1, 1, wx.EXPAND),
             (0,10,0),
             (self.hboxs2, 1, wx.EXPAND),
@@ -215,6 +241,8 @@ class Dev3201Window(wx.Window):
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p2)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p3)
         self.Bind(wx.EVT_BUTTON, self.OnOffPort, self.btn_p4)
+        
+        self.btn_dis.Bind(wx.EVT_BUTTON, self.OnDisconnect)
 
         self.rbtn = []
         self.rbtn.append(self.btn_p1)
@@ -228,6 +256,12 @@ class Dev3201Window(wx.Window):
         self.enable_controls(True)
 
         self.timer_vu.Start(50)
+    
+    def OnDisconnect(self, e):
+        print("On disconnect button:")
+        # self.Disconnect()
+        self.parent.remove_switch("3201")
+        # self.top.remove_switch("3201")
 
     def update_cport(self, portno):
         self.swtitle = "3201"
@@ -508,7 +542,8 @@ class Dev3201Window(wx.Window):
             None
         """
 
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
+        # res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",ON,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -532,7 +567,8 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
+        # res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",OFF,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -792,8 +828,6 @@ class Dev3201Window(wx.Window):
             speed = "SS"
         res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
 
-        # cmd = 'superspeed'+' '+str(val)+'\r\n'
-        # res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')

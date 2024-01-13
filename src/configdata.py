@@ -108,6 +108,7 @@ def load_default_config():
     """
     cdata = defaultconfig.config_data
     fpath = get_file_path()
+    print("Cpath, Fpath:", cdata, fpath)
     save_config(fpath, cdata)
     return cdata
 
@@ -229,6 +230,71 @@ def set_base_config_data(gdata):
     cdata["myrole"] = gdata["myrole"]
     cdata["dut"]["nodes"] = gdata["dut"]["nodes"]
     cdata["rpanel"] = gdata["rpanel"]
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+
+def set_network_config(gdata):
+    print("Set Net Data: ", gdata)
+    cdata = read_all_config()
+    key = list(gdata.keys())[0]
+    if "myrole" in cdata:
+        cdata["myrole"]["uc"]= gdata["uc"]
+        cdata["myrole"]["cc"]= gdata["scc"]
+        cdata["myrole"]["thc"]= gdata["thc"]
+    else:
+        cdata["myrole"] = {}
+        cdata["myrole"]["uc"]= gdata["uc"]
+        cdata["myrole"]["cc"]= gdata["scc"]
+        cdata["myrole"]["thc"]= gdata["thc"]
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+    
+def set_nw_scc_config(gdata):
+    cdata = read_all_config()
+    nwcdata = cdata["uc"]["mynodes"]
+    key = list(gdata.keys())[0]
+    if "mycc" in nwcdata:
+        print("GDF: ", cdata["uc"]["mynodes"]["mycc"]["tcp"])
+        cdata["uc"]["mynodes"]["mycc"]["tcp"]= {"ip": gdata["ip"], "port": gdata["port"]}
+        # cdata["uc"]["mynodes"]["mycc"]["tcp"]["ip"]= gdata["ip"]
+        # cdata["uc"]["mynodes"]["mycc"]["tcp"]["port"]= gdata["port"]
+    else:
+        cdata["uc"]["mynodes"]["mycc"] = {"name": "control computer", "interface": "tcp", "serial": {}, "tcp": {}} 
+        cdata["uc"]["mynodes"]["mycc"]["tcp"]= {"ip": gdata["ip"], "port": gdata["port"]}
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+
+def set_nw_thc_config(gdata):
+    cdata = read_all_config()
+    nwcdata = cdata["uc"]["mynodes"]
+    key = list(gdata.keys())[0]
+    if "mythc" in nwcdata:
+        cdata["uc"]["mynodes"]["mythc"]["tcp"]= {"ip": gdata["ip"], "port": gdata["port"]}
+    else:
+        cdata["uc"]["mynodes"]["mythc"] = {"name": "control computer", "interface": "tcp", "serial": {}, "tcp": {}} 
+        cdata["uc"]["mynodes"]["mythc"]["tcp"]= {"ip": gdata["ip"], "port": gdata["port"]}
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+
+def set_scc_config(gdata):
+    cdata = read_all_config()
+    scdata = cdata["cc"]
+    print("Given SCC Data: ", gdata)
+    
+    key = list(gdata.keys())[0]
+    print("Key available: ", key)
+    cdata["cc"][gdata["type"]] = {"ip": gdata["ip"], "port": gdata["port"]}
+    fpath = get_file_path()
+    save_config(fpath, cdata)
+
+def set_thc_config(gdata):
+    cdata = read_all_config()
+    scdata = cdata["thc"]
+    print("Given THC Data: ", gdata)
+    
+    key = list(gdata.keys())[0]
+    print("Key available: ", key)
+    cdata["thc"][gdata["type"]] = {"ip": gdata["ip"], "port": gdata["port"]}
     fpath = get_file_path()
     save_config(fpath, cdata)
 

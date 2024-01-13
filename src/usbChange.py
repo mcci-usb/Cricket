@@ -1,5 +1,6 @@
 import sys
 import copy
+
 from uiGlobals import *
 
 def get_usb_change(top):
@@ -10,16 +11,27 @@ def get_usb_change(top):
     Returns:
         None
     """    
+    print("GET USB CHANGE NETWORk::")
     top.usbenum.enumerate_usb_devices()
     result = top.usbenum.get_result()
+    
 
     usb3diff = get_usb3_change(top, result["usb3list"])
     usb4diff = get_usb4_change(top, result["usb4tblist"])
     top.update_usb_status(result["usb3type"])
-    prepare_tree_change(top, usb3diff, usb4diff)
+    
+    if top.myrole['uc']:
+        prepare_tree_change(top, usb3diff, usb4diff)
 
     if result["usb4tbjson"] != None:
-        top.store_usb4_win_info(result["usb4tbjson"])
+        if top.myrole['uc']:
+            top.store_usb4_win_info(result["usb4tbjson"])
+        else:
+            resdict = {}
+            resdict["usb3d"] = usb3diff
+            resdict["usb4d"] = usb4diff
+            resdict["tbjson"] = result["usb4tbjson"]
+            return resdict
 
 
 def get_usb3_change(top, newlist):
@@ -93,8 +105,6 @@ def get_usb4_change(top, newlist):
     rmlist = [i for i in uoldlist if i not in unewlist]
 
     return {"added": adlist, "removed": rmlist}
-
-
 
 def prepare_tree_change(top, usb3dict, usb4dict):
     strout = ""

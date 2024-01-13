@@ -93,6 +93,12 @@ class LeftPanel(ScrolledPanel):
             
         self.main_sizer.Add((0,20), 0, wx.EXPAND)
         self.Layout()
+    
+    def remove_switch(self, swname):
+        print("L Panel Remove Switch: ", swname)
+        self.multiswobj.clear()
+        self.main_sizer.Clear(True)
+        self.Layout()
 
     def port_on(self, swkey, port, stat):
         self.multiswobj[swkey].port_on(port, stat)

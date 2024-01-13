@@ -275,7 +275,6 @@ class AutoWindow(wx.Window):
         self.Update_port_count()
         self.con_flg = True
 
-
     def Update_port_count(self):
         """
         Update the port count based on the selected switch in the switch selector.

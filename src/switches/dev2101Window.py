@@ -357,7 +357,6 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-
         res, outstr = model.control_port(self.top, self.swid+",off")
         if res == 0:
             self.top.print_on_log(self.swid+": Port OFF\n")
@@ -460,7 +459,7 @@ class Dev2101Window(wx.Panel):
         
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-        self.read_status()
+        # self.read_status()  // Need to update this
 
     def enable_port_controls(self, stat):
         """
