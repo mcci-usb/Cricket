@@ -61,7 +61,7 @@ class ScanNwThread(threading.Thread):
         ips = str(subnet).split(".")
         strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
         portip = "No Node found"
-        for ip in range(160, 165):
+        for ip in range(0, 255):
             if self.completed_event.is_set():
                 break
             host = strsn+"."+str(ip)
@@ -78,6 +78,7 @@ class ScanNwThread(threading.Thread):
         
         wx.CallAfter(self.txtctrl.SetValue, portip)
         wx.CallAfter(self.btnScan.SetLabel, "scan network")
+    
         
     def join(self, timeout = None):
         """
@@ -140,10 +141,10 @@ class SearchNetwork(wx.Panel):
         self.st_port = wx.StaticText(self, -1, "Search Port")
         self.st_sysip = wx.StaticText(self, -1, "------")
         self.tc_port = wx.TextCtrl(self, -1, "2021",size = (50, -1))
-        self.tc_nwcip = wx.ComboBox(self,size=(100,-1))
+        self.tc_nwcip = wx.ComboBox(self, -1,  size=(100,-1))
         self.btn_save= wx.Button(self, -1, "Save", size = (50, -1))
 
-        self.st_os = wx.StaticText(self, -1, "OS")
+        self.st_os = wx.StaticText(self, -1, "Server OS")
         self.rb_win = wx.RadioButton(self, ID_RBTN_WIN, "Window")
         self.rb_linux = wx.RadioButton(self, ID_RBTN_LINUX, "Linux")
         self.rb_mac = wx.RadioButton(self, ID_RBTN_MAC, "Mac")

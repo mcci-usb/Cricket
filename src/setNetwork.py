@@ -1,6 +1,7 @@
 import wx
 import threading
 import configdata
+import socket
 
 class SetNetwork(wx.Panel):
     def __init__(self, parent, ctype):
@@ -13,8 +14,7 @@ class SetNetwork(wx.Panel):
         self.ctype = ctype
         
         self.set_network()
-
-    
+        
     def set_port(self):
         self.config_data = configdata.read_all_config()
         self.port = None
@@ -26,10 +26,12 @@ class SetNetwork(wx.Panel):
             self.sip = self.config_data["thc"]["tcp"]["ip"]
         
         self.scc_tc_port.SetValue(self.port)
+        # self.subnet = self.get_network_subnet()[0]
         self.scc_tc_sip.SetValue(self.sip)
             
     def set_network(self):
         self.SetBackgroundColour("White")
+        
         # self.top = top
         # Create static box with naming of Log Window
         sb = wx.StaticBox(self, -1,"Set Network")
@@ -41,7 +43,7 @@ class SetNetwork(wx.Panel):
         # self.scc_tc_port = wx.TextCtrl(self, -1, "1234", size = (65, -1))
         self.scc_tc_port = wx.TextCtrl(self, -1, " ", size = (60, -1))
         self.scc_st_sip = wx.StaticText(self, -1, self.ctype+" IP",size = (60, -1))
-        self.scc_tc_sip = wx.TextCtrl(self, -1, " ",size = (95, -1))
+        self.scc_tc_sip = wx.TextCtrl(self, -1, "0.0.0.0 ",size = (95, -1))
         
         self.btn_save= wx.Button(self, -1, "Save", size = (60, -1))
         
@@ -76,8 +78,7 @@ class SetNetwork(wx.Panel):
         self.SetSizer(self.vbox1)
         self.vbox1.Fit(self)
         self.Layout()
-    
-    
+     
     def load_network_config(self):
         # Load the network configuration based on the ctype (SCC or THC)
         config = {}

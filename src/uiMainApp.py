@@ -207,8 +207,10 @@ class UiMainFrame (wx.Frame):
         # This is a sample, replace it with your logic to load from the actual file
         self.panel.update_panels(self.myrole)
         if self.myrole["uc"] != True:
-            self.startCcServer()
-            self.startHcServer()
+            if self.myrole["cc"] == True:
+                self.startCcServer()
+            if self.myrole["thc"] == True:
+                self.startHcServer() 
         self.saveScreenSize()
 
     def init_usbTreeImage(self):
