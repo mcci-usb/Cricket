@@ -379,8 +379,6 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
-        # res = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
-        # print("Port ON Resp: ", res)
         res, outstr = model.send_port_cmd(self.top, self.swid+",ON,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
@@ -402,6 +400,7 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
+
         res, outstr = model.send_port_cmd(self.top, self.swid+",OFF,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')

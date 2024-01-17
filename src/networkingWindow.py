@@ -9,7 +9,7 @@ import setNetwork
 
 class NetConfigDialog(wx.Dialog):
     def __init__(self, parent, myrole):
-        wx.Dialog.__init__(self, parent, title="Network Configuration", size=(540, 480),
+        wx.Dialog.__init__(self, parent, title="Network Configuration", size=(640, 680),
                            style=wx.DEFAULT_DIALOG_STYLE)
         
         self.parent = parent
@@ -20,8 +20,6 @@ class NetConfigDialog(wx.Dialog):
         self.scc_flg = False
         self.thc_flg = False
         
-        print("My Role ------: ", self.myrole)
-        
         self.SetBackgroundColour("White")
         # self.myrole = myrole
         self.scan_sc_flg = False
@@ -31,12 +29,9 @@ class NetConfigDialog(wx.Dialog):
     
         self.config_data = configdata.read_all_config()
         
-        print("NW SCC, THC : ", self.config_data["uc"]["mynodes"]["mycc"], self.config_data["uc"]["mynodes"]["mythc"])
-        
         self.InitSelectionType()
         self.Selection_computer()
-        # self.SearchnwType()
-        # self.SetnwType()
+        
         self.saveinsertion()
         
         self.Initnwconfig()
@@ -49,8 +44,7 @@ class NetConfigDialog(wx.Dialog):
             (self.vboxsave,1, wx.EXPAND | wx.ALL, 10),
             
         ])
-        # self.alter_nw_panel()
- 
+        
         self.SetSizer(self.vboxParent)
         self.Show()
         self.Layout()
@@ -157,7 +151,6 @@ class NetConfigDialog(wx.Dialog):
         
 
     def Onsave(self, e):
-        print("save-event")
         self.config = {"mode": 'single', "uc": True, "scc": True, "thc": True}
         single_flg = False
 
@@ -167,7 +160,6 @@ class NetConfigDialog(wx.Dialog):
             self.mc = self.cb_uc.GetValue()
             self.scc = self.cb_scc.GetValue()
             self.thc = self.cb_thc.GetValue()
-            print("Multistatus:", self.mc, self.scc, self.thc)
             self.config["uc"] = self.mc
             self.config["scc"] = self.scc
             self.config["thc"] = self.thc
@@ -176,14 +168,9 @@ class NetConfigDialog(wx.Dialog):
         # configdata.set_net_base_data(self.dut)
         
         self.EndModal(wx.ID_OK)
-        print("config status->:", self.config)
         
         return self.config
     
-    # def Onclose(self, e):
-    #     print("close-event")
-    #     # self.alter_nw_panel()
-        
     def get_comp_config(self):
         bin_str = f"{int(self.thc_flg)}{int(self.scc_flg)}{int(self.uc_flg)}"
         mystat = int(bin_str, 2)
@@ -195,36 +182,25 @@ class NetConfigDialog(wx.Dialog):
     
     def switch_nw_case(self, swopt):
         # self.onRadioButton()
-        print("swopt:", swopt)
         if swopt == 0x00 or swopt == 0x07:
-            print("No option need to show")
+            pass
         elif swopt == 0x01:
-            print("Scan SCC and Scan THC")
             self.insertScanNw("SCC")
             self.insertScanNw("THC")
-            
         elif swopt == 0x02:
-            print("Set SCC and Scan THC")
             self.insertSetNw("SCC")
-            # self.insertScanNw("THC")
         elif swopt == 0x03:
-            print("Scan THC")
             self.insertScanNw("THC")
         elif swopt == 0x04:
-            print("Scan SCC and Set THC")
-            # self.insertScanNw("SCC")
             self.insertSetNw("THC")
         elif swopt == 0x05:
-            print("Scan SCC")
             self.insertScanNw("SCC")
         elif swopt == 0x06:
-            print("Set SCC and Set THC")
             self.insertSetNw("SCC")
             self.insertSetNw("THC")
         
     def alter_nw_panel(self):
         cstate = self.get_comp_config()
-        print("----------Cstate:", cstate)
         self.clearNwPanel()
         self.switch_nw_case(cstate)
         self.Layout()
@@ -268,9 +244,6 @@ class NetConfigDialog(wx.Dialog):
         self.alter_panel()
         
     def alter_panel(self):
-        print("User Comp: ", self.uc_flg)
-        print("SC Comp: ", self.scc_flg)
-        print("TH Comp: ", self.thc_flg)
         self.alter_nw_panel()
         
     def update_controls(self):
@@ -288,17 +261,13 @@ class NetConfigDialog(wx.Dialog):
         # self.alter_panel()
 
         if self.myrole["uc"] and self.myrole["cc"] and self.myrole["thc"]:
-            print("uc, cc, and thc are all True:")
             self.rbtn_single.SetValue(True)
         
         elif self.myrole["uc"]:
-            print("UC printed....")
             self.rbtn_multi.SetValue(True)
-            # self.alter_panel()
             self.alter_nw_panel()
         
         elif not self.myrole["uc"]:
-            print("Not uc panel---->")
             self.rbtn_multi.SetValue(True)
             self.cb_uc.Enable(True)
             self.cb_scc.Enable(True)
@@ -308,11 +277,8 @@ class NetConfigDialog(wx.Dialog):
             self.scc_flg = self.cb_scc.GetValue()
             self.thc_flg = self.cb_thc.GetValue()
             
-            # self.alter_panel()
         elif self.myrole["uc"] and self.myrole["cc"]:
             self.rbtn_multi.SetValue(True)
-            print("uc and cc are both True:")
-            # Add your additional logic here if needed
             self.cb_uc.Enable(True)
             self.cb_scc.Enable(True)
             self.cb_thc.Enable(True)
@@ -320,12 +286,9 @@ class NetConfigDialog(wx.Dialog):
             self.uc_flg = self.cb_uc.GetValue()
             self.scc_flg = self.cb_scc.GetValue()
             self.thc_flg = self.cb_thc.GetValue()
-            # self.alter_panel()
             
         elif self.myrole["uc"] and self.myrole["thc"]:
             self.rbtn_multi.SetValue(True)
-            print("uc and thc are both True:")
-            # Add your additional logic here if needed
             self.cb_uc.Enable(True)
             self.cb_scc.Enable(True)
             self.cb_thc.Enable(True)
@@ -333,8 +296,6 @@ class NetConfigDialog(wx.Dialog):
             self.uc_flg = self.cb_uc.GetValue()
             self.scc_flg = self.cb_scc.GetValue()
             self.thc_flg = self.cb_thc.GetValue()
-            # self.alter_panel()
     
         else:
             self.rbtn_single.SetValue(True)
-            print("uc or cc or uc thc:")

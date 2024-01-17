@@ -276,11 +276,12 @@ class LoopWindow(wx.Window):
 
     def update_sw_selector(self, swdict):
         self.cb_switch.Clear()
-        for key, val in swdict.items():
-            swstr = ""+val+"("+key+")"
-            self.cb_switch.Append(swstr)
-        self.cb_switch.SetSelection(0)
-        self.Update_port_count()
+        if len(swdict) > 0:
+            for key, val in swdict.items():
+                swstr = ""+val+"("+key+")"
+                self.cb_switch.Append(swstr)
+            self.cb_switch.SetSelection(0)
+            self.Update_port_count()
 
     def Update_port_count(self):
         self.swid = self.cb_switch.GetValue()

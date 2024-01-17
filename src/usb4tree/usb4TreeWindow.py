@@ -146,8 +146,13 @@ class Usb4TreeWindow(wx.Window):
             (self.szr_top, 1, wx.EXPAND),
             (0,0,0)
             ])
+        
+        mythcos = sys.platform
+        if not top.parent.myrole['thc']:
+            mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
 
-        self.usb4parse = usb4parse.create_usb4tb_parser()
+        self.usb4parse = usb4parse.create_usb4tb_parser(mythcos)
+
 
         # Set size of frame
         self.SetSizer(self.vbox)

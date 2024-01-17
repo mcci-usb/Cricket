@@ -82,10 +82,7 @@ def search_device(top):
         nwip = top.ucConfig['mynodes']["mycc"]["tcp"]["ip"]
         nwport = top.ucConfig['mynodes']["mycc"]["tcp"]["port"]
         
-        # print("Search Device over network: ", nwip, nwport)
-        
-        resdict = devnw.get_device_list(nwip,
-                                    int(nwport))
+        resdict = devnw.get_device_list(nwip, int(nwport))
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]
             top.ccflag = True
@@ -148,7 +145,7 @@ def connect_device(top, swdict):
             return-1, "No CC"
 
 # Need to check
-def disconnect_device(top):
+def disconnect_device(top, swport):
     """
     disconnect the devices
     Args:
@@ -158,10 +155,14 @@ def disconnect_device(top):
         return devnw.close() network device close()
     """
     if top.devCtrl == "local":
-        return top.devHand.close()
-    elif top.devCtrl == "network":
-        return devnw.close_serial_device(top.ldata['sccid'],
-                                    int(top.ldata['ssccpn']))
+        if swport in top.handlers:
+            top.handlers[swport].disconnect()
+            top.handlers.pop(swport)
+        # return top.devHand.close()
+    elif top.devCtrl == "tcp":
+        nwip = top.ucConfig['mynodes']["mycc"]["tcp"]["ip"]
+        nwport = top.ucConfig['mynodes']["mycc"]["tcp"]["port"]
+        return devnw.close_serial_device(nwip, int(nwport), swport)
 
 def send_port_cmd(top, cmd):
     """
@@ -184,7 +185,7 @@ def send_port_cmd(top, cmd):
     
     if top.devCtrl == "local":
         swid, opr, pno = cmd.split(',')
-        if(pno == "0"):
+        if(opr == "OFF"):
             return top.handlers[swid].port_off()
         else:
             return top.handlers[swid].port_on(pno)
@@ -279,6 +280,7 @@ def read_port(top, swid):
         
 # Need to check
 def send_speed_cmd(top, cmd):
+
     """
     Set the speed for a switch.
 
@@ -292,9 +294,27 @@ def send_speed_cmd(top, cmd):
         The result of the speed setting operation. The specific return value
         depends on the set_speed operation performed by the device handler.
     """
+    swid, speed = cmd.split(',')
+   
     if top.devCtrl == "local":
-        swid, speed = cmd.split(',')
+        # swid, speed = cmd.split(',')
         return top.handlers[swid].set_speed(speed)
+    elif top.devCtrl == "tcp":
+        nwip = top.ucConfig['mynodes']["mycc"]["tcp"]["ip"]
+        nwport = top.ucConfig['mynodes']["mycc"]["tcp"]["port"]
+        resdict = devnw.send_speed_cmd(nwip, int(nwport), cmd)
+        if resdict["result"][0]["status"] == "OK":
+            top.ccflag = True
+            findict = resdict["result"][1]["data"]
+            if findict[0] == -1:
+                top.device_no_response()
+            return findict
+        else:
+            top.print_on_log("Control Computer Connection Fail!\n")
+            top.device_no_response()
+            top.ccflag = False
+            return-1, "No CC"
+
 
 def send_volts_cmd(top, swid):
     """

@@ -93,7 +93,7 @@ class ServerHc:
             self.socket.listen(5)
         except:
             print("Server Init failed")
-        # print('Test Host Server Listeneing port: ' + host + ':' + str(port))
+       
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None

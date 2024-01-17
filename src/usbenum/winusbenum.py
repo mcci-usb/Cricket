@@ -35,11 +35,15 @@ TB3R = 'Thunderbolt 3(TM) Router'
 SPEED_DICT = {"Unknown 0": "0 Gbp/s", "Gen 2": "10 Gbp/s", "Gen 3": "20 Gbp/s"}
 WIDTH_DICT = {"Unknown 0": "0", "Single Lane": "1", "Dual Lane": "2", "Two Single Lanes": "2"}
 
+USB4_SCAN_DELAY = 6000
+
 class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
     def __init__(self):
         self.usb_type_dict = {}
         self.usb_list = []
-
+        self.start_time = None
+        self.end_time = None
+        
         self.websocket_thread = None
         self.ws = None
         self.connected = False
@@ -48,6 +52,8 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.pwd = None
         self.usb4tb_json = None
         self.usb4tb_list = []
+
+        self.fail_cnt = 0
         
     def set_login_credentials(self, uname, pwd):
         self.uname = uname
@@ -57,16 +63,18 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         # raise NotImplementedError("Subclasses must implement enumerate_usb_devices")
         self.completed = False
         self.enumerate_usb3_devices()
-        if self.uname != None and self.pwd != None:
-            self.enumerate_usb4tb_devices()
-        else:
-            self.completed = True
-
+        self.enumerate_usb4tb_devices()
     
     def enumerate_usb4tb_devices(self):
-        self.open_usb4tb_ws()
-
-
+        if self.uname != None and self.pwd != None:
+            if self.fail_cnt > 2:
+                self.fail_cnt = 3
+                self.completed = True
+            else:
+                self.open_usb4tb_ws()
+        else:
+            self.completed = True
+        
     def open_usb4tb_ws(self):
         """
         Connect to the USB4 speed scanning service.
@@ -76,15 +84,10 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
             - If the WebSocket thread is not running, start it.
         
         """
-        if self.uname == None or self.pwd == None:
-            print("Please provide valid credentials")
-        else:
-            
-            if self.websocket_thread is None or not self.websocket_thread.is_alive():
-                
-                if self.connected == False:
-                    self.websocket_thread = threading.Thread(target=self.run_usb4tb_websocket)
-                    self.websocket_thread.start()
+        if self.websocket_thread is None or not self.websocket_thread.is_alive():
+            if self.connected == False:
+                self.websocket_thread = threading.Thread(target=self.run_usb4tb_websocket)
+                self.websocket_thread.start()
 
 
     def close_usb4t_ws(self):
@@ -162,19 +165,22 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         # self.update_text_ctrl(message)
         self.parseresponse(message)
         self.ws.close()
-        # print(message)
         self.ws = None
         self.connected = False
         self.completed = True
+        self.fail_cnt = 0
+
 
     def on_usb4tb_error(self, ws, error):
-        print("USB4 TB WS Req Error : ", error)
         self.completed = True
+        self.ws.close()
+        self.ws = None
+        self.connected = False
+        self.fail_cnt = self.fail_cnt + 1
 
     def on_usb4tb_close(self, ws, scode, msg):
         self.completed = True
 
-    
     def parseresponse(self, msgusb4):
         """
         parsing the usb4 list json its getting from msgusb4.
@@ -309,8 +315,7 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
             except:
                 # Print message
                 print("Error")
-        # for i in range(len(hc_list)):
-        #     master_list.append(hc_list[i])
+        
         for i in range(len(hub_list)):
             master_list.append(hub_list[i])
         for i in range(len(per_list)):

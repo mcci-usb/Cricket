@@ -155,11 +155,6 @@ class UiPanel(wx.Panel):
         self.lpanel.add_switches(swlist)
         self.lpanel.Show()
         
-    def remove_switch(self, swname):
-        print("L Panel Remove Switch: ", swname)
-        self.lpanel.remove_switch(swname)
-
-
     def update_uc_panels(self, sutmenu):
        
         self.cpanel.update_uc_panels()
@@ -182,29 +177,6 @@ class UiPanel(wx.Panel):
             self.cpanel.remove_mode_panels()
             # self.reSizeScreen()
             self.Layout()
-    
-
-    # def update_server_panel(self):
-    #     print("update logpan panel:")
-       
-    #     self.vboxl.Show(self.logPan)
-    #     self.hboxm.Show(self.vboxl)
-    #     self.vboxl.Hide(self.hboxdl)
-    #     # self.Layout()
-    #     self.Layout()
-
-    # def update_cc_panels(self, sutmenu):
-       
-    #     self.cpanel.update_server_panel()
-    #     self.update_slog_panel(sutmenu)
-         
-    # def update_hc_panels(self):
-        
-    #     self.cpanel.update_server_panel()
-    #     self.update_slog_panel({})
-    
-
-
 
     def PrintLog(self, strin):
       
@@ -287,26 +259,20 @@ class UiPanel(wx.Panel):
         self.autoPan.device_disconnected()
     
     def auto_connect(self):
-       
         self.comPan.auto_connect()
 
     def updt_dut_config(self, dutno):
-       
         self.parent.updt_dut_config(dutno)
 
     def get_dut_config(self, dutno):
-       
         return self.parent.get_dut_config(dutno)
 
     def request_dut_close(self, dutname):
-       
         self.parent.request_dut_close(dutname)
-
 
     def save_file(self, content, ftype):
         
         self.parent.save_file(content, ftype)
-    
     
 def EVT_RESULT(win, func):
     

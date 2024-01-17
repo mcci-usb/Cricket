@@ -11,7 +11,6 @@ def get_usb_change(top):
     Returns:
         None
     """    
-    print("GET USB CHANGE NETWORk::")
     top.usbenum.enumerate_usb_devices()
     result = top.usbenum.get_result()
     
@@ -126,17 +125,17 @@ def prepare_tree_change(top, usb3dict, usb4dict):
     
     if(len(rmdlist)):
         strout = strout + "Removed\n"
-        strout = strout + convert_usb_info(rmdlist)
+        strout = strout + convert_usb_info(top, rmdlist)
 
     if(len(addedlist)):   
         strout = strout + "Added\n"
-        strout = strout + convert_usb_info(addedlist)
+        strout = strout + convert_usb_info(top, addedlist)
     
     # Print the device list USB Device Tree Window
     top.print_on_log(strout)
 
 
-def convert_usb_info(udlist):
+def convert_usb_info(top, udlist):
     usb3_list = []
     usb4_list = []
 
@@ -169,7 +168,10 @@ def convert_usb_info(udlist):
             cnt += 1
 
     for dev4 in usb4_list:
-        if sys.platform == 'win32':
+        thcostype = sys.platform
+        if not top.myrole['thc']:
+            thcostype = top.ucConfig['mynodes']["mythc"]["os"]
+        if thcostype == 'win32':
             try:
                 hvid = ("%X" % int(dev4.get('vid'))).zfill(4)
                 hpid = ("%X" % int(dev4.get('pid'))).zfill(4)
@@ -194,7 +196,7 @@ def convert_usb_info(udlist):
                 vpid = f" (VID_{hvid}; PID_{hpid}) USB4 Device Error\n"
                 strdev = strdev + f"{cnt + 1}. {vpid}\n"
                 cnt += 1
-        elif sys.platform == 'linux':
+        elif thcostype == 'linux':
             try:
                 hwid = dev4.get('uuid')
                 htls = dev4.get('tx speed')
@@ -209,7 +211,7 @@ def convert_usb_info(udlist):
                 vpid = f" (VID_{hwid}) USB4 Device Error\n"
                 strdev = strdev + f"{cnt + 1}. {vpid}\n"
                 cnt += 1
-        elif sys.platform == 'darwin':
+        elif thcostype == 'darwin':
             try:
                 hwid = dev4.get('hwid')
                 htls = dev4.get('speed')

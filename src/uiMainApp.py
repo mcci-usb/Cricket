@@ -72,7 +72,7 @@ from cricketlib import searchswitch
 from cricketlib import switch3141
 from cricketlib import switch3201
 
-from cricketlib import switch2101
+# from cricketlib import switch2101
 from cricketlib import switch2301
 from cricketlib import switch3142
 
@@ -188,8 +188,7 @@ class UiMainFrame (wx.Frame):
             self.config_data["msudp"] = {"uname": None, "pwd": None}
         mslogin = self.config_data["msudp"]
         self.usbenum.set_login_credentials(mslogin["uname"], mslogin["pwd"])
-        # usb_device_enumerator.enumerate_usb_devices()
-
+        
         # Check for the latest version
         update = updtDlg.check_version()
         if update != None:
@@ -207,9 +206,7 @@ class UiMainFrame (wx.Frame):
         # Load the configuration from config_data
         # This is a sample, replace it with your logic to load from the actual file
         self.panel.update_panels(self.myrole)
-        print("Myrole = ", self.myrole)
         if self.myrole["uc"] != True:
-            # print(" ---> Initiate SCC and THC Server: ")
             self.startCcServer()
             self.startHcServer()
         self.saveScreenSize()
@@ -400,8 +397,9 @@ class UiMainFrame (wx.Frame):
         self.handlers = {}
         self.swuidict ={}
 
-        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
-        
+        # self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
+        self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142,"3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
+
         self.ldata['ssccif'] = "network"
         self.ldata['ssccpn'] = "2021"
         
@@ -433,7 +431,7 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
-        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+        # self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
 
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
 
@@ -475,7 +473,7 @@ class UiMainFrame (wx.Frame):
             self.print_on_log("\nNo Server Event")
         else:
             if event.data == "search":
-                self.print_on_log("\nSearch Event")
+                self.print_on_log("\nUser Computer Searching The Devices")
                 self.dev_list.clear()
                 self.dev_list = searchswitch.get_switches()
                 self.ucbusy = False
@@ -521,7 +519,6 @@ class UiMainFrame (wx.Frame):
             self.print_on_log("No Switches found ...\n")
 
     def remove_switch(self, swname):
-        print("UI Main App Remove Switch: ", swname)
         self.panel.remove_switch(swname)
    
     def update_slog_menu(self):
@@ -535,8 +532,6 @@ class UiMainFrame (wx.Frame):
 
         """
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            # self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
-            # self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
             if "rpanel" in self.config_data:
                 rpanel = self.config_data["rpanel"]
                 self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
@@ -826,7 +821,7 @@ class UiMainFrame (wx.Frame):
             - "Disconnect": ID_MENU_MODEL_DISCONNECT
         """
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
-        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
+        # self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
         
     def build_help_menu(self):
         """
@@ -1164,18 +1159,21 @@ class UiMainFrame (wx.Frame):
         if not self.wdialog:
             self.show_warning_dlg()
 
-    def OnDisconnect (self, event):
-        """
-        click on disconnect menu the connecting device is disconnect.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns:
-            None
-        """
-        self.device_no_response()
+    def disconnect_device(self, swport):
+        devControl.disconnect_device(self, swport)
+        
+    # def OnDisconnect (self, event):
+    #     """
+    #     click on disconnect menu the connecting device is disconnect.
+    #     Args:
+    #         self: The self parameter is a reference to the current 
+    #         instance of the class,and is used to access variables
+    #         that belongs to the class.
+    #         event: event handling on disconnect menu.
+    #     Returns:
+    #         None
+    #     """
+    #     self.device_no_response()
     
     def OnClose(self, event):
         """
@@ -1314,6 +1312,7 @@ class UiMainFrame (wx.Frame):
         # update selected switch list loop panel's switch selector
         self.panel.cpanel.autoPan.update_sw_selector(self.swuidict)
         self.panel.cpanel.loopPan.update_sw_selector(self.swuidict)
+        # self.panel.lpanel.update_sw_selector(self.swuidict)
     
     def save_usb_list(self, mlist):
         """
@@ -1388,7 +1387,9 @@ class UiMainFrame (wx.Frame):
         Returns:
             return None
         """
+        
         self.panel.update_usb4_tree(usb4dict)
+        # pass
     
     def get_enum_delay(self):
         """
@@ -1739,10 +1740,10 @@ class UiMainFrame (wx.Frame):
         """
         if status:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+            # self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
         else:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+            # self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
 
     def device_disconnected(self):
         """

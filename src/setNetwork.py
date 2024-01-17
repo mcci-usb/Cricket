@@ -12,19 +12,11 @@ class SetNetwork(wx.Panel):
         
         self.ctype = ctype
         
-        # self.config_data = configdata.read_all_config()
-        
-        # print("------------->>>>>: ", self.config_data["uc"]["mynodes"]["mycc"], self.config_data["uc"]["mynodes"]["mythc"])
-        
-        
-        # self.vboxParent = wx.BoxSizer(wx.VERTICAL)
         self.set_network()
 
     
     def set_port(self):
         self.config_data = configdata.read_all_config()
-        
-        # self.port = self.config_data["uc"]["mynodes"]["mycc"], self.config_data["uc"]["mynodes"]["mythc"]
         self.port = None
         if self.ctype == "SCC":
             self.port = self.config_data["cc"]["tcp"]["port"]
@@ -32,32 +24,12 @@ class SetNetwork(wx.Panel):
         else:
             self.port = self.config_data["thc"]["tcp"]["port"]
             self.sip = self.config_data["thc"]["tcp"]["ip"]
-            
-        print("##Server Type: ", self.ctype)
-        print("####Server Config: ", self.port)
         
         self.scc_tc_port.SetValue(self.port)
         self.scc_tc_sip.SetValue(self.sip)
-        
-        # for data in self.port:
-        #     if 'control computer' in data.get('name', '').lower():
-        #         # This is the condition for 'control computer'
-        #         self.scc_tc_port.SetValue(data.get('tcp', {}).get('port', ''))
-        #         print(f"Found 'control computer': Set port to {data.get('tcp', {}).get('port', '')}")
-                
-        #     elif 'test host computer' in data.get('name', '').lower():
-        #         # This is the condition for 'test host computer'
-        #         self.scc_tc_port.SetValue(data.get('tcp', {}).get('port', ''))
-        #         print(f"Found 'test host computer': Set port to {data.get('tcp', {}).get('port', '')}")
-                
-        #     else:
-        #         # Handle the case when neither 'control computer' nor 'test host computer' is present
-        #         print("Neither 'control computer' nor 'test host computer' found.")
             
     def set_network(self):
         self.SetBackgroundColour("White")
-        # self.SetMinSize((480,520))
-
         # self.top = top
         # Create static box with naming of Log Window
         sb = wx.StaticBox(self, -1,"Set Network")
@@ -65,7 +37,6 @@ class SetNetwork(wx.Panel):
         # Create StaticBoxSizer as vertical
         self.vbox1 = wx.StaticBoxSizer(sb, wx.VERTICAL)
         
-
         self.scc_st_port = wx.StaticText(self, -1, self.ctype+" Port" ,size = (65, -1))
         # self.scc_tc_port = wx.TextCtrl(self, -1, "1234", size = (65, -1))
         self.scc_tc_port = wx.TextCtrl(self, -1, " ", size = (60, -1))
@@ -76,7 +47,6 @@ class SetNetwork(wx.Panel):
         
         self.set_port()
         
-    
         # Create BoxSizer as horizontal
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox3 = wx.BoxSizer(wx.HORIZONTAL)
@@ -107,15 +77,6 @@ class SetNetwork(wx.Panel):
         self.vbox1.Fit(self)
         self.Layout()
     
-    # def get_nw_scc_config():
-    # # Assuming you have a way to store and retrieve the configuration
-    # # For example, using a global variable or a configuration file
-    #     config = {
-    #         "ip": "x.x.x.x",  # Replace with your actual IP address
-    #         "port": "1122"     # Replace with your actual port number
-    #     }
-    #     return config
-    
     
     def load_network_config(self):
         # Load the network configuration based on the ctype (SCC or THC)
@@ -131,14 +92,11 @@ class SetNetwork(wx.Panel):
             self.scc_tc_port.SetValue(config.get("port", ""))
             
     def SaveNetworkComp(self, e):
-        print("Setnetwork-saved!!!")
         devaddr = self.scc_tc_sip.GetValue()
         portno = self.scc_tc_port.GetValue()
         if self.ctype == "SCC":
             configdata.set_scc_config({"type": "tcp", "ip": devaddr, "port": portno})
-            print("Save-Done-scc!!!")
         elif self.ctype == "THC":
             configdata.set_thc_config({"type": "tcp", "ip": devaddr, "port": portno})
-            print("Save-Done-thc!!!")
         
         

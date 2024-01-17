@@ -52,10 +52,9 @@ def send_request(host, port, reqdict):
             hs.settimeout(1)
             rcvd_data += rcvchunk
     except socket.timeout:
-        # print("Socket timeout occurred. Connection might be too slow or no data is being sent.")
         rcvd_json = rcvd_data.decode('utf-8')
         rcvd_obj = json.loads(rcvd_json)
-
+        
         sdict["status"] = "OK"
         rlist.append(sdict)
         rlist.append(rcvd_obj)
@@ -68,7 +67,6 @@ def send_request(host, port, reqdict):
 
     rdict["result"] = rlist
     return rdict
-
 
 def get_usb_tree(host, port):
     """

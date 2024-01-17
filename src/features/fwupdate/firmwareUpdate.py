@@ -719,17 +719,6 @@ class firmwareWindow(wx.Window):
                     self.fw_seq = DO_RESET
                     self.timer_fu.Start(1000)
 
-    def update_start_old(self, event):
-        self.bloc = self.tc_bloc.GetValue()
-        if os.path.exists(self.bloc):
-            selcom = self.get_selected_com()
-            self.sw = switch3141.Switch3141(selcom)
-            if(self.sw.connect()):
-                self.sw.do_reset()
-                dports = devControl.get_avail_ports(self.top)
-        else:
-            print("File Not available")
-
     def update_cancel(self, event):
         self.fw_seq = READ_AVAIL_PORTS
         self.timer_fu.Start(500)

@@ -80,12 +80,12 @@ def get_tree_change(top):
     elif top.thCtrl == "tcp":
         nwip = top.ucConfig['mynodes']["mythc"]["tcp"]["ip"]
         nwport = top.ucConfig['mynodes']["mythc"]["tcp"]["port"]
-        
-        # print("Search Device over network: ", nwip, nwport)
+      
         resdict = thnw.get_usb_tree(nwip, int(nwport))
         
         if resdict["result"][0]["status"] == "OK":
             findict = resdict["result"][1]["data"]
+            print("Prepare Tree change: ", findict["usb4d"])
             thlocal.prepare_tree_change(top, findict["usb3d"], findict["usb4d"])
             if findict["tbjson"] != None:
                 top.store_usb4_win_info(findict["tbjson"])

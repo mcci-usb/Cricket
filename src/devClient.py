@@ -114,7 +114,7 @@ def select_usb_device(host, port, sport):
     reqdict["port"] = sport
     return send_request(host, port, reqdict)
 
-def close_serial_device(host, port):
+def close_serial_device(host, port, sport):
     """
     closing the serial port device.
     Args:
@@ -127,6 +127,7 @@ def close_serial_device(host, port):
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "close"
+    reqdict["port"] = sport
     return send_request(host, port, reqdict)
 
 def send_port_cmd(host, port, cmd):
@@ -178,6 +179,24 @@ def send_status_cmd(host, port, swid):
     reqdict["itype"] = "serial"
     reqdict["cmd"] = "status"
     reqdict["port"] = swid
+    return send_request(host, port, reqdict)
+
+def send_speed_cmd(host, port, cmd):
+    """
+    sending the serial status command.
+    Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
+    swid, speed = cmd.split(',')
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "speed"
+    reqdict["port"] = swid
+    reqdict["speed"] = speed
     return send_request(host, port, reqdict)
 
 def send_volts_cmd(host, port, swid):

@@ -1,5 +1,6 @@
 import wx
 
+from uiGlobals import *
 import threading
 import socket
 import configdata
@@ -56,19 +57,14 @@ class ScanNwThread(threading.Thread):
 
         """
         subnet = self.get_network_subnet()[0]
-        # print("subnet:", subnet)
-        # self.txtsysip.SetLabel(str(subnet))
         wx.CallAfter(self.txtsysip.SetLabel, str(subnet))
         ips = str(subnet).split(".")
-        # print("-------------:", ips)
         strsn = str(ips[0])+"."+str(ips[1])+"."+str(ips[2])
-        # print("Strsn---->", strsn)
         portip = "No Node found"
         for ip in range(160, 165):
             if self.completed_event.is_set():
                 break
             host = strsn+"."+str(ip)
-            # print("Searching IP: ", host)
             wx.CallAfter(print, f"Searching IP: {host}")
             try:
                 s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -79,8 +75,7 @@ class ScanNwThread(threading.Thread):
                 break
             except:
                 s.close()
-        # self.txtctrl.SetValue(portip)
-        # self.btnScan.SetLabel("scan network")
+        
         wx.CallAfter(self.txtctrl.SetValue, portip)
         wx.CallAfter(self.btnScan.SetLabel, "scan network")
         
@@ -125,6 +120,7 @@ class SearchNetwork(wx.Panel):
         self.ctype = ctype
         self.scan_flg = False
         self.searchthread = None
+        self.ostype = "win32"
         
         # self.vboxParent = wx.BoxSizer(wx.VERTICAL)
         self.scan_network()
@@ -146,6 +142,12 @@ class SearchNetwork(wx.Panel):
         self.tc_port = wx.TextCtrl(self, -1, "2021",size = (50, -1))
         self.tc_nwcip = wx.ComboBox(self,size=(100,-1))
         self.btn_save= wx.Button(self, -1, "Save", size = (50, -1))
+
+        self.st_os = wx.StaticText(self, -1, "OS")
+        self.rb_win = wx.RadioButton(self, ID_RBTN_WIN, "Window")
+        self.rb_linux = wx.RadioButton(self, ID_RBTN_LINUX, "Linux")
+        self.rb_mac = wx.RadioButton(self, ID_RBTN_MAC, "Mac")
+        
         
     
         # Create BoxSizer as horizontal
@@ -168,10 +170,22 @@ class SearchNetwork(wx.Panel):
         
         self.hbox1.Add(self.btn_save, 0, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 62)
+        
+        self.hbox.Add(self.st_os, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 10)
+        self.hbox.Add(self.rb_win, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 10)
+        self.hbox.Add(self.rb_linux, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 10)
+        self.hbox.Add(self.rb_mac, flag=wx.ALIGN_CENTER_VERTICAL |
+                       wx.LEFT, border = 10)
+        
        
         
         self.btn_scannwc.Bind(wx.EVT_BUTTON, self.ScanNetworkComp)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveNetworkComp)
+
+        self.Bind(wx.EVT_RADIOBUTTON, self.SelectOsChanged)
         
         # self.szr_top = wx.BoxSizer(wx.VERTICAL)
       
@@ -188,44 +202,34 @@ class SearchNetwork(wx.Panel):
         self.set_param()
     
     def SaveNetworkComp(self, e):
-        print("Save Clicked !!!!")
         devaddr = self.tc_nwcip.GetValue()
         portno = self.tc_port.GetValue()
+        # os = self.SelectOsChanged()
+
         if self.ctype == "SCC":
-            configdata.set_nw_scc_config({"ip": devaddr, "port": portno})
-            print("Save-Done-Scc!!!")
+            # configdata.set_nw_scc_config({"ip": devaddr, "port": portno, "os": })
+            configdata.set_nw_scc_config({"ip": devaddr, "port": portno, "os":self.ostype})
+           
         elif self.ctype == "THC":
-            print("Save-Done-Thc!!!")
-            configdata.set_nw_thc_config({"ip": devaddr, "port": portno})
-        # if self.searchthread and not self.searchthread.completed_event.is_set():
-        #     # The thread is still running, handle appropriately (show a message, etc.)
-        #     print("Network scanning still in progress. Cannot save.")
-        # else:
-        #     print("Hey getup...")
-        
-        
-    # def SaveNetworkComp(self, e):
-    #     print("Save Clicked !!!!")
-    #     if self.searchthread != None:
-    #         self.searchthread.join()
-        
-    def SaveNetworkComp_old(self, e):
-        # iftype = 'network'
-        # if self.scan_flg == False:
-        devaddr = self.tc_nwcip.GetValue()
-        portno = self.tc_port.GetValue()
-        if self.ctype == "SCC":
-            configdata.set_nw_scc_config({"ip": devaddr, "port": portno})
-        elif self.ctype == "THC":
-            configdata.set_nw_thc_config({"ip": devaddr, "port": portno})
-        # print("Save Done")
-        self.scan_flg = False 
-        # self.searchthread.join()
-        if self.searchthread != None:
-            self.searchthread.join()
-            del self.searchthread
+            configdata.set_nw_thc_config({"ip": devaddr, "port": portno, "os":self.ostype})
+          
+    def SelectOsChanged(self, e):
+        rb = e.GetEventObject()
+
+        id = rb.GetId()
+
+        if id == ID_RBTN_WIN:
+            # Windows
+            self.ostype = "win32"
             
-        
+        elif id == ID_RBTN_LINUX:
+            # Returs highspeed
+            self.ostype = "linux"
+
+        elif id == ID_RBTN_MAC:
+            # Returs highspeed
+            self.ostype = "darwin"
+     
     def ScanNetworkComp(self, e):
         """
         Scanning the network from Client and Server.
@@ -258,9 +262,7 @@ class SearchNetwork(wx.Panel):
         """
         self.scan_flg = True
         self.btn_scannwc.SetLabel("stop scan")
-        
-        # devControl.ResetDeviceControl(self.top)
-
+       
         portstr = self.tc_port.GetValue()
         
         self.tc_nwcip.SetValue("searching network")
@@ -278,7 +280,7 @@ class SearchNetwork(wx.Panel):
         if self.searchthread != None:
             del self.searchthread
         self.searchthread = ScanNwThread(port, self.st_sysip, self.tc_nwcip, self.btn_scannwc)
-        # self.searchthread = ScanNwThread(port, None, self.tc_nwcip, self.btn_scannwc)
+
         self.searchthread.start()
             
     def StopNwScan(self):
@@ -295,7 +297,6 @@ class SearchNetwork(wx.Panel):
         self.btn_scannwc.SetLabel("scan network")
         self.scan_flg = False 
         self.searchthread.join()  
-    
 
     def set_param(self):
         self.config_data = configdata.read_all_config()
@@ -305,20 +306,24 @@ class SearchNetwork(wx.Panel):
         if self.ctype == "SCC":
             self.port = self.config_data["uc"]["mynodes"]["mycc"]["tcp"]["port"]
             self.sip = self.config_data["uc"]["mynodes"]["mycc"]["tcp"]["ip"]
+            self.ostype = self.config_data["uc"]["mynodes"]["mycc"]["os"]
         else:
             mythckeys = list(self.config_data["uc"]["mynodes"]["mythc"]["tcp"].keys())
-            print("MythcKeys: ", mythckeys)
             if len(mythckeys) > 0:
                 self.port = self.config_data["uc"]["mynodes"]["mythc"]["tcp"]["port"]
                 self.sip = self.config_data["uc"]["mynodes"]["mythc"]["tcp"]["ip"]
+                self.ostype = self.config_data["uc"]["mynodes"]["mythc"]["os"]
             else:
                 self.port = ""
                 self.sip = ""
+                self.ostype = "win32"
             
-        print("##Server Type: ", self.ctype)
-        print("####Server Config: ", self.port)
-        
         self.tc_port.SetValue(self.port)
         self.tc_nwcip.SetValue(self.sip)
-    
+        if self.ostype == "win32":
+            self.rb_win.SetValue(True)
+        elif self.ostype == "linux":
+            self.rb_linux.SetValue(True)
+        elif self.ostype == "darwin":
+            self.rb_mac.SetValue(True)
       
