@@ -248,9 +248,9 @@ class RequestSync(threading.Thread):
         cmd = reqdict["cmd"]
         if(ctype == "usb"):
             if (cmd == "lsusb"):
-                wx.CallAfter(self.window.panel.PrintLog, "\Read USB")
+                wx.CallAfter(self.window.panel.PrintLog, "Read USB")
                 result = usbChange.get_usb_change(self.window)
-                wx.CallAfter(self.window.panel.PrintLog, "USB Result " +  str(result))
+                wx.CallAfter(self.window.panel.PrintLog, "USB Result ")
                 rdict = {}
                 rdict["data"] = result
                 return rdict

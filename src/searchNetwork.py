@@ -1,5 +1,28 @@
-import wx
+##############################################################################
+# 
+# Module: searchNetwork.py
+#
+# Description:
+#     This diaong scanning the Server netowork IP and Port.
+#
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation June 2021
+#
+# Revision history:
+#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 
+import wx
 from uiGlobals import *
 import threading
 import socket
