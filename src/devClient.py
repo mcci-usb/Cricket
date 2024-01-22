@@ -20,7 +20,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -46,7 +46,6 @@ def send_request(host, port, reqdict):
     sdict = {}
     try:
         result = cs.connect((host, port))
-        #rcvdata = cs.recv(1024)
         data= json.dumps(reqdict)
         cs.send(data.encode('utf-8'))
         rcvdata = cs.recv(1024)
@@ -76,7 +75,7 @@ def get_device_list(host, port):
     reqdict["cmd"] = "search"
     return send_request(host, port, reqdict)
 
-def open_serial_device(host, port, sport, baud):
+def open_serial_device(host, port, swname, sport, baud):
     """
     once connecting the sevrer client search serial device list 
     Args:
@@ -92,6 +91,7 @@ def open_serial_device(host, port, sport, baud):
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "open"
     reqdict["itype"] = "serial"
+    reqdict["swname"] = swname
     reqdict["port"] = sport
     reqdict["baud"] = str(baud)
     return send_request(host, port, reqdict)
@@ -109,12 +109,12 @@ def select_usb_device(host, port, sport):
     """
     reqdict = {}
     reqdict["ctype"] = "device"
-    reqdict["cmd"] = "open"
     reqdict["itype"] = "usb"
+    reqdict["cmd"] = "open"
     reqdict["port"] = sport
     return send_request(host, port, reqdict)
 
-def close_serial_device(host, port):
+def close_serial_device(host, port, sport):
     """
     closing the serial port device.
     Args:
@@ -127,6 +127,7 @@ def close_serial_device(host, port):
     reqdict = {}
     reqdict["ctype"] = "device"
     reqdict["cmd"] = "close"
+    reqdict["port"] = sport
     return send_request(host, port, reqdict)
 
 def send_port_cmd(host, port, cmd):
@@ -147,7 +148,7 @@ def send_port_cmd(host, port, cmd):
     reqdict["stat"] = cmd
     return send_request(host, port, reqdict)
 
-def read_port_cmd(host, port):
+def read_port_cmd(host, port, swid):
     """
     read the port command
     Args:
@@ -159,10 +160,12 @@ def read_port_cmd(host, port):
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
+    reqdict["port"] = swid
     reqdict["cmd"] = "read"
+    
     return send_request(host, port, reqdict)
 
-def send_status_cmd(host, port):
+def send_status_cmd(host, port, swid):
     """
     sending the serial status command.
     Args:
@@ -175,9 +178,28 @@ def send_status_cmd(host, port):
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
     reqdict["cmd"] = "status"
+    reqdict["port"] = swid
     return send_request(host, port, reqdict)
 
-def send_volts_cmd(host, port):
+def send_speed_cmd(host, port, cmd):
+    """
+    sending the serial status command.
+    Args:
+        host: host ipaddress.
+        port: send with port number
+    Returns:
+        send_request(host, port, reqdict)
+    """
+    swid, speed = cmd.split(',')
+    reqdict = {}
+    reqdict["ctype"] = "control"
+    reqdict["itype"] = "serial"
+    reqdict["cmd"] = "speed"
+    reqdict["port"] = swid
+    reqdict["speed"] = speed
+    return send_request(host, port, reqdict)
+
+def send_volts_cmd(host, port, swid):
     """
     send the volts command
     Args:
@@ -191,9 +213,10 @@ def send_volts_cmd(host, port):
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
     reqdict["cmd"] = "volts"
+    reqdict["port"] = swid
     return send_request(host, port, reqdict)
 
-def send_amps_cmd(host, port):
+def send_amps_cmd(host, port, swid):
     """
     send the amps command
     Args:
@@ -207,9 +230,10 @@ def send_amps_cmd(host, port):
     reqdict["ctype"] = "control"
     reqdict["itype"] = "serial"
     reqdict["cmd"] = "amps"
+    reqdict["port"] = swid
     return send_request(host, port, reqdict)
 
-def control_port(host, port,cmd):
+def control_port(host, port, cmd):
     """
     controlling the switching ports
     Args:
@@ -222,5 +246,5 @@ def control_port(host, port,cmd):
     reqdict = {}
     reqdict["ctype"] = "control"
     reqdict["itype"] = "usb"
-    reqdict["cmd"] = str(cmd)
+    reqdict["cmd"] = cmd
     return send_request(host, port, reqdict)

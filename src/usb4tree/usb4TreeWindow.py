@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 
@@ -146,8 +146,13 @@ class Usb4TreeWindow(wx.Window):
             (self.szr_top, 1, wx.EXPAND),
             (0,0,0)
             ])
+        
+        mythcos = sys.platform
+        if not top.parent.myrole['thc']:
+            mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
 
-        self.usb4parse = usb4parse.create_usb4tb_parser()
+        self.usb4parse = usb4parse.create_usb4tb_parser(mythcos)
+
 
         # Set size of frame
         self.SetSizer(self.vbox)

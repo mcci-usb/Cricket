@@ -1,5 +1,6 @@
 import sys
 import copy
+
 from uiGlobals import *
 
 def get_usb_change(top):
@@ -16,11 +17,26 @@ def get_usb_change(top):
     usb3diff = get_usb3_change(top, result["usb3list"])
     usb4diff = get_usb4_change(top, result["usb4tblist"])
     top.update_usb_status(result["usb3type"])
-    prepare_tree_change(top, usb3diff, usb4diff)
+    
+    if top.myrole['uc']:
+        prepare_tree_change(top, usb3diff, usb4diff)
 
-    if result["usb4tbjson"] != None:
-        top.store_usb4_win_info(result["usb4tbjson"])
-
+    if result["usb4tbjson"] != None and len(result["usb4tbjson"]) > 0:
+        if top.myrole['uc']:
+            top.store_usb4_win_info(result["usb4tbjson"])
+        else:
+            resdict = {}
+            resdict["usb3d"] = usb3diff
+            resdict["usb4d"] = usb4diff
+            resdict["tbjson"] = result["usb4tbjson"]
+            return resdict
+    else:
+        resdict = {}
+        resdict["usb3d"] = usb3diff
+        resdict["usb4d"] = []
+        resdict["tbjson"] = []
+        return resdict
+        
 
 def get_usb3_change(top, newlist):
     oldlist = top.get_usb_list()
@@ -94,21 +110,23 @@ def get_usb4_change(top, newlist):
 
     return {"added": adlist, "removed": rmlist}
 
-
-
 def prepare_tree_change(top, usb3dict, usb4dict):
     strout = ""
     addedlist = []
     rmdlist = []
     for dev in usb3dict["added"]:
         addedlist.append(dev)
-    for dev in usb4dict["added"]:
-        addedlist.append(dev)
+    
+    if usb4dict != None and len(usb4dict):
+        for dev in usb4dict["added"]:
+            addedlist.append(dev)
 
     for dev in usb3dict["removed"]:
         rmdlist.append(dev)
-    for dev in usb4dict["removed"]:
-        rmdlist.append(dev)
+
+    if usb4dict != None and len(usb4dict):
+        for dev in usb4dict["removed"]:
+            rmdlist.append(dev)
     
     if(len(addedlist) == 0 and len(rmdlist) == 0):
         # No device added removed from port, then print "No change"
@@ -116,17 +134,17 @@ def prepare_tree_change(top, usb3dict, usb4dict):
     
     if(len(rmdlist)):
         strout = strout + "Removed\n"
-        strout = strout + convert_usb_info(rmdlist)
+        strout = strout + convert_usb_info(top, rmdlist)
 
     if(len(addedlist)):   
         strout = strout + "Added\n"
-        strout = strout + convert_usb_info(addedlist)
+        strout = strout + convert_usb_info(top, addedlist)
     
     # Print the device list USB Device Tree Window
     top.print_on_log(strout)
 
 
-def convert_usb_info(udlist):
+def convert_usb_info(top, udlist):
     usb3_list = []
     usb4_list = []
 
@@ -159,7 +177,10 @@ def convert_usb_info(udlist):
             cnt += 1
 
     for dev4 in usb4_list:
-        if sys.platform == 'win32':
+        thcostype = sys.platform
+        if not top.myrole['thc']:
+            thcostype = top.ucConfig['mynodes']["mythc"]["os"]
+        if thcostype == 'win32':
             try:
                 hvid = ("%X" % int(dev4.get('vid'))).zfill(4)
                 hpid = ("%X" % int(dev4.get('pid'))).zfill(4)
@@ -184,7 +205,7 @@ def convert_usb_info(udlist):
                 vpid = f" (VID_{hvid}; PID_{hpid}) USB4 Device Error\n"
                 strdev = strdev + f"{cnt + 1}. {vpid}\n"
                 cnt += 1
-        elif sys.platform == 'linux':
+        elif thcostype == 'linux':
             try:
                 hwid = dev4.get('uuid')
                 htls = dev4.get('tx speed')
@@ -199,7 +220,7 @@ def convert_usb_info(udlist):
                 vpid = f" (VID_{hwid}) USB4 Device Error\n"
                 strdev = strdev + f"{cnt + 1}. {vpid}\n"
                 cnt += 1
-        elif sys.platform == 'darwin':
+        elif thcostype == 'darwin':
             try:
                 hwid = dev4.get('hwid')
                 htls = dev4.get('speed')

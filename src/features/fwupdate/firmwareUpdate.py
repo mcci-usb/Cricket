@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -718,17 +718,6 @@ class firmwareWindow(wx.Window):
                 if(self.sw.connect() or self.sw2.connect()):
                     self.fw_seq = DO_RESET
                     self.timer_fu.Start(1000)
-
-    def update_start_old(self, event):
-        self.bloc = self.tc_bloc.GetValue()
-        if os.path.exists(self.bloc):
-            selcom = self.get_selected_com()
-            self.sw = switch3141.Switch3141(selcom)
-            if(self.sw.connect()):
-                self.sw.do_reset()
-                dports = devControl.get_avail_ports(self.top)
-        else:
-            print("File Not available")
 
     def update_cancel(self, event):
         self.fw_seq = READ_AVAIL_PORTS

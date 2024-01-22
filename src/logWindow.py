@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -272,9 +272,11 @@ class LogWindow(wx.Window):
         # thControl.get_tree_change(self.top)
         try:
             thControl.get_tree_change(self.top)
-        except:
+        except Exception as err:
             # print message
             self.print_on_log("USB Read Error!")
+            self.print_on_log("USB RE Msg: "+str(err))
+            
 
         self.wait_flg = False
         self.btn_ref.Enable()

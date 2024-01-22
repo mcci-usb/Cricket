@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 from enum import auto
@@ -153,6 +153,27 @@ class MidPanel(wx.Panel):
             None
         """
         self.hboxm.Hide(self.vboxl)
+        self.Layout()
+    
+    def remove_mode_panels(self):
+        self.vboxl.Hide(self.hboxdl)
+        self.hide_usb_enum_controls()
+        self.Layout()
+    
+    def hide_usb_enum_controls(self):
+        
+        self.logPan.show_usb_ctrls(False)
+
+    def show_usb_enum_controls(self):
+        
+        self.logPan.show_usb_ctrls(True)
+
+        self.Layout()
+    
+    
+    def show_mode_panels(self):
+        self.vboxl.Show(self.hboxdl)
+        self.show_usb_enum_controls()
         self.Layout()
 
     def remove_dev_panels(self):

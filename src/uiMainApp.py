@@ -19,7 +19,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lib imports
@@ -48,6 +48,7 @@ from features.fwupdate import firmwareUpdate
 from setDialog import *
 from portDialog import *
 from warningMessage import *
+from networkingWindow import *
 #from ccServer import *
 import updateDialog as updtDlg
 
@@ -138,7 +139,7 @@ class UiMainFrame (wx.Frame):
        
         self.build_menu_bar()
         self.build_config_menu()
-        self.build_set_menu()
+        self.build_set_menu() 
         self.build_com_menu()
         self.build_tool_menu()
         self.build_help_menu()
@@ -187,14 +188,30 @@ class UiMainFrame (wx.Frame):
             self.config_data["msudp"] = {"uname": None, "pwd": None}
         mslogin = self.config_data["msudp"]
         self.usbenum.set_login_credentials(mslogin["uname"], mslogin["pwd"])
-        # usb_device_enumerator.enumerate_usb_devices()
-
+        
         # Check for the latest version
         update = updtDlg.check_version()
         if update != None:
             dlg = updtDlg.UpdateDialog(self, self, update)
             dlg.ShowModal()
             dlg.Destroy()
+    
+        self.load_config()
+        EVT_RESULT(self, self.RunServerEvent)
+
+        # Set up the layout
+        # self.setup_layout()
+
+    def load_config(self):
+        # Load the configuration from config_data
+        # This is a sample, replace it with your logic to load from the actual file
+        self.panel.update_panels(self.myrole)
+        if self.myrole["uc"] != True:
+            if self.myrole["cc"] == True:
+                self.startCcServer()
+            if self.myrole["thc"] == True:
+                self.startHcServer() 
+        self.saveScreenSize()
 
     def init_usbTreeImage(self):
         """
@@ -276,24 +293,6 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Enable(ID_MENU_CONFIG_UC, False)
         self.menuBar.Enable(ID_MENU_CONFIG_SCC, False)
         self.menuBar.Enable(ID_MENU_CONFIG_THC, False)
-
-    def build_set_menu(self):
-        """
-        Builds the settings menu for selecting specific configurations.
-
-        Notes:
-            - Appends menu items for Switch Control Computer (SCC) 
-              and Test Host Computer (THC).
-            - Uncomment the line for Warning menu if needed.
-
-        Dependencies:
-            - Assumes the use of wxPython for GUI components.
-
-        """
-        # Set Menu   
-        self.setMenu.Append(ID_MENU_SET_SCC, "Switch Control Computer")
-        self.setMenu.Append(ID_MENU_SET_THC, "Test Host Computer")
-        # self.setMenu.Append(ID_MENU_SET_WARNING, "Warning")
     
     def read_configs(self):
         """
@@ -392,6 +391,7 @@ class UiMainFrame (wx.Frame):
 
         self.dev_list = []
         self.switch_list = []
+        self.ucbusy = True
 
         self.masterList = None
         self.tbMasterList = None
@@ -400,7 +400,15 @@ class UiMainFrame (wx.Frame):
         self.swuidict ={}
 
         self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
-
+        
+        self.ldata['ssccif'] = "network"
+        self.ldata['ssccpn'] = "2021"
+        
+        self.ldata['sthcif'] = "network"
+        self.ldata['sthcpn'] = "2022"   
+        
+        
+        
     def define_events(self):
         """
         Defines event bindings for menu items and controls.
@@ -416,20 +424,22 @@ class UiMainFrame (wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnSelectThc, id=ID_MENU_SET_THC)
         # self.Bind(wx.EVT_MENU, self.OnWarningWindow, id=ID_MENU_SET_WARNING)
 
-        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ucmenu)
-        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ccmenu)
-        self.Bind(wx.EVT_MENU, self.UpdateConfig, self.hcmenu)
+        # self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ucmenu)
+        # self.Bind(wx.EVT_MENU, self.UpdateConfig, self.ccmenu)
+        # self.Bind(wx.EVT_MENU, self.UpdateConfig, self.hcmenu)
 
         self.Bind(wx.EVT_MENU, self.OnClickHelp, id=ID_MENU_HELP_ABOUT)
         self.Bind(wx.EVT_MENU, self.OnHideWindow, id=ID_MENU_WIN_MIN)
         self.Bind(wx.EVT_MENU, self.OnShowWindow, id=ID_MENU_WIN_SHOW)
         self.Bind(wx.EVT_MENU, self.OnConnect, id=ID_MENU_MODEL_CONNECT)
-        self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
+        # self.Bind(wx.EVT_MENU, self.OnDisconnect, id=ID_MENU_MODEL_DISCONNECT)
 
         self.Bind(wx.EVT_CLOSE, self.OnAppClose)
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
+        self.Bind(wx.EVT_MENU, self.OnNetworkWindow, id = ID_NETWORK_MENU)
+       
 
     def init_connect(self):
         """
@@ -446,6 +456,31 @@ class UiMainFrame (wx.Frame):
         thControl.SetDeviceControl(self)
         # if self.myrole["uc"] == True:
         #     self.auto_connect()
+        
+    
+    def RunServerEvent(self, event):
+        """
+        serching the port event handling indicates 
+        server is connecting that port
+        Args:
+            self: The self parameter is a reference to the current 
+            instance of the class,and is used to access variables
+            that belongs to the class.
+            event: searching the event with server.
+        Returns:
+            None
+        """
+        if event.data is None:
+            self.print_on_log("\nNo Server Event")
+        else:
+            if event.data == "search":
+                self.print_on_log("\nUser Computer Searching The Devices")
+                self.dev_list.clear()
+                self.dev_list = searchswitch.get_switches()
+                self.ucbusy = False
+            else:
+                self.print_on_log("\nUnknown Server Event")
+
 
     def auto_connect(self):
         """
@@ -484,6 +519,8 @@ class UiMainFrame (wx.Frame):
         else:
             self.print_on_log("No Switches found ...\n")
 
+    def remove_switch(self, swname):
+        self.panel.remove_switch(swname)
    
     def update_slog_menu(self):
         """
@@ -496,8 +533,6 @@ class UiMainFrame (wx.Frame):
 
         """
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            # self.dutMenuBar.Check(ID_MENU_DUT1, self.duts["nodes"]["dut1"])
-            # self.dutMenuBar.Check(ID_MENU_DUT2, self.duts["nodes"]["dut2"])
             if "rpanel" in self.config_data:
                 rpanel = self.config_data["rpanel"]
                 self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
@@ -526,7 +561,8 @@ class UiMainFrame (wx.Frame):
 
         self.configMenu = wx.Menu()
         self.comMenu = wx.Menu()
-        self.setMenu = wx.Menu()
+        # self.setMenu = wx.Menu()
+        self.netMenu = wx.Menu()
         self.toolMenu = wx.Menu()
         self.slogMenu = wx.Menu()
         self.helpMenu = wx.Menu()
@@ -545,7 +581,8 @@ class UiMainFrame (wx.Frame):
             self.menuBar.Append(self.winMenu,    "&Window")
        
         self.menuBar.Append(self.configMenu, "&Config System")
-        self.menuBar.Append(self.setMenu, "&Settings")
+        # self.menuBar.Append(self.setMenu, "&Settings")
+        self.menuBar.Append(self.netMenu, "&Settings")
         self.menuBar.Append(self.comMenu,     "&MCCI USB Switch")
 
         self.menuBar.Append(self.toolMenu, "&Tools")
@@ -557,6 +594,10 @@ class UiMainFrame (wx.Frame):
             self.helpMenu.Append(ID_MENU_HELP_ABOUT, "About...")
         
         self.menuBar.Append(self.helpMenu,    "&Help")
+    
+    def build_set_menu(self):
+        self.Nmenu = wx.MenuItem(self.netMenu, ID_NETWORK_MENU, "Configurations")
+        self.netMenu.Append(self.Nmenu)
 
     
     def build_tool_menu(self):
@@ -591,18 +632,6 @@ class UiMainFrame (wx.Frame):
         self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
-        """
-        Handles the window move event.
-
-        Parameters:
-            - e (wx.MoveEvent): The move event containing information about the new window position.
-
-        Description:
-            - Retrieves the current window position.
-            - Obtains the screen size.
-            - Saves the screen size to maintain the application state.
-
-        """
         x, y = e.GetPosition()
         w, h = wx.DisplaySize()
         sw = self.Size[0]
@@ -610,16 +639,7 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
 
     def initScreenSize(self):
-        """
-        Initializes the screen size and position of the main window.
-
-        Description:
-            - Retrieves the display size.
-            - Checks stored configuration data for window position and size.
-            - If no configuration is available, sets a default size and centers the window.
-            - Otherwise, sets the window position and size based on stored configuration.
-
-        """
+       
         dw, dh = wx.DisplaySize()
         opos = self.config_data["screen"]["pos"]
         osize = self.config_data["screen"]["size"]
@@ -632,35 +652,14 @@ class UiMainFrame (wx.Frame):
             self.SetSize((osize[0], osize[1]))
 
     def saveScreenSize(self):
-        """
-        Saves the current screen size and position of the 
-        main window to configuration data.
-
-        Description:
-            - Retrieves the current position (px, py) and size (sw, sh) of the main window.
-            - Creates a dictionary with the screen position and size.
-            - Updates the configuration data with the new screen information.
-
-        """
+        
         px, py = self.GetPosition()
         sw, sh = self.GetSize()
         findict = {"screen": {"pos": [px, py], "size": [sw, sh]}}
         configdata.updt_screen_size(findict)
 
     def reSizeScreen(self):
-        """
-        Resize the main window to a percentage of the display size, maintaining fixed left and middle panels.
-
-        Description:
-            - Retrieves the current display size (w, h).
-            - Calculates new dimensions (dw, dh) as a percentage of the display size.
-            - Checks the current window size (sw, sh).
-            - Resizes the main window if the calculated dimensions are different.
-
-        """
-        # Left and Middle panel are fixed
-        # Only DUT Log Window is optional
-        # Check the screen size before resize it
+       
         w, h = wx.DisplaySize()
 
         dw = int(w * 0.97)
@@ -672,6 +671,8 @@ class UiMainFrame (wx.Frame):
         reqwidth = 950
         # if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
         if self.config_data["rpanel"]["dut1"] or self.config_data["rpanel"]["dut2"] or self.config_data["rpanel"]["u4tree"]:
+        # if self.config_data["myrole"]["cc"]:
+            # pass
             reqwidth = 1420
             if sw < reqwidth:
                 self.SetSize((reqwidth, dh))
@@ -682,6 +683,30 @@ class UiMainFrame (wx.Frame):
         self.Layout()
 
         self.saveScreenSize()
+    
+    def serverResizerScreen(self):
+        w, h = wx.DisplaySize()
+
+        dw = int(w * 0.97)
+        dh = int(h * 0.95)
+
+        sw = self.Size[0]
+        sh = self.Size[1]
+
+        reqwidth = 550
+        # if self.duts["nodes"]["dut1"] == True or self.duts["nodes"]["dut2"]:
+        if self.config_data["myrole"]["uc"] == False:
+            reqwidth = 550
+            if sw < reqwidth:
+                self.SetSize((reqwidth, dh))
+        else:
+            self.SetSize((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.CenterOnScreen()
+        self.Layout()
+
+        self.saveScreenSize()
+        
 
     def SelectDUT(self, event):
         """
@@ -797,7 +822,7 @@ class UiMainFrame (wx.Frame):
             - "Disconnect": ID_MENU_MODEL_DISCONNECT
         """
         self.comMenu.Append(ID_MENU_MODEL_CONNECT, "Connect")
-        self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
+        # self.comMenu.Append(ID_MENU_MODEL_DISCONNECT, "Disconnect")
         
     def build_help_menu(self):
         """
@@ -841,6 +866,8 @@ class UiMainFrame (wx.Frame):
         self.ucmenu.Check(self.myrole["uc"])
         self.ccmenu.Check(self.myrole["cc"])
         self.hcmenu.Check(self.myrole["thc"])
+    
+  
 
     def OnClickHelp(self, event):
         """
@@ -972,6 +999,18 @@ class UiMainFrame (wx.Frame):
         dlg = AboutDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
+        
+    def OnNetworkWindow(self, event):
+        dlg = NetConfigDialog(self, self.myrole)
+        dlg.ShowModal()
+        dlg.Destroy()
+        self.read_configs()
+        self.panel.update_panels(self.myrole)
+        self.serverResizerScreen()
+        self.CenterOnScreen()
+        self.Refresh()
+    
+    
 
     def OnFirmwareUpdateWindow(self, event):
         """
@@ -1093,12 +1132,11 @@ class UiMainFrame (wx.Frame):
 
         self.print_on_log("Search Switches ...\n")
         self.dev_list.clear()
-        self.dev_list = searchswitch.get_switches()
+        self.dev_list = devControl.search_device(self)
 
         if (wx.IsBusy()):
             wx.EndBusyCursor()
 
-        # self.dev_list = devControl.search_device(self)
         self.dev_list = self.dev_list["switches"]
         
         if(len(self.dev_list) > 1):
@@ -1122,18 +1160,21 @@ class UiMainFrame (wx.Frame):
         if not self.wdialog:
             self.show_warning_dlg()
 
-    def OnDisconnect (self, event):
-        """
-        click on disconnect menu the connecting device is disconnect.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: event handling on disconnect menu.
-        Returns:
-            None
-        """
-        self.device_no_response()
+    def disconnect_device(self, swport):
+        devControl.disconnect_device(self, swport)
+        
+    # def OnDisconnect (self, event):
+    #     """
+    #     click on disconnect menu the connecting device is disconnect.
+    #     Args:
+    #         self: The self parameter is a reference to the current 
+    #         instance of the class,and is used to access variables
+    #         that belongs to the class.
+    #         event: event handling on disconnect menu.
+    #     Returns:
+    #         None
+    #     """
+    #     self.device_no_response()
     
     def OnClose(self, event):
         """
@@ -1272,6 +1313,7 @@ class UiMainFrame (wx.Frame):
         # update selected switch list loop panel's switch selector
         self.panel.cpanel.autoPan.update_sw_selector(self.swuidict)
         self.panel.cpanel.loopPan.update_sw_selector(self.swuidict)
+        # self.panel.lpanel.update_sw_selector(self.swuidict)
     
     def save_usb_list(self, mlist):
         """
@@ -1346,7 +1388,9 @@ class UiMainFrame (wx.Frame):
         Returns:
             return None
         """
+        
         self.panel.update_usb4_tree(usb4dict)
+        # pass
     
     def get_enum_delay(self):
         """
@@ -1697,10 +1741,10 @@ class UiMainFrame (wx.Frame):
         """
         if status:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+            # self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
         else:
             self.menuBar.Enable(ID_MENU_MODEL_CONNECT, True)
-            self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
+            # self.menuBar.Enable(ID_MENU_MODEL_DISCONNECT, True)
 
     def device_disconnected(self):
         """
@@ -1848,22 +1892,6 @@ class UiMainFrame (wx.Frame):
         self.panel.update_right_panel(pdict)
         self.Refresh()
 
-     
-    def UpdateConfig(self, event):
-        """
-        Updates the configuration based on the menu selection.
-
-        Parameters:
-            event (wx.Event): The event object representing the menu selection.
-
-        """
-        self.myrole["uc"] = True if self.ucmenu.IsChecked() else False
-        self.myrole["cc"] = True if self.ccmenu.IsChecked() else False
-        self.myrole["thc"] = True if self.hcmenu.IsChecked() else False
-
-        self.update_other_menu()
-        self.panel.update_panels(self.myrole, self.duts)
-
     def saveMenus(self):
         """
         Saves the menu configurations and screen size.
@@ -1919,10 +1947,12 @@ class UiMainFrame (wx.Frame):
         Returns: 
             None
         """
-        if status:
-            self.menuBar.Enable(ID_MENU_SET_SCC, True)
-        else:
-            self.menuBar.Enable(ID_MENU_SET_SCC, False)
+        pass
+        # if status:
+        #     self.menuBar.Enable(ID_MENU_SET_SCC, True)
+        # else:
+        #     pass
+            # self.menuBar.Enable(ID_MENU_SET_SCC, False)
 
     def update_thc_menu(self, status):
         """
@@ -1936,10 +1966,12 @@ class UiMainFrame (wx.Frame):
         Returns: 
             None
         """
-        if status:
-            self.menuBar.Enable(ID_MENU_SET_THC, True)
-        else:
-            self.menuBar.Enable(ID_MENU_SET_THC, False)
+        pass
+        # if status:
+        #     self.menuBar.Enable(ID_MENU_SET_THC, True)
+        # else:
+        #     pass
+            # self.menuBar.Enable(ID_MENU_SET_THC, False)
         
     def update_manage_model(self, status):
         """
@@ -1978,8 +2010,11 @@ class UiMainFrame (wx.Frame):
             None
         """
         if self.ccserver == None:
-            self.ccserver = devServer.ServerCc("", int(self.ldata['ssccpn']))
+            ccport = self.ccConfig["tcp"]["port"]
+            self.ccserver = devServer.ServerCc("", int(ccport))
             strin = "Control Computer Listening: "+self.ccserver.bind_addr
+            # self.ccserver = devServer.ServerCc("", 2021)
+            # strin = "Control Computer Listening: 192.168.76.23"
             self.panel.PrintLog(strin+"\n")
             
             self.listencc = devServer.StayAccept(self)
@@ -1997,8 +2032,11 @@ class UiMainFrame (wx.Frame):
             None
         """
         if self.hcserver == None:
-            self.hcserver = thServer.ServerHc("", int(self.ldata['sthcpn']))
+            thcport = self.thcConfig["tcp"]["port"]
+            self.hcserver = thServer.ServerHc("", int(thcport))
+            # self.hcserver = thServer.ServerHc("", 2022)
             strin = "Host Computer Listening: "+self.hcserver.bind_addr
+            # strin = "Host Computer Listening: 192.168.76.23"
             self.panel.PrintLog(strin+"\n")
             
             self.listenhc = thServer.StayAccept(self)

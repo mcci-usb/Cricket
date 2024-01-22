@@ -49,12 +49,10 @@ class LoginFrame(wx.Dialog):
 
         self.username_label = wx.StaticText(self.panel, label="Username")
         self.username_text = wx.TextCtrl(self.panel, size=(150, -1))
-        # self.username_text = wx.TextCtrl(self.panel, wx.ID_ANY, "mcci", size=(150, -1))
-
+        
         self.password_label = wx.StaticText(self.panel, label="Password")
         self.password_text = wx.TextCtrl(self.panel, style=wx.TE_PASSWORD, size=(150, -1))
-        # self.password_text = wx.TextCtrl(self.panel, wx.ID_ANY, "mcci", size=(150, -1))
-
+        
         self.login_button = wx.Button(self.panel, label="Save")
         self.login_button.Bind(wx.EVT_BUTTON, self.on_save)
 

@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#     V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Lip imports
@@ -94,7 +94,7 @@ class Dev3201Window(wx.Window):
         self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
-        
+          
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (-1,-1))
         self.st_p3 = wx.StaticText(self, -1, "Port 3", size = (-1,-1))
@@ -134,11 +134,15 @@ class Dev3201Window(wx.Window):
         self.hbox5 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxi = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox6 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.hboxdb = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxp1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp2 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp3 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxp4 = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.hboxds = wx.BoxSizer(wx.HORIZONTAL)
 
         self.hboxs1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxs2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -147,9 +151,11 @@ class Dev3201Window(wx.Window):
                         wx.ALIGN_CENTER_VERTICAL, border=0)
         self.hboxp1.Add(self.btn_p1, flag=wx.LEFT, border = 10)
         
+        
         self.hboxp2.Add(self.st_p2, 0, flag= wx.ALIGN_CENTER_VERTICAL | 
                         wx.LEFT, border = 0)
         self.hboxp2.Add(self.btn_p2, flag=wx.LEFT,  border = 10)
+        
         
         self.hboxp3.Add(self.st_p3, flag=wx.ALIGN_LEFT | wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=0)
@@ -158,6 +164,9 @@ class Dev3201Window(wx.Window):
         self.hboxp4.Add(self.st_p4, 0, flag=wx.ALIGN_LEFT | 
                         wx.ALIGN_CENTER_VERTICAL | wx.LEFT, border = 0)
         self.hboxp4.Add(self.btn_p4, flag=wx.LEFT,  border = 10)
+        
+        
+        self.hboxds.Add(self.hboxdb, flag=wx.LEFT, border=260)
 
         self.hboxs1.Add(self.hboxp1, flag=wx.LEFT, border=20)
         self.hboxs1.Add((0,0), 1, wx.EXPAND)
@@ -188,7 +197,9 @@ class Dev3201Window(wx.Window):
         self.vbox = wx.StaticBoxSizer(self.sb, wx.VERTICAL)
 
         self.vbox.AddMany([
-            (0,10,0),
+            (0,0,0),
+            (self.hboxds, 1, wx.EXPAND),
+            (0,0,0),
             (self.hboxs1, 1, wx.EXPAND),
             (0,10,0),
             (self.hboxs2, 1, wx.EXPAND),
@@ -508,7 +519,8 @@ class Dev3201Window(wx.Window):
             None
         """
 
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
+        # res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(pno))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",ON,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('1', '1 ON')
@@ -532,7 +544,8 @@ class Dev3201Window(wx.Window):
         Returns:
             None
         """
-        res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
+        # res, outstr = model.send_port_cmd(self.top, self.swid+",on,"+str(0))
+        res, outstr = model.send_port_cmd(self.top, self.swid+",OFF,"+str(pno))
         if res == 0:
             outstr = outstr.replace('p', 'P')
             outstr = outstr.replace('0', ""+str(pno)+" OFF")
@@ -792,8 +805,6 @@ class Dev3201Window(wx.Window):
             speed = "SS"
         res, outstr = model.send_speed_cmd(self.top, self.swid+","+speed)
 
-        # cmd = 'superspeed'+' '+str(val)+'\r\n'
-        # res, outstr = model.send_port_cmd(self.top, cmd)
         if res == 0:
             outstr = outstr.replace('s', 'S')
             outstr = outstr.replace('1', 'Enabled')

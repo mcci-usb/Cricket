@@ -18,7 +18,7 @@
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 #Lib imports
@@ -357,7 +357,6 @@ class Dev2101Window(wx.Panel):
         Returns:
             None
         """
-
         res, outstr = model.control_port(self.top, self.swid+",off")
         if res == 0:
             self.top.print_on_log(self.swid+": Port OFF\n")
@@ -460,7 +459,7 @@ class Dev2101Window(wx.Panel):
         
         self.enable_port_controls(stat)
         self.enable_speed_controls(stat)
-        self.read_status()
+        # self.read_status()  // Need to update this
 
     def enable_port_controls(self, stat):
         """

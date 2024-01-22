@@ -21,7 +21,7 @@
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#    V4.0.0 Wed May 25 2023 17:00:00   Seenivasan V
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 # Built-in imports
@@ -32,6 +32,8 @@ import time
 import wx
 import json
 import usbChange
+
+from uiGlobals import *
 
 keywords = {'Python',
             'wxpython',
@@ -91,7 +93,7 @@ class ServerHc:
             self.socket.listen(5)
         except:
             print("Server Init failed")
-        #print('Test Host Server Listeneing port: ' + host + ':' + str(port))
+       
         self.bind_addr = host + ':' + str(port)
         self.conn_socket = None
         self.addr = None
@@ -246,9 +248,11 @@ class RequestSync(threading.Thread):
         cmd = reqdict["cmd"]
         if(ctype == "usb"):
             if (cmd == "lsusb"):
-                result = usbChange.get_usb_tree()
+                wx.CallAfter(self.window.panel.PrintLog, "Read USB")
+                result = usbChange.get_usb_change(self.window)
+                wx.CallAfter(self.window.panel.PrintLog, "USB Result ")
                 rdict = {}
-                rdict["data"] = list(result)
+                rdict["data"] = result
                 return rdict
         else:
             rdict = {}
