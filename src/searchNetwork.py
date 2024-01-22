@@ -145,7 +145,7 @@ class SearchNetwork(wx.Panel):
         self.btn_save= wx.Button(self, -1, "Save", size = (50, -1))
 
         self.st_os = wx.StaticText(self, -1, "Server OS")
-        self.rb_win = wx.RadioButton(self, ID_RBTN_WIN, "Window")
+        self.rb_win = wx.RadioButton(self, ID_RBTN_WIN, "Windows")
         self.rb_linux = wx.RadioButton(self, ID_RBTN_LINUX, "Linux")
         self.rb_mac = wx.RadioButton(self, ID_RBTN_MAC, "Mac")
         

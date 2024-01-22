@@ -16,8 +16,8 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
         self.websocket_thread = None
         self.ws = None
         self.connected = False
-        self.uname = "mcci"
-        self.pwd = "mcci"
+        self.uname = None
+        self.pwd = None
         self.usb4tb_json = None
         self.usb4tb_list = []
         

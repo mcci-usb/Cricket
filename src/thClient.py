@@ -33,7 +33,7 @@ def send_request(host, port, reqdict):
     hs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     hs.connect((host, port))
  
-    hs.settimeout(5)
+    hs.settimeout(6)
 
     rdict = {}
     rlist = []

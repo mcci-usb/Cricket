@@ -62,6 +62,6 @@ config_data = {
        "batch" : {"location": ""},
        "screen": {"pos": [], "size": []},
        "wdialog": False,
-       "msudp": {"uname": "mcci", "pwd": "mcci"},
+       "msudp": {"uname": None, "pwd": None},
        "rpanel": {"dut1": True, "dut2": True, "u4tree": True}
 }

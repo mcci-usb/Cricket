@@ -13,7 +13,6 @@ def get_usb_change(top):
     """    
     top.usbenum.enumerate_usb_devices()
     result = top.usbenum.get_result()
-    
 
     usb3diff = get_usb3_change(top, result["usb3list"])
     usb4diff = get_usb4_change(top, result["usb4tblist"])
@@ -22,7 +21,7 @@ def get_usb_change(top):
     if top.myrole['uc']:
         prepare_tree_change(top, usb3diff, usb4diff)
 
-    if result["usb4tbjson"] != None:
+    if result["usb4tbjson"] != None and len(result["usb4tbjson"]) > 0:
         if top.myrole['uc']:
             top.store_usb4_win_info(result["usb4tbjson"])
         else:
@@ -31,7 +30,13 @@ def get_usb_change(top):
             resdict["usb4d"] = usb4diff
             resdict["tbjson"] = result["usb4tbjson"]
             return resdict
-
+    else:
+        resdict = {}
+        resdict["usb3d"] = usb3diff
+        resdict["usb4d"] = []
+        resdict["tbjson"] = []
+        return resdict
+        
 
 def get_usb3_change(top, newlist):
     oldlist = top.get_usb_list()
@@ -111,13 +116,17 @@ def prepare_tree_change(top, usb3dict, usb4dict):
     rmdlist = []
     for dev in usb3dict["added"]:
         addedlist.append(dev)
-    for dev in usb4dict["added"]:
-        addedlist.append(dev)
+    
+    if usb4dict != None and len(usb4dict):
+        for dev in usb4dict["added"]:
+            addedlist.append(dev)
 
     for dev in usb3dict["removed"]:
         rmdlist.append(dev)
-    for dev in usb4dict["removed"]:
-        rmdlist.append(dev)
+
+    if usb4dict != None and len(usb4dict):
+        for dev in usb4dict["removed"]:
+            rmdlist.append(dev)
     
     if(len(addedlist) == 0 and len(rmdlist) == 0):
         # No device added removed from port, then print "No change"

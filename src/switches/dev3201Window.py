@@ -94,11 +94,7 @@ class Dev3201Window(wx.Window):
         self.timer_port = wx.Timer(self)
         # Call this to give the sizer a minimal size.
         self.SetMinSize((290, 190))
-        
-        # base = os.path.abspath(os.path.dirname(__file__))
-        # x_mark_bitmap = wx.Bitmap(base + "/icons/x_mark.png", wx.BITMAP_TYPE_ANY)  # Replace "x_mark.png" with the actual filename of your X mark image
-        # self.btn_dis = wx.BitmapButton(self, -1, x_mark_bitmap, size=(-1, -1))
-        
+          
         self.st_p1 = wx.StaticText(self, -1, "Port 1", size = (-1,-1))
         self.st_p2 = wx.StaticText(self,-1, "Port 2", size = (-1,-1))
         self.st_p3 = wx.StaticText(self, -1, "Port 3", size = (-1,-1))

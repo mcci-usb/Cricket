@@ -74,7 +74,6 @@ def ResetDeviceControl(top):
 
 
 def get_tree_change(top):
-    # print("Triggering USB Tree Change: ",top.thCtrl)
     if top.thCtrl == "local":
         thlocal.get_usb_change(top)
     elif top.thCtrl == "tcp":
@@ -83,12 +82,17 @@ def get_tree_change(top):
       
         resdict = thnw.get_usb_tree(nwip, int(nwport))
         
-        if resdict["result"][0]["status"] == "OK":
-            findict = resdict["result"][1]["data"]
-            print("Prepare Tree change: ", findict["usb4d"])
-            thlocal.prepare_tree_change(top, findict["usb3d"], findict["usb4d"])
-            if findict["tbjson"] != None:
-                top.store_usb4_win_info(findict["tbjson"])
+        if len(resdict) > 0:
+            
+            if resdict["result"][0]["status"] == "OK":
+                findict = resdict["result"][1]["data"]
+                thlocal.prepare_tree_change(top, findict["usb3d"], findict["usb4d"])
+                if findict["tbjson"] != None and len(findict["tbjson"]) > 0:
+                    top.store_usb4_win_info(findict["tbjson"])
+            else:
+                top.print_on_log("TH Computer Connection Fail!\n")
+                top.device_no_response()
         else:
             top.print_on_log("TH Computer Connection Fail!\n")
             top.device_no_response()
+            

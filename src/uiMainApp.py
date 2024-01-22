@@ -400,8 +400,7 @@ class UiMainFrame (wx.Frame):
         self.swuidict ={}
 
         self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142, "2101":switch2101.Switch2101, "3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
-        # self.swobjmap = {"3141": switch3141.Switch3141,"3142": switch3142.Switch3142,"3201": switch3201.Switch3201, "2301": switch2301.Switch2301}
-
+        
         self.ldata['ssccif'] = "network"
         self.ldata['ssccpn'] = "2021"
         
