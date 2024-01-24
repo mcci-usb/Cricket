@@ -4,7 +4,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v4.0.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/) [![Git commits](https://img.shields.io/badge/commits%20since%20v4.0.0-4-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/compare/version400...master)
+[![Git release](https://img.shields.io/badge/release-v4.3.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.3.0)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -273,6 +273,12 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+- v4.3.0 is patch release it contains the following changes.
+
+  - Two and Three computers support windows [#127](https://github.com/mcci-usb/Cricket/commit/5393cb66f8dbabbb3bb758ccd2578203e0f84ab1)
+  - Implement Disconnect Switch [#128](https://github.com/mcci-usb/Cricket/commit/6d892fcbdd86364f6d45fad4159ab4ab42f539c6)
+  - Fixed USB Read Error [#129](https://github.com/mcci-usb/Cricket/commit/90e81bddcda58191526146eac9cdeccfbd17e85e)
 
 - v4.2.0 is patch release it contains the following changes.
 
