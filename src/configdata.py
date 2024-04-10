@@ -62,7 +62,7 @@ def get_file_path():
     dpath = os.path.join(lpath, "MCCI", "Cricket")
 
     os.makedirs(dpath, exist_ok=True)
-    fpath = os.path.join(dpath, "config.json")
+    fpath = os.path.join(dpath, "mcciconfig.json")
     return fpath
 
 def save_config(fpath, cdata):

@@ -98,7 +98,7 @@ class Usb4TreeWindow(wx.Window):
 
         self.totline = 0
 
-        sb = wx.StaticBox(self, -1, "USB4 Tree View")
+        sb = wx.StaticBox(self, -1, "")
 
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
         
@@ -148,8 +148,8 @@ class Usb4TreeWindow(wx.Window):
             ])
         
         mythcos = sys.platform
-        if not top.parent.myrole['thc']:
-            mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
+        # if not top.parent.myrole['thc']:
+        #     mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
 
         self.usb4parse = usb4parse.create_usb4tb_parser(mythcos)
 

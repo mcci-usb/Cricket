@@ -45,6 +45,12 @@ from aboutDialog import *
 from comDialog import *
 
 from features.fwupdate import firmwareUpdate
+# from features.dut import dutLogWindow
+
+# from features.dutlog import dutlogs
+
+
+
 from setDialog import *
 from portDialog import *
 from warningMessage import *
@@ -167,6 +173,10 @@ class UiMainFrame (wx.Frame):
 
         self.devHand = None
         self.dutLogWindow = None
+        
+        #VINAY
+        # self.dutlogs = None
+        
  
         self.print_on_log("Loading Configuration\n")
         
@@ -438,6 +448,7 @@ class UiMainFrame (wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnConnectGraph, id = ID_MENU_GRAPH)
         self.Bind(wx.EVT_MENU, self.OnFirmwareUpdateWindow, id = ID_3141_FIRMWARE)
+        # self.Bind(wx.EVT_MENU, self.OndutLogWindow, id = ID_DUT_WINDOW)
         self.Bind(wx.EVT_MENU, self.OnNetworkWindow, id = ID_NETWORK_MENU)
        
 
@@ -533,14 +544,15 @@ class UiMainFrame (wx.Frame):
 
         """
         if self.ucmenu.IsChecked() == True or self.ccmenu.IsChecked() == True:
-            if "rpanel" in self.config_data:
-                rpanel = self.config_data["rpanel"]
-                self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
-                self.dutMenuBar.Check(ID_MENU_DUT2, rpanel["dut2"] if "dut2" in rpanel else False)
-                self.toolMenu.Check(ID_USB4_TREEVIEW, rpanel["u4tree"] if "u4tree" in rpanel else False)
-            else:
-                rpanel = {"dut1": False, "dut2": False, "u4tree": False}
-                self.config_data["rpanel"] = rpanel
+            pass
+            # if "rpanel" in self.config_data:
+            #     rpanel = self.config_data["rpanel"]
+            #     self.dutMenuBar.Check(ID_MENU_DUT1, rpanel["dut1"] if "dut1" in rpanel else False)
+            #     self.dutMenuBar.Check(ID_MENU_DUT2, rpanel["dut2"] if "dut2" in rpanel else False)
+            #     self.toolMenu.Check(ID_USB4_TREEVIEW, rpanel["u4tree"] if "u4tree" in rpanel else False)
+            # else:
+            #     rpanel = {"dut1": False, "dut2": False, "u4tree": False}
+            #     self.config_data["rpanel"] = rpanel
                 
                 
         else:
@@ -618,9 +630,17 @@ class UiMainFrame (wx.Frame):
         self.toolMenu.Append(self.fware)
 
         self.dutMenuBar = wx.Menu()
-        self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
-        self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
-        self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
+        pass
+        # self.dutMenuBar.Append(ID_MENU_DUT1, "DUT Log Window-1", kind = ITEM_CHECK)
+        # self.dutMenuBar.Append(ID_MENU_DUT2, "DUT Log Window-2", kind = ITEM_CHECK)
+        # self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
+        
+        
+        self.dutMenuBars = wx.Menu()
+        self.fdut = wx.MenuItem(self.toolMenu, ID_DUT_WINDOW, "DUTS")
+        self.toolMenu.Append(self.fdut)
+        
+        
         
         self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View", kind = ITEM_CHECK)
         self.toolMenu.Append(self.usb4t)
@@ -1010,7 +1030,6 @@ class UiMainFrame (wx.Frame):
         self.CenterOnScreen()
         self.Refresh()
     
-    
 
     def OnFirmwareUpdateWindow(self, event):
         """
@@ -1027,6 +1046,13 @@ class UiMainFrame (wx.Frame):
         dlg = firmwareUpdate.FirmwareDialog(self, self)
         dlg.ShowModal()
         dlg.Destroy()
+    
+    
+    # def OndutLogWindow(self, event):
+    #     print("ONDUTLOGWINDOW:")
+    #     dlg = dutlogs.DutDialog(self, self)
+    #     dlg.ShowModal()
+    #     dlg.Destroy()
     
     def OnAppClose (self, event):
         """
@@ -1388,10 +1414,17 @@ class UiMainFrame (wx.Frame):
         Returns:
             return None
         """
+        print("store_usb4_win_info-uiMainapp")
         
         self.panel.update_usb4_tree(usb4dict)
         # pass
     
+    def store_usb3_win_info(self, usb3dict):
+        # print("store_usb3_win_info-->")
+        
+        # print("store_usb3_win_info-uiMainapp")
+        self.panel.update_usb3_tree(usb3dict)
+
     def get_enum_delay(self):
         """
         Get USB device Enumeration delay

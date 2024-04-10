@@ -360,3 +360,29 @@ class DutLogWindow(wx.Window):
         self.totline += 1
         t = msg.data
         self.scb.AppendText("%s" % t)
+        
+class dutDialog(wx.Dialog):
+    
+    def __init__ (self, parent, top):
+        
+        wx.Dialog.__init__(self, parent, -1, "Switch 3141 Firmware Update",
+                           size=wx.Size(100, 100),
+                           style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
+                           name="MCCI USB Switch Search Dialog")
+
+        self.top = top
+        self.win = DutLogWindow(self, top)
+
+        # Sizes the window to fit its best size.
+        self.Fit()
+        self.CenterOnParent(wx.BOTH)
+    
+    def OnOK (self, evt):
+        
+    # Returns numeric code to caller
+        self.EndModal(wx.ID_OK)
+     
+    def OnSize (self, evt):
+       
+        self.Layout()
+    

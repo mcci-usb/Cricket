@@ -39,6 +39,8 @@ class WinUsb4TreeParse():
    
 
     def get_item_data(self, msg):
+        # print("\n\n\n")
+        # print("---------......---->>>", msg)
         """
         Extracts USB4 item data from the input message.
 

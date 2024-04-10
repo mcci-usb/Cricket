@@ -14,16 +14,20 @@ def get_usb_change(top):
     top.usbenum.enumerate_usb_devices()
     result = top.usbenum.get_result()
 
+    usb3tree = result["usb3list"]
     usb3diff = get_usb3_change(top, result["usb3list"])
     usb4diff = get_usb4_change(top, result["usb4tblist"])
     top.update_usb_status(result["usb3type"])
     
     if top.myrole['uc']:
         prepare_tree_change(top, usb3diff, usb4diff)
+        # print("--------------->>>>>", usb3diff)
 
     if result["usb4tbjson"] != None and len(result["usb4tbjson"]) > 0:
         if top.myrole['uc']:
             top.store_usb4_win_info(result["usb4tbjson"])
+            # top.store_usb3_win_info(result["usb4tbjson"]) #VINAY
+            top.store_usb3_win_info(usb3tree)
         else:
             resdict = {}
             resdict["usb3d"] = usb3diff
@@ -33,11 +37,11 @@ def get_usb_change(top):
     else:
         resdict = {}
         resdict["usb3d"] = usb3diff
+        top.store_usb3_win_info(usb3tree) #VINAY
         resdict["usb4d"] = []
         resdict["tbjson"] = []
         return resdict
         
-
 def get_usb3_change(top, newlist):
     oldlist = top.get_usb_list()
     if oldlist == None:
@@ -135,10 +139,14 @@ def prepare_tree_change(top, usb3dict, usb4dict):
     if(len(rmdlist)):
         strout = strout + "Removed\n"
         strout = strout + convert_usb_info(top, rmdlist)
+        # print("###################Removed##########################")
+        # print(strout)
 
     if(len(addedlist)):   
         strout = strout + "Added\n"
         strout = strout + convert_usb_info(top, addedlist)
+        # print("###################Added##########################")
+        # print(strout)
     
     # Print the device list USB Device Tree Window
     top.print_on_log(strout)

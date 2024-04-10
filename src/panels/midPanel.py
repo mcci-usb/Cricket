@@ -21,7 +21,7 @@
 #    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
-from enum import auto
+# from enum import auto
 import wx
 
 import sys
