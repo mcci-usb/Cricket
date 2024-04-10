@@ -218,7 +218,7 @@ class LoopWindow(wx.Window):
         # The wx.TextCtrl duty entering upto '2' Digits
         self.tc_duty.SetMaxLength(5)
         # The wx.TextCtrl Repeat entering upto '3' Digits
-        self.tc_cycle.SetMaxLength(3)
+        self.tc_cycle.SetMaxLength(4)
         # The wx.combobox port selection entering upto '1' Digits
         self.cb_psel.SetMaxLength(1)
 
