@@ -4,9 +4,6 @@ class WinUsb3TreeParse():
         self.ldata = None
     
     def parse_usb3tb_data(self, usb3data):
-        print("parse_usb3tb_data")
-        # self.idata = self.get_item_data(usb3data)
-        # self.ldata = self.get_level_data(self.idata)
         self.idata = self.get_item_data(usb3data)
         self.ldata = self.get_level_data(self.idata)
         # if self.idata is not None:
@@ -15,7 +12,7 @@ class WinUsb3TreeParse():
         #     print("Error: idata is None")
 
     def get_item_data(self, msg):
-        # print("------->......", msg)
+
         if not isinstance(msg, list):
             print("Error: usb3data is not a list")
             return None

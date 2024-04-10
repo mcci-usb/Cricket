@@ -78,26 +78,6 @@ class RightPanel(wx.Panel):
     def add_switches(self, swlist):
         self.Layout()
     
-    # ------------------------------------------
-    # def init_my_panel(self, pdict):
-    #     rpdict = pdict["rpanel"]
-    #     dutdict = pdict["dut"]
-    #     pkeys = list(rpdict.keys())
-
-    #     for pobj in pkeys:
-    #         if rpdict[pobj] == True:
-    #             for pobj in pkeys:
-    #         print("--------------pobj:", pobj)
-    #         if rpdict[pobj] == True:
-    #             if(pobj == "u4tree"):
-    #                 self.slobj.append(usb4TreeWindow.Usb4TreeWindow(self, self.parent))
-    #                 # self.objdict[pbj] = True
-    #             else:
-    #                 self.slobj.append(dutLogWindow.DutLogWindow(self, self.parent, {pobj: dutdict[pobj]}))
-    #                 # self.objdict[pbj] = True
-    #     self.display_my_objects()
-    
-    # ------------------------------------------
     
     def print_on_log(self, data):
         pass

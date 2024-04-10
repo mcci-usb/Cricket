@@ -72,7 +72,6 @@ class Usb3TreeWindow(wx.Window):
 
         # Redraw the USB3 Tree View with the new data
         self.redraw_usb3_tree(self.usb3parse.idata, self.usb3parse.ldata)
-        print("usb-redraw-tree\n:", self.usb3parse.idata, self.usb3parse.ldata)
 
     def redraw_usb3_tree(self, idata, ldata):
         self.delete_all_items()

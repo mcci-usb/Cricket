@@ -1414,7 +1414,6 @@ class UiMainFrame (wx.Frame):
         Returns:
             return None
         """
-        print("store_usb4_win_info-uiMainapp")
         
         self.panel.update_usb4_tree(usb4dict)
         # pass

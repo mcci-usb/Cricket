@@ -139,14 +139,10 @@ def prepare_tree_change(top, usb3dict, usb4dict):
     if(len(rmdlist)):
         strout = strout + "Removed\n"
         strout = strout + convert_usb_info(top, rmdlist)
-        # print("###################Removed##########################")
-        # print(strout)
-
+      
     if(len(addedlist)):   
         strout = strout + "Added\n"
         strout = strout + convert_usb_info(top, addedlist)
-        # print("###################Added##########################")
-        # print(strout)
     
     # Print the device list USB Device Tree Window
     top.print_on_log(strout)
