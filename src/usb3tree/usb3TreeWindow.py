@@ -20,11 +20,11 @@ usbClass = {
     255: "Vendor Specific",
     # Add new class IDs and their names here
     # For example:
-    220: "Diagnostic Devices",
-    224: "Wireless Controller",
-    239: "Miscellaneous",
-    254: "Application Specific",
-    255: "Vendor Specific"
+    # 220: "Diagnostic Devices",
+    # 224: "Wireless Controller",
+    # 239: "Miscellaneous",
+    # 254: "Application Specific",
+    # 255: "Vendor Specific"
 }
 
 
