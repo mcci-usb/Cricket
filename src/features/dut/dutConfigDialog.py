@@ -1,3 +1,18 @@
+
+##############################################################################
+# 
+# Module: dutConfigDialog.py
+#
+# Description:
+#     Configure the DUT dialog window.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Jan 2024
+#
+# Revision history:
+#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 from random import choice, choices
 import wx
 

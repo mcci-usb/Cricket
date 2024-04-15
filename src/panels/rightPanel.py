@@ -1,3 +1,18 @@
+##############################################################################
+# 
+# Module: right.py
+#
+# Description:
+#     Update the Right panel
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
+
 from uiGlobals import *
 from usb4tree import usb4TreeWindow
 from usb3tree import usb3TreeWindow

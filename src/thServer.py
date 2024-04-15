@@ -8,15 +8,6 @@
 #     Based on the command from Clinet, control device which is connected
 #     Send the response back to Clinet in JSON format (JSON Object)
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
 # Author:
 #     Seenivasan V, MCCI Corporation June 2021
 #

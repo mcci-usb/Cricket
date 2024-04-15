@@ -1,4 +1,19 @@
 # macos_usbenum.py
+##############################################################################
+# 
+# Module: macusbenum.py
+#
+# Description:
+#     This module provides a class for scanning the USB bus on mac systems
+#     and retrieving the list of attached devices.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2024
+#
+# Revision history:
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+################################################################################
 
 import copy
 import json

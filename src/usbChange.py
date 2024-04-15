@@ -1,3 +1,17 @@
+##############################################################################
+# 
+# Module: usbChange.py
+#
+# Description:
+#     print the device added/removed information.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2020
+#
+# Revision history:
+#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 import sys
 import copy
 

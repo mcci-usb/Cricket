@@ -5,20 +5,11 @@
 # Description:
 #     Dialog to display latest version of the application
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V4.0.0 Wed Nov 09 2023 17:00:00   Seenivasan V 
+#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
 

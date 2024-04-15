@@ -1,3 +1,17 @@
+##############################################################################
+# 
+# Module: Macusb4parse.py
+#
+# Description:
+#     parsing the USB4 Tree view data in Windows
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Jan 2024
+#
+# Revision history:
+#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 EADR = 'EvtAddDeviceRouter'
 ERDR = 'EvtRemoveDeviceRouter'
 

@@ -5,14 +5,6 @@
 # Description:
 #     Loop Window for Switch Model3201,Model3141, Model2101
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
 #
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020

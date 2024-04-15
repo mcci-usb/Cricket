@@ -1,3 +1,17 @@
+##############################################################################
+# 
+# Module: USB3Treewindow.py
+#
+# Description:
+#     Scan the USB bus and get the list of devices attached
+#
+# Author:
+#     Vinay N, MCCI Corporation Mar 2024
+#
+# Revision history:
+#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 import wx
 import sys
 
