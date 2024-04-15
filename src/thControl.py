@@ -77,23 +77,23 @@ def get_tree_change(top):
     if top.thCtrl == "local":
         thlocal.get_usb_change(top)
     elif top.thCtrl == "tcp":
-        pass
-        # nwip = top.ucConfig['mynodes']["mythc"]["tcp"]["ip"]
-        # nwport = top.ucConfig['mynodes']["mythc"]["tcp"]["port"]
+        # pass
+        nwip = top.ucConfig['mynodes']["mythc"]["tcp"]["ip"]
+        nwport = top.ucConfig['mynodes']["mythc"]["tcp"]["port"]
       
-        # resdict = thnw.get_usb_tree(nwip, int(nwport))
+        resdict = thnw.get_usb_tree(nwip, int(nwport))
         
-        # if len(resdict) > 0:
+        if len(resdict) > 0:
             
-        #     if resdict["result"][0]["status"] == "OK":
-        #         findict = resdict["result"][1]["data"]
-        #         thlocal.prepare_tree_change(top, findict["usb3d"], findict["usb4d"])
-        #         if findict["tbjson"] != None and len(findict["tbjson"]) > 0:
-        #             top.store_usb4_win_info(findict["tbjson"])
-        #     else:
-        #         top.print_on_log("TH Computer Connection Fail!\n")
-        #         top.device_no_response()
-        # else:
-        #     top.print_on_log("TH Computer Connection Fail!\n")
-        #     top.device_no_response()
+            if resdict["result"][0]["status"] == "OK":
+                findict = resdict["result"][1]["data"]
+                thlocal.prepare_tree_change(top, findict["usb3d"], findict["usb4d"])
+                if findict["tbjson"] != None and len(findict["tbjson"]) > 0:
+                    top.store_usb4_win_info(findict["tbjson"])
+            else:
+                top.print_on_log("TH Computer Connection Fail!\n")
+                top.device_no_response()
+        else:
+            top.print_on_log("TH Computer Connection Fail!\n")
+            top.device_no_response()
             
