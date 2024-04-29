@@ -1,7 +1,7 @@
 
 ##############################################################################
 # 
-# Module: linuxusb4parse.py
+# Module: linuxusb3parse.py
 #
 # Description:
 #     parsing the USB3 Tree view data in Linux 

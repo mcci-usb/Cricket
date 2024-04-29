@@ -627,19 +627,19 @@ class UiMainFrame (wx.Frame):
         # self.toolMenu.Append(wx.ID_ANY, "&DUT-Log", self.dutMenuBar)
         
         
-        self.dutMenuBars = wx.Menu()
-        self.fdut = wx.MenuItem(self.toolMenu, ID_DUT_WINDOW, "DUTS")
-        self.toolMenu.Append(self.fdut)
+        # self.dutMenuBars = wx.Menu()
+        # self.fdut = wx.MenuItem(self.toolMenu, ID_DUT_WINDOW, "DUTS")
+        # self.toolMenu.Append(self.fdut)
         
         
         
-        self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View", kind = ITEM_CHECK)
-        self.toolMenu.Append(self.usb4t)
+        # self.usb4t = wx.MenuItem(self.toolMenu, ID_USB4_TREEVIEW, "USB4 Tree View", kind = ITEM_CHECK)
+        # self.toolMenu.Append(self.usb4t)
         
         
-        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
-        self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
-        self.Bind(wx.EVT_MENU, self.SelectU4TREE, id=ID_USB4_TREEVIEW)
+        # self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT1)
+        # self.Bind(wx.EVT_MENU, self.SelectDUT, id=ID_MENU_DUT2)
+        # self.Bind(wx.EVT_MENU, self.SelectU4TREE, id=ID_USB4_TREEVIEW)
         self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
@@ -733,15 +733,16 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
 
         """
-        obj = event.GetEventObject()
+        pass
+        # obj = event.GetEventObject()
         
-        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
-        self.config_data["rpanel"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        self.config_data["rpanel"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        # # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        # self.config_data["rpanel"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # self.config_data["rpanel"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
 
-        self.update_right_panel()
-        self.reSizeScreen()
+        # self.update_right_panel()
+        # self.reSizeScreen()
         
         # if not self.dutLogWindow.IsShown():
         #     obj.MenuItems[0].Check(False)
@@ -761,14 +762,15 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
 
         """
-        obj = event.GetEventObject()
+        pass
+        # obj = event.GetEventObject()
         
-        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
-        self.config_data["rpanel"]["u4tree"] = True if self.usb4t.IsChecked() else False
+        # # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
+        # # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
+        # self.config_data["rpanel"]["u4tree"] = True if self.usb4t.IsChecked() else False
         
-        self.update_right_panel()
-        self.reSizeScreen()
+        # self.update_right_panel()
+        # self.reSizeScreen()
 
     def updt_dut_config(self, dutdict):
         """

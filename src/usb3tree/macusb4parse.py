@@ -1,6 +1,6 @@
 ##############################################################################
 # 
-# Module: Macusb4parse.py
+# Module: Macusb3parse.py
 #
 # Description:
 #     parsing the USB3 Tree view data in Mac 

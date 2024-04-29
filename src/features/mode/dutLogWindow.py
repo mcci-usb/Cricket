@@ -23,6 +23,7 @@ from datetime import datetime
 import wx
 
 import configdata
+# import defaultconfig
 
 from .dutConfigDialog import DutConfigDialog
 
@@ -106,6 +107,15 @@ class DutLogWindow(wx.Window):
         Returns:
             None
         """
+        # udict = {"msudp": {"uname": self.username, "pwd": self.password}}
+        udict = {'dut1': {'name': '', 'faultseq': [], 'action': 'None', 'interface': 'serial', 'serial': {'port': 'None', 'baud': '9600', 'databits': '8', 'parity': 'none', 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}, 'default': {'serial': {'port': 'None', 'baud': '9600', 'parity': 'none', 'databits': 8, 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}}}}
+        
+        # udict2 = {'dut2': {'name': 'DUT Log Window-2', 'faultseq': [], 'action': 'None', 'interface': 'serial', 'serial': {'port': 'None', 'baud': '9600', 'databits': '8', 'parity': 'none', 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}, 'default': {'serial': {'port': 'None', 'baud': '9600', 'parity': 'none', 'databits': 8, 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}}}}
+        
+        
+        # print("udict---->", udict)
+        # configdata.updt_portal_credentials(udict)
+
         wx.Window.__init__(self, parent)
         # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
@@ -113,7 +123,8 @@ class DutLogWindow(wx.Window):
 
         self.name = "dut"
         self.top = top
-        self.sut = sut
+        self.sut = udict
+        # self.sut = udict2
         self.parent = parent
 
         key = list(self.sut.keys())[0]
@@ -122,6 +133,19 @@ class DutLogWindow(wx.Window):
         self.sutType = self.sut[key]["interface"]
         self.sutSettings = self.sut[key][self.sutType]
         self.sutFaultMsg = self.sut[key]["faultseq"]
+        
+        # key2 = list(self.sut.keys())[0]
+
+        # self.name = self.sut[key]["name"]
+        # self.sutType = self.sut[key]["interface"]
+        # self.sutSettings = self.sut[key][self.sutType]
+        # self.sutFaultMsg = self.sut[key]["faultseq"]
+        
+        
+        
+        
+        # key = list(self.sut.keys())[0]
+        # key = None
 
         sb = wx.StaticBox(self, -1, self.name)
 
@@ -232,6 +256,7 @@ class DutLogWindow(wx.Window):
             res = [True for gnhwid in usb_hwid_str if(gnhwid in hwid)]
             if(not res):
                 port_name.append(port)
+                print("PORT:", port)
         return port_name
 
     def print_on_log(self, strin):
@@ -254,6 +279,7 @@ class DutLogWindow(wx.Window):
         return cdata
 
     def read_config_data(self):
+        # pass
         sutset = list(self.sutSettings.keys())
         
         if(len(sutset) == 0):
@@ -291,6 +317,8 @@ class DutLogWindow(wx.Window):
         
             self.devHand.open()
             self.port_flg = True
+            
+            print("self.devHand_port:",self.devHand.port )
         except:
             self.print_on_log("\nCouldn't open the port-Top")
             self.port_flg = False

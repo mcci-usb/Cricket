@@ -319,6 +319,8 @@ class Dev3141Window(wx.Panel):
         Returns:
             None
         """
+        if self.top.con_flg == False:
+            return
         if(stat):
             if self.top.mode == MODE_MANUAL:
                 res, outstr = model.read_port_status(self.top, self.swid)

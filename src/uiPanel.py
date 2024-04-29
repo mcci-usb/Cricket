@@ -66,7 +66,7 @@ class UiPanel(wx.Panel):
         self.vb_center.Add(self.cpanel, 0, wx.ALIGN_LEFT | wx.EXPAND)
 
         # self.rpanel = rightPanel.RightPanel(self)
-        self.rpanel = rightPanel.RightPanel(self, self.parent, "")
+        self.rpanel = rightPanel.RightPanel(self, self.parent, None) #MCCI VINAY
 
         self.vb_right.Add(self.rpanel, 1, wx.ALIGN_LEFT | wx.EXPAND)
 
