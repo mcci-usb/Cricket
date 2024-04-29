@@ -372,7 +372,7 @@ class DutConfigDialog(wx.Frame):
            
     def RefreshConfig(self, e):
         self.cb_list = self.filter_port()
-        print("combo_box:", self.cb_list)
+        # print("combo_box:", self.cb_list)
         # self.cb_switch.Clear()
         for cport in self.cb_list:
             self.cb_switch.Append(cport)
