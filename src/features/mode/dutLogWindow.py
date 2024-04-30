@@ -256,7 +256,7 @@ class DutLogWindow(wx.Window):
             res = [True for gnhwid in usb_hwid_str if(gnhwid in hwid)]
             if(not res):
                 port_name.append(port)
-                print("PORT:", port)
+                
         return port_name
 
     def print_on_log(self, strin):
@@ -317,8 +317,7 @@ class DutLogWindow(wx.Window):
         
             self.devHand.open()
             self.port_flg = True
-            
-            print("self.devHand_port:",self.devHand.port )
+           
         except:
             self.print_on_log("\nCouldn't open the port-Top")
             self.port_flg = False
