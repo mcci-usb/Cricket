@@ -256,11 +256,13 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         backend = None
         # Running Python-application on Windows
         if sys.platform == "win32":
-            backend = usb.backend.libusb1.get_backend(find_library=lambda x: "" + 
-                path + "Lib\\site-packages\\libusb\\_platform\\_windows\\x64\\libusb-1.0.dll")
+            backend = usb.backend.libusb1.get_backend()
 
         # Generator object
-        usb_devices = usb.core.find(find_all=True, backend=backend) 
+        usb_devices = usb.core.find(find_all=True, backend=backend)
+
+        # Generator object
+        # usb_devices = usb.core.find(find_all=True, backend=backend)
 
         # Here attached a list of Host controlloers, list of Hub,
         # List of periperals info with specific vid, pid.
