@@ -46,6 +46,11 @@ usbClass = {
 # Utilities
 ##############################################################################
 class Usb3TreeWindow(wx.Window):
+    """
+    A class logWindow with init method
+
+    To show the all actions while handling ports of devices 
+    """
 
     def __init__(self, parent, top):
 
@@ -82,12 +87,18 @@ class Usb3TreeWindow(wx.Window):
         self.Layout()
 
     def update_usb3_tree(self, usb3data):
+        """
+        Update the USB list based on List 
+        """
         self.usb3parse.parse_usb3tb_data(usb3data)
 
         # Redraw the USB3 Tree View with the new data
         self.redraw_usb3_tree(self.usb3parse.idata, self.usb3parse.ldata)
 
     def redraw_usb3_tree(self, idata, ldata):
+        """
+        Redrraw the Tree view N Levels of USB4 and Thunderbolt
+        """
         self.delete_all_items()
         lkeys = list(ldata.keys())
         if 'level0' in lkeys:  # Check for USB3 devices under the correct key

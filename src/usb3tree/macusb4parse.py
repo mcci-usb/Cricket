@@ -18,6 +18,18 @@ class MacUsb4TreeParse():
         self.ldata = None
     
     def parse_usb3tb_data(self, usb3data):
+        """
+        Parse USB4TB data and organize it into internal data structures.
+
+        This method takes USB4TB data and organizes it into internal data structures
+        for easier access and manipulation.
+
+        Args:
+            usb4data (dict): USB4TB data to be parsed.
+
+        Returns:
+            None
+        """
         
         self.idata = self.get_item_data(usb3data)
         self.ldata = self.get_level_data(self.idata)
@@ -27,6 +39,18 @@ class MacUsb4TreeParse():
         #     print("Error: idata is None")
 
     def get_item_data(self, msg):
+        """
+        Parse USB 3.0 data from a list of dictionaries containing USB device information.
+
+        Args:
+            msg (list): A list of dictionaries containing USB device information.
+
+        Returns:
+            dict: A dictionary containing parsed USB 3.0 data with keys formatted as 'vid,pid,bus,speed'.
+                Each value is a dictionary containing details such as type, vid, pid, bus, speed, ifc,
+                and optionally mport and port if available.
+            None: If the input 'msg' is not a list or if there are missing required fields in any item.
+        """
         if not isinstance(msg, list):
             print("Error: usb3data is not a list")
             return None
@@ -67,6 +91,18 @@ class MacUsb4TreeParse():
         return parsed_usb3
 
     def get_level_data(self, u3tbuf):
+        """
+        Organize USB 3.0 data into levels based on the count of comma-separated keys.
+
+        Args:
+            u3tbuf (dict): A dictionary containing USB 3.0 data where keys are formatted as 'vid,pid,bus,speed'.
+
+        Returns:
+            dict: A dictionary organizing USB 3.0 data into levels based on the count of comma-separated keys.
+                Keys are formatted as 'levelX' where X is the count of commas in the keys of u3tbuf.
+                Values are lists containing keys from u3tbuf that match the respective level.
+            None: If the input 'u3tbuf' is not a dictionary.
+        """
         if not isinstance(u3tbuf, dict):
             print("Error: u3tbuf is not a dictionary")
             return None
