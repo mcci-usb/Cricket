@@ -3,25 +3,16 @@
 # Module: midPanel.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
-#
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
+#     Updated the Mid Panel
 #
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
-from enum import auto
+# from enum import auto
 import wx
 
 import sys

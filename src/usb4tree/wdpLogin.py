@@ -3,22 +3,13 @@
 # Module: wdpLogin.py
 #
 # Description:
-#     Dialog to display windows device portal Login credentials window.
-#
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
+#     Dialog to display windows device portal Login credentials window..
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation Jan 2024
 #
 # Revision history:
-#     V4.2.0 Wed Nov 2023 17:00:00   Seenivasan V 
+#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
 

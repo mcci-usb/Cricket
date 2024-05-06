@@ -1,3 +1,19 @@
+##############################################################################
+# 
+# Module: linuxusbenum.py
+#
+# Description:
+#     This module provides a class for scanning the USB bus on Linux systems
+#     and retrieving the list of attached devices.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Mar 2024
+#
+# Revision history:
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+################################################################################
+
 import os
 import usb.util
 

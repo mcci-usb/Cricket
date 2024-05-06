@@ -3,22 +3,13 @@
 # Module: serialLogWindow.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
-#
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
+#     To log the data of DUT information.
 #
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -32,6 +23,7 @@ from datetime import datetime
 import wx
 
 import configdata
+# import defaultconfig
 
 from .dutConfigDialog import DutConfigDialog
 
@@ -115,6 +107,15 @@ class DutLogWindow(wx.Window):
         Returns:
             None
         """
+        # udict = {"msudp": {"uname": self.username, "pwd": self.password}}
+        udict = {'dut1': {'name': '', 'faultseq': [], 'action': 'None', 'interface': 'serial', 'serial': {'port': 'None', 'baud': '9600', 'databits': '8', 'parity': 'none', 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}, 'default': {'serial': {'port': 'None', 'baud': '9600', 'parity': 'none', 'databits': 8, 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}}}}
+        
+        # udict2 = {'dut2': {'name': 'DUT Log Window-2', 'faultseq': [], 'action': 'None', 'interface': 'serial', 'serial': {'port': 'None', 'baud': '9600', 'databits': '8', 'parity': 'none', 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}, 'default': {'serial': {'port': 'None', 'baud': '9600', 'parity': 'none', 'databits': 8, 'stopbits': '1', 'parerrcheck': 'ignore'}, 'tcp': {}}}}
+        
+        
+        # print("udict---->", udict)
+        # configdata.updt_portal_credentials(udict)
+
         wx.Window.__init__(self, parent)
         # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
@@ -122,7 +123,8 @@ class DutLogWindow(wx.Window):
 
         self.name = "dut"
         self.top = top
-        self.sut = sut
+        self.sut = udict
+        # self.sut = udict2
         self.parent = parent
 
         key = list(self.sut.keys())[0]
@@ -131,6 +133,19 @@ class DutLogWindow(wx.Window):
         self.sutType = self.sut[key]["interface"]
         self.sutSettings = self.sut[key][self.sutType]
         self.sutFaultMsg = self.sut[key]["faultseq"]
+        
+        # key2 = list(self.sut.keys())[0]
+
+        # self.name = self.sut[key]["name"]
+        # self.sutType = self.sut[key]["interface"]
+        # self.sutSettings = self.sut[key][self.sutType]
+        # self.sutFaultMsg = self.sut[key]["faultseq"]
+        
+        
+        
+        
+        # key = list(self.sut.keys())[0]
+        # key = None
 
         sb = wx.StaticBox(self, -1, self.name)
 
@@ -241,6 +256,7 @@ class DutLogWindow(wx.Window):
             res = [True for gnhwid in usb_hwid_str if(gnhwid in hwid)]
             if(not res):
                 port_name.append(port)
+                
         return port_name
 
     def print_on_log(self, strin):
@@ -263,6 +279,7 @@ class DutLogWindow(wx.Window):
         return cdata
 
     def read_config_data(self):
+        # pass
         sutset = list(self.sutSettings.keys())
         
         if(len(sutset) == 0):
@@ -300,6 +317,7 @@ class DutLogWindow(wx.Window):
         
             self.devHand.open()
             self.port_flg = True
+           
         except:
             self.print_on_log("\nCouldn't open the port-Top")
             self.port_flg = False
@@ -360,3 +378,29 @@ class DutLogWindow(wx.Window):
         self.totline += 1
         t = msg.data
         self.scb.AppendText("%s" % t)
+        
+class dutDialog(wx.Dialog):
+    
+    def __init__ (self, parent, top):
+        
+        wx.Dialog.__init__(self, parent, -1, "Switch 3141 Firmware Update",
+                           size=wx.Size(100, 100),
+                           style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
+                           name="MCCI USB Switch Search Dialog")
+
+        self.top = top
+        self.win = DutLogWindow(self, top)
+
+        # Sizes the window to fit its best size.
+        self.Fit()
+        self.CenterOnParent(wx.BOTH)
+    
+    def OnOK (self, evt):
+        
+    # Returns numeric code to caller
+        self.EndModal(wx.ID_OK)
+     
+    def OnSize (self, evt):
+       
+        self.Layout()
+    

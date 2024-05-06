@@ -1,4 +1,18 @@
 # usbenum.py
+##############################################################################
+# 
+# Module: usb4parse.py
+#
+# Description:
+#     parsing the USB4 Tree view data
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Jan 2024
+#
+# Revision history:
+#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 import sys
 
 class USB4TBParser:

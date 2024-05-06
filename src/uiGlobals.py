@@ -5,20 +5,11 @@
 # Description:
 #     Define all global variables for the entire UI Cricket App.
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#     V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
+#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 #
 ##############################################################################
@@ -28,7 +19,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.3.0"
+APP_VERSION = "4.3.1"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -156,6 +147,7 @@ ID_MENU_SET_WARNING = 1109
 
 
 ID_MENU_GRAPH = 1110
+ID_DUT_WINDOW = 1222
 ID_3141_FIRMWARE = 1234
 
 ID_MENU_DUT1 = ID_MENU_GRAPH + 1

@@ -5,20 +5,11 @@
 # Description:
 #     This dialog is created for network configuration.
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
 # Author:
 #     Seenivasan V, MCCI Corporation June 2021
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V 
+#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -92,7 +83,7 @@ class NetConfigDialog(wx.Dialog):
             (self.rbtn_single, 1, wx.EXPAND | wx.ALL, 5),
             (self.rbtn_multi, 1, wx.EXPAND | wx.ALL, 5)
         ])
-
+    
     def Selection_computer(self):
         ab = wx.StaticBox(self, -1, "Computer Settings", size = (400, 200))
         self.vbcsel = wx.StaticBoxSizer(ab, wx.VERTICAL)
@@ -115,8 +106,7 @@ class NetConfigDialog(wx.Dialog):
         # self.rbtn_single.SetValue(not self.myrole["uc"])
         # self.rbtn_multi.SetValue(self.myrole["uc"])
     
-        
-    
+
     def SearchnwType(self):
         
         # self.hb_center = wx.BoxSizer(wx.VERTICAL)
@@ -173,7 +163,7 @@ class NetConfigDialog(wx.Dialog):
             # (10, 50, 0)
         ])
         
-
+    
     def Onsave(self, e):
         self.config = {"mode": 'single', "uc": True, "scc": True, "thc": True}
         single_flg = False
@@ -262,11 +252,11 @@ class NetConfigDialog(wx.Dialog):
     def on_scc_checkbox(self, evt):
         self.scc_flg = self.cb_scc.GetValue()
         self.alter_panel()
- 
+    
     def on_thc_checkbox(self, evt):
         self.thc_flg = self.cb_thc.GetValue()
         self.alter_panel()
-        
+      
     def alter_panel(self):
         self.alter_nw_panel()
         

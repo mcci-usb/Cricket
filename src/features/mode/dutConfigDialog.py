@@ -1,3 +1,18 @@
+
+##############################################################################
+# 
+# Module: dutConfigDialog.py
+#
+# Description:
+#     Configure the DUT dialog window.
+#
+# Author:
+#     Seenivasan V, MCCI Corporation Jan 2024
+#
+# Revision history:
+#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#       Module created
+##############################################################################
 from random import choice, choices
 import wx
 
@@ -39,6 +54,7 @@ class DutConfigDialog(wx.Frame):
 
         self.SetSizer(self.vboxParent)
         self.cb_list = self.filter_port()
+        print(self.cb_list)
 
         base = os.path.abspath(os.path.dirname(__file__))
         iconpath = os.path.abspath(os.path.join(base, os.pardir, os.pardir))
@@ -356,7 +372,8 @@ class DutConfigDialog(wx.Frame):
            
     def RefreshConfig(self, e):
         self.cb_list = self.filter_port()
-        self.cb_switch.Clear()
+        # print("combo_box:", self.cb_list)
+        # self.cb_switch.Clear()
         for cport in self.cb_list:
             self.cb_switch.Append(cport)
         self.cb_switch.SetSelection(0)

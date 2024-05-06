@@ -5,20 +5,11 @@
 # Description:
 #     Scan the USB bus and get the list of devices attached
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Seenivasan V, MCCI Corporation Jan 2024
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
+#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
 
@@ -98,7 +89,7 @@ class Usb4TreeWindow(wx.Window):
 
         self.totline = 0
 
-        sb = wx.StaticBox(self, -1, "USB4 Tree View")
+        sb = wx.StaticBox(self, -1, "")
 
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
         
@@ -148,8 +139,8 @@ class Usb4TreeWindow(wx.Window):
             ])
         
         mythcos = sys.platform
-        if not top.parent.myrole['thc']:
-            mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
+        # if not top.parent.myrole['thc']:
+        #     mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
 
         self.usb4parse = usb4parse.create_usb4tb_parser(mythcos)
 
