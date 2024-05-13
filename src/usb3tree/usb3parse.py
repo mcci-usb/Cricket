@@ -44,9 +44,9 @@ def create_usb3tb_parser(mythos):
     if mythos == 'win32':
         from .winusb3parse import WinUsb3TreeParse as OS_USB4TBParser
     elif mythos == 'linux':
-        from .linuxusb3parse import LinuxUsb4TreeParse as OS_USB4TBParser
+        from .linuxusb3parse import LinuxUsb3TreeParse as OS_USB4TBParser
     elif mythos == 'darwin':
-        from .macusb4parse import MacUsb4TreeParse as OS_USB4TBParser
+        from .macusb3parse import MacUsb3TreeParse as OS_USB4TBParser
     else:
         raise NotImplementedError(f"Platform '{sys.platform}' not supported")
 

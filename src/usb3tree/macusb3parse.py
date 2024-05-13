@@ -1,6 +1,6 @@
 ##############################################################################
 # 
-# Module: winusb3parse.py
+# Module: MacUsb3TreeParse.py
 #
 # Description:
 #     parsing the USB4 Tree view data in Windows
@@ -12,7 +12,7 @@
 #      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
 #       Module created
 ##############################################################################
-class WinUsb3TreeParse():
+class MacUsb3TreeParse():
     def __init__(self):
         self.idata = None
         self.ldata = None

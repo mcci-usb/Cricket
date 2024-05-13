@@ -99,8 +99,8 @@ class AutoUpdate(wx.Window):
         Note:
             The method also destroys the parent window after opening the web browser.
         """
-        # webbrowser.open("https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/"+self.latest_version)  
-        webbrowser.open(None+self.latest_version)  
+        webbrowser.open("https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/"+self.latest_version)  
+        # webbrowser.open(None+self.latest_version)  
         self.parent.Destroy()
         
     
