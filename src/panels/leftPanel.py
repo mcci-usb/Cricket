@@ -104,6 +104,7 @@ class LeftPanel(ScrolledPanel):
         for key, val in swdict.items():
             swstr = ""+val+"("+key+")"
             self.cb_selsw.Append(swstr)
+        self.cb_selsw.SetSelection(0)
 
     def add_switches(self, swlist):
         if len(swlist) > 0:
