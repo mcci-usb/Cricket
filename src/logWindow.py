@@ -25,6 +25,7 @@ import threading
 
 # Own modules
 import thControl
+import sys
 
 ##############################################################################
 # Utilities
@@ -326,7 +327,23 @@ class LogWindow(wx.Window):
         Returns:
             None
         """
-        self.update_interval_period()
+        if self.chk_usb.GetValue():  # If the checkbox is checked
+            if sys.platform == 'win32':
+                response = wx.MessageBox(
+                    "Do you want to USB4 info?\n"
+                    "USB4 requires your PC to support USB4 (TB4). "
+                    "Config under USB4 Tree View with Device Portal credentials to enable.\n "
+                    "If your providing Credentials earlier click on Ok\n",
+                    "USB Info",
+                    wx.OK | wx.ICON_INFORMATION  # Flags
+                )
+
+                # Optionally, handle the response from the message box
+                if response == wx.OK:
+                    # Perform any additional action if the user clicks Cancel
+                    self.chk_usb.SetValue(True)  # Uncheck the checkbox if Cancel is clicked
+
+            self.update_interval_period()
 
     def update_interval_period(self):
         """
