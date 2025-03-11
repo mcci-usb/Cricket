@@ -1,123 +1,108 @@
-##############################################################################
-# 
-# Module: right.py
-#
-# Description:
-#     Update the Right panel
-#
-# Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
-#
-# Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-##############################################################################
-
-from uiGlobals import *
+import wx
+from features.dut import dutLogWindow
 from usb4tree import usb4TreeWindow
-from usb3tree import usb3TreeWindow
-
-# from features.mode import loopWindow
-# from features.mode import autoWindow
-# from features.mode import batchWindow
-
-from features.mode import dutLogWindow
-
-# from features.dut import dutLogWindow
-from sys import platform
+from usb4tree import usb3TreeWindow
 
 class RightPanel(wx.Panel):
-    """
-    A class UiPanel with init method
-    the UiPanel navigate to UIApp name
-    """ 
-    def __init__(self, parent, top, portno):
+    def __init__(self, parent):
         super(RightPanel, self).__init__(parent)
-
-        self.SetMinSize((600, 400))  # Set minimum size to control resizing
-
-        wx.GetApp().SetAppName("Cricket")
-
-        self.parent = top
+        
         self.SetBackgroundColour('White')
-        
-        #-----------------------------------
-        self.slobj = []
-        self.objtype = []
-        self.objdict = {"dut1": False, "dut2": False}
-        
-        #-----------------------------------
+        self.parent = parent
 
-        self.font_size = DEFAULT_FONT_SIZE
+        # Create USB4 and USB3 Tree Notebook (Top Section)
+        self.usb_notebook = wx.Notebook(self)
+        
+        # Create DUT Notebook (Bottom Section)
+        self.dut_notebook = wx.Notebook(self)
 
-        if platform == "darwin":
-            self.font_size = MAC_FONT_SIZE
+        # Layout Sizers
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.top_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.top_sizer.Add(self.usb_notebook, 1, wx.EXPAND)
+        self.bottom_sizer.Add(self.dut_notebook, 1, wx.EXPAND)
 
-        self.SetFont(wx.Font(self.font_size, wx.SWISS, wx.NORMAL, wx.NORMAL, False,'MS Shell Dlg 2'))
+        self.main_sizer.Add(self.top_sizer, 1, wx.EXPAND | wx.ALL, 5)   # Top Section
+        self.main_sizer.Add(self.bottom_sizer, 1, wx.EXPAND | wx.ALL, 5) # Bottom Section
 
-        self.portno = portno
-
-        self.hboxdl = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxdll = wx.BoxSizer(wx.HORIZONTAL)
-        
-        # p = wx.Panel(self)
-        nb = wx.Notebook(self)
-
-        self.usb4Pan = usb4TreeWindow.Usb4TreeWindow(nb, top)
-        self.usbPan = usb3TreeWindow.Usb3TreeWindow(nb, top)
-        # self.usbPan = None
-        
-        
-
-        nb.AddPage(self.usb4Pan, "USB4 Tree View")
-        nb.AddPage(self.usbPan, "USB3 Tree View")
-        
-        
-        
-        nb2 = wx.Notebook(self)
-        # self.autoPan = autoWindow.AutoWindow(nb2, top)
-        # self.loopPan = loopWindow.LoopWindow(nb2, top)
-        self.dutPan = dutLogWindow.DutLogWindow(nb2, top, None)
-        
-        # nb2.AddPage(self.autoPan, "DUT Logwindow-1")
-        # nb2.AddPage(self.loopPan, "DUT Logwindow-2")
-        nb2.AddPage(self.dutPan, "DUT Logwindow-1")
-        nb2.AddPage(self.dutPan, "DUT Logwindow-2")
-        
-        
-        self.hboxdl.Add(nb, 1, wx.EXPAND)
-        self.hboxdll.Add(nb2, 1, wx.EXPAND)
-        # self.hboxdll = wx.BoxSizer(wx.HORIZONTAL)
-        
-        self.vboxl = wx.BoxSizer(wx.VERTICAL)
-        self.vboxl.Add((0, 20), 0, wx.EXPAND)
-        self.vboxl.Add(self.hboxdl, 1, wx.ALIGN_LEFT | wx.EXPAND)
-        self.vboxl.Add((0, 10), 0, 0)
-        self.vboxl.Add(self.hboxdll, 1, wx.ALIGN_LEFT | wx.EXPAND)
-        self.vboxl.Add((0, 10), 0, 0)
-        
-        self.hboxm = wx.BoxSizer(wx.HORIZONTAL)
-        self.hboxm.Add((20, 0), 0, wx.EXPAND)
-        self.hboxm.Add(self.vboxl, 1, wx.EXPAND)
-        self.hboxm.Add((20, 0), 0, wx.EXPAND)
-        
-        self.SetSizer(self.hboxm)
-        
-        self.SetAutoLayout(True)
-        self.hboxm.Fit(self)
+        self.SetSizer(self.main_sizer)
         self.Layout()
 
+    def init_my_panel(self, pdict):
+        rpdict = pdict["rpanel"]
+        dutdict = pdict["dut"]
+        
+        # Clear Notebooks
+        self.usb_notebook.DeleteAllPages()
+        self.dut_notebook.DeleteAllPages()
+
+        # usb4_selected = rpdict.get("u4tree", False)
+        # usb3_selected = rpdict.get("u3tree", False)
+        usb4_selected = True  # Always show USB4 Tree
+        usb3_selected = True  # Always show USB3 Tree
+
+        dut_selected = any(rpdict.get(dut, False) for dut in dutdict.keys())
+
+        # Populate USB4 and USB3 Tree Notebook
+        if usb4_selected:
+            usb4_page = usb4TreeWindow.Usb4TreeWindow(self.usb_notebook, self.parent)
+            self.usb_notebook.AddPage(usb4_page, "USB4 Tree Window")
+        
+        if usb3_selected:
+            usb3_page = usb3TreeWindow.Usb3TreeWindow(self.usb_notebook, self.parent)
+            self.usb_notebook.AddPage(usb3_page, "USB3 Tree Window")
+
+        # Populate DUT Notebook
+        if dut_selected:
+            for dut in dutdict.keys():
+                if rpdict.get(dut, False):
+                    dut_page = dutLogWindow.DutLogWindow(self.dut_notebook, self.parent, {dut: dutdict[dut]})
+                    self.dut_notebook.AddPage(dut_page, dut.upper())
+
+        # Adjust layout dynamically
+        self.main_sizer.Show(self.top_sizer, usb4_selected or usb3_selected)
+        self.main_sizer.Show(self.bottom_sizer, dut_selected)
+
+        if dut_selected and not (usb4_selected or usb3_selected):
+            self.main_sizer.SetItemMinSize(self.bottom_sizer, -1, -1)  # Expand DUT section fully
+        else:
+            self.main_sizer.SetItemMinSize(self.bottom_sizer, -1, 100)  # Reset DUT section size
+
+        self.Layout()
+
+    def update_my_panel(self, pdict):
+        self.init_my_panel(pdict)  # Refresh the layout
+
+    # def update_usb4_tree(self, msusb4):
+    #     for i in range(self.usb_notebook.GetPageCount()):
+    #         page = self.usb_notebook.GetPage(i)
+    #         # if isinstance(page, (usb4TreeWindow.Usb4TreeWindow, usb3TreeWindow.Usb3TreeWindow)):
+    #         if isinstance(page, usb4TreeWindow.Usb4TreeWindow):
+    #             page.update_usb4_tree(msusb4)
+    #         # elif isinstance(page, usb3TreeWindow.Usb3TreeWindow):
+    #         #      page.update_usb3_tree(msusb)  # Update USB3 Tree
+    #             break
+    
     def update_usb4_tree(self, msusb4):
-        self.usb4Pan.update_usb4_tree(msusb4)
-        # self.usbPan.update_usb4_tree(msusb4)
-    
-    def update_usb3_tree(self, msusb3):
-        self.usbPan.update_usb3_tree(msusb3)
-        # self.usbPan.update_usb4_tree(msusb4)
+        # print("msusb4-->:", msusb4)
+        for i in range(self.usb_notebook.GetPageCount()):
+            page = self.usb_notebook.GetPage(i)
+            if isinstance(page, usb4TreeWindow.Usb4TreeWindow):
+                page.update_usb4_tree(msusb4)
+                break  # Stop after finding the first USB4 page
+        # pass
 
-    def add_switches(self, swlist):
-        self.Layout()
-    
+    def update_usb3_tree(self, msusb3):
+        for i in range(self.usb_notebook.GetPageCount()):
+            page = self.usb_notebook.GetPage(i)
+            if isinstance(page, usb3TreeWindow.Usb3TreeWindow):
+                page.update_usb3_tree(msusb3)
+                break  # Stop after finding the first USB3 page
+
+    # def update_usb3_tree(self, msusb3):
+    #     self.update_usb3_tree(msusb3)
     
     def print_on_log(self, data):
         pass

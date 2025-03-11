@@ -5,11 +5,20 @@
 # Description:
 #     Scan the USB bus and get the list of devices attached
 #
+# Copyright notice:
+#     This file copyright (c) 2020 by
+#
+#         MCCI Corporation
+#         3520 Krums Corners Road
+#         Ithaca, NY  14850
+#
+#     Released under the MCCI Corporation.
+#
 # Author:
 #     Seenivasan V, MCCI Corporation Mar 2020
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
+#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
 #       Module created
 ##############################################################################
 
@@ -65,10 +74,8 @@ class UiPanel(wx.Panel):
         self.cpanel = midPanel.MidPanel(self, self.parent, "")
         self.vb_center.Add(self.cpanel, 0, wx.ALIGN_LEFT | wx.EXPAND)
 
-        # self.rpanel = rightPanel.RightPanel(self)
-        self.rpanel = rightPanel.RightPanel(self, self.parent, None) #MCCI VINAY
-
-        self.vb_right.Add(self.rpanel, 1, wx.ALIGN_LEFT | wx.EXPAND)
+        self.rpanel = rightPanel.RightPanel(self)
+        self.vb_right.Add(self.rpanel, 1, wx.EXPAND | wx.ALL)
 
         self.hb_outer.Add((10,0), 0, wx.EXPAND)
         self.hb_outer.Add(self.vb_left, 0, wx.ALIGN_LEFT | wx.EXPAND)
@@ -128,21 +135,20 @@ class UiPanel(wx.Panel):
 
     def init_right_panel(self, pdict):
         
-        # self.rpanel.init_my_panel(pdict) #VINAY
-        pass
+        self.rpanel.init_my_panel(pdict)
 
     def update_right_panel(self, pdict):
-        pass
-        # self.rpanel.update_my_panel(pdict) EDITED
+       
+        self.rpanel.update_my_panel(pdict)
 
     def update_usb4_tree(self, msusb4):
-        # print("update_usb4_tree-uiPanel")
        
         self.rpanel.update_usb4_tree(msusb4)
-        
+    
     def update_usb3_tree(self, msusb3): #VINAY
         # print("update_usb3_tree-uiPanel")
         self.rpanel.update_usb3_tree(msusb3)
+
 
     def show_selected(self, swstr):
        
@@ -179,7 +185,7 @@ class UiPanel(wx.Panel):
     def PrintLog(self, strin):
       
         self.cpanel.logPan.print_on_log(strin)
-        # self.rpanel.print_on_log(strin) # VINAY 
+        self.rpanel.print_on_log(strin)
     
     def get_enum_delay(self):
       

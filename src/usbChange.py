@@ -35,8 +35,7 @@ def get_usb_change(top):
     
     if top.myrole['uc']:
         prepare_tree_change(top, usb3diff, usb4diff)
-        # print("--------------->>>>>", usb3diff)
-
+        
     if result["usb4tbjson"] != None and len(result["usb4tbjson"]) > 0:
         if top.myrole['uc']:
             top.store_usb4_win_info(result["usb4tbjson"])

@@ -269,7 +269,6 @@ class LogWindow(wx.Window):
             self.print_on_log("USB Read Error!")
             self.print_on_log("USB RE Msg: "+str(err))
             
-
         self.wait_flg = False
         self.btn_ref.Enable()
     
