@@ -54,6 +54,7 @@ class DutConfigDialog(wx.Frame):
 
         self.Show()
         self.Layout()
+        self.CenterOnParent(wx.BOTH)
 
 
         #--------------------- ---EVENT BIND--- #---------------------
@@ -221,7 +222,7 @@ class DutConfigDialog(wx.Frame):
         self.hbox_ap = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxdr8 = wx.BoxSizer(wx.HORIZONTAL)
 
-        cb_action = ["stop sequence", "count match"]
+        cb_action = ["Stop sequence", "Count match"]
 
         ca = wx.StaticBox(self, -1, "Data to Watch", size = (400, 200))
         self.vboxLog = wx.StaticBoxSizer(ca, wx.VERTICAL)
@@ -235,7 +236,7 @@ class DutConfigDialog(wx.Frame):
         self.hboxdr8.Add(self.btn_savedtow, flag=wx.LEFT | 
                         wx.ALIGN_CENTER_VERTICAL, border=120)
 
-        self.st_action = wx.StaticText(self, -1, "Match action")
+        self.st_action = wx.StaticText(self, -1, "Match Action")
         self.cb_action = wx.ComboBox(self,
                                      size=(130,-1),
                                      style = wx.TE_PROCESS_ENTER, choices=cb_action)

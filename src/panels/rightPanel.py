@@ -52,7 +52,7 @@ class RightPanel(wx.Panel):
         
         if usb3_selected:
             usb3_page = usb3TreeWindow.Usb3TreeWindow(self.usb_notebook, self.parent)
-            self.usb_notebook.AddPage(usb3_page, "USB3 Tree Window")
+            self.usb_notebook.AddPage(usb3_page, "USB Tree Window")
 
         # Populate DUT Notebook
         if dut_selected:

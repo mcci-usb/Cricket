@@ -65,7 +65,7 @@ class Usb3TreeWindow(wx.Window):
 
         # Create the tree control
         self.tree = wx.TreeCtrl(self, wx.TR_DEFAULT_STYLE)
-        self.root = self.tree.AddRoot("MY COMPUTER USB3 Tree View")
+        self.root = self.tree.AddRoot("MY COMPUTER USB Tree View")
 
         # Bind events
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnItemSelect, self.tree)
