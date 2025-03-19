@@ -223,7 +223,7 @@ portCnt = {"3141": 2,"3142":2, "3201": 4, "2301": 4, "2101": 1}
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-24\nMCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-25\nMCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
 
 
