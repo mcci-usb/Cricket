@@ -90,6 +90,11 @@ class LeftPanel(ScrolledPanel):
         self.swname = self.swid.split("(")[0]
     
     def on_disconnect(self, evt):
+        if not self.swid:  # If no switch is selected, get the first one from the combo box
+            if self.cb_selsw.GetCount() > 0:
+                self.swid = self.cb_selsw.GetString(0)  # Select the first item in the list
+                self.SwitchChange(None)  # Update swport and swname based on swid
+        
         if self.swport in self.parent.swuidict:
             self.parent.swuidict.pop(self.swport)
             if self.swname != "2101":

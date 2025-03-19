@@ -24,6 +24,8 @@ import serial.tools.list_ports
 from uiGlobals import *
 from cricketlib import switch3141
 from cricketlib import switch3142
+from cricketlib import searchswitch
+from cricketlib import searchswitchboot
 
 import devControl
 
@@ -108,6 +110,7 @@ class firmwareWindow(wx.Window):
         self.flash_flg = False
 
         self.dlist = []
+        # self.dlist = ["COM4", "COM5", "COM6"]
         self.clist = []
         self.switchlist = []
         self.addswitchlist = []
@@ -328,7 +331,6 @@ class firmwareWindow(wx.Window):
             if self.parse_set_address():
                 self.top.print_on_log("Firmware update success!\n")
         
-
     def load_block_flash(self):
         mybarr = []
         mybarr.append(0x42)
@@ -363,7 +365,6 @@ class firmwareWindow(wx.Window):
 
         self.fw_seq = SET_ADDRESS        
         
-
     def read_efuse(self):
         self.write_avr(CMD_READ_EFUSE)
         self.fw_seq = READ_EFUSE
@@ -646,17 +647,30 @@ class firmwareWindow(wx.Window):
     
 
     def SearchEvent(self, event):
+        
+        # self.fst_lb(b)
+        
         if event.data is None:
             self.top.print_on_log("No Search event\n")
         elif event.data == "search":
             #self.btn_scan.Enable(False)
             self.btn_scan.Unbind(wx.EVT_BUTTON)
-            self.get_devices()
+            # self.get_devices()
+            self.get_boot()
             wx.GetApp().Yield()
             self.btn_scan.Bind(wx.EVT_BUTTON, self.ScanDevice)
         elif event.data == "print":
             self.top.print_on_log("Searching Devices ...\n")
-        
+    
+    def get_boot(self):
+        b = searchswitchboot.find_switch()
+        if (wx.IsBusy()):
+            wx.EndBusyCursor()
+        self.fst_lb.Clear()
+        self.fst_lb.Append(b)
+        self.fst_lb.SetSelection(0)
+  
+         
     def get_devices(self):    
         devlist = devControl.search_device(self.top)
         if (wx.IsBusy()):
@@ -684,12 +698,39 @@ class firmwareWindow(wx.Window):
                     self.fst_lb.Clear()
                     nlist.append(val_list[i]+"("+key_list[i]+")")
                     self.fst_lb.Append(nlist)
+                    self.fst_lb.SetSelection(0)
                     self.top.print_on_log(str1+"\n")
+                    
     
-    def get_selected_com(self):        
-        scval = self.fst_lb.GetValue()
-        txt = scval.split("(")
-        return txt[1].replace(")","")
+    def get_selected_com(self):
+        """
+        Get the selected COM port from the list box.
+        Expected format: "COM3 (Description)" so we return the part inside the parentheses.
+        If the format is not as expected but the string starts with "COM", return the entire string.
+        If nothing is selected, assume boot mode.
+        """
+        scval = self.fst_lb.GetValue().strip()
+        if not scval:
+            # No value selected; assume device is in boot mode and start firmware update process.
+            self.fw_seq = READ_AVAIL_PORTS
+            self.timer_fu.Start(500)
+            return ""
+
+        # If the string contains parentheses, extract the part inside.
+        if "(" in scval and ")" in scval:
+            self.top.print_on_log("firmware update started here device is in Normal mode!")
+            txt = scval.split("(")
+            if len(txt) > 1:
+                return txt[1].replace(")", "").strip()
+        else:
+            self.top.print_on_log("firmware update started here device in boot mode!")
+            self.fw_seq = READ_AVAIL_PORTS  # Assuming self.fw_seq is defined in your context.
+            self.timer_fu.Start(500)        # And self.timer_fu is available.
+            # return scval
+            return ""
+      
+        # Otherwise, log the issue and return an empty string.
+        return ""
     
     def update_start(self, event):
         self.bloc = self.tc_bloc.GetValue()
@@ -704,6 +745,10 @@ class firmwareWindow(wx.Window):
                 self.mem_addr = list(self.mem_flash.keys())
                 self.mem_addr.sort()
                 selcom = self.get_selected_com()
+                if not selcom:
+                    self.fw_seq = READ_AVAIL_PORTS
+                    self.timer_fu.Start(500)
+                    return
                 self.sw = switch3141.Switch3141(selcom)
                 self.sw2 = switch3142.Switch3142(selcom)
                 if(self.sw.connect() or self.sw2.connect()):
@@ -711,11 +756,12 @@ class firmwareWindow(wx.Window):
                     self.timer_fu.Start(1000)
 
     def update_cancel(self, event):
-        self.fw_seq = READ_AVAIL_PORTS
-        self.timer_fu.Start(500)
-        
+        # self.fw_seq = READ_AVAIL_PORTS
+        # self.timer_fu.Start(500)
+        print("cancel_button:")
 
     def OnClick (self, evt):
+        print("On click:")
         self.GetParent().OnOK(evt)
    
     def OnSize (self, evt):
@@ -728,8 +774,6 @@ class firmwareWindow(wx.Window):
         for line in lines:
             self.unpack_line(line)
         
-
-
     def unpack_line(self, line):
         if line[0] == ":" and line[-1] == "\n":
             data_len = int(line[1:3], 16)

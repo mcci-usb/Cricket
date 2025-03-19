@@ -225,7 +225,7 @@ class Usb4TreeWindow(wx.Window):
                     objdict[l0item+","+str(pno)] = self.tree.AppendItem(objdict[l0item], "Port-"+str(pno))
         return objdict
     
-    # # Draw level 1 to 6 data
+    ## Draw level 1 to 6 data
     def draw_leveln_data(self, ddict, dlist, riobj, lidx):
         """
         Draw the Tree view N Levels of USB4 and Thunderbolt
@@ -238,6 +238,7 @@ class Usb4TreeWindow(wx.Window):
                 self.tree.SetItemText(riobj[item], "Port-"+cidx+", "+ddict[item]["mname"]+" ("+ddict[item]["vname"]+")")
                 if 'vid' in ddict[item] and 'pid' in ddict[item]:
                     device_data = f"VID: {ddict[item]['vid']}, PID: {ddict[item]['pid']}"
+                    print("device_data:", device_data)
                     self.tree.SetItemPyData(riobj[item], device_data)
                 if len(ddict[item]["ports"]) > 0:
                     for pno in ddict[item]["ports"]:

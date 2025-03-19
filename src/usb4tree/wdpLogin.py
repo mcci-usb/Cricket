@@ -63,6 +63,7 @@ class LoginFrame(wx.Dialog):
         sizer.Add(self.login_button, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, 20)
 
         self.panel.SetSizer(sizer)
+        self.CenterOnParent(wx.BOTH)
 
     def on_save(self, event):
         """
