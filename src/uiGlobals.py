@@ -19,7 +19,7 @@ import wx
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.4.2"
+APP_VERSION = "4.5.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
