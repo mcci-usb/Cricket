@@ -4,7 +4,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v4.3.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.3.0)
+[![Git release](https://img.shields.io/badge/release-v4.5.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.5.0)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -273,6 +273,10 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+-  v4.5.0 is patach release its contains the following chnages.
+
+   - device Detects Different COM Port After Switching to Boot Mode During Firmware Update[#147](https://github.com/mcci-usb/Cricket/commit/290560d239955475b5c467f85b4859e75f00d23c)
 
 - v4.3.0 is patch release it contains the following changes.
 
