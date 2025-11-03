@@ -1027,9 +1027,9 @@ class UiMainFrame (wx.Frame):
             event (wx.Event): The event object representing the menu selection.
         """
 
-        dlg = firmwareUpdate.FirmwareDialog(self, self)
-        dlg.ShowModal()
-        dlg.Destroy()
+        dlg = firmwareUpdate.FirmwareFrame(self, self)
+        dlg.Show()
+        self.CenterOnScreen()
     
     def OnAppClose (self, event):
         """
