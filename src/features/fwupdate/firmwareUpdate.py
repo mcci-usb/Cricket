@@ -650,8 +650,12 @@ class FirmwareUpdate():
                         # self.log(f"[BOOT MODE] PORT={normal_port}, VID={vid:04X}, PID={pid:04X}, REV={rev}")
                         self.log(f"[BOOT MODE] PORT={normal_port}, VID={vid:04X}, PID={pid:04X}")
                         return normal_port, vid, pid, rev
-                except Exception:
-                    continue
+                finally:
+                    try:
+                        usb.util.dispose_resources(dev)
+                    except:
+                        pass
+                    del dev
 
         # If not already in bootloader, do reset + detect new port
         for attempt in range(1, max_attempts + 1):
