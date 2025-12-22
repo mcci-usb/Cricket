@@ -174,9 +174,11 @@ class VbusChart(wx.Frame):
         self.top_vbox.Add(self.graph_vbox,0, wx.ALL|wx.CENTER, 5)
         self.top_vbox.Add(self.hbox_btn, 0, wx.ALL|wx.CENTER, 10)
 
-        self.panel.SetSizer(self.top_vbox)
+        # self.panel.SetSizer(self.top_vbox)
+        # self.Centre()
+        # self.panel.Fit()
+        self.panel.SetSizerAndFit(self.top_vbox)
         self.Centre()
-        self.panel.Fit()
 
         # Timer for Data update
         self.timer_ud = wx.Timer(self)
@@ -464,36 +466,69 @@ class VbusChart(wx.Frame):
             self.amax = ampsin
 
 
-    def print_chart_lables(self):
-        """
-        here chart labels (X and Y)axes, title name. facecolor print on chart.
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        self.ax.set_xlabel(r"Time (sec)",fontsize=8 )
-        self.ax.set_facecolor('black')
+    # def print_chart_lables(self):
+    #     """
+    #     here chart labels (X and Y)axes, title name. facecolor print on chart.
+    #     Args:
+    #         self: The self parameter is a reference to the current 
+    #         instance of the class,and is used to access variables
+    #         that belongs to the class.
+    #     Returns:
+    #         None
+    #     """
+    #     self.ax.set_xlabel(r"Time (sec)",fontsize=8 )
+    #     self.ax.set_facecolor('black')
             
-        if self.vchart and self.achart:
-            self.ax.set_ylabel(r"Volts (V)", fontsize=8, color='tab:red')
-            self.ax.set_title("VBUS V/I Plot", fontsize=10)
+    #     if self.vchart and self.achart:
+    #         self.ax.set_ylabel(r"Volts (V)", fontsize=8, color='tab:red')
+    #         self.ax.set_title("VBUS V/I Plot", fontsize=10)
            
-            self.ax2.set_ylabel('Amps(A)', fontsize=8, color='tab:green')
-            self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
-            self.ax2.axhline(0, color='blue', linestyle='--',linewidth=0.5)
+    #         self.ax2.set_ylabel('Amps(A)', fontsize=8, color='tab:green')
+    #         self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
+    #         self.ax2.axhline(0, color='blue', linestyle='--',linewidth=0.5)
+
+    #     elif self.vchart:
+    #         self.ax.set_ylabel(r"Volts (V)", fontsize=8, color='tab:red')
+    #         self.ax.set_title("VBUS Volt Plot", fontsize=10)
+    #         self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
+            
+    #     elif self.achart:
+    #         self.ax.set_ylabel(r"Amps(A)", fontsize=8, color='tab:green')
+    #         self.ax.set_title("VBUS Amp Plot", fontsize=10)
+    #         self.ax.axhline(0, color='blue', linestyle='--', linewidth=0.5)
+    
+    def print_chart_lables(self):
+        self.ax.set_xlabel("Time (sec)", fontsize=8)
+        self.ax.set_facecolor('black')
+
+        if self.vchart and self.achart:
+            # LEFT axis (Volts)
+            self.ax.set_ylabel("Volts (V)", fontsize=8, color='red')
+            self.ax.yaxis.set_label_position("left")
+            self.ax.yaxis.tick_left()
+
+            # RIGHT axis (Amps)
+            self.ax2.set_ylabel("Amps (A)", fontsize=8, color='green')
+            self.ax2.yaxis.set_label_position("right")
+            self.ax2.yaxis.tick_right()
+
+            self.ax.set_title("VBUS V/I Plot", fontsize=10)
+
+            # Only ONE zero reference line
+            self.ax.axhline(0, color='yellow', linestyle='--', linewidth=0.5)
 
         elif self.vchart:
-            self.ax.set_ylabel(r"Volts (V)", fontsize=8, color='tab:red')
+            self.ax.set_ylabel("Volts (V)", fontsize=8, color='red')
+            self.ax.yaxis.set_label_position("left")
+            self.ax.yaxis.tick_left()
             self.ax.set_title("VBUS Volt Plot", fontsize=10)
-            self.ax.axhline(0, color='yellow', linestyle='--',linewidth=0.5)
-            
+
         elif self.achart:
-            self.ax.set_ylabel(r"Amps(A)", fontsize=8, color='tab:green')
+            self.ax.set_ylabel("Amps (A)", fontsize=8, color='green')
+            self.ax.yaxis.set_label_position("left")
+            self.ax.yaxis.tick_left()
             self.ax.set_title("VBUS Amp Plot", fontsize=10)
-            self.ax.axhline(0, color='blue', linestyle='--', linewidth=0.5)
+
             
     def ChartThread(self):
         """
