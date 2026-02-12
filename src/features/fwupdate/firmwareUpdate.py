@@ -796,6 +796,40 @@ class FirmwareFrame(wx.Frame):
     def ui_log(self, msg):
         # append safely to wx main thread
         wx.CallAfter(self.log_box.AppendText, str(msg) + "\n")
+    
+    # ---------- HELPER: get model from HEX filename ----------
+    def get_model_from_hex(self, hexfile):
+        name = os.path.basename(hexfile).lower()
+        if "3141" in name:
+            return "3141"
+        if "3142" in name:
+            return "3142"
+        return None
+
+
+    # ---------- HELPER: get device model from VID/PID/REV ----------
+    def get_device_model_from_usb(self, vid, pid):
+        """
+        Returns (model, rev)
+        """
+        try:
+            for dev in usb.core.find(find_all=True, idVendor=vid, idProduct=pid):
+                try:
+                    rev = f"{dev.bcdDevice:04x}"
+
+                    # <<< UPDATE MAPPING IF REQUIRED >>>
+                    if rev in ("0004", "0005"):
+                        return "3141", rev
+                    elif rev in ("0006","0008"):
+                        return "3142", rev
+
+                finally:
+                    usb.util.dispose_resources(dev)
+        except Exception:
+            pass
+
+        return None, None
+
 
     def ui_progress(self, pct):
         wx.CallAfter(self.gauge.SetValue, pct)
@@ -826,7 +860,7 @@ class FirmwareFrame(wx.Frame):
                             line = ser.readline()
                             try:
                                 line_str = line.decode('utf-8').strip()
-                                # print("linestr:", line_str)
+                                
                                 if "Model 3141" in line_str:
                                     model_name = "3141"
                                 elif "Model 3142" in line_str:
@@ -960,6 +994,46 @@ class FirmwareFrame(wx.Frame):
                 # Step 1: Detect bootloader port
                 self.ui_log(f"[INFO] Detecting bootloader port on {port} (sending reset)...")
                 bootport, vid, pid, rev = self._fw.detect_bootloader_device(port)
+                
+                # ---------- NEW: DEVICE vs FIRMWARE VALIDATION ----------
+                hex_model = self.get_model_from_hex(hexfile)
+
+                # Validate VID / PID first
+                if vid != 0x045E or pid != 0x0646:
+                    wx.CallAfter(
+                        wx.MessageBox,
+                        f"Unsupported device detected!\n\nVID={vid:04X} PID={pid:04X}",
+                        "Invalid Device",
+                        wx.OK | wx.ICON_ERROR
+                    )
+                    return
+
+                device_model, device_rev = self.get_device_model_from_usb(vid, pid)
+
+                # Unknown revision → block update
+                if not device_model:
+                    wx.CallAfter(
+                        wx.MessageBox,
+                        f"Unknown device revision detected.\n\nREV={device_rev}",
+                        "Invalid Device Revision",
+                        wx.OK | wx.ICON_ERROR
+                    )
+                    return
+
+                # HEX vs Device model mismatch
+                if hex_model and hex_model != device_model:
+                    wx.CallAfter(
+                        wx.MessageBox,
+                        f"Firmware update compatibility check failed.\n\n"
+                        # f"Connected Device : Model {device_model} (REV {device_rev})\n"
+                        f"Selected MCCI Model {device_model}\n"
+                        f"Selected MCCI Model {hex_model} FW Hex File\n\n"
+                        f"Please Select Model {device_model} Firmware Hex file to proceed.",
+                        "Firmware Update Compatibility Error",
+                        wx.OK | wx.ICON_ERROR
+                    )
+                    self.ui_log("[ERR] Firmware update aborted due to compatibility check failure.")
+                    return
 
                 if not bootport:
                     self.ui_log("[ERR] Bootloader port detection failed. Aborting.")
