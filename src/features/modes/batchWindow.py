@@ -14,17 +14,26 @@
 ##############################################################################
 # Lib imports
 import wx
-
 from uiGlobals import *
-
 import os
-
+import re  
 from wx.lib.scrolledpanel import ScrolledPanel
+# ---- Extract model ----
+# import re
 
 import configdata
 ##############################################################################
 # Utilities
 ##############################################################################
+
+MODEL_PORT_MAP = {
+    "3141": ["p1", "p2"],
+    "3142": ["p1", "p2"],
+    "2101": ["p1", "p2"],
+    "3201": ["p1", "p2", "p3", "p4"],
+    "2301": ["p1", "p2", "p3", "p4"],
+}
+
 
 class BatchWindow(wx.Window):
     def __init__(self, parent, top):
@@ -37,6 +46,7 @@ class BatchWindow(wx.Window):
         self.top = top
         
         self.batch_flg = False
+        self.mapping_error = False
 
         self.batchopcode = {
             "switch": self.parseSwMacro,
@@ -60,7 +70,6 @@ class BatchWindow(wx.Window):
         }
 
         self.vbOuter = wx.BoxSizer(wx.VERTICAL)
-
         self.hbOuter = wx.BoxSizer(wx.HORIZONTAL)
         self.vbMid = wx.BoxSizer(wx.VERTICAL)
         self.hbSelect = wx.BoxSizer(wx.HORIZONTAL)
@@ -80,13 +89,11 @@ class BatchWindow(wx.Window):
         self.cdpass = 0
         self.cdfail = 0
         
-        self.InitTopHbox()
+        # self.InitTopHbox()
         self.InitSeqBox()
         self.InitBotHbox()
 
         self.vbMid.AddMany([
-            ((0, 20), 0, wx.EXPAND),
-            (self.hbSelect, 0, wx.EXPAND),
             ((0, 20), 0, wx.EXPAND),
             (self.vbSeq, 1, wx.EXPAND),
             ((0, 20), 0, wx.EXPAND),
@@ -116,9 +123,6 @@ class BatchWindow(wx.Window):
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.TimerServ, self.timer)
 
-        self.bloc = self.top.get_batch_location()
-        self.load_last_file()
-    
     def Batch_strat_msg(self, seqName):
         """
         auto mode Start up Message for Auto Mode on logwindow.
@@ -189,58 +193,209 @@ class BatchWindow(wx.Window):
 
         Parameters:
            repeat: set the paramaeter
-
         """
-        
         self.top.print_on_log("Repeat\n")
-
-    def InitTopHbox(self):
-        self.st_seqname = wx.StaticText(self, -1, "Browse the Sequence: ")
-        self.tc_bloc = wx.TextCtrl(self, -1, size=(250,-1), 
-                                            style = wx.TE_CENTRE |
-                                            wx.TE_PROCESS_ENTER,
-                                            validator=NumericValidator())
-        self.btn_load = wx.Button(self, -1, "Load", size=(60,25))
-
-        self.hbSelect.AddMany([
-            ((-1,0), 1, wx.EXPAND),
-            (self.st_seqname, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER),
-            ((20,0), 0, wx.EXPAND),
-            (self.tc_bloc , 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER),
-            ((20,0), 0, wx.EXPAND),
-            (self.btn_load , 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER),
-            ((-1,0), 1, wx.EXPAND)
-        ])
-
-        self.btn_load.Bind(wx.EVT_BUTTON, self.LoadBatch)
-
+        
     def InitSeqBox(self):
-        """
-        init sequntial box
 
-        """
+        self.tc_seq = wx.TextCtrl(
+            self,
+            -1,
+            style=wx.TE_MULTILINE,
+            size=(400,250)
+        )
 
-        self.tc_seq = wx.TextCtrl(self, -1, style= wx.TE_MULTILINE, 
-                                        size=(400,250))
+        # ---- New Default Model Template ----
+        # default_script = (
+        #     "model = 3141\n"
+        #     "delay = 1000\n"
+        #     "repeat = 10\n"
+        # )
+        
+        default_script = (
+            "model = 3141, p1\n"
+            "delay = 1000\n"
+            "repeat = 10\n"
+        )
+
+
+        self.tc_seq.SetValue(default_script)
+
         self.vbSeq.Add(
             self.tc_seq, 1, wx.EXPAND
         )
-    
+
+
     def InitBotHbox(self):
+        
+        self.btn_generate = wx.Button(self, -1, "Generate Script", size=(100,25))
+        self.btn_revert = wx.Button(self, -1, "Revert", size=(70,25))
         self.btn_start = wx.Button(self, -1, "Start", size=(60,25))
         self.btn_save = wx.Button(self, -1, "Save", size=(60,25))
-
+        
         self.hbBtn.AddMany([
             ((-1,0), 1, wx.EXPAND),
-            (self.btn_start, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER),
+            (self.btn_generate, 0, wx.ALIGN_CENTER),
             ((20,0), 0, wx.EXPAND),
-            (self.btn_save , 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER),
+            (self.btn_revert, 0, wx.ALIGN_CENTER),
+            ((20,0), 0, wx.EXPAND),
+            (self.btn_start, 0, wx.ALIGN_CENTER),
+            ((20,0), 0, wx.EXPAND),
+            (self.btn_save , 0, wx.ALIGN_CENTER),
             ((-1,0), 1, wx.EXPAND)
         ])
 
         self.btn_start.Bind(wx.EVT_BUTTON, self.OnClickBatch)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveBatch)
+        self.btn_generate.Bind(wx.EVT_BUTTON, self.OnGenerateScript)
+        self.btn_revert.Bind(wx.EVT_BUTTON, self.OnRevertScript)
         self.btn_start.Disable()
+    
+    def OnGenerateScript(self, event):
+
+        text = self.tc_seq.GetValue()
+
+        models = {}   # ← model : [ports]
+        delay = 1000
+        repeat = 1
+
+        # ---- Parse ----
+        for line in text.splitlines():
+
+            if "=" not in line:
+                continue
+
+            key, value = [x.strip() for x in line.split("=")]
+
+            # ---------------- MODEL PARSE ----------------
+            if key.lower() == "model":
+
+                parts = value.replace(" ", "").split(",")
+
+                model = parts[0]
+                ports = parts[1:] if len(parts) > 1 else []
+
+                # remove p0 if user typed
+                ports = [p for p in ports if p != "p0"]
+
+                models[model] = ports
+
+            # ---------------- DELAY ----------------
+            elif key.lower() == "delay":
+                delay = int(value)
+
+            # ---------------- REPEAT ----------------
+            elif key.lower() == "repeat":
+                repeat = int(value)
+
+        # ---- Validation ----
+        if not models:
+            wx.MessageBox(
+                "No model defined in script.",
+                "Input Error",
+                wx.OK | wx.ICON_ERROR
+            )
+            return
+
+        script = ""
+
+        # ---- Switch Mapping ----
+        for model in models:
+
+            if model not in MODEL_PORT_MAP:
+                wx.MessageBox(
+                    f"Unsupported model: {model}",
+                    "Model Error",
+                    wx.OK | wx.ICON_ERROR
+                )
+                return
+
+            script += f'switch my{model} = "COMX", "{model}"\n'
+
+        script += "\nmain:\n"
+
+        # ---- Generate Ports ----
+        for model, user_ports in models.items():
+
+            available_ports = MODEL_PORT_MAP[model]
+
+            # ---- If user specified ports ----
+            if user_ports:
+
+                invalid = [p for p in user_ports if p not in available_ports]
+
+                if invalid:
+                    wx.MessageBox(
+                        f"{model} → Invalid port(s): {', '.join(invalid)}",
+                        "Port Error",
+                        wx.OK | wx.ICON_ERROR
+                    )
+                    return
+
+                ports_to_use = user_ports
+
+            else:
+                ports_to_use = available_ports  # all ports
+
+            # ---- Generate Sequence ----
+            for p in ports_to_use:
+
+                script += f"port my{model}.{p}\n"
+                script += f"delay {delay}ms\n"
+                script += f"port my{model}.p0\n"
+                script += f"delay {delay}ms\n"
+
+            script += "\n"
+
+        script += f"repeat {repeat}\nend\n"
+
+        self.tc_seq.SetValue(script)
+        self.btn_start.Enable()
+
+    def OnRevertScript(self, event):
+        text = self.tc_seq.GetValue()
+        # ---- If already simple → reload template ----
+        if "switch my" not in text:
+
+            default_script = (
+                "model = 3141, p1\n"
+                "delay = 1000\n"
+                "repeat = 10\n"
+            )
+
+
+            self.tc_seq.SetValue(default_script)
+            return
+
+        # ---- Extract model ----
+        model_match = re.search(r"switch my(\d+)", text)
+        model = model_match.group(1) if model_match else "3141"
+
+        # ---- Extract delay ----
+        delay_match = re.search(r"delay (\d+)ms", text)
+        delay = delay_match.group(1) if delay_match else "1000"
+
+        # ---- Extract repeat ----
+        repeat_match = re.search(r"repeat (\d+)", text)
+        repeat = repeat_match.group(1) if repeat_match else "10"
+
+        # ---- Extract port (FIRST ON port only) ----
+        port_match = re.search(r"port my\d+\.(p\d+)", text)
+
+        if port_match:
+            port = port_match.group(1)
+        else:
+            port = "p1"   # default fallback
+
+        # ---- Build simple script ----
+        # ---- Build simple script ----
+        simple_script = (
+            f"model = {model}, {port}\n"
+            f"delay = {delay}\n"
+            f"repeat = {repeat}\n"
+        )
+
+        self.tc_seq.SetValue(simple_script)
 
     def OnClickBatch(self, event):
         """
@@ -260,12 +415,10 @@ class BatchWindow(wx.Window):
             self.timer.Stop()        
         else:
             self.StartBatch()
-
+    
     def StopBatch(self):
         """
         Stop Batch Mode.
-    
-
         """
         self.batch_flg = False
         # The Lablel to set name as Auto
@@ -304,7 +457,6 @@ class BatchWindow(wx.Window):
                 else:
                     return {"result": "error", "message": "Port ON not surrounded with Port OFF"}
         return {"result": "success"}
-
 
     def checkSafeSwitching(self):
         # Filterout switch, port, delay
@@ -367,25 +519,67 @@ class BatchWindow(wx.Window):
                 return True
             else:
                 return False
-
-      
+    
     def StartBatch(self):
         """
-        start batch mode.
-    
+        Start batch mode.
         """
+
         self.mappedSw = {}
         self.reqSw = {}
         self.main_flg = False
         self.end_flg = False
         self.finseq = []
+        self.mapping_error = False
+
         self.parseBatchSeq()
+
+        # ---- Mapping Parse Error ----
+        if self.mapping_error:
+
+            msg = (
+                "Batch Script Parsing Error\n\n"
+                "Switch mapping could not be parsed correctly.\n\n"
+                "Possible reasons:\n"
+                " • Extra spaces in switch line\n"
+                " • Incorrect switch syntax\n"
+                " • Unsupported switch model\n\n"
+                "Example correct format:\n"
+                ' switch my3141 = "COM6", "3141"\n\n'
+                "Please correct the script and try again."
+            )
+
+            wx.MessageBox(
+                msg,
+                "Parsing Error",
+                wx.OK | wx.ICON_ERROR
+            )
+            return
+
+        # ---- Safety Check ----
         if self.checkSafeSwitching():
+
             if self.top.createBatchPanel(self.reqSw):
                 self.runBatchSeq()
+
             else:
-                wx.MessageBox('Could not find the Switch as per sequence', 'Warning', wx.OK | wx.ICON_WARNING)
-        
+                missing_switches = ", ".join(self.reqSw.keys())
+
+                msg = (
+                    "Switch mapping not found for the batch sequence.\n\n"
+                    f"Requested Switch(es): {missing_switches}\n\n"
+                    "Please verify the following:\n"
+                    " • Please check whether the Switch Model is correct\n"
+                    " • The switch device or model is connected and powered ON\n"
+                    " • The correct Serial COM Port is assigned (e.g., COM1)\n"
+                )
+
+                wx.MessageBox(
+                    msg,
+                    "Switch Detection Warning",
+                    wx.OK | wx.ICON_WARNING
+                )
+
     def runBatchSeq(self):
         """
         Run batch mode
@@ -590,10 +784,11 @@ class BatchWindow(wx.Window):
         Parse the serial script
         """
         devlist = ["3141","3142", "3201", "2301", "2101"]
-    
-        swpath = oclist[3].replace(',', '')
-        swpath = swpath[1:][:-1]
-        swtype = oclist[4][1:][:-1]
+        
+        swpath = oclist[3].replace(',', '').strip()
+        swpath = swpath[1:-1].strip()
+        swtype = oclist[4][1:-1].strip()
+
 
         if oclist[2] == "=":
             if swtype in devlist:
@@ -617,30 +812,79 @@ class BatchWindow(wx.Window):
                 pass
 
         else:
-            self.top.print_on_log("Main keyword should present after declaration")
-
+            # self.top.print_on_log("Main keyword should present after declaration")
+            pass
+    
     def parsePort(self, indata):
         """
         Parsing the port.
         """
+
         if self.main_flg == True:
+
             speed = None
+
+            # ---- Detect speed ----
             try:
-                if indata[2] == 'SS0' or indata[2] == 'SS1':
+                if indata[2] in ['SS0', 'SS1']:
                     speed = indata[2]
             except:
                 pass
-            
-            swcode = indata[1].split('.')   
-            swname = swcode[0]
-            portname = swcode[1].replace('p', '') 
+
+            # ---- Parse switch & port ----
+            try:
+                swcode = indata[1].split('.')
+                swname = swcode[0]
+                portname = swcode[1].replace('p', '')
+            except:
+                self.mapping_error = True
+
+                wx.MessageBox(
+                    "Invalid port syntax detected.\n\n"
+                    "Example:\n"
+                    " port my3141.p1",
+                    "Parsing Error",
+                    wx.OK | wx.ICON_ERROR
+                )
+                return
+
+            # ---- Mapping validation ----
+            if swname not in self.mappedSw:
+
+                self.mapping_error = True
+
+                msg = (
+                    "Batch Script Parsing Error\n\n"
+                    f"Switch '{swname}' is not mapped.\n\n"
+                    "Possible reasons:\n"
+                    " • Switch declaration missing\n"
+                    " • Incorrect switch name in port line\n"
+                    " • Extra spaces or syntax issue\n\n"
+                    "Example:\n"
+                    ' switch my3141 = "COM6", "3141"\n'
+                    " port my3141.p1\n"
+                )
+
+                wx.MessageBox(
+                    msg,
+                    "Mapping Error",
+                    wx.OK | wx.ICON_ERROR
+                )
+                return
+
+            # ---- Append switch ----
             self.finseq.append({"switch": self.mappedSw[swname]})
-            if speed != None:
+
+            # ---- Append speed if exists ----
+            if speed is not None:
                 self.finseq.append({"speed": speed})
+
+            # ---- Append port (ALWAYS) ----
             self.finseq.append({"port": int(portname)})
-            
+
         else:
-            self.top.print_on_log("Main keyword should present after declaration")
+            pass
+
 
     def parseRead(self, indata):
         """
@@ -677,9 +921,7 @@ class BatchWindow(wx.Window):
                 self.finseq.append({"serial": {indata[1]: serset}})
         except:
             pass
-
-
-
+        
     def parseRepeat(self, indata):
         """
         Parse repeat command and add it to the batch sequence.
