@@ -167,7 +167,7 @@ class Dev3142Window(wx.Panel):
                        wx.ALIGN_CENTER_VERTICAL)
         self.hbox5.Add(self.stlbl_amps, flag=wx.LEFT | 
                        wx.ALIGN_CENTER_VERTICAL |
-                       wx.ALIGN_LEFT, border=20)
+                       wx.ALIGN_LEFT, border=30)
         self.hbox5.Add(self.st_amps, flag=wx.LEFT| wx.ALIGN_CENTER_VERTICAL)
        
                 
@@ -272,6 +272,7 @@ class Dev3142Window(wx.Panel):
                 self.fv = iv
                 outstr = str(self.fv) + "V"
                 self.update_volts(outstr)
+
         
     def AmpsCmd(self, evt):
         self.get_amps()
@@ -314,12 +315,17 @@ class Dev3142Window(wx.Panel):
         self.timer_do.Stop()
         self.get_orientation()
     
+    # def VaTimer(self, e):
+    #     self.timer_va.Stop()
+    #     # Check voltage
+    #     self.get_voltage()
+    #     # Check amps
+    #     self.get_amps()
+    
     def VaTimer(self, e):
-        self.timer_va.Stop()
-        # Check voltage
         self.get_voltage()
-        # Check amps
         self.get_amps()
+
 
     def SafeTimer(self, e):
         self.timer_safe.Stop()
@@ -348,7 +354,7 @@ class Dev3142Window(wx.Panel):
                 self.port_on(port+1, self.btnStat[port])
                 if(self.btnStat[port]):
                    self.timer_do.Start(3000)
-                   self.timer_va.Start(3000)
+                   self.timer_va.Start(500)
                 else:
                    self.timer_do.Stop()
                    self.timer_va.Stop()
