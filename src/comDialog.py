@@ -1,28 +1,28 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: comDialog.py
 #
 # Description:
-#     Dialog to show list of available MCCI USB Switch (3141, 3201, 2101 and 2301)
-#     Search, view, select and connect module
+#     Dialog to display list of available MCCI USB Switch devices
+#     (3141, 3201, 2101, 2301). Provides functionality to search,
+#     view, select, add, and connect USB switch devices through GUI.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 # Lib imports
 from random import choices
 from matplotlib import style
 import wx
-
 from sys import platform
 
 # Own modules
 from uiGlobals import *
-
 import devControl
 
 ##############################################################################
@@ -30,7 +30,15 @@ import devControl
 ##############################################################################
 
 class SearchSwitch(wx.PyEvent):
-    """A class ServerEvent with init method"""
+    """
+    Custom event class used to handle USB switch search events.
+
+    This event is posted during device search operations
+    and carries search status or trigger information.
+
+    Attributes:
+        data: Event payload containing search action details.
+    """
 
     def __init__(self, data):
         """Init Result Event."""
@@ -40,9 +48,19 @@ class SearchSwitch(wx.PyEvent):
 
 class ComWindow(wx.Window):
     """
-    A  class AboutWindow with init method
-    The AboutWindow navigate to MCCI Logo with naming of 
-    application UI "Criket",Version and copyright info.  
+    Communication dialog window for USB switch management.
+
+    This window allows users to search available USB switches,
+    select devices, add them to connection list, and establish
+    communication with selected switches.
+
+    Attributes:
+        top: Reference to main application controller.
+        parent: Parent dialog window.
+        dlist: Detected device list.
+        clist: Selected connection list.
+        switchlist: Available switch collection.
+        addswitchlist: Added switch collection.
     """
     def __init__ (self, parent, top):
         """
@@ -82,7 +100,6 @@ class ComWindow(wx.Window):
         
         self.btn_connect = wx.Button(self, ID_BTN_ADD, "Connect", 
                                      size=(80,-1))
-        
         
         self.btn_top = wx.BoxSizer(wx.HORIZONTAL)
         self.szr_top = wx.BoxSizer(wx.HORIZONTAL)
@@ -146,6 +163,15 @@ class ComWindow(wx.Window):
         self.load_initial()
 
     def load_initial(self):
+        """
+        Load initially detected devices into the list box.
+
+        Args:
+            self: Reference to the current class instance.
+
+        Returns:
+            None
+        """
         
         for i in range(len(self.top.dev_list)):
             lt = self.top.dev_list[i]["model"]+"("+ self.top.dev_list[i]["port"] +")"
@@ -172,14 +198,12 @@ class ComWindow(wx.Window):
         
     def ScanDevice(self, evt):
         """
-        Scan the list of connected devices over the USB bus
-        
+        Trigger USB switch device scanning.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the AutoButton() method is an 
-            object specific to a particular event type.
+            self: Reference to the current class instance.
+            evt: Button click event object.
+
         Returns:
             None
         """
@@ -190,13 +214,12 @@ class ComWindow(wx.Window):
 
     def SearchEvent(self, event):
         """
-        Event Handler for Device Search Button.
-        search the device(s) its displays in the statusbar and dropdown box 
+        Handle search event actions and update UI/logs.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current class instance.
+            event: Custom search event object.
+
         Returns:
             None
         """
@@ -211,7 +234,16 @@ class ComWindow(wx.Window):
         elif event.data == "print":
             self.top.print_on_log("Searching Devices ...\n")
         
-    def get_devices(self):    
+    def get_devices(self):
+        """
+        Retrieve connected USB switch devices.
+
+        Args:
+            self: Reference to the current class instance.
+
+        Returns:
+            None
+        """ 
         devlist = devControl.search_device(self.top)
         if (wx.IsBusy()):
             wx.EndBusyCursor()
@@ -246,10 +278,11 @@ class ComWindow(wx.Window):
     
     def DeviceAdd(self, evt):
         """
-        Handle the event for adding devices.
+        Add selected devices to connection list.
 
         Args:
-            evt: The event object.
+            self: Reference to the current class instance.
+            evt: Button click event object.
 
         Returns:
             None
@@ -271,14 +304,12 @@ class ComWindow(wx.Window):
    
     def ConnectDevice(self, evt):
         """
-        Event Handler for Connect Button, to connect device
-        Connect status will be displayed in the statusbar 
+        Handle connect button action to initiate device connection.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: handling the event for connect the device
+            self: Reference to the current class instance.
+            evt: Button click event object.
+
         Returns:
             None
         """
@@ -286,17 +317,15 @@ class ComWindow(wx.Window):
         self.btn_connect.Disable()
         self.top.add_switch_dialogs()
        
-
     def connect_device(self):
         """
-        Establish the connection with selected Model
+        Establish communication with selected USB switch.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current class instance.
+
         Returns:
-            Nones
+            None
         """
         # Combo box, device list is disable
         # self.fst_lb.Disable()
@@ -315,14 +344,13 @@ class ComWindow(wx.Window):
     
     def get_selected_com(self):
         """
-        Get the selected Com port and Switch Model
+        Retrieve selected COM port and device model.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current class instance.
+
         Returns:
-            it returns the Com Port and Model in String
+            tuple: (COM port, device model)
         """
         self.cval = self.fst_lb.GetItems()
         txt = self.cval.split("(")
@@ -330,12 +358,11 @@ class ComWindow(wx.Window):
 
     def device_connected(self):
         """
-        Connect the selected device
+        Update UI and state after successful device connection.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current class instance.
+
         Returns:
             None
         """
@@ -344,94 +371,70 @@ class ComWindow(wx.Window):
         self.top.device_connected()
         self.parent.EndModal(True)
            
-    def device_connected2(self):
-        """
-        Connect the selected device
-
-        Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            None
-        """
-        # Set label button name as Disconnect
-        self.btn_connect.SetLabel("Disconnect")
-        self.top.con_flg = True
-        self.top.UpdatePort()
-        # Device update info
-        self.top.UpdateDevice()
-        self.top.UpdateSingle("Connected", 3)
-        # Print on logwindow
-        self.top.print_on_log("MCCI USB Switch "+DEVICES[self.top.selDevice]
-                                              +" Connected!\n")
-        self.top.device_connected()
-        self.parent.EndModal(True)
 
     def OnClick (self, evt):
         """
-        OnClick() event handler function retrieves the label of 
-        source button, which caused the click event. 
-        That label is printed on the console.
+        Handle mouse click event on dialog.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
-            object specific to a particular event type.
+            self: Reference to the current class instance.
+            evt: Mouse event object.
+
         Returns:
-            None        
+            None
         """
         self.GetParent().OnOK(evt)
    
     def OnSize (self, evt):
         """
-        OnSize() event handler function retrieves the about window size. 
+        Handle dialog resize event.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
-            object specific to a particular event type.
+            self: Reference to the current class instance.
+            evt: Size event object.
+
         Returns:
-            None        
+            None
         """
         self.Layout()
 
 def EVT_RESULT(win, func):
     """
-    Bind a function to the custom result event.
+    Bind custom result event to a handler function.
 
     Args:
-        win: The window to which the event is connected.
-        func: The function to be called when the event occurs.
+        win: Target window object.
+        func: Event handler function.
 
     Returns:
         None
     """
     win.Connect(-1, -1, EVT_RESULT_ID, func)    
 
-def get_devices(top):
-    devlist = devControl.search_device(top)
-    dev_list = devlist["devices"]
+# def get_devices(top):
+#     devlist = devControl.search_device(top)
+#     dev_list = devlist["devices"]
 
 class ComDialog(wx.Dialog):
     """
-    wxWindows application must have a class derived from wx.Dialog.
+    Dialog wrapper for USB switch communication window.
+
+    This dialog embeds the ComWindow panel and manages
+    modal interaction for USB switch search and connection.
+
+    Attributes:
+        top: Reference to main application controller.
+        win: Embedded communication window instance.
     """
     def __init__ (self, parent, top):
         """
-        A AboutDialog is Window an application creates to 
-        retrieve Cricket UI Application input.
+        Initialize USB switch communication dialog.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
+            self: Reference to the current class instance.
+            parent: Parent window reference.
+            top: Application controller reference.
+
         Returns:
             None
         """
@@ -449,32 +452,27 @@ class ComDialog(wx.Dialog):
     
     def OnOK (self, evt):
         """
-        OnOK() event handler function retrieves the label of 
-        source button, which caused the click event. 
+        Handle dialog confirmation event.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnOK() method is an 
-            object specific to a particular event type.
+            self: Reference to the current class instance.
+            evt: Event object.
+
         Returns:
-            None        
+            None
         """
     # Returns numeric code to caller
         self.EndModal(wx.ID_OK)
      
     def OnSize (self, evt):
         """
-        OnSize() event handler function retrieves the about window size. 
-        
+        Handle dialog resize event.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnSize() method is an 
-            object specific to a particular event type.
+            self: Reference to the current class instance.
+            evt: Size event object.
+
         Returns:
-            None        
-        """ 
+            None
+        """
         self.Layout()

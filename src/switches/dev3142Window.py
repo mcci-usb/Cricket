@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: dev3142Window.py
@@ -6,11 +7,11 @@
 #     Device specific functions and UI for interfacing Model 3142 with GUI
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 # Lib imports
 import wx

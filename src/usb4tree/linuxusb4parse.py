@@ -1,19 +1,48 @@
-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: linuxusb4parse.py
 #
 # Description:
-#     parsing the USB4 Tree view data in Linux 
+#     This module provides parsing utilities for USB4 and
+#     Thunderbolt topology data on Linux systems.
+#
+#     It converts enumerated USB4 device information into
+#     structured hierarchy buffers that can be rendered in
+#     Tree View UI components.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Jan 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+##############################################################################
+# Utilities
 ##############################################################################
 class LinuxUsb4TreeParse():
+    """
+    Linux USB4 / Thunderbolt Tree Parser.
+
+    Description:
+        Parses USB4 and Thunderbolt enumeration data collected
+        from Linux systems and converts it into structured
+        hierarchy buffers for Tree View visualization.
+
+        The parser generates:
+
+            • Indexed device data (idata)
+            • Level-wise hierarchy mapping (ldata)
+
+    Attributes:
+        idata (dict):
+            Parsed USB4 device dictionary indexed by node ID.
+
+        ldata (dict):
+            Hierarchy level mapping dictionary.
+    """
     def __init__(self):
         self.idata = None
         self.ldata = None

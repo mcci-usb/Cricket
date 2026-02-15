@@ -1,5 +1,4 @@
-# windows_usbenum.py
-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: winusbenum.py
@@ -9,22 +8,27 @@
 #     and retrieving the list of attached devices.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-################################################################################
-from .usbenumall import USBDeviceEnumerator
-import sys
-import usb.util
-from usb.backend import libusb1
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+##############################################################################
 
+# Built-in imports
+import sys
 import threading
-import websocket
 import base64
 import json
 import copy
+
+# Lib imports
+import usb.util
+from usb.backend import libusb1
+import websocket
+
+# Own modules
+from .usbenumall import USBDeviceEnumerator
 
 EADR = 'EvtAddDeviceRouter'
 ERDR = 'EvtRemoveDeviceRouter'
@@ -52,8 +56,43 @@ WIDTH_DICT = {"Unknown 0": "0", "Single Lane": "1", "Dual Lane": "2", "Two Singl
 
 USB4_SCAN_DELAY = 6000
 
+##############################################################################
+# Utilities
+##############################################################################
 class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
+    """
+    Windows USB Device Enumerator.
+
+    This class implements USB enumeration functionality specific to
+    Windows platforms. It supports:
+
+        • USB 3.x device enumeration using libusb backend
+        • USB4 / Thunderbolt device detection via WebSocket service
+        • Link speed and width extraction
+        • Device topology parsing
+
+    Attributes:
+        usb_type_dict: Summary count of host, hub, and peripheral devices.
+        usb_list: List of enumerated USB 3.x devices.
+        usb4tb_json: Raw USB4 / Thunderbolt JSON response.
+        usb4tb_list: Parsed USB4 / Thunderbolt device list.
+        connected: WebSocket connection state.
+        completed: Enumeration completion flag.
+        fail_cnt: WebSocket retry failure counter.
+    """
     def __init__(self):
+        """
+        Initialize Windows USB enumerator instance.
+
+        Sets up internal data structures, WebSocket state flags,
+        authentication placeholders, and enumeration result storage.
+
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
+        """
         self.usb_type_dict = {}
         self.usb_list = []
         self.start_time = None
@@ -71,16 +110,55 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.fail_cnt = 0
         
     def set_login_credentials(self, uname, pwd):
+        """
+        Set authentication credentials for USB4 scanning service.
+
+        Args:
+            self: Reference to the class instance.
+            uname: Username for authentication.
+            pwd: Password for authentication.
+
+        Returns:
+            None
+        """
         self.uname = uname
         self.pwd = pwd
 
     def enumerate_usb_devices(self):
+        """
+        Perform complete USB enumeration.
+
+        This includes:
+
+            • USB 3.x device scanning
+            • USB4 / Thunderbolt device scanning
+
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
+        """
         # raise NotImplementedError("Subclasses must implement enumerate_usb_devices")
         self.completed = False
         self.enumerate_usb3_devices()
         self.enumerate_usb4tb_devices()
     
     def enumerate_usb4tb_devices(self):
+        """
+        Initiate USB4 / Thunderbolt enumeration.
+
+        Description:
+            • Validates login credentials.
+            • Starts WebSocket scan if allowed.
+            • Handles retry failure limits.
+
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
+        """
         if self.uname != None and self.pwd != None:
             if self.fail_cnt > 2:
                 self.fail_cnt = 3
@@ -92,12 +170,17 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         
     def open_usb4tb_ws(self):
         """
-        Connect to the USB4 speed scanning service.
+        Open WebSocket connection for USB4 scanning.
 
         Description:
-            - Check if valid credentials are provided.
-            - If the WebSocket thread is not running, start it.
-        
+            • Verifies thread state.
+            • Starts WebSocket listener thread.
+
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
         """
         if self.websocket_thread is None or not self.websocket_thread.is_alive():
             if self.connected == False:
@@ -107,11 +190,13 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
 
     def close_usb4t_ws(self):
         """
-        Disconnect from the USB4 speed scanning service.
+        Close USB4 WebSocket connection.
 
-        Description:
-            - Close the WebSocket connection.
-        
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
         """
         self.ws.close()
         self.ws = None
@@ -119,27 +204,38 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
 
     def get_result(self):
         """
-        Get the results of USB4 speed scanning.
+        Retrieve enumeration results.
+
+        Waits until enumeration completes and returns collected data.
+
+        Args:
+            self: Reference to the class instance.
 
         Returns:
-            tuple: A tuple containing the lists of added USB4 devices (`u4added`) and all USB4 devices (`u4all`).
-
+            dict: USB enumeration result containing:
+                • usb3type
+                • usb3list
+                • usb4tbjson
+                • usb4tblist
         """
         while(not self.completed):
             mydata = None
         return {"usb3type": self.usb_type_dict, "usb3list": self.usb_list, "usb4tbjson": self.usb4tb_json, "usb4tblist": self.usb4tb_list}
 
-
     def run_usb4tb_websocket(self):
         """
-        Run the WebSocket connection for USB4 speed scanning.
+        Execute USB4 scanning WebSocket client.
 
         Description:
-            - Encode the credentials in base64.
-            - Define custom headers for basic authentication.
-            - Create a WebSocket connection with custom headers.
-            - Set the `connected` flag to True.
+            • Encodes credentials using Base64.
+            • Creates authenticated WebSocket session.
+            • Listens for USB4 device events.
 
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
         """
         # Encode the credentials in base64
         credentials = base64.b64encode(f"{self.uname}:{self.pwd}".encode("utf-8")).decode("utf-8")
@@ -162,20 +258,17 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.connected = True
         self.ws.run_forever()
 
-    
     def on_usb4tb_message(self, ws, message):
         """
-        Handle the incoming message from the WebSocket.
+        Handle incoming USB4 WebSocket message.
 
-        Description:
-            - Update the text control with the received message.
-            - Close the WebSocket connection.
-            - Set flags to indicate that scanning is closed.
+        Args:
+            self: Reference to the class instance.
+            ws: WebSocket client instance.
+            message: Received JSON message.
 
-        Parameters:
-            ws (websocket.WebSocketApp): The WebSocket instance.
-            message (str): The received message.
-
+        Returns:
+            None
         """
         # self.update_text_ctrl(message)
         self.parseresponse(message)
@@ -185,8 +278,18 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.completed = True
         self.fail_cnt = 0
 
-
     def on_usb4tb_error(self, ws, error):
+        """
+        Handle WebSocket error during USB4 scanning.
+
+        Args:
+            self: Reference to the class instance.
+            ws: WebSocket client instance.
+            error: Error information.
+
+        Returns:
+            None
+        """
         self.completed = True
         self.ws.close()
         self.ws = None
@@ -194,11 +297,38 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
         self.fail_cnt = self.fail_cnt + 1
 
     def on_usb4tb_close(self, ws, scode, msg):
+        """
+        Handle WebSocket closure event.
+
+        Args:
+            self: Reference to the class instance.
+            ws: WebSocket client instance.
+            scode: Status code.
+            msg: Closure message.
+
+        Returns:
+            None
+        """
         self.completed = True
 
     def parseresponse(self, msgusb4):
         """
-        parsing the usb4 list json its getting from msgusb4.
+        Parse USB4 / Thunderbolt JSON response.
+
+        Extracts device attributes such as:
+
+            • VID / PID
+            • Model name
+            • Link speed
+            • Link width
+            • Topology ID
+
+        Args:
+            self: Reference to the class instance.
+            msgusb4: Raw JSON message string.
+
+        Returns:
+            None
         """
         self.usb4tb_json = json.loads(msgusb4)
         usb4e = self.usb4tb_json["events"]
@@ -237,6 +367,20 @@ class WindowsUSBDeviceEnumerator(USBDeviceEnumerator):
                         self.usb4tb_list.append(mydict)
     
     def enumerate_usb3_devices(self):
+        """
+        Enumerate USB 3.x devices using libusb backend.
+
+        Description:
+            • Detects host controllers, hubs, and peripherals.
+            • Extracts VID, PID, bus, port, and speed.
+            • Retrieves interface class details.
+
+        Args:
+            self: Reference to the class instance.
+
+        Returns:
+            None
+        """
         # List of Host controllers
         hc_list = []
         # List connected hub

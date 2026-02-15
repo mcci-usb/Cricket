@@ -1,31 +1,64 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: linuxusbenum.py
 #
 # Description:
-#     This module provides a class for scanning the USB bus on Linux systems
-#     and retrieving the list of attached devices.
+#     Linux USB Enumeration module.
+#     Provides functionality to scan the USB bus on Linux systems
+#     and retrieve the list of connected USB 3.x and USB4/Thunderbolt
+#     devices with topology and speed details.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-################################################################################
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
 
+# Built-in imports
 import os
-import usb.util
-
+import re
 import copy
+
+# Lib imports
+import usb.util
 from usb.backend import libusb1
-# from usbenumall import USBDeviceEnumerator
+
+# Own modules
 from . import usbenumall
 
-import re
-
+##############################################################################
+# Utilities
+##############################################################################
 class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
+    """
+    Summary:
+        Linux USB Device Enumerator.
+
+    Longer Description:
+        Enumerates USB devices connected to Linux systems.
+        Supports USB 3.x and USB4/Thunderbolt device scanning,
+        classification, and topology extraction using system tools.
+
+    Attributes:
+        usb_type_dict: Dictionary storing count of USB device types.
+        usb_list: List of enumerated USB3 devices.
+        usb4tb_json: Parsed USB4 Thunderbolt JSON data.
+        usb4tb_list: List of USB4 Thunderbolt devices.
+    """
     def __init__(self):
+        """
+        Initialize Linux USB Device Enumerator.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.usb_type_dict = {}
         self.usb_list = []
 
@@ -38,14 +71,32 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
         self.usb4tb_list = []
         
     def set_login_credentials(self, uname, pwd):
+        """
+        Set login credentials.
+
+        Description:
+            Placeholder method for compatibility with other
+            OS enumerators that require authentication.
+
+        Args:
+            uname: Username.
+            pwd: Password.
+
+        Returns:
+            None
+        """
         pass
 
     def enumerate_usb_devices(self):
         """
-        Enumerate both USB 3.0 and USB4TB devices.
+        Enumerate USB devices.
 
-        This method calls specific methods to enumerate USB 3.0 and USB4TB devices,
-        categorizing them into different types.
+        Description:
+            Initiates enumeration of both USB3 and
+            USB4/Thunderbolt devices.
+
+        Args:
+            None
 
         Returns:
             None
@@ -56,7 +107,16 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
     def enumerate_usb3_devices(self):
         """
-        Enumerate USB 3.0 devices and categorize them into Host controllers, Hubs, and Peripherals.
+        Enumerate USB3 devices.
+
+        Description:
+            Scans and categorizes USB3 devices into:
+            - Host Controllers
+            - Hubs
+            - Peripherals
+
+        Args:
+            None
 
         Returns:
             None
@@ -156,7 +216,14 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
     
     def enumerate_usb4tb_devices(self):
         """
-        Enumerate USB4TB devices using boltctl command.
+        Enumerate USB4 / Thunderbolt devices.
+
+        Description:
+            Uses `boltctl` command-line utility to gather
+            Thunderbolt device topology and speed details.
+
+        Args:
+            None
 
         Returns:
             None
@@ -187,25 +254,38 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
     def get_result(self):
         """
-        Get the results of USB4 speed scanning.
+        Get enumeration results.
+
+        Description:
+            Returns collected USB enumeration data.
+
+        Args:
+            None
 
         Returns:
-            tuple: A tuple containing the lists of added USB4 devices (`u4added`) and all USB4 devices (`u4all`).
-
+            dict:
+                Dictionary containing USB3 and USB4
+                enumeration results.
         """
         return {"usb3type": self.usb_type_dict, "usb3list": self.usb_list, "usb4tbjson": self.usb4tb_json, "usb4tblist": self.usb4tb_list}
 
 
     def find_device(self, gistr):
         """
-        Find and extract information about a device from a given string.
+        Parse device entry.
+
+        Description:
+            Extracts Thunderbolt device details from
+            formatted command output string.
 
         Args:
-            gistr (str): The string containing information about devices.
+            gistr (str):
+                Raw device information string.
 
         Returns:
-            dict or None: If a device is found, returns a dictionary containing extracted information.
-                            If no device is found, returns None.
+            dict | None:
+                Parsed device dictionary if found,
+                otherwise None.
         """
         
         pattern = re.compile(r'\*\s(.*?)(?=\\n)')
@@ -223,15 +303,21 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
    
     def extract_json(self, desc, gistr):
         """
-        Extract relevant information from a given JSON-like string.
+        Extract structured device data.
+
+        Description:
+            Converts parsed string data into structured
+            dictionary format containing device metadata.
 
         Args:
-            desc (str): A description of the information being extracted.
-            gistr (str): The JSON-like string containing key-value pairs.
+            desc (str):
+                Device description.
+            gistr (str):
+                Raw key-value formatted string.
 
         Returns:
-            dict: A dictionary containing extracted information with keys such as 'name', 'uuid', 'devtype',
-                'type', 'vendor', 'generation', 'rx speed', and 'tx speed'.
+            dict:
+                Structured USB4 device information.
         """
         lines = gistr.split('\\n')
 
@@ -266,13 +352,20 @@ class LinuxUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
         return final_dict
     
-
     def run_boltctl_command(self):
         """
-        Run the boltctl command and capture the formatted output.
+        Execute boltctl scan command.
+
+        Description:
+            Runs system command to retrieve formatted
+            Thunderbolt device information.
+
+        Args:
+            None
 
         Returns:
-            str: The formatted output of the boltctl command.
+            str:
+                Formatted command output string.
         """
         # Run the boltctl command and capture the output
         with os.popen('boltctl | jq -R -s -c \'split("\\n\n")[:-1] | map(gsub("^\\\\s*[-|]+\\\\s*"; "") | gsub("\\\\|-"; "")) | join("\\n\\n")\'') as pipe:

@@ -1,31 +1,97 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: winusb3parse.py
 #
 # Description:
-#     parsing the USB4 Tree view data in Windows
+#     USB 3.0 Tree View Parsing module for Windows systems.
+#     Parses USB3 enumeration data and organizes it into
+#     hierarchical tree levels for UI representation.
 #
 # Author:
-#     Vinay N, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+##############################################################################
+# Utilities
 ##############################################################################
 class WinUsb3TreeParse():
+    """
+    Summary:
+        Windows USB3 Tree Parser.
+
+    Longer Description:
+        Parses enumerated USB3 device data and converts it into
+        structured dictionaries suitable for tree view rendering
+        in UI applications.
+
+    Attributes:
+        idata (dict):
+            Parsed USB3 device item data.
+
+        ldata (dict):
+            Hierarchical level-wise USB3 topology data.
+    """
     def __init__(self):
+        """
+        Initialize USB3 Tree Parser.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.idata = None
         self.ldata = None
     
     def parse_usb3tb_data(self, usb3data):
+        """
+        Parse USB3 topology data.
+
+        Description:
+            Entry method to parse raw USB3 enumeration data.
+            Generates structured item data and hierarchical level data.
+
+        Args:
+            usb3data (list):
+                List of USB3 device dictionaries obtained
+                from enumeration modules.
+
+        Returns:
+            None
+        """
         self.idata = self.get_item_data(usb3data)
         self.ldata = self.get_level_data(self.idata)
-        # if self.idata is not None:
-        #     self.ldata = self.get_level_data(self.idata)
-        # else:
-        #     print("Error: idata is None")
-
+        
     def get_item_data(self, msg):
+        """
+        Extract USB3 item data.
+
+        Description:
+            Processes USB3 device list and extracts key device
+            attributes required for tree rendering such as:
+
+            - Vendor ID
+            - Product ID
+            - Bus number
+            - Speed
+            - Interface classes
+            - Port mapping
+
+        Args:
+            msg (list):
+                Raw USB3 enumeration data list.
+
+        Returns:
+            dict:
+                Dictionary mapping unique keys to parsed USB3 items.
+                Returns None if input format is invalid.
+        """
 
         if not isinstance(msg, list):
             print("Error: usb3data is not a list")
@@ -67,6 +133,29 @@ class WinUsb3TreeParse():
         return parsed_usb3
 
     def get_level_data(self, u3tbuf):
+        """
+        Organize USB3 data into hierarchical levels.
+
+        Description:
+            Groups parsed USB3 devices based on topology depth
+            by counting key delimiters. Used for UI tree generation.
+
+        Args:
+            u3tbuf (dict):
+                Parsed USB3 item dictionary.
+
+        Returns:
+            dict:
+                Dictionary with level keys such as:
+
+                    level0
+                    level1
+                    level2
+
+                Each containing lists of topology keys.
+                Returns None if input is invalid.
+        """
+
         if not isinstance(u3tbuf, dict):
             print("Error: u3tbuf is not a dictionary")
             return None
@@ -80,12 +169,3 @@ class WinUsb3TreeParse():
             else:
                 pdict['level'+str(lcnt)] = [rkitem]
         return pdict
-
-# # Sample USB3 data
-# usb3_data = [{'type': 'usb3', 'vid': '32903', 'pid': '2880', 'bus': '2', 'speed': 5, 'ifc': [9]}, {'type': 'usb3', 'vid': '7516', 'pid': '22529', 'bus': '1', 'speed': 3, 'ifc': [9]}, {'type': 'usb3', 'vid': '5967', 'pid': '9317', 'bus': '1', 'mport': '(7,)', 'port': '7', 'speed': 3, 'ifc': [14, 14, 254]}, {'type': 'usb3', 'vid': '1121', 'pid': '20052', 'bus': '1', 'mport': '(3,)', 'port': '3', 'speed': 1, 'ifc': [3]}, {'type': 'usb3', 'vid': '32903', 'pid': '38', 'bus': '1', 'mport': '(10,)', 'port': '10', 'speed': 2, 'ifc': [224, 224]}, {'type': 'usb3', 'vid': '7825', 'pid': '56897', 'bus': '1', 'mport': '(1, 5)', 'port': '5', 'speed': 2, 'ifc': [17, 255]}, {'type': 'usb3', 'vid': '1118', 'pid': '1606', 'bus': '1', 'mport': '(9,)', 'port': '9', 'speed': 2, 'ifc': [2, 10]}, {'type': 'usb3', 'vid': '1267', 'pid': '3147', 'bus': '1', 'mport': '(6,)', 'port': '6', 'speed': 2, 'ifc': [255]}]
-
-# # Creating an instance of the parser
-# usb_parser = WinUsb3TreeParse()
-
-# # Parsing USB3 data
-# usb_parser.parse_usb3tb_data(usb3_data)

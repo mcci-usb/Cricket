@@ -9,19 +9,23 @@
 #     Send the response back to Clinet in JSON format (JSON Object)
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 # Built-in imports
 
+# Built-in imports
 import socket
 import threading
-import wx
 import json
 
+# Lib imports
+import wx
+
+# Own modules
 from uiGlobals import *
 
 keywords = {'Python',
@@ -128,7 +132,6 @@ class StayAccept(threading.Thread):
         """
         self.wait = False
         
-
 class RequestSync(threading.Thread):
     """A class RequestSync with init method"""
     def __init__(self, parent):

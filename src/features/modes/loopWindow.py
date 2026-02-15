@@ -1,17 +1,29 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
-# Module: loopWindow.py
+#
+# Module: loopwindow.py
 #
 # Description:
-#     Loop Window for Switch Model3201,Model3141, Model2101
+#     Loop Operation Control Window for USB Switch Devices.
 #
+#     This module provides a graphical interface to execute
+#     repeated switching sequences across selected ports.
+#
+#     The Loop Mode allows users to:
+#
+#         • Select switch device
+#         • Choose ports for looping
+#         • Configure loop count
+#         • Configure delay interval
+#         • Execute sequential port switching
+#         • Monitor execution status
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 # Lib imports
 import wx
@@ -32,13 +44,22 @@ class LoopWindow(wx.Window):
     """
     def __init__(self, parent, top):
         """
-        Loop Window for Switch Model3201,Model3141, Model2101 
+        Initialize Loop Window UI and control parameters.
+
+        Detailed Description:
+            This constructor initializes the Loop Mode window,
+            creates all UI widgets, and sets default values for
+            loop execution parameters such as interval, loop count,
+            selected ports, and execution flags.
+
+            It also initializes timer objects used for controlling
+            loop switching operations.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: creates an object
+            self: Reference to the current LoopWindow instance.
+            parent: Parent window reference.
+            top: Main application controller reference.
+
         Returns:
             None
         """
@@ -267,6 +288,26 @@ class LoopWindow(wx.Window):
         self.enable_controls(True)
 
     def update_sw_selector(self, swdict):
+        """
+        Populate switch selector dropdown.
+
+        Detailed Description:
+            Updates the switch selection ComboBox with the list
+            of available connected switch devices retrieved from
+
+            the device manager.
+
+        Args:
+            self: Reference to the current instance.
+            swdict (dict):
+                Dictionary containing switch identifiers and names.
+
+        Returns:
+            None
+
+        Raises:
+            None
+       """
         self.cb_switch.Clear()
         if len(swdict) > 0:
             for key, val in swdict.items():
@@ -276,12 +317,49 @@ class LoopWindow(wx.Window):
             self.Update_port_count()
 
     def Update_port_count(self):
+        """
+        Update available port count based on selected switch.
+
+        Detailed Description:
+            This function retrieves the currently selected switch
+            from the switch selector ComboBox and extracts the
+            switch identifier and switch name.
+
+            Using the switch name, it determines the total number
+            of supported ports from the global port count dictionary
+            and updates the Loop/Auto port selection list accordingly.
+
+            The function ensures that only valid ports for the
+            selected switch model are enabled for user interaction.
+
+        Args:
+            self:
+                Reference to the current LoopWindow instance.
+
+        Returns:
+            None
+        """
         self.swid = self.cb_switch.GetValue()
         self.swkey = self.swid.split("(")[1][:-1]
         swname = self.swid.split("(")[0]
         self.set_port_list(portCnt[swname])
 
     def SwitchChange(self, evt):
+        """
+        Handle switch selection change event.
+
+        Detailed Description:
+            Triggered when the user selects a different switch
+            from the dropdown. Updates port availability and
+            loop configuration context.
+
+        Args:
+            self: Reference to the current instance.
+            evt: wxPython ComboBox event object.
+
+        Returns:
+            None
+        """
         self.Update_port_count()
 
     def StartAuto(self, evt):
@@ -528,12 +606,22 @@ class LoopWindow(wx.Window):
 
     def start_loop(self):
         """
-        Start Loop Mode
+        Start loop execution process.
+
+        Detailed Description:
+            Initiates looping operation across selected ports
+            using configured interval and loop count values.
+
+            Enables timer-driven switching until loop count
+            completion or manual stop.
+
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self.cval = self.cb_psel.GetValue()
@@ -575,12 +663,20 @@ class LoopWindow(wx.Window):
     
     def stop_loop(self):
         """
-        Stop Loop Mode - 1. When click stop 2. When cycle completed
+        Stop loop execution process.
+
+        Detailed Description:
+            Terminates active loop switching operations,
+            stops timers, resets execution counters, and
+            restores UI control states.
+
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self.start_flg = False

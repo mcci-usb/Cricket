@@ -1,25 +1,20 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
-# Module: serialLogWindow.py
+#
+# Module: dutLogWindow.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
+#     DUT Monitoring & Log Display Window for Supported MCCI Switch Models.
 #
-# Copyright notice:
-#     This file copyright (c) 2020 by
-#
-#         MCCI Corporation
-#         3520 Krums Corners Road
-#         Ithaca, NY  14850
-#
-#     Released under the MCCI Corporation.
-#
+# Detailed Description:
+#     This module implements a real-time monitoring and logging window
+#     for Device Under Test (DUT) communication.#
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 
 # Lib imports
@@ -48,24 +43,80 @@ ERR2 = "FATAL ERROR: Secure Fault"
 ERR3 = "osTimerNew() failed"
 ################################ Evt Listener ################################
 def EVT_RESULT(win, func):
-    """Define Result Event."""
+    """
+    Bind DUT Result Event Listener.
+
+    Connects a custom DUT result event to a handler function
+    within the given window.
+
+    Args:
+        win (wx.Window):
+            Target window to receive the event.
+
+        func (callable):
+            Callback function to handle the event.
+    """
     win.Connect(-1, -1, EVT_DUT_SL_DATA_ID, func)
 
 class ResultEvent(wx.PyEvent):
-    """Simple event to carry arbitrary result data."""
+    """
+    Custom Event to Carry DUT Monitoring Data.
+
+    This event is posted from worker threads to the GUI thread
+    to safely transfer DUT log data.
+
+    Inherits:
+        wx.PyEvent
+    """
     def __init__(self, data):
-        """Init Result Event."""
+        """
+        Initialize Result Event.
+
+        Args:
+            data (str):
+                Log or monitoring data received from DUT.
+        """
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_DUT_SL_DATA_ID)
         self.data = data 
 
 ###################### Thread to Look for data in the queue ###################
 class TestThread(Thread):
-    """Test Worker Thread Class."""
+    """
+    DUT Log Queue Listener Thread.
+
+    This worker thread continuously monitors a shared queue
+    for incoming DUT log data and posts it to the GUI using
+    custom wx events.
+
+    Purpose:
+        • Prevent GUI blocking
+        • Enable real-time log updates
+        • Handle asynchronous DUT communication
+
+    Inherits:
+        threading.Thread
+
+    Args:
+        wxObject (wx.Window):
+            Target GUI window to receive log events.
+
+        inqueue (queue.Queue):
+            Queue object containing DUT log messages.
+    """
         
     #----------------------------------------------------------------------
     def __init__(self, wxObject, inqueue):
-        """Init Worker Thread Class."""
+        """
+        Initialize Worker Thread.
+
+        Args:
+            wxObject (wx.Window):
+                Window that receives posted log events.
+
+            inqueue (queue.Queue):
+                Queue used to receive DUT log messages.
+        """
         Thread.__init__(self)
         self.wxObject = wxObject
         self.run_flg = True
@@ -75,7 +126,19 @@ class TestThread(Thread):
         
     #----------------------------------------------------------------------
     def run(self):
-        """Run Worker Thread."""
+        """
+        Execute Worker Thread Loop.
+
+        Continuously monitors the queue for new DUT data and
+        posts results to the GUI thread.
+
+        Behavior:
+            • Sends monitoring start message
+            • Polls queue for log data
+            • Posts data via ResultEvent
+            • Sleeps briefly to reduce CPU load
+            • Sends monitoring exit message on stop
+        """
         # This is the code executing in the new thread.
         wx.PostEvent(self.wxObject, ResultEvent("\nBegin DUT Monitoring..."))
         
@@ -91,6 +154,11 @@ class TestThread(Thread):
         wx.PostEvent(self.wxObject, ResultEvent("\nExit DUT Monitoring..."))
 
     def stop(self):
+        """
+        Stop Worker Thread Execution.
+
+        Sets the run flag to False, terminating the monitoring loop.
+        """
         self.run_flg = False
 
 
@@ -244,9 +312,21 @@ class DutLogWindow(wx.Window):
         return port_name
 
     def print_on_log(self, strin):
+        """
+        Append Text to Log Display.
+
+        Args:
+            strin (str):
+                Text string to append to the log window.
+        """
         self.scb.AppendText(strin)
 
     def print_com_config(self):
+        """
+        Display Current Serial Configuration.
+
+        Prints configured COM port parameters to the log window.
+        """
         strout = ""
         strout += self.sutSettings["port"]+", "
         strout += self.sutSettings["baud"]+", "
@@ -256,6 +336,16 @@ class DutLogWindow(wx.Window):
         self.print_on_log(strout)
 
     def push_com_default(self):
+        """
+        Load Default Serial Configuration.
+
+        Provides fallback serial settings when no configuration
+        is available.
+
+        Returns:
+            dict:
+                Default serial configuration dictionary.
+        """
         cdata = {"comPort": "COM0", "baudRate": "9600", "dataBits": "8", "parity": "None", 
                  "stopBits": "1", "parityErrChk": "(ignore)", 
                  "faultMsg": {"1": "Non-secure Usage Fault", "2": "FATAL ERROR: SecureFault", 
@@ -263,28 +353,76 @@ class DutLogWindow(wx.Window):
         return cdata
 
     def read_config_data(self):
+        """
+        Read DUT Configuration Data.
+
+        Loads serial configuration settings. If none exist,
+        default settings are applied.
+        """
         sutset = list(self.sutSettings.keys())
         
         if(len(sutset) == 0):
             self.sutSettings = self.push_com_default()
 
     def get_config_data(self):
+        """
+        Retrieve Current DUT Configuration.
+
+        Returns:
+            dict:
+                DUT serial configuration settings.
+        """
         return self.sutSettings
 
     def updt_dut_config(self, dutdict):
+        """
+        Update DUT Configuration in Parent.
+
+        Args:
+            dutdict (dict):
+                Updated DUT configuration dictionary.
+        """
         self.top.updt_dut_config(dutdict)
 
     def save_config_data(self, cdata):
+        """
+        Save DUT Configuration Data.
+
+        Persists configuration data to storage.
+
+        Args:
+            cdata (dict):
+                Configuration data to save.
+        """
         configdata.save_config(self.fpath, cdata)
         self.sutSettings = cdata
     
     def OnDutConfig(self, e):
+        """
+        Open DUT Configuration Dialog.
+
+        Launches the DUT configuration window for editing
+        communication and monitoring settings.
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         dutno = list(self.sut.keys())[0]
         self.sut = self.top.get_dut_config(dutno)
         dlg = DutConfigDialog(self, self.sut)
         dlg.Show()
 
     def openComPort(self):
+        """
+        Open Serial COM Port Connection.
+
+        Initializes and opens the configured serial port
+        using DUT communication settings.
+
+        Updates:
+            self.port_flg → Connection status flag.
+        """
         self.name = list(self.sut.keys())[0]
         self.dutn = self.sut[self.name]
         self.itype = self.dutn["interface"]
@@ -305,6 +443,20 @@ class DutLogWindow(wx.Window):
             self.port_flg = False
 
     def OnSutConnect(self, e):
+        """
+        Handle DUT Connect / Disconnect Action.
+
+        Establishes or terminates serial communication
+        with the DUT.
+
+        Starts/stops:
+            • DUT worker thread
+            • Queue monitoring thread
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         if(not self.con_flg):
             self.openComPort()
             if(self.port_flg):
@@ -325,10 +477,28 @@ class DutLogWindow(wx.Window):
             self.mythread.stop()
 
     def OnSutClear(self, e):
+        """
+        Clear Log Display.
+
+        Removes all text from the log window and resets
+        line counters.
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         self.scb.SetValue('')
         self.totline = 0
 
     def com_port_stopped(self):
+        """
+        Handle COM Port Disconnection Event.
+
+        Attempts to reopen the serial port and restart
+        DUT monitoring threads.
+
+        Updates connection state and UI labels accordingly.
+        """
         self.mySut.stop()
         self.openComPort()
         if(self.port_flg):
@@ -343,19 +513,41 @@ class DutLogWindow(wx.Window):
             self.con_flg = False
 
     def OnSutSave(self, e):
+        """
+        Save Log Content to File.
+
+        Exports the current log display content to a text file.
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         content = self.scb.GetValue()
         self.top.save_file(content, "*.txt")
         
     def OnSutclose(self, e):
+        """
+        Close DUT Log Window.
+
+        Sends a close request to the parent application
+        to remove this DUT monitoring panel.
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         self.top.request_dut_close(list(self.sut.keys())[0])
-        # self.parent.update_slog_panel_after_close(self)
-        # self.Destroy()
-        # self.parent.update_slog_panel_after_close(self)
-        # self.Destroy()
 
     def updateDisplay(self, msg):
         """
-        Receives data from thread and updates the display
+        Update Log Display from Thread Events.
+
+        Receives DUT log data from worker thread events
+        and appends it to the display window.
+
+        Args:
+            msg (ResultEvent):
+                Event containing DUT log data.
         """
         self.totline += 1
         t = msg.data

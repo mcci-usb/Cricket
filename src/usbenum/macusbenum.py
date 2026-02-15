@@ -1,41 +1,70 @@
-# macos_usbenum.py
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: macusbenum.py
 #
 # Description:
-#     This module provides a class for scanning the USB bus on mac systems
-#     and retrieving the list of attached devices.
+#     macOS USB Enumeration module.
+#     Provides functionality to scan the USB bus on macOS systems
+#     and retrieve the list of connected USB 3.x and USB4/Thunderbolt
+#     devices with topology and speed details.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-################################################################################
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
 
-import copy
-import json
+# Built-in imports
 import os
+import json
+import copy
+import xml.dom.minidom
 
-# from usbenumall import USBDeviceEnumerator
-from . import usbenumall
-
-# USB modules
+# Lib imports
 import usb.util
 from usb.backend import libusb1
 
-import xml.dom.minidom
+# Own modules
+from . import usbenumall
 
 
 speed_tag = ['receptacle_1_tag', 'receptacle_2_tag', 'receptacle_3_tag', 'receptacle_4_tag']
 swuid_tag = 'switch_uid_key'
 tbdata_tag = 'SPThunderboltDataType'
 
+##############################################################################
+# Utilities
+##############################################################################
 class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
-    
+    """
+    Summary:
+        macOS USB Device Enumerator.
+
+    Longer Description:
+        Enumerates USB devices connected to macOS systems.
+        Supports USB 3.x and USB4/Thunderbolt device scanning,
+        classification, and topology extraction.
+
+    Attributes:
+        usb_type_dict: Dictionary storing count of USB device types.
+        usb_list: List of enumerated USB3 devices.
+        usb4tb_json: Raw Thunderbolt JSON data.
+        usb4tb_dict: Parsed Thunderbolt device list.
+    """
     def __init__(self):
+        """
+        Initialize macOS USB Device Enumerator.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.usb_type_dict = {}
         self.usb_list = []
 
@@ -43,14 +72,32 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
         self.usb4tb_dict = {}
         
     def set_login_credentials(self, uname, pwd):
+        """
+        Set login credentials.
+
+        Description:
+            Placeholder method for compatibility with other
+            OS enumerators that require authentication.
+
+        Args:
+            uname: Username.
+            pwd: Password.
+
+        Returns:
+            None
+        """
         pass
         
     def enumerate_usb_devices(self):
         """
-        Enumerate both USB 3.0 and USB4 and USB4TB devices.
+        Enumerate USB devices.
 
-        This method calls specific methods to enumerate USB 3.0 and USB4TB devices,
-        categorizing them into different types.
+        Description:
+            Initiates enumeration of both USB3 and
+            USB4/Thunderbolt devices.
+
+        Args:
+            None
 
         Returns:
             None
@@ -61,23 +108,38 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
     def get_result(self):
         """
-        Get the results of USB4 speed scanning.
+        Get enumeration results.
+
+        Description:
+            Returns collected USB enumeration data.
+
+        Args:
+            None
 
         Returns:
-            tuple: A tuple containing the lists of added USB4 devices (`u4added`) and all USB4 devices (`u4all`).
-
+            dict:
+                Dictionary containing USB3 and USB4
+                enumeration results.
         """
 
-        return {"usb3type": self.usb_type_dict, "usb3list": self.usb_list, "usb4tbjson": self.usb4tb_json, "usb4tblist": self.usb4tb_dict}
+        return {"usb3type": self.usb_type_dict, 
+                "usb3list": self.usb_list, 
+                "usb4tbjson": self.usb4tb_json, 
+                "usb4tblist": self.usb4tb_dict
+            }
 
-        
     def enumerate_usb3_devices(self):
         """
-        Enumerate USB 3.0 devices and categorize them into Host controllers, Hubs, and Peripherals.
+        Enumerate USB3 devices.
 
-        This method uses the `usb.core.find` function to find all connected USB devices.
-        It categorizes the devices based on their class and port number into Host controllers,
-        Hubs, and Peripherals. The information is stored in separate lists.
+        Description:
+            Scans and categorizes USB3 devices into:
+            - Host Controllers
+            - Hubs
+            - Peripherals
+
+        Args:
+            None
 
         Returns:
             None
@@ -189,15 +251,17 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
         self.usb_list = copy.deepcopy(master_list)
 
-
-
     # Enumerate USB4 TB devices
     def enumerate_usb4tb_devices(self):
         """
-        Enumerate USB4TB devices using system_profiler command.
+        Enumerate USB4 / Thunderbolt devices.
 
-        This method uses the `system_profiler` command to gather information about Thunderbolt devices
-        and then processes the information to create a list of USB4TB devices.
+        Description:
+            Uses macOS `system_profiler` command to gather
+            Thunderbolt topology and device information.
+
+        Args:
+            None
 
         Returns:
             None
@@ -226,15 +290,17 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
     def handleBusTree(self, gbus, tblist):
         """
-        Recursively handle the Thunderbolt bus tree and extract information about connected devices.
+        Process Thunderbolt bus tree.
 
-        This method takes a Thunderbolt bus (`gbus`) and a list (`tblist`) to store information about
-        connected devices. It recursively grabs data from the bus and continues the process until there
-        are no more child devices.
+        Description:
+            Recursively traverses Thunderbolt bus hierarchy
+            and extracts connected device information.
 
         Args:
-            gbus: The Thunderbolt bus to handle.
-            tblist (list): The list to store information about connected devices.
+            gbus:
+                Thunderbolt bus data.
+            tblist (list):
+                List storing parsed device details.
 
         Returns:
             None
@@ -253,18 +319,21 @@ class MacOSUSBDeviceEnumerator(usbenumall.USBDeviceEnumerator):
 
     def grabData(self, gbus, finalList):
         """
-        Extract data from a Thunderbolt bus and add it to the final list.
+        Extract Thunderbolt device data.
 
-        This method takes a Thunderbolt bus (`gbus`) and a list (`finalList`) to store information about
-        connected devices. It extracts relevant data from the bus and adds it to the list.
+        Description:
+            Parses bus node information and appends
+            formatted device details into final list.
 
         Args:
-            gbus: The Thunderbolt bus from which to extract data.
-            finalList (list): The list to store information about connected devices.
+            gbus:
+                Thunderbolt bus node.
+            finalList (list):
+                Destination list for parsed data.
 
         Returns:
-            list or None: If data is extracted, returns a list containing the extracted information.
-                        If no data is found, returns None.
+            list | None:
+                Child device list if available.
         """
         childs = None
         if swuid_tag in gbus:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: autoWindow.py
@@ -6,11 +7,11 @@
 #     autoWindow for Switch Model 3201, 3141, 2101, 2301
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#     V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 # Lib imports
 import wx
@@ -22,9 +23,6 @@ from wx.lib.scrolledpanel import ScrolledPanel
 # import re
 
 import configdata
-##############################################################################
-# Utilities
-##############################################################################
 
 MODEL_PORT_MAP = {
     "3141": ["p1", "p2"],
@@ -34,9 +32,57 @@ MODEL_PORT_MAP = {
     "2301": ["p1", "p2", "p3", "p4"],
 }
 
-
+##############################################################################
+# Utilities
+##############################################################################
 class BatchWindow(wx.Window):
+    """
+    Batch Execution Window.
+
+    Description:
+        Provides a graphical interface to execute batch scripts
+        for automated switch and port control operations.
+
+        This window enables users to run predefined macro commands
+        that control device switching, port toggling, serial
+        communication, delays, and repeat sequences.
+        Inheritance:
+        wx.Window → Provides GUI container functionality.
+    """
     def __init__(self, parent, top):
+        """
+        Initialize Batch Execution Window.
+
+        Detailed Description:
+            This constructor initializes the BatchWindow UI container
+            and prepares internal execution states, opcode mappings,
+            and command decoding handlers required for batch script
+            processing.
+
+            It sets up:
+
+                • Parent UI reference
+                • Top controller reference
+                • Batch execution flags
+                • Opcode parser mappings
+                • Execution decoder mappings
+                Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            parent:
+                Parent UI container that owns this window.
+
+            top:
+                Main controller reference used for device control,
+                logging, and command execution.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         wx.Window.__init__(self, parent)
         # SET BACKGROUND COLOUR TO White
         self.SetBackgroundColour("White")
@@ -140,9 +186,65 @@ class BatchWindow(wx.Window):
         pass
 
     def setSwPath(self, inpath):
+        """
+        Set Switch Path for Batch Execution.
+
+        Detailed Description:
+            This function stores the switch path identifier parsed
+            from the batch script and assigns it to the current
+            execution context.
+
+            The switch path is used in subsequent batch operations
+            such as port control, switching actions, and device
+            routing.
+
+            It acts as the active target switch reference for all
+            upcoming commands within the batch execution cycle.
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            inpath:
+                Switch path identifier parsed from the batch script.
+                Typically represents the switch device key or route.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.swpath = inpath
 
     def doPortON(self, portNo):
+        """
+        Execute Port ON Operation.
+
+        Detailed Description:
+            This function triggers a port ON command on the selected
+            switch device during batch execution.
+
+            It uses the previously configured switch path and sends
+            a control command to enable (turn ON) the specified port.
+
+            The command is forwarded to the top controller, which
+            communicates with the physical switch hardware.
+            Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            portNo:
+                Port number to be turned ON.
+                Expected to be an integer representing the physical
+                port index on the switch device.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.top.port_on(self.swpath, portNo, True)
     
     def setSpeed(self, inspeed):
@@ -167,6 +269,36 @@ class BatchWindow(wx.Window):
         self.top.print_on_log("Delay: "+str(indelay)+"\n")
 
     def executeOthers(self, incmd):
+        """
+        Execute Generic Read Operations from Batch Script.
+
+        Detailed Description:
+            This function processes and executes generic READ commands
+            parsed from the batch script during batch execution.
+
+            It logs the read request into the DUT / Switch log window
+            and routes the command to the appropriate handler based
+            on the command type.
+            Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            incmd:
+                Incoming read command string parsed from the
+                batch script.
+
+                Examples:
+                    "USB"
+                    "VBUS"
+                    "Current"
+                    "Voltage"
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.top.print_on_log("Read: "+incmd+"\n")
         if incmd == "USB":
             self.top.get_usb_tree()
@@ -174,6 +306,58 @@ class BatchWindow(wx.Window):
             self.top.read_param(self.swpath, incmd)
 
     def executeSerial(self, incmd):
+        """
+        Execute Serial Communication Commands from Batch Script.
+
+        Detailed Description:
+            This function processes serial communication instructions
+            parsed from the batch execution script and routes them to
+            the appropriate serial interface handlers.
+
+            The incoming command dictionary contains a single key
+            representing the serial operation type along with its
+            associated parameters.
+
+            Supported serial operations include:
+
+            • open
+                Opens the configured serial COM port using the
+                provided serial settings.
+
+            • write
+                Sends data to the serial device over the active
+                COM port connection.
+
+            • read
+                Reads data from the serial device and validates
+                the response.
+
+                Based on the validation result:
+                    - Pass counter is incremented on success.
+                    - Fail counter is incremented on mismatch.
+
+            This mechanism is primarily used for automated DUT
+            communication validation during batch execution.
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            incmd:
+                Dictionary containing serial command and parameters.
+
+                Example formats:
+
+                    {"open":  {"port": "COM3", "baud": 9600}}
+                    {"write": "AT+RST"}
+                    {"read":  "OK"}
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         skey = list(incmd.keys())[0]
         #   self.top.print_on_log("Serial: "+incmd+"\n")
         if skey == "open":
@@ -197,6 +381,36 @@ class BatchWindow(wx.Window):
         self.top.print_on_log("Repeat\n")
         
     def InitSeqBox(self):
+        """
+        Initialize Batch Sequence Script Editor UI.
+
+        Detailed Description:
+            This function creates and configures the multi-line text
+            control used for entering batch execution scripts.
+
+            The sequence editor allows users to define automated
+            switch and DUT operation commands such as:
+
+            • Model / Port selection
+            • Delay intervals
+            • Repeat cycle count
+
+            A default template script is preloaded into the editor
+            to guide users in writing valid batch sequences.
+
+            The initialized text control is then added to the
+            parent sequence layout container.
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
 
         self.tc_seq = wx.TextCtrl(
             self,
@@ -205,13 +419,6 @@ class BatchWindow(wx.Window):
             size=(400,250)
         )
 
-        # ---- New Default Model Template ----
-        # default_script = (
-        #     "model = 3141\n"
-        #     "delay = 1000\n"
-        #     "repeat = 10\n"
-        # )
-        
         default_script = (
             "model = 3141, p1\n"
             "delay = 1000\n"
@@ -227,7 +434,48 @@ class BatchWindow(wx.Window):
 
 
     def InitBotHbox(self):
-        
+        """
+        Initialize Batch Control Button Layout.
+
+        Detailed Description:
+            This function creates and arranges the bottom control
+            buttons used for batch script operations within the
+            Batch Window interface.
+
+            The control section provides user actions to manage
+            batch execution workflows including:
+
+            • Script generation
+            • Script revert/reset
+            • Batch execution start
+            • Script saving
+
+            Buttons are aligned horizontally using a box sizer
+            layout to maintain consistent UI spacing and alignment.
+
+            Event bindings are also configured to connect each
+            button with its respective handler function.
+
+        Buttons Created:
+            Generate Script :
+                Builds or auto-generates batch command scripts.
+
+            Revert :
+                Restores the script editor to its previous/default state.
+
+            Start :
+                Initiates batch execution sequence.
+
+            Save :
+                Saves the current batch script to file/storage.
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+        Returns:
+            None
+        """
         self.btn_generate = wx.Button(self, -1, "Generate Script", size=(100,25))
         self.btn_revert = wx.Button(self, -1, "Revert", size=(70,25))
         self.btn_start = wx.Button(self, -1, "Start", size=(60,25))
@@ -252,22 +500,65 @@ class BatchWindow(wx.Window):
         self.btn_start.Disable()
     
     def OnGenerateScript(self, event):
+        """
+        Generate Batch Script from User Input.
 
+        Detailed Description:
+            This function parses the user-entered batch configuration
+            script from the sequence text control and automatically
+            generates a fully structured execution script.
+
+            The generated script includes:
+
+                • Switch mapping definitions
+                • Port switching sequence
+                • Delay intervals
+                • Repeat execution block
+
+            It validates user inputs such as model names and port
+            selections before script generation to ensure compatibility
+            with supported hardware configurations.
+
+        Processing Flow:
+            1. Read raw script text from the editor.
+            2. Parse configuration parameters:
+                - Model(s)
+                - Port(s)
+                - Delay
+                - Repeat count
+            3. Validate model support using MODEL_PORT_MAP.
+            4. Validate selected ports (if provided).
+            5. Auto-generate formatted batch script.
+            6. Load generated script back into editor.
+            7. Enable batch execution (Start button).
+
+        Supported Input Format Example:
+            model = 3141, p1, p2
+            delay = 1000
+            repeat = 10
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            event:
+                wxPython button click event triggered when
+                the "Generate Script" button is pressed.
+
+        Returns:
+            None
+        """
         text = self.tc_seq.GetValue()
 
         models = {}   # ← model : [ports]
         delay = 1000
         repeat = 1
 
-        # ---- Parse ----
         for line in text.splitlines():
 
             if "=" not in line:
                 continue
-
             key, value = [x.strip() for x in line.split("=")]
-
-            # ---------------- MODEL PARSE ----------------
             if key.lower() == "model":
 
                 parts = value.replace(" ", "").split(",")
@@ -280,11 +571,8 @@ class BatchWindow(wx.Window):
 
                 models[model] = ports
 
-            # ---------------- DELAY ----------------
             elif key.lower() == "delay":
                 delay = int(value)
-
-            # ---------------- REPEAT ----------------
             elif key.lower() == "repeat":
                 repeat = int(value)
 
@@ -296,9 +584,7 @@ class BatchWindow(wx.Window):
                 wx.OK | wx.ICON_ERROR
             )
             return
-
         script = ""
-
         # ---- Switch Mapping ----
         for model in models:
 
@@ -353,6 +639,56 @@ class BatchWindow(wx.Window):
         self.btn_start.Enable()
 
     def OnRevertScript(self, event):
+        """
+        Revert Generated Batch Script to Simple Template Format.
+
+        Detailed Description:
+            This function converts an auto-generated batch execution
+            script back into a simplified user-editable template.
+
+            It is primarily used when users want to modify parameters
+            such as:
+
+                • Model number
+                • Selected port
+                • Delay interval
+                • Repeat count
+
+            The function performs pattern extraction from the generated
+            script and rebuilds a minimal configuration script.
+
+        Processing Flow:
+            1. Read the current script from the editor.
+            2. Check whether the script is already in simple format.
+            3. If simple → reload default template.
+            4. If generated → extract:
+                • Model ID
+                • Delay value
+                • Repeat count
+                • First active port
+            5. Rebuild simplified script.
+            6. Load template back into editor.
+
+        Default Template Format:
+            model = 3141, p1
+            delay = 1000
+            repeat = 10
+
+        Args:
+            self:
+                Reference to the current BatchWindow instance.
+
+            event:
+                wxPython button click event triggered when
+                the "Revert" button is pressed.
+
+        Returns:
+            None
+
+        Raises:
+            None
+                Parsing failures fall back to default values.
+        """
         text = self.tc_seq.GetValue()
         # ---- If already simple → reload template ----
         if "switch my" not in text:
@@ -418,7 +754,26 @@ class BatchWindow(wx.Window):
     
     def StopBatch(self):
         """
-        Stop Batch Mode.
+        Stop Batch Execution Mode.
+
+        Detailed Description:
+            This function terminates the currently running Batch Mode
+            execution process.
+
+            It performs the following operations:
+
+                • Resets the internal batch execution flag.
+                • Updates the Start/Stop button label back to "Start".
+                • Switches the application operating mode to Manual.
+                Args:
+        self:
+            Reference to the current BatchWindow instance.
+
+        Returns:
+            None
+
+        Raises:
+            None
         """
         self.batch_flg = False
         # The Lablel to set name as Auto
@@ -427,6 +782,41 @@ class BatchWindow(wx.Window):
         self.top.set_mode(MODE_MANUAL)
 
     def check_each_sw(self, swseq):
+        """
+        Validate and extract Switch Sequence Parameters.
+
+        Detailed Description:
+            This function parses each switch operation entry from the
+            provided switch sequence list and categorizes the commands
+            based on operation type.
+
+            It inspects every item in the sequence and identifies whether
+            the operation corresponds to:
+
+                • Port switching command
+                • Delay execution command
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            swseq (list of dict) :
+                Parsed switch execution sequence containing
+                port and delay command dictionaries.
+
+                Example:
+                    [
+                        {'port': 'p1'},
+                        {'delay': 1000},
+                        {'port': 'p0'}
+                    ]
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
+        
         dlist = []
         klist = []
         plist = []
@@ -459,6 +849,38 @@ class BatchWindow(wx.Window):
         return {"result": "success"}
 
     def checkSafeSwitching(self):
+        """
+        Validate Safe Port Switching Sequence in Batch Execution.
+
+        Detailed Description:
+            This function verifies whether the generated or user-defined
+            batch switching sequence follows safe device switching rules.
+
+            It performs multi-stage validation to ensure that:
+
+                • Only relevant switching commands are processed.
+                • Consecutive delay commands are merged.
+                • Switching sequences are grouped per device.
+                • Port ON/OFF timing is validated for safety compliance.
+
+            The primary objective is to prevent unsafe switching patterns
+            that could damage connected DUT devices.
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+        Returns:
+            bool :
+
+                True  →
+                    Safe to proceed with batch execution
+                    OR user overrides warning.
+
+                False →
+                    Unsafe switching detected and user
+                    chose to abort execution.
+        """
         # Filterout switch, port, delay
         mykilist = ["switch", "port", "delay"]
         mynewlist = []
@@ -522,9 +944,32 @@ class BatchWindow(wx.Window):
     
     def StartBatch(self):
         """
-        Start batch mode.
-        """
+        Initialize and Execute Batch Mode Sequence.
 
+        Detailed Description:
+            This function is responsible for starting the Batch Execution Mode.
+
+            It performs complete initialization, parsing, validation,
+            safety verification, and execution of the batch script
+            entered by the user.
+
+            The batch execution workflow includes:
+
+                • Resetting previous batch states
+                • Parsing batch script sequence
+                • Validating switch mapping
+                • Performing safety switching checks
+                • Creating batch execution UI panel
+                • Running the batch sequence
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+        Returns:
+            None
+
+        """
         self.mappedSw = {}
         self.reqSw = {}
         self.main_flg = False
@@ -582,8 +1027,26 @@ class BatchWindow(wx.Window):
 
     def runBatchSeq(self):
         """
-        Run batch mode
+        Start Batch Sequence Execution.
+
+        Detailed Description:
+            This function initializes and starts the batch execution engine.
+
+            It prepares runtime counters, resets execution indexes,
+            prints batch start logs, and activates the execution timer
+            to begin processing the batch sequence.
+        
+        Args:
+        self :
+            Reference to the current BatchWindow instance.
+
+        Returns:
+            None
+
+        Raises:
+            None
         """
+
         self.batch_flg = True
         self.btn_start.SetLabel("Stop")
 
@@ -643,10 +1106,29 @@ class BatchWindow(wx.Window):
 
     def executeBatchSeq(self):
         """
-        Executing the Batch script sequence.
-    
+        Execute Parsed Batch Script Sequence.
 
-        """
+        Detailed Description:
+            This function initializes the execution parameters required
+            to start processing the parsed batch script.
+
+            It prepares runtime counters, validates repeat count,
+            resets the sequence index pointer, and calculates the
+            total number of commands available in the final sequence.
+
+        Execution Responsibilities:
+
+            • Reset completed cycle counter
+            • Validate repeat count (minimum = 1)
+            • Initialize sequence index pointer
+            • Calculate total sequence length
+            Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            Returns:
+                None
+            """
         self.done = 0
         if self.repeat == 0:
             self.repeat = 1
@@ -656,20 +1138,89 @@ class BatchWindow(wx.Window):
         
     def SaveBatch(self, event):
         """
-        Save batch script.
+        Save Batch Script Content.
+
+        Detailed Description:
+            This function retrieves the batch script content
+            from the sequence text control and saves it
+            into a text file using the batch save handler.
+
+        Execution Responsibilities:
+
+            • Read batch script from UI text control
+            • Invoke save handler with file filter
+            • Store script as a .txt file
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            event :
+                Button click event triggering the save action.
+
+        Returns:
+            None
         """
         content = self.tc_seq.GetValue()
         self.save_batch(content, "*.txt")
 
     def updateBatchLocation(self, pathname):
         """
-        Update batch mode  script location path.
+        Update Batch Script Location Path.
+
+        Detailed Description:
+            This function updates the stored batch script
+            file location path in the application configuration.
+
+            It ensures the latest selected batch script
+            directory or file path is saved for future access.
+
+        Execution Responsibilities:
+
+            • Receive batch script path input
+            • Update configuration storage
+            • Maintain last used batch location reference
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            pathname :
+                Absolute path of the selected batch script file
+                or directory location.
+
+        Returns:
+            None
         """
         configdata.updt_batch_location(pathname)
 
     def LoadBatch(self, event):
         """
-        Loading the Batch mode from local path.
+        Load Batch Script From Local Path.
+
+        Detailed Description:
+            This function handles loading an existing batch
+            script file from the user’s local system.
+
+            It opens the file selection dialog, retrieves the
+            selected batch script path, and updates the stored
+            batch location for future reference.
+
+        Execution Responsibilities:
+
+            • Open batch file selection dialog
+            • Retrieve selected file path
+            • Update batch script location in configuration
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            event :
+                Event object triggered by Load button action.
+
+        Returns:
+            None
         """
         pathname = self.load_file()
         self.updateBatchLocation(pathname)
@@ -677,7 +1228,32 @@ class BatchWindow(wx.Window):
 
     def load_last_file(self):
         """
-        Loading the last file of batch mode file.
+        Load Last Used Batch Script File.
+
+        Detailed Description:
+            This function loads the previously used batch
+            script file from the stored batch location.
+
+            It validates the saved file path, reads the script
+            content, and populates the batch sequence editor.
+            If the file is unavailable or invalid, execution
+            controls are disabled.
+
+        Execution Responsibilities:
+
+            • Validate stored batch file path
+            • Clear existing batch editor content
+            • Reset parsed sequence data
+            • Read and load script into editor
+            • Enable batch execution if load succeeds
+            • Handle file access errors safely
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+        Returns:
+            None
         """
         if self.bloc == None:
             self.btn_start.Disable()
@@ -781,7 +1357,37 @@ class BatchWindow(wx.Window):
     
     def parseSwMacro(self, oclist):
         """
-        Parse the serial script
+        Parse Switch Mapping Macro from Batch Script.
+
+        Detailed Description:
+            This function parses the switch mapping definition
+            from the batch script sequence.
+
+            It extracts the switch alias, communication path,
+            and switch model type from the tokenized command list.
+            The parsed mapping is validated against the supported
+            device model list before registering it for execution.
+
+        Execution Responsibilities:
+
+            • Extract switch communication path
+            • Extract switch model type
+            • Validate mapping syntax ('=' operator)
+            • Verify supported device model
+            • Store alias → COM path mapping
+            • Register required switch model list
+            • Log parsing errors if validation fails
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            oclist :
+                Tokenized command list containing switch
+                mapping elements parsed from script.
+
+        Returns:
+            None
         """
         devlist = ["3141","3142", "3201", "2301", "2101"]
         
@@ -801,7 +1407,27 @@ class BatchWindow(wx.Window):
         
     def parseDelay(self, indata):
         """
-        Parsing the delay.
+        Parse Delay Command from Batch Script.
+
+        Detailed Description:
+            This function parses the delay instruction defined
+            inside the batch script main execution block.
+
+            It validates whether the parser is currently inside
+            the 'main' execution section. If valid, it extracts
+            the delay value (in milliseconds), converts it into
+            integer format, and appends it to the final execution
+            sequence list.
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            indata :
+                Tokenized delay command list parsed
+                from the batch script.
+
+        Returns:
+            None
         """
         if self.main_flg == True:
             try:
@@ -817,7 +1443,32 @@ class BatchWindow(wx.Window):
     
     def parsePort(self, indata):
         """
-        Parsing the port.
+        Parse Port Command from Batch Script.
+
+        Detailed Description:
+            This function parses the port switching instruction
+            defined inside the batch script main execution block.
+
+            It extracts the switch identifier, port number, and
+            optional speed parameter from the parsed command tokens.
+
+            The function validates whether the referenced switch
+            is already mapped. If mapping is missing or syntax is
+            invalid, it raises a parsing error and stops execution.
+
+            When valid, the function appends the corresponding
+            switch path, optional speed, and port number into the
+            final execution sequence list.
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            indata :
+                Tokenized port command list parsed
+                from the batch script.
+
+        Returns:
+            None
         """
 
         if self.main_flg == True:
@@ -885,10 +1536,32 @@ class BatchWindow(wx.Window):
         else:
             pass
 
-
     def parseRead(self, indata):
         """
-        Parsing the read of voltage and current.
+        Parse Read Command from Batch Script.
+
+        Detailed Description:
+            This function parses the read instruction defined
+            in the batch script. It validates whether the
+            requested read parameter is supported and, if valid,
+            appends it to the final execution sequence.
+
+        Execution Responsibilities:
+
+            • Validate read parameter support
+            • Accept voltage / current / USB commands
+            • Append read operation to final sequence list
+
+        Args:
+            self :
+                Reference to the current BatchWindow instance.
+
+            indata :
+                Tokenized read command list parsed
+                from the batch script.
+
+        Returns:
+            None
         """
         rdlist = ["voltage", "current", "USB", ]
         try:
@@ -902,7 +1575,8 @@ class BatchWindow(wx.Window):
         Parse serial commands and add them to the batch sequence.
 
         Description:
-            - Check if the second element in indata is one of the allowed values ("open", "write", "read").
+            - Check if the second element in indata is one of the 
+              allowed values ("open", "write", "read").
             - If yes, extract the serial settings from the third element in indata.
             - Replace double quotes from the serial settings.
             - Add the serial command to the batch sequence.

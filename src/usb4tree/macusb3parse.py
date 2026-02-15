@@ -1,31 +1,68 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: Macusb3parse.py
 #
 # Description:
-#     parsing the USB3 Tree view data in Mac 
+#     This module provides parsing utilities for USB 3.0 topology
+#     data on macOS systems.
+#
+#     It converts enumerated USB3 device information into structured
+#     hierarchy buffers that can be rendered in Tree View UI
+#     components.
 #
 # Author:
-#     Vinay N, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+##############################################################################
+# Utilities
 ##############################################################################
 class MacUsb3TreeParse():
+    """
+    macOS USB 3.0 Tree Parser.
+
+    Description:
+        Parses USB 3.0 enumeration data and converts it into
+        structured tree buffers for UI visualization.
+
+        The parser generates:
+
+            • Indexed device data (idata)
+            • Level-wise hierarchy mapping (ldata)
+
+    Attributes:
+        idata (dict):
+            Parsed USB3 device dictionary.
+
+        ldata (dict):
+            Hierarchy level mapping dictionary.
+    """
     def __init__(self):
         self.idata = None
         self.ldata = None
     
     def parse_usb3tb_data(self, usb3data):
         """
-        Parse USB4TB data and organize it into internal data structures.
+        Parse USB 3.0 topology data.
 
-        This method takes USB4TB data and organizes it into internal data structures
-        for easier access and manipulation.
+        Description:
+            Converts raw USB3 enumeration output into structured
+            internal buffers for Tree View rendering.
+
+            Processing steps:
+
+                1. Parse device list
+                2. Build indexed dictionary
+                3. Generate hierarchy levels
 
         Args:
-            usb4data (dict): USB4TB data to be parsed.
+            usb3data (list):
+                List of USB3 device dictionaries.
 
         Returns:
             None
@@ -33,23 +70,30 @@ class MacUsb3TreeParse():
         
         self.idata = self.get_item_data(usb3data)
         self.ldata = self.get_level_data(self.idata)
-        # if self.idata is not None:
-        #     self.ldata = self.get_level_data(self.idata)
-        # else:
-        #     print("Error: idata is None")
+        
 
     def get_item_data(self, msg):
         """
-        Parse USB 3.0 data from a list of dictionaries containing USB device information.
+        Extract USB 3.0 device information.
+
+        Description:
+            Parses a list of USB3 device dictionaries and
+            converts them into indexed device records.
+
+            Each device key is generated using:
+
+                vid,pid,bus,speed
 
         Args:
-            msg (list): A list of dictionaries containing USB device information.
+            msg (list):
+                USB3 enumeration list.
 
         Returns:
-            dict: A dictionary containing parsed USB 3.0 data with keys formatted as 'vid,pid,bus,speed'.
-                Each value is a dictionary containing details such as type, vid, pid, bus, speed, ifc,
-                and optionally mport and port if available.
-            None: If the input 'msg' is not a list or if there are missing required fields in any item.
+            dict:
+                Parsed USB3 device dictionary.
+
+            None:
+                If input is invalid.
         """
         if not isinstance(msg, list):
             print("Error: usb3data is not a list")
@@ -92,16 +136,28 @@ class MacUsb3TreeParse():
 
     def get_level_data(self, u3tbuf):
         """
-        Organize USB 3.0 data into levels based on the count of comma-separated keys.
+        Generate hierarchy level mapping.
+
+        Description:
+            Organizes USB3 device keys into hierarchy levels
+            based on comma depth in index keys.
+
+            Example key:
+
+                "32903,2880,2,5"
+
+            Comma count determines level grouping.
 
         Args:
-            u3tbuf (dict): A dictionary containing USB 3.0 data where keys are formatted as 'vid,pid,bus,speed'.
+            u3tbuf (dict):
+                Indexed USB3 device dictionary.
 
         Returns:
-            dict: A dictionary organizing USB 3.0 data into levels based on the count of comma-separated keys.
-                Keys are formatted as 'levelX' where X is the count of commas in the keys of u3tbuf.
-                Values are lists containing keys from u3tbuf that match the respective level.
-            None: If the input 'u3tbuf' is not a dictionary.
+            dict:
+                Level-wise hierarchy mapping.
+
+            None:
+                If input is invalid.
         """
         if not isinstance(u3tbuf, dict):
             print("Error: u3tbuf is not a dictionary")
@@ -116,12 +172,3 @@ class MacUsb3TreeParse():
             else:
                 pdict['level'+str(lcnt)] = [rkitem]
         return pdict
-
-# # Sample USB3 data
-# usb3_data = [{'type': 'usb3', 'vid': '32903', 'pid': '2880', 'bus': '2', 'speed': 5, 'ifc': [9]}, {'type': 'usb3', 'vid': '7516', 'pid': '22529', 'bus': '1', 'speed': 3, 'ifc': [9]}, {'type': 'usb3', 'vid': '5967', 'pid': '9317', 'bus': '1', 'mport': '(7,)', 'port': '7', 'speed': 3, 'ifc': [14, 14, 254]}, {'type': 'usb3', 'vid': '1121', 'pid': '20052', 'bus': '1', 'mport': '(3,)', 'port': '3', 'speed': 1, 'ifc': [3]}, {'type': 'usb3', 'vid': '32903', 'pid': '38', 'bus': '1', 'mport': '(10,)', 'port': '10', 'speed': 2, 'ifc': [224, 224]}, {'type': 'usb3', 'vid': '7825', 'pid': '56897', 'bus': '1', 'mport': '(1, 5)', 'port': '5', 'speed': 2, 'ifc': [17, 255]}, {'type': 'usb3', 'vid': '1118', 'pid': '1606', 'bus': '1', 'mport': '(9,)', 'port': '9', 'speed': 2, 'ifc': [2, 10]}, {'type': 'usb3', 'vid': '1267', 'pid': '3147', 'bus': '1', 'mport': '(6,)', 'port': '6', 'speed': 2, 'ifc': [255]}]
-
-# # Creating an instance of the parser
-# usb_parser = WinUsb3TreeParse()
-
-# # Parsing USB3 data
-# usb_parser.parse_usb3tb_data(usb3_data)

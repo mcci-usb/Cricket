@@ -1,250 +1,314 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: thServer.py
 #
 # Description:
-#     Server socket module, which listens for the client
-#     Based on the command from Clinet, control device which is connected
-#     Send the response back to Clinet in JSON format (JSON Object)
+#     Server socket module which listens for client connections.
+#     Based on commands received from the client, controls connected
+#     devices and sends responses back in JSON format.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
-# Built-in imports
 
+# Built-in imports
 import socket
 import threading
 import time
-import wx
 import json
-import usbChange
 
+# Lib imports
+import wx
+
+# Own modules
+import usbChange
 from uiGlobals import *
 
-keywords = {'Python',
-            'wxpython',
-            'SocketProgramming'
-            }
+##############################################################################
+# Global Keywords
+##############################################################################
+
+keywords = {
+    "Python",
+    "wxpython",
+    "SocketProgramming"
+}
+
+##############################################################################
+# Server Event
+##############################################################################
 
 class ServerEvent(wx.PyEvent):
     """
-    A class ServerEvent with init method
-    wxWindow is the base class for all windows and 
-    represents any visible object on screen.
+    Custom wx event used to pass server data
+    to the UI thread safely.
+
+    Attributes:
+        data: Event payload information.
     """
+
     def __init__(self, data):
-        
         """
-        here the server sets the event type. 
+        Initialize server event.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            data: creates an object
+            self: Reference to current instance.
+            data: Data payload for the event.
+
         Returns:
             None
+
+        Raises:
+            None
         """
-        """Init Result Event."""
         wx.PyEvent.__init__(self)
         self.SetEventType(EVT_RESULT_ID)
         self.data = data
-        
+
+##############################################################################
+# Server Host Controller
+##############################################################################
 
 class ServerHc:
     """
-    A class ServerHc with init method
-    wxWindow is the base class for all windows and 
-    represents any visible object on screen.
+    Host controller server socket manager.
+
+    Handles socket creation, binding,
+    listening, and connection tracking.
     """
-    def __init__(self, host='', port: int = 5567):
+
+    def __init__(self, host="", port: int = 5567):
         """
-        here the server sets Ip address, port. 
+        Initialize server socket.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            host: host ip address ipaddress 
-            port : port number of that particular ipaddress.
+            self: Reference to current instance.
+            host: Host IP address.
+            port: Port number.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self.IP = ""
         self.PORT = port
-        self.ADDR = ((self.IP, self.PORT))
+        self.ADDR = (self.IP, self.PORT)
+
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         try:
             self.socket.bind((host, port))
             self.socket.listen(5)
-        except:
+        except Exception:
             print("Server Init failed")
-       
-        self.bind_addr = host + ':' + str(port)
+
+        self.bind_addr = host + ":" + str(port)
         self.conn_socket = None
         self.addr = None
 
     def close(self):
         """
-        Close the server connection
+        Close the server socket.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
+            self: Reference to current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self.socket.close()
-        
 
+##############################################################################
+# Connection Accept Thread
+##############################################################################
 class StayAccept(threading.Thread):
     """
-    A class StayAccept with init method
-    wxWindow is the base class for all windows and 
-    represents any visible object on screen.
+    Thread that continuously accepts
+    incoming client connections.
     """
+
     def __init__(self, parent):
         """
-        here the server is wait the connection. 
+        Initialize accept thread.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
+            self: Reference to current instance.
+            parent: Parent UI window.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         super(StayAccept, self).__init__()
         self.window = parent
         self.wait = True
         self.rs = None
-    
+
     def run(self) -> None:
         """
-        here the server is running connection
-        establsihed to new connection info. 
+        Listen and accept incoming connections.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            data: creates an object
+            self: Reference to current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         while self.wait:
             try:
-                self.window.hcserver.conn_socket, self.window.hcserver.addr = \
-                        self.window.hcserver.socket.accept()
-                new_conn_info = '\nnew connection: ' + \
-                        str(self.window.hcserver.addr)
+                (
+                    self.window.hcserver.conn_socket,
+                    self.window.hcserver.addr,
+                ) = self.window.hcserver.socket.accept()
+
+                new_conn_info = "\nnew connection: " + str(
+                    self.window.hcserver.addr
+                )
+
                 self.rs = RequestSync(self.window)
                 self.rs.start()
-            except:
+
+            except Exception:
                 pass
 
     def close_connection(self):
         """
-        here the server connection is close.
+        Stop accepting new connections.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
+            self: Reference to current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self.wait = False
 
-   
+##############################################################################
+# Request Sync Thread
+##############################################################################
+
 class RequestSync(threading.Thread):
     """
-    A class RequestSync with init method
-    wxWindow is the base class for all windows and 
-    represents any visible object on screen.
+    Thread that processes client requests
+    and sends responses.
     """
     def __init__(self, parent):
         """
-        here the server requesting using threading.
+        Initialize request handler thread.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
+            self: Reference to current instance.
+            parent: Parent UI window.
+
         Returns:
+            None
+        Raises:
             None
         """
         super(RequestSync, self).__init__()
         self.window = parent
         self._running = True
-    
+
     def terminate(self):
         """
-        here the server connection is terminate.
+        Terminate the request thread.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to current instance.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         self._running = False
 
     def run(self) -> None:
         """
-        This message sent to client, when it gets connected with this server
+        Receive, process, and respond to
+        client requests.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to current instance.
+
         Returns:
             None
+
+        Raises:
+            None
         """
-        # This message sent to client, when it gets connected with this server
         while self._running:
             try:
                 creq = self.window.hcserver.conn_socket.recv(1024)
                 data = json.loads(creq.decode())
+
             except ConnectionResetError:
                 self.window.hcserver.conn_socket.close()
-                disconnect_info = str(self.window.hcserver.addr) + ' socket\n'
-                wx.CallAfter(self.window.panel.PrintLog,
-                                        "\n P2: "+disconnect_info)
+                disconnect_info = (
+                    str(self.window.hcserver.addr) + " socket\n"
+                )
+
+                wx.CallAfter(
+                    self.window.panel.PrintLog,
+                    "\n P2: " + disconnect_info,
+                )
                 break
             if data:
                 result = self.verify_command(data)
-                data= json.dumps(result)
-                self.window.hcserver.conn_socket.sendall(data.encode('utf-8'))
-                self.terminate()          
-    
+                data = json.dumps(result)
+                self.window.hcserver.conn_socket.sendall(
+                    data.encode("utf-8")
+                )
+                self.terminate()
+
     def verify_command(self, reqdict):
         """
-        this function is verified USB Tree view command "usb", and "lsusb".
+        Verify and process client command.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            reqdict: request the command
+            self: Reference to current instance.
+            reqdict: Request dictionary from client.
         Returns:
-            rdict: device info
+            dict: Response data.
+        Raises:
+            None
         """
-           
         ctype = reqdict["ctype"]
         cmd = reqdict["cmd"]
-        if(ctype == "usb"):
-            if (cmd == "lsusb"):
-                wx.CallAfter(self.window.panel.PrintLog, "Read USB")
+        if ctype == "usb":
+            if cmd == "lsusb":
+                wx.CallAfter(
+                    self.window.panel.PrintLog, "Read USB"
+                )
+
                 result = usbChange.get_usb_change(self.window)
-                wx.CallAfter(self.window.panel.PrintLog, "USB Result ")
+
+                wx.CallAfter(
+                    self.window.panel.PrintLog, "USB Result "
+                )
                 rdict = {}
                 rdict["data"] = result
                 return rdict
+
         else:
             rdict = {}
             rdict["data"] = "Invalid command"

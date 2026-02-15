@@ -1,29 +1,72 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: networkingWindow.py
 #
 # Description:
-#     This dialog is created for network configuration.
+#     Network configuration dialog for Cricket UI.
+#
+#     This dialog allows users to configure single or multi-computer
+#     network setups including:
+#         • User Computer (UC)
+#         • Switch Control Computer (SCC)
+#         • Test Host Computer (THC)
+#
+#     Provides options to scan network devices, configure IP/Port,
+#     and store system network roles.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 
-import wx
-import configdata
+# Built-in imports
 import socket
 import threading
 
+# Lib imports
+import wx
+
+# Own modules
+import configdata
 import searchNetwork
 import setNetwork
-# import SetNetwork
 
 class NetConfigDialog(wx.Dialog):
+    """
+    Network Configuration Dialog.
+
+    Provides UI controls to configure system networking mode
+    and assign roles for different computers in the Cricket setup.
+
+    Supports:
+        • Single computer configuration
+        • Multi-computer (network) configuration
+        • Network scanning
+        • IP/Port setup
+
+    Attributes:
+        parent: Parent application window.
+        myrole: Current system role configuration.
+        config_data: Loaded configuration data.
+        uc_flg: User computer selection flag.
+        scc_flg: Switch Control Computer selection flag.
+        thc_flg: Test Host Computer selection flag.
+    """
     def __init__(self, parent, myrole):
+        """
+        Initialize Network Configuration dialog.
+
+        Args:
+            parent: Parent window reference.
+            myrole: Dictionary containing current role settings.
+
+        Returns:
+            None
+        """
         wx.Dialog.__init__(self, parent, title="Network Configuration", size=(640, 680),
                            style=wx.DEFAULT_DIALOG_STYLE)
         
@@ -41,7 +84,6 @@ class NetConfigDialog(wx.Dialog):
         self.scan_th_flg = False
         self.vboxParent = wx.BoxSizer(wx.VERTICAL)
         
-    
         self.config_data = configdata.read_all_config()
         
         self.InitSelectionType()
@@ -67,9 +109,31 @@ class NetConfigDialog(wx.Dialog):
         self.alter_nw_panel()
    
     def Initnwconfig(self):
+        """
+        Initialize network configuration container sizer.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.vbnws = wx.BoxSizer(wx.VERTICAL)
                 
     def InitSelectionType(self):
+        """
+        Create selection controls for system configuration type.
+
+        Provides radio buttons for:
+            • Single Computer
+            • Network Computer
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.hbsmc = wx.BoxSizer(wx.HORIZONTAL)
         
         bc = wx.StaticBox(self, -1, "Settings", size = (400, 200))
@@ -85,6 +149,20 @@ class NetConfigDialog(wx.Dialog):
         ])
     
     def Selection_computer(self):
+        """
+        Create computer role selection controls.
+
+        Allows enabling/disabling:
+            • User Computer
+            • Switch Control Computer
+            • Test Host Computer
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         ab = wx.StaticBox(self, -1, "Computer Settings", size = (400, 200))
         self.vbcsel = wx.StaticBoxSizer(ab, wx.VERTICAL)
         
@@ -95,25 +173,26 @@ class NetConfigDialog(wx.Dialog):
         self.cb_uc.Bind(wx.EVT_CHECKBOX, self.on_uc_checkbox)
         self.cb_scc.Bind(wx.EVT_CHECKBOX, self.on_scc_checkbox)
         self.cb_thc.Bind(wx.EVT_CHECKBOX, self.on_thc_checkbox)
-        
-        
         self.vbcsel.AddMany([
             (self.cb_uc, 1, wx.EXPAND | wx.ALL, 5),
             (self.cb_scc, 1, wx.EXPAND | wx.ALL, 5),
             (self.cb_thc, 1, wx.EXPAND | wx.ALL, 5)
         ])
-        #  Set the initial state of the radio buttons
-        # self.rbtn_single.SetValue(not self.myrole["uc"])
-        # self.rbtn_multi.SetValue(self.myrole["uc"])
-    
-
+        
     def SearchnwType(self):
-        
-        # self.hb_center = wx.BoxSizer(wx.VERTICAL)
-        # self.hb_center.Add((0,25), 0, wx.EXPAND)
-        
+        """
+        Insert network search panel.
+
+        Loads SearchNetwork UI for scanning
+        available network systems.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """       
         self.search_nw = searchNetwork.SearchNetwork(self, self.parent)
-        
         self.vboxl = wx.BoxSizer(wx.VERTICAL)
         # self.vboxl.Add((0,10), 0, wx.EXPAND)
         self.vboxl.Add((0,5), 0, 0)
@@ -121,12 +200,20 @@ class NetConfigDialog(wx.Dialog):
         self.vboxl.Add((0,5), 0, wx.EXPAND)
     
     def SetnwType(self):
-        
-        # self.hb_center = wx.BoxSizer(wx.VERTICAL)
-        # self.hb_center.Add((0,25), 0, wx.EXPAND)
+        """
+        Insert network configuration panel.
+
+        Loads SetNetwork UI for manual
+        IP and port configuration.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         
         self.set_nw = setNetwork.SetNetwork(self, self.parent)
-        
         self.vboxl2 = wx.BoxSizer(wx.VERTICAL)
         # self.vboxl2.Add((0,10), 0, wx.EXPAND)
         self.vboxl2.Add((0,5), 0, 0)
@@ -134,20 +221,48 @@ class NetConfigDialog(wx.Dialog):
         self.vboxl2.Add((0,5), 0, wx.EXPAND)
         
     def insertScanNw(self, ctype):
+        """
+        Insert scan network panel dynamically.
+
+        Args:
+            ctype: Computer type (SCC / THC).
+
+        Returns:
+            None
+        """
         self.search_nw = searchNetwork.SearchNetwork(self, ctype)
         self.vbnws.Add((0,5), 0, 0)
         self.vbnws.Add(self.search_nw, 1, wx.EXPAND)
         self.vbnws.Add((0,5), 0, wx.EXPAND)
 
-    
     def insertSetNw(self, ctype):
+        """
+        Insert manual network setup panel.
+
+        Args:
+            ctype: Computer type (SCC / THC).
+
+        Returns:
+            None
+        """
         self.set_nw = setNetwork.SetNetwork(self, ctype)
-        
         self.vbnws.Add((0,5), 0, 0)
         self.vbnws.Add(self.set_nw, 1, wx.EXPAND)
         self.vbnws.Add((0,5), 0, wx.EXPAND)
 
     def saveinsertion(self):
+        """
+        Create Save button section.
+
+        Adds control to store all
+        configured network settings.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.btn_save = wx.Button(self, -1, "Save All")
         # self.btn_cancel = wx.Button(self, -1, "Close")
         
@@ -158,13 +273,22 @@ class NetConfigDialog(wx.Dialog):
         self.vboxsave.AddMany([
             (200, 0, 0),
             (self.btn_save, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
-            # (10, 50, 0)
-            # (self.btn_cancel, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL),
-            # (10, 50, 0)
+            
         ])
         
-    
     def Onsave(self, e):
+        """
+        Save network configuration settings.
+
+        Stores selected mode and computer roles
+        into configuration database.
+
+        Args:
+            e: Button click event.
+
+        Returns:
+            dict: Saved configuration data.
+        """
         self.config = {"mode": 'single', "uc": True, "scc": True, "thc": True}
         single_flg = False
 
@@ -186,15 +310,39 @@ class NetConfigDialog(wx.Dialog):
         return self.config
     
     def get_comp_config(self):
+        """
+        Compute binary state of computer selections.
+
+        Returns:
+            int: Encoded selection state value.
+        """
         bin_str = f"{int(self.thc_flg)}{int(self.scc_flg)}{int(self.uc_flg)}"
         mystat = int(bin_str, 2)
         return mystat
     
     def clearNwPanel(self):
+        """
+        Clear all network panels.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.vbnws.Clear(True)
         self.Layout()
     
     def switch_nw_case(self, swopt):
+        """
+        Load network panels based on selection state.
+
+        Args:
+            swopt: Encoded selection state.
+
+        Returns:
+            None
+        """
         # self.onRadioButton()
         if swopt == 0x00 or swopt == 0x07:
             pass
@@ -214,12 +362,30 @@ class NetConfigDialog(wx.Dialog):
             self.insertSetNw("THC")
         
     def alter_nw_panel(self):
+        """
+        Update network panel layout dynamically.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         cstate = self.get_comp_config()
         self.clearNwPanel()
         self.switch_nw_case(cstate)
         self.Layout()
        
     def onRadioButton(self, evet):
+        """
+        Handle configuration mode radio selection.
+
+        Args:
+            evet: Radio button event.
+
+        Returns:
+            None
+        """
         self.clearNwPanel() 
         if self.rbtn_single.GetValue():
             self.cb_uc.SetValue(True)
@@ -241,26 +407,80 @@ class NetConfigDialog(wx.Dialog):
         self.alter_nw_panel()
         
     def enableCheckboxes(self, enable):
+        """
+        Enable or disable computer selection checkboxes.
+
+        Args:
+            enable: Boolean flag.
+
+        Returns:
+            None
+        """
         self.cb_uc.Enable(enable)
         self.cb_scc.Enable(enable)
         self.cb_thc.Enable(enable)
         
     def on_uc_checkbox(self, evt):
+        """
+        Handle User Computer checkbox event.
+
+        Args:
+            evt: Checkbox event.
+
+        Returns:
+            None
+        """
         self.uc_flg = self.cb_uc.GetValue()
         self.alter_panel()
             
     def on_scc_checkbox(self, evt):
+        """
+        Handle SCC checkbox event.
+
+        Args:
+            evt: Checkbox event.
+
+        Returns:
+            None
+        """
         self.scc_flg = self.cb_scc.GetValue()
         self.alter_panel()
     
     def on_thc_checkbox(self, evt):
+        """
+        Handle THC checkbox event.
+
+        Args:
+            evt: Checkbox event.
+
+        Returns:
+            None
+        """
         self.thc_flg = self.cb_thc.GetValue()
         self.alter_panel()
       
     def alter_panel(self):
+        """
+        Refresh panel layout based on role selection.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.alter_nw_panel()
         
     def update_controls(self):
+        """
+        Initialize UI controls using existing role configuration.
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.rbtn_single.SetValue(self.myrole["uc"])
         self.rbtn_multi.SetValue(not self.myrole["uc"])
 
