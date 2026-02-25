@@ -4,7 +4,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v4.5.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.6.0)
+[![Git release](https://img.shields.io/badge/release-v4.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.7.0)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -273,6 +273,12 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+- v4.7.0 is patach release its contains the following changes.
+    - Support Per-Model Port Syntax in Batch Script Generator & Revert [#155](https://github.com/mcci-usb/Cricket/commit/007231d87f16ed34464283b59621715e12dd8771).
+    - Implement Voltage and Current Update for Manual Port Control [#154](https://github.com/mcci-usb/Cricket/commit/cfb423f992dd080f0f3571d633ca7caa47a523fa)
+    - firmware update Model name and Hex file comapresion [#153](https://github.com/mcci-usb/Cricket/commit/759dc7615326558e51efd1e6eb6c0d60b94edf7b).
+    - update headers [#152](https://github.com/mcci-usb/Cricket/commit/a504e640874cb9721039e635bdb54b79c9c27194)
 
 - v4.6.0 is patch release its contains the following changes.
    - Firmware update hangs on second attempt due to USB device resource not released [#150](https://github.com/mcci-usb/Cricket/commit/55146dc416d131d1c825ecefa2c62bab2779ce4e)
