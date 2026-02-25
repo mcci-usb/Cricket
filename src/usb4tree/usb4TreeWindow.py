@@ -1,33 +1,45 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
-# Module: serialLogWindow.py
+#
+# Module: usb4TreeWindow.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
+#     USB4 / Thunderbolt Tree View Window.
+#
+#     This module provides a graphical tree view representation of
+#     connected USB4 and Thunderbolt devices.
+#
+#     Features:
+#         • Displays hierarchical USB4 topology
+#         • Shows device Vendor ID (VID) & Product ID (PID)
+#         • Multi-level routing visualization
+#         • Port-wise expansion
+#         • Tooltip device information
+#         • Windows Device Portal credential configuration (Windows only)
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Jan 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 
 # Lib imports
 import wx
 import wx.adv
 import sys
-
+from datetime import datetime
 
 # Own modules
 from uiGlobals import *
-from datetime import datetime
-
-import wx
-
 from .wdpLogin import LoginFrame
 from usb4tree import usb4parse
-# import dummyusb4 as dumusb4
+
+##############################################################################
+# USB4 / Thunderbolt Constants
+##############################################################################
 
 EADR = 'EvtAddDeviceRouter'
 ERDR = 'EvtRemoveDeviceRouter'
@@ -62,19 +74,57 @@ MAX_LEVEL = 7
 ##############################################################################
 class Usb4TreeWindow(wx.Window):
     """
-    A class logWindow with init method
+    Summary:
+        USB4 / Thunderbolt Tree Visualization Window.
 
-    To show the all actions while handling ports of devices 
+    Description:
+        Provides a hierarchical tree representation of USB4 and
+        Thunderbolt topology detected on the host system.
+
+        The tree displays:
+
+        • Routers
+        • End devices
+        • Ports
+        • Vendor & product identifiers
+        • Multi-level routing paths
+
+        Windows-specific features include:
+
+        • Device Portal credential configuration
+        • USB4 speed data integration
+
+    Args:
+        parent (wx.Window):
+            Parent container window.
+
+        top (object):
+            Main frame / controller reference.
+
+    Attributes:
+        tree (wx.TreeCtrl):
+            Tree control displaying USB4 hierarchy.
+
+        root (wx.TreeItemId):
+            Root node (“My Computer USB4 Tree View”).
+
+        usb4parse (object):
+            Platform-specific USB4 parser instance.
+
+        btn_config (wx.Button):
+            Credential configuration button (Windows only).
     """
     def __init__(self, parent, top):
         """
-        logWindow values displayed for all Models 3201, 3141,2101 
+        Initialize USB4 Tree Window UI.
+
         Args:
-            self: The self parameter is a reference to the current .
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: creates an object
+            parent (wx.Window):
+                Parent window reference.
+
+            top (object):
+                Top-level frame/controller reference.
+
         Returns:
             None
         """
@@ -139,12 +189,8 @@ class Usb4TreeWindow(wx.Window):
             ])
         
         mythcos = sys.platform
-        # if not top.parent.myrole['thc']:
-        #     mythcos = self.top.parent.ucConfig['mynodes']["mythc"]["os"]
-
+       
         self.usb4parse = usb4parse.create_usb4tb_parser(mythcos)
-
-
         # Set size of frame
         self.SetSizer(self.vbox)
         self.vbox.Fit(self)
@@ -152,7 +198,14 @@ class Usb4TreeWindow(wx.Window):
 
     def update_usb4_tree(self, usb4data):
         """
-        Update the USB4 and Thunderbolt list based on List 
+        Update USB4 / Thunderbolt tree data.
+
+        Args:
+            usb4data (dict):
+                Parsed USB4 event data.
+
+        Returns:
+            None
         """
         self.usb4parse.parse_usb4tb_data(usb4data)
         self.redrawu4tree(self.usb4parse.idata, self.usb4parse.ldata)
@@ -181,7 +234,37 @@ class Usb4TreeWindow(wx.Window):
     # Delete all items except root items
     def DeleteAllItems(self):
         """
-        Delete all item and TH4 or USB4 devices from Tree View 
+        Remove all USB4 / Thunderbolt devices from the Tree View.
+
+        Description:
+            This method clears the existing USB4 topology displayed
+            in the TreeCtrl by deleting all child nodes under the
+            root item.
+
+            It is typically invoked before redrawing or refreshing
+            the USB4 / Thunderbolt tree to ensure that outdated or
+            previously scanned device entries are removed.
+
+            The root node itself remains intact while all connected
+            routers, ports, and peripheral devices beneath it are
+            deleted.
+
+        Workflow:
+            1. Retrieve the root tree item.
+            2. Validate that the root item exists.
+            3. Delete all child nodes under the root.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Notes:
+            • Used during USB4 rescan / refresh operations.
+            • Prevents duplicate or stale topology entries.
+            • Root label (e.g., "MY COMPUTER USB4 Tree View")
+            is preserved.
         """
         root = self.tree.GetRootItem()
         if root.IsOk():
@@ -189,17 +272,79 @@ class Usb4TreeWindow(wx.Window):
 
     def OnItemSelect(self, event):
         """
-        Handles the tree item selection event.
+        Handle USB4 Tree item selection events.
 
-        Parameters:
-            event (wx.TreeEvent): The tree selection event.
+        Description:
+            This event handler is triggered whenever a user selects
+            an item in the USB4 / Thunderbolt Tree View.
+
+            The method retrieves the selected tree node and extracts
+            its display text. This information can be used for:
+
+                • Displaying device/router details
+                • Updating status/log panels
+                • Showing VID/PID or topology metadata
+                • Triggering additional UI actions
+
+            Currently, the function captures the selected item and
+            its label text for further processing or debugging.
+
+        Args:
+            event (wx.TreeEvent):
+                The tree selection event generated when a user clicks
+                or navigates to a node in the TreeCtrl.
+
+        Returns:
+            None
+
+        Notes:
+            • Item metadata (VID/PID) can be retrieved using
+            self.tree.GetItemPyData(item) if previously set.
+            • This handler can be extended to show device details
+            in log/status panels.
         """
         item = event.GetItem()
         text = self.tree.GetItemText(item)
 
     def redrawu4tree(self, idata, ldata):
         """
-        Redrraw the Tree view N Levels of USB4 and Thunderbolt
+        Redraw the complete USB4 / Thunderbolt Tree View hierarchy.
+
+        Description:
+            This method reconstructs the entire USB4 / Thunderbolt routing
+            tree in the UI based on parsed topology data.
+
+            The function performs the following steps:
+
+                1. Clears all existing tree nodes except the root.
+                2. Identifies available topology levels from parsed data.
+                3. Draws Level-0 (Root / Host Routers).
+                4. Iteratively renders deeper routing levels (Level-1 → N).
+                5. Links child routers/devices to their parent ports.
+
+            This ensures the tree view always reflects the latest
+            USB4 / Thunderbolt topology after a scan/update.
+
+        Args:
+            idata (dict):
+                Parsed USB4 item dictionary containing device/router
+                metadata such as model, vendor, VID, PID and ports.
+
+            ldata (dict):
+                Level-organized topology dictionary where:
+
+                    • 'level0' → Root routers
+                    • 'level1' → Downstream routers/devices
+                    • ...
+                    • 'levelN' → Deep routing hierarchy
+
+        Returns:
+            None
+
+        Notes:
+            • MAX_LEVEL controls the deepest routing level rendered.
+            • draw_level0_data() handles root rendering.
+            • draw_leveln_data() handles deeper hierarchy rendering.
         """
         self.DeleteAllItems()
         lkeys = list(ldata.keys())
@@ -212,7 +357,40 @@ class Usb4TreeWindow(wx.Window):
     # # Draw level 0 data
     def draw_level0_data(self, ddict, dlist):
         """
-        Draw the Tree view 0 and 1 Levels of USB4 and Thunderbolt
+        Draw the Tree view for Level-0 and Level-1 USB4 / Thunderbolt devices.
+
+        Description:
+            This method renders the top hierarchy of the USB4 / Thunderbolt
+            routing tree.
+
+            • Level-0 represents Root / Host routers.
+            • Level-1 represents directly connected downstream ports.
+
+            The function:
+
+                - Creates root child nodes for each detected router/device
+                - Displays Model Name and Vendor Name
+                - Attaches VID & PID as tooltip metadata
+                - Adds child port nodes under each router
+
+            This forms the base structure for deeper level rendering.
+
+        Args:
+            ddict (dict):
+                Parsed USB4 device item dictionary containing
+                model, vendor, VID, PID and port details.
+
+            dlist (list):
+                List of topology index keys representing
+                Level-0 routing devices.
+
+        Returns:
+            dict:
+                Dictionary mapping topology keys to
+                wx.TreeCtrl item object references.
+
+                This object map is later used to attach
+                deeper routing levels.
         """
         objdict = {}
         for l0item in dlist:
@@ -228,7 +406,37 @@ class Usb4TreeWindow(wx.Window):
     ## Draw level 1 to 6 data
     def draw_leveln_data(self, ddict, dlist, riobj, lidx):
         """
-        Draw the Tree view N Levels of USB4 and Thunderbolt
+        Draw the Tree view for deeper USB4 routing levels.
+
+        Description:
+            This method renders hierarchical USB4 / Thunderbolt routing
+            devices beyond Level-0 in the tree structure.
+
+            It updates:
+
+                • Port routing labels
+                • Device names
+                • Vendor & Product IDs
+                • Child port nodes
+
+            The hierarchy is derived from topology index paths.
+
+        Args:
+            ddict (dict):
+                Parsed USB4 device item dictionary.
+
+            dlist (list):
+                List of routing topology keys for the level.
+
+            riobj (dict):
+                Previously created tree node object references.
+
+            lidx (int):
+                Current hierarchy level index.
+
+        Returns:
+            dict:
+                Updated tree object reference dictionary.
         """
         
         objlist = list(riobj.keys())

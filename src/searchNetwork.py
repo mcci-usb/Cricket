@@ -1,22 +1,31 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: searchNetwork.py
 #
 # Description:
-#     This diaong scanning the Server netowork IP and Port.
+#     Dialog window used to scan server network IP address
+#     and port availability for SCC and THC systems.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 
+# Lib imports
 import wx
+
+# Own modules
 from uiGlobals import *
+
+# Built-in imports
 import threading
 import socket
+
+# Configuration imports
 import configdata
 
 CC_PORT = 2021
@@ -27,29 +36,32 @@ HC_PORT = 2022
 ##############################################################################
 class ScanNwThread(threading.Thread):
     """
-    A class ScannNwThread with init method.
-    using Threading in Scanning the network from client and server.
+    Thread class used for scanning network nodes.
+
+    Performs subnet scanning to detect active
+    SCC / THC servers listening on a given port.
+
+    Attributes:
+        port: Network port to scan.
+        txtsysip: UI label displaying system IP.
+        txtctrl: UI control displaying detected IP.
+        btnScan: Scan button reference.
+        completed_event: Thread stop event flag.
     """
     def __init__(self, port, txtsysip, txtctrl, btnScan, name="NwScanThread"):
         """
-        adding event with threading.
+        Initialize network scanning thread.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            port: network port number.
-            txtsysip: system listening own system ip
-            txtctrl: maually enter ipaddress in network,
-            name: name as NwScanThread. 
-        Returns:
-            None:
-        """
-        # self.completed_event = threading.Event()
-        
-         # Event to signal completion
-        
+            port: Network port number.
+            txtsysip: System IP display control.
+            txtctrl: Network IP combo control.
+            btnScan: Scan button reference.
+            name: Thread name.
 
+        Returns:
+            None
+        """
         self.port = port
         self.txtctrl = txtctrl
         self.txtsysip = txtsysip
@@ -60,15 +72,16 @@ class ScanNwThread(threading.Thread):
  
     def run(self):
         """
-        thread running
+        Execute subnet scanning process.
+
+        Searches IP range and detects
+        available server nodes.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
-
         """
         subnet = self.get_network_subnet()[0]
         wx.CallAfter(self.txtsysip.SetLabel, str(subnet))
@@ -93,16 +106,13 @@ class ScanNwThread(threading.Thread):
         wx.CallAfter(self.txtctrl.SetValue, portip)
         wx.CallAfter(self.btnScan.SetLabel, "scan network")
     
-        
     def join(self, timeout = None):
         """
-        join the thread event
+        Stop network scanning thread.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            timeout: timer is running between start and stop
+            timeout: Optional join timeout.
+
         Returns:
             None
         """
@@ -111,24 +121,48 @@ class ScanNwThread(threading.Thread):
 
     def get_network_subnet(self):
         """
-        getting the hostcomputer network subnet with ipaddress.
+        Retrieve system subnet information.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
-            hostcomputer ipaddress
+            tuple:
+                Local system IP and port.
         """
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 88))
         return (s.getsockname())
     
-
 class SearchNetwork(wx.Panel):
+    """
+    UI panel for scanning network servers.
+
+    Provides controls to:
+
+    - Scan SCC / THC servers
+    - Configure search port
+    - Detect server OS
+    - Save network configuration
+
+    Attributes:
+        parent: Parent window reference.
+        ctype: Configuration type (SCC / THC).
+        scan_flg: Scan state flag.
+        searchthread: Active scan thread.
+        ostype: Selected server OS type.
+    """
     def __init__(self, parent, ctype):
-        # wx.Panel.__init__(self, parent, title="Network Configuration", size=(550, 480),
-        #                    style=wx.DEFAULT_DIALOG_STYLE)
+        """
+        Initialize SearchNetwork panel.
+
+        Args:
+            parent: Parent window reference.
+            ctype: Configuration type identifier.
+
+        Returns:
+            None
+        """
         super(SearchNetwork, self).__init__(parent)
         
         self.SetBackgroundColour("White")
@@ -136,21 +170,32 @@ class SearchNetwork(wx.Panel):
         self.scan_flg = False
         self.searchthread = None
         self.ostype = "win32"
-        
         # self.vboxParent = wx.BoxSizer(wx.VERTICAL)
         self.scan_network()
         
     def scan_network(self):
+        """
+        Build network scanning UI layout.
+
+        Initializes controls for:
+
+        - Port input
+        - Scan trigger
+        - OS selection
+        - Save configuration
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.SetBackgroundColour("White")
         # self.SetMinSize((480,520))
-
-        # self.top = top
-        # Create static box with naming of Log Window
         sb = wx.StaticBox(self, -1,"Scan Network")
 
         # Create StaticBoxSizer as vertical
         self.vbox = wx.StaticBoxSizer(sb, wx.VERTICAL)
-        
         self.btn_scannwc= wx.Button(self, -1, "Search "+self.ctype, size = (80, -1))
         self.st_port = wx.StaticText(self, -1, "Search Port")
         self.st_sysip = wx.StaticText(self, -1, "------")
@@ -163,8 +208,6 @@ class SearchNetwork(wx.Panel):
         self.rb_linux = wx.RadioButton(self, ID_RBTN_LINUX, "Linux")
         self.rb_mac = wx.RadioButton(self, ID_RBTN_MAC, "Mac")
         
-        
-    
         # Create BoxSizer as horizontal
         self.hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -194,15 +237,10 @@ class SearchNetwork(wx.Panel):
                        wx.LEFT, border = 10)
         self.hbox.Add(self.rb_mac, flag=wx.ALIGN_CENTER_VERTICAL |
                        wx.LEFT, border = 10)
-        
-       
-        
         self.btn_scannwc.Bind(wx.EVT_BUTTON, self.ScanNetworkComp)
         self.btn_save.Bind(wx.EVT_BUTTON, self.SaveNetworkComp)
 
         self.Bind(wx.EVT_RADIOBUTTON, self.SelectOsChanged)
-        
-        # self.szr_top = wx.BoxSizer(wx.VERTICAL)
       
         self.vbox.AddMany([
             (self.hbox1, 0, wx.ALIGN_LEFT),
@@ -217,6 +255,17 @@ class SearchNetwork(wx.Panel):
         self.set_param()
     
     def SaveNetworkComp(self, e):
+        """
+        Save scanned network configuration.
+
+        Stores detected IP, port, and OS type.
+
+        Args:
+            e: wx Event object.
+
+        Returns:
+            None
+        """
         devaddr = self.tc_nwcip.GetValue()
         portno = self.tc_port.GetValue()
         # os = self.SelectOsChanged()
@@ -229,6 +278,18 @@ class SearchNetwork(wx.Panel):
             configdata.set_nw_thc_config({"ip": devaddr, "port": portno, "os":self.ostype})
           
     def SelectOsChanged(self, e):
+        """
+        Handle server OS selection change.
+
+        Updates internal OS type based
+        on selected radio button.
+
+        Args:
+            e: wx Event object.
+
+        Returns:
+            None
+        """
         rb = e.GetEventObject()
 
         id = rb.GetId()
@@ -247,31 +308,31 @@ class SearchNetwork(wx.Panel):
      
     def ScanNetworkComp(self, e):
         """
-        Scanning the network from Client and Server.
+        Handle scan button event.
+
+        Starts or stops network scanning.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e: event in scan network button
+            e: wx Event object.
+
         Returns:
             None
-
         """
         if self.scan_flg == False:
             self.StartNwScan()
         else:
             self.StopNwScan() 
                 
-                
     def StartNwScan(self):
         """
-        start the server network scanning
+        Start network scanning thread.
+
+        Initializes scan parameters and
+        begins subnet search.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
@@ -300,12 +361,13 @@ class SearchNetwork(wx.Panel):
             
     def StopNwScan(self):
         """
-        stop the scanning network
+        Stop active network scanning.
+
+        Terminates scanning thread safely.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
@@ -314,6 +376,21 @@ class SearchNetwork(wx.Panel):
         self.searchthread.join()  
 
     def set_param(self):
+        """
+        Load saved network configuration.
+
+        Initializes UI fields with stored:
+
+        - IP address
+        - Port number
+        - OS type
+
+        Args:
+            self: Instance reference.
+
+        Returns:
+            None
+        """
         self.config_data = configdata.read_all_config()
         
         # self.port = self.config_data["uc"]["mynodes"]["mycc"], self.config_data["uc"]["mynodes"]["mythc"]
@@ -341,4 +418,3 @@ class SearchNetwork(wx.Panel):
             self.rb_linux.SetValue(True)
         elif self.ostype == "darwin":
             self.rb_mac.SetValue(True)
-      

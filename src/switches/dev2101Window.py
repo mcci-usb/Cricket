@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: dev2101Window.py
@@ -6,19 +7,20 @@
 #     Device specific functions and UI for interfacing Model 2101 with GUI
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
-#Lib imports
-import sys
-import wx
-
 # Built-in imports
+import sys
 import os
 import time
+
+# Lib imports
+import wx
+
 # Own modules
 import thControl
 import devControl as model
@@ -185,8 +187,20 @@ class Dev2101Window(wx.Panel):
                 elif(ob == 3):
                     self.rbtn_ss0.SetValue(True)
         
-
     def update_cport(self, portno):
+        """
+        Update the current switch port label and identifier.
+
+        Args:
+            self: Reference to the current instance of the class.
+            portno: Port number / switch identifier to be updated.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.swtitle = "2101"
         if(len(portno)):
             self.swtitle += " ("+portno+")"
@@ -211,8 +225,6 @@ class Dev2101Window(wx.Panel):
         # Returns the object (usually a window) associated,
         # With the event, if any.
         co = e.GetEventObject()
-        # Returns the identifier associated with,
-        # This event, such as a button command id.
         cbi = co.GetId()
         if self.top.mode == MODE_MANUAL and not self.usb_flg:
             self.port_on_manual(cbi)
@@ -314,6 +326,19 @@ class Dev2101Window(wx.Panel):
                 self.usb_flg = True
     
     def SafeTimer(self, e):
+        """
+        Handle the safe delay timer event.
+
+        Args:
+            self: Reference to the current instance of the class.
+            e: Timer event object triggered by wx.Timer.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.timer_safe.Stop()
         self.usb_flg = False
      
@@ -355,6 +380,7 @@ class Dev2101Window(wx.Panel):
 
     
     def set_speed(self, speed):
+        """ set the speed """
         if(speed == "SS1"):
             self.top.print_on_log("Super Speed Enabled\n")
             self.portcmd = "ss"

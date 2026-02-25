@@ -1,32 +1,76 @@
-# usbenum.py
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: usnenumall.py
 #
 # Description:
-#    his method must be implemented by subclasses to perform the enumeration of USB devices.
+#     Base USB Enumeration module.
+#     Provides an abstract class for enumerating USB devices across
+#     different operating systems. Subclasses must implement the
+#     enumeration logic specific to the target OS.
+#
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-################################################################################
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+# Built-in imports
 import sys
 
+# Lib imports
+# None
+
+# Own modules
+# (OS-dependent modules imported dynamically below)
+
+##############################################################################
+# Utilities
+##############################################################################
 class USBDeviceEnumerator:
+    """
+    Summary:
+        Base class for USB device enumeration.
+
+    Longer Description:
+        This abstract class defines the structure for USB device
+        enumeration. Operating system–specific subclasses must
+        implement the enumeration logic.
+
+    Attributes:
+        usb_devices: List storing enumerated USB device details.
+    """
     def __init__(self):
+        """
+        Initialize USBDeviceEnumerator class.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.usb_devices = []
 
     def enumerate_usb_devices(self):
         """
         Enumerate USB devices.
 
-        This method must be implemented by subclasses to perform the enumeration of USB devices.
-        Subclasses should provide their own implementation based on the operating system.
+        Description:
+            This method must be implemented by subclasses to perform
+            USB device enumeration based on the operating system.
+
+        Args:
+            None
+
+        Returns:
+            None
 
         Raises:
-            NotImplementedError: This method should be implemented by subclasses.
+            NotImplementedError:
+                If subclass does not implement this method.
         """
         raise NotImplementedError("Subclasses must implement enumerate_usb_devices")
 
@@ -41,17 +85,24 @@ elif sys.platform == 'darwin':
 else:
     raise NotImplementedError(f"Platform '{sys.platform}' not supported")
 
-
 def create_usb_device_enumerator():
     """
-    Create an instance of USB device enumerator based on the current operating system.
+    Create USB Device Enumerator instance.
+
+    Description:
+        Creates and returns an OS-specific USB device enumerator
+        instance based on the current platform.
+
+    Args:
+        None
 
     Returns:
-        OS_USBDeviceEnumerator: An instance of the appropriate USB device enumerator for the
-                               current operating system.
+        OS_USBDeviceEnumerator:
+            Instance of the platform-specific enumerator.
 
     Raises:
-        NotImplementedError: If the platform is not supported.
+        NotImplementedError:
+            If the current platform is not supported.
     """
     if sys.platform == 'win32' or sys.platform == 'linux' or sys.platform == 'darwin':
         return OS_USBDeviceEnumerator()

@@ -1,24 +1,38 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: configdata.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
+#     Configuration data management module for Cricket UI application.
+#
+#     Handles reading, writing, loading, and updating application
+#     configuration files including:
+#         • User roles and system modes
+#         • Network configuration (SCC / THC)
+#         • DUT configuration
+#         • Batch and screen settings
+#         • Portal credentials
+#
+#     Stores configuration in JSON format under the
+#     user-specific OS data directory.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
-################################################################################
-
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+# Built-in imports
 import os
 import sys
 from sys import platform
 from pathlib import Path
 import json
 from os import getenv
+
+# Own modules
 import defaultconfig
 
 def get_user_data_dir():
@@ -40,7 +54,6 @@ def get_user_data_dir():
     else:
         dpath = Path(getenv('XDG_DATA_HOME', "~/.local/lib")).expanduser()
     return dpath
-
 
 def get_file_path():
     """
@@ -224,6 +237,28 @@ def set_base_config_data(gdata):
     save_config(fpath, cdata)
 
 def set_network_config(gdata):
+    """
+    Set network role configuration.
+
+    Updates the system role configuration such as
+    User Computer (UC), Switch Control Computer (SCC),
+    and Test Host Computer (THC).
+
+    Args:
+        gdata: Dictionary containing role configuration.
+               Example:
+                   {
+                       "uc": True,
+                       "scc": True,
+                       "thc": False
+                   }
+
+    Returns:
+        None
+
+    Raises:
+        KeyError: If required role keys are missing.
+    """
     cdata = read_all_config()
     key = list(gdata.keys())[0]
     if "myrole" in cdata:
@@ -239,6 +274,27 @@ def set_network_config(gdata):
     save_config(fpath, cdata)
     
 def set_nw_scc_config(gdata):
+    """
+    Set Switch Control Computer (SCC) network configuration.
+
+    Updates SCC TCP network parameters including
+    IP address, port, and operating system.
+
+    Args:
+        gdata: Dictionary containing SCC network configuration.
+               Example:
+                   {
+                       "ip": "192.168.1.10",
+                       "port": "2021",
+                       "os": "win32"
+                   }
+
+    Returns:
+        None
+
+    Raises:
+        KeyError: If required configuration keys are missing.
+    """
     cdata = read_all_config()
     nwcdata = cdata["uc"]["mynodes"]
     key = list(gdata.keys())[0]
@@ -253,6 +309,27 @@ def set_nw_scc_config(gdata):
     save_config(fpath, cdata)
 
 def set_nw_thc_config(gdata):
+    """
+    Set Test Host Computer (THC) network configuration.
+
+    Updates THC TCP network parameters including
+    IP address, port, and operating system.
+
+    Args:
+        gdata: Dictionary containing THC network configuration.
+               Example:
+                   {
+                       "ip": "192.168.1.20",
+                       "port": "2022",
+                       "os": "linux"
+                   }
+
+    Returns:
+        None
+
+    Raises:
+        KeyError: If required configuration keys are missing.
+    """
     cdata = read_all_config()
     nwcdata = cdata["uc"]["mynodes"]
     key = list(gdata.keys())[0]
@@ -267,6 +344,27 @@ def set_nw_thc_config(gdata):
     save_config(fpath, cdata)
 
 def set_scc_config(gdata):
+    """
+    Set SCC interface configuration.
+
+    Updates SCC communication interface settings
+    such as TCP network parameters.
+
+    Args:
+        gdata: Dictionary containing SCC interface configuration.
+               Example:
+                   {
+                       "type": "tcp",
+                       "ip": "192.168.1.10",
+                       "port": "2021"
+                   }
+
+    Returns:
+        None
+
+    Raises:
+        KeyError: If required configuration keys are missing.
+    """
     cdata = read_all_config()
     scdata = cdata["cc"]
     
@@ -276,6 +374,27 @@ def set_scc_config(gdata):
     save_config(fpath, cdata)
 
 def set_thc_config(gdata):
+    """
+    Set THC interface configuration.
+
+    Updates THC communication interface settings
+    such as TCP network parameters.
+
+    Args:
+        gdata: Dictionary containing THC interface configuration.
+               Example:
+                   {
+                       "type": "tcp",
+                       "ip": "192.168.1.20",
+                       "port": "2022"
+                   }
+
+    Returns:
+        None
+
+    Raises:
+        KeyError: If required configuration keys are missing.
+    """
     cdata = read_all_config()
     scdata = cdata["thc"]
     

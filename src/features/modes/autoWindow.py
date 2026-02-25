@@ -1,16 +1,27 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: autoWindow.py
 #
 # Description:
-#     autoWindow for Switch Model 3201, 3141, 2101, 2301
+#     Auto Mode Control Window for USB Switch Devices.
+#
+#     This module provides the graphical user interface and control logic
+#     required to perform automated port switching operations on supported
+#     USB Switch Models.
+#
+#     Supported Models:
+#         • Switch Model 3201
+#         • Switch Model 3141
+#         • Switch Model 2101
+#         • Switch Model 2301
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#     V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 # Lib imports
 import wx
@@ -24,11 +35,24 @@ from uiGlobals import *
 ##############################################################################
 class AutoWindow(wx.Window):
     """
-    A  class autoWindow with init method
+    Auto Mode Control Window.
 
-    the autoWindow navigate to Interval with time, Duty and Auto button.
-    the Auto Mode is used to switching between 
-    the available Port(s) of the selected devices and time stamp.
+    Description:
+        Provides automated switching control for supported
+        USB Switch Models (3201, 3141, 2101, 2301).
+
+        Enables interval-based and duty-cycle-based
+        port switching automation.
+
+    Features:
+
+        • Switch selector
+        • Multi-port selection
+        • Interval configuration
+        • Duty cycle configuration
+        • Auto ON/OFF switching
+        • USB enumeration delay handling
+        • Safety warnings
     """
     def __init__(self, parent, top):
         """
@@ -204,9 +228,6 @@ class AutoWindow(wx.Window):
                                            "Max: 60 sec"))
         self.btn_auto.SetToolTip(wx.ToolTip("On/Off each Port "
                                             "for a interval until stop"))
-        # Create static box with naming of Auto Mode
-        # sb = wx.StaticBox(self, -1, "Auto Mode")
-        # Creates a boxsizer is vertical
 
         self.hb_outer = wx.BoxSizer(wx.HORIZONTAL)
         self.vb_contnr = wx.BoxSizer(wx.VERTICAL)
@@ -247,7 +268,6 @@ class AutoWindow(wx.Window):
         self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p2)
         self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p3)
         self.Bind(wx.EVT_CHECKBOX, self.auto_ports_enable_p1, self.cb_p4)
-
         self.enable_controls(True)
 
     def update_sw_selector(self, swdict):
@@ -361,24 +381,44 @@ class AutoWindow(wx.Window):
 
     def auto_ports_enable_p1(self, event):
         """
-        auto ports binding the events handling
+        Handle Auto Mode port checkbox selection events.
+
+        Detailed Description:
+            Triggered when user selects or deselects
+            port checkboxes in Auto Mode configuration.
+
+            Used to dynamically manage selected port
+            lists and validation states.
+
+            (Currently placeholder — logic can be extended
+            for validation or UI updates.)
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            event: if check the ports its enable
+            self:
+                Reference to the AutoWindow instance.
+
+            event:
+                wxPython checkbox event object.
+
         Returns:
-            None
         """
         pass
 
     def set_port_list(self):
         """
-        adding all selected ports in a List, used for the AutoMode 
+        Build selected Auto Mode port list.
+
+        Detailed Description:
+            Collects all user-selected ports from
+            checkbox controls and stores them in
+            an internal list used for Auto switching.
+
+            This list determines switching sequence.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self:
+                Reference to the AutoWindow instance.
+
         Returns:
             None
         """
@@ -394,14 +434,27 @@ class AutoWindow(wx.Window):
     
     def TimerServ(self, evt):
         """
-        Timer Event for Port ON/OFF in Auto Mode
+        Auto Mode switching timer service handler.
+
+        Detailed Description:
+            Core Auto Mode execution engine.
+
+            Performs:
+
+                • Port ON/OFF switching
+                • Port rotation sequencing
+                • Timer rescheduling
+                • USB delay synchronization
+
+            Triggered at configured interval timings.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the TimerServ() method is an 
-            object specific to a particular event type.
+            self:
+                Reference to AutoWindow instance.
+
+            evt:
+                wxPython timer event object.
+
         Returns:
             None
         """

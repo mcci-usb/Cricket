@@ -1,16 +1,18 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: aboutDialog.py
 #
 # Description:
-#     Dialog to display copyright information
+#     Dialog to display application information including
+#     logo, version details, and copyright text.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 
 # Built-in imports
@@ -25,169 +27,181 @@ from uiGlobals import *
 ##############################################################################
 # Utilities
 ##############################################################################
+
 class AboutWindow(wx.Window):
     """
-    A  class AboutWindow with init method
-    The AboutWindow navigate to MCCI Logo with naming of 
-    application UI "Criket",Version and copyright info.  
+    About dialog content window.
+
+    Displays application logo, version,
+    and copyright information.
+
+    Attributes:
+        top: Reference to top-level UI controller.
+        image: Logo bitmap widget.
+        text: List of static text widgets.
     """
-    def __init__ (self, parent, top):
+
+    def __init__(self, parent, top):
         """
-        AboutWindow that contains the about dialog elements.
+        Initialize About window UI components.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: creates an object
+            self: Reference to the current instance.
+            parent: Parent dialog window.
+            top: Top-level application object.
+
         Returns:
             None
+
+        Raises:
+            None
         """
-        wx.Window.__init__(self, parent, -1,
-                           size=wx.Size(100,100),
-                           style=wx.CLIP_CHILDREN,
-                           name="About")
+        wx.Window.__init__(
+            self,
+            parent,
+            -1,
+            size=wx.Size(100, 100),
+            style=wx.CLIP_CHILDREN,
+            name="About",
+        )
 
         self.top = top
 
         base = os.path.abspath(os.path.dirname(__file__))
-        bmp = wx.Image(base+"/icons/"+IMG_LOGO).ConvertToBitmap()
-        
-        self.image = wx.StaticBitmap(self, ID_ABOUT_IMAGE, bmp,
-                                     wx.DefaultPosition, wx.DefaultSize)
-        
-        # Dialog to display copyright, version name information.
-        self.text = [ wx.StaticText(self, -1, VERSION_NAME),
-                      wx.StaticText(self, -1, VERSION_ID ),
-                      wx.StaticText(self, -1,  VERSION_STR),
-                      wx.StaticText(self, -1, VERSION_COPY, style=wx.ALIGN_CENTER),
-                      wx.StaticText(self, -1, "\nAll rights reserved.\n\n")
-                    ]
+        bmp = wx.Image(base + "/icons/" + IMG_LOGO).ConvertToBitmap()
+
+        self.image = wx.StaticBitmap(
+            self, ID_ABOUT_IMAGE, bmp, wx.DefaultPosition, wx.DefaultSize
+        )
+
+        # Copyright / Version Text
+        self.text = [
+            wx.StaticText(self, -1, VERSION_NAME),
+            wx.StaticText(self, -1, VERSION_ID),
+            wx.StaticText(self, -1, VERSION_STR),
+            wx.StaticText(self, -1, VERSION_COPY, style=wx.ALIGN_CENTER),
+            wx.StaticText(self, -1, "\nAll rights reserved.\n\n"),
+        ]
+
         self.image.Bind(wx.EVT_LEFT_UP, self.OnClick)
+
         for i in self.text:
-        # i.SetBackgroundColour('White')
             i.Bind(wx.EVT_LEFT_UP, self.OnClick)
 
-        # Associate some events with methods of this class
-        # To call OnClick() method of the program on a button’s click event,
-        # The following statement is required
         self.Bind(wx.EVT_LEFT_UP, self.OnClick)
-
-        # This method is called by the system when the window is resized,
-        # Because of the association above.
         self.Bind(wx.EVT_SIZE, self.OnSize)
 
-        # A vertical box sizer is applied to a panel object, 
-        # which is placed inside wxFrame window.
+        # Layout
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        widgets = [ (self.image, 1, wx.CENTER) ]
+        widgets = [(self.image, 1, wx.CENTER)]
+
         for i in self.text:
-            widgets.extend([ (i, 0, wx.CENTER) ])
-        
+            widgets.extend([(i, 0, wx.CENTER)])
+
         self.sizer.AddMany(widgets)
 
-        # Associate the sizer with the window and set the,
-        # Window size and minimal size accordingly.
         self.SetSizerAndFit(self.sizer)
-
-        # Determines whether the Layout function will be called 
-        # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
-    def OnClick (self, evt):
+    def OnClick(self, evt):
         """
-        OnClick() event handler function retrieves the label of 
-        source button, which caused the click event. 
-        That label is printed on the console.
+        Handle click events on About dialog widgets.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
-            object specific to a particular event type.
+            self: Reference to the current instance.
+            evt: Mouse click event object.
+
         Returns:
-            None        
+            None
+
+        Raises:
+            None
         """
         self.GetParent().OnOK(evt)
-   
-    def OnSize (self, evt):
+
+    def OnSize(self, evt):
         """
-        OnSize() event handler function retrieves the about window size. 
+        Handle window resize events.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnClick() method is an 
-            object specific to a particular event type.
+            self: Reference to the current instance.
+            evt: Size event object.
+
         Returns:
-            None        
+            None
+
+        Raises:
+            None
         """
         self.Layout()
 
 class AboutDialog(wx.Dialog):
     """
-    wxWindows application must have a class derived from wx.Dialog.
+    About dialog container window.
+
+    Wraps AboutWindow and manages dialog
+    behavior such as centering and closing.
     """
-    def __init__ (self, parent, top):
+
+    def __init__(self, parent, top):
         """
-        A AboutDialog is Window an application creates to 
-        retrieve Cricket UI Application input.
+        Initialize About dialog.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
+            self: Reference to the current instance.
+            parent: Parent frame window.
+            top: Top-level application object.
+
         Returns:
             None
+
+        Raises:
+            None
         """
-        wx.Dialog.__init__(self, parent, -1, "About",
-                           size=wx.Size(100, 100),
-                           style=wx.STAY_ON_TOP|wx.DEFAULT_DIALOG_STYLE,
-                           name="About Dialog")
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "About",
+            size=wx.Size(100, 100),
+            style=wx.STAY_ON_TOP | wx.DEFAULT_DIALOG_STYLE,
+            name="About Dialog",
+        )
 
         self.top = top
         self.win = AboutWindow(self, top)
 
-        # Sizes the window to fit its best size.
         self.Fit()
-        # Centre frame using CentreOnParent() function,
-        # Show window in the center of the screen.
-        # Centres the window on its parent.
         self.CenterOnParent(wx.BOTH)
-    
-    def OnOK (self, evt):
+
+    def OnOK(self, evt):
         """
-        OnOK() event handler function retrieves the label of 
-        source button, which caused the click event. 
+        Handle OK / close action for About dialog.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnOK() method is an 
-            object specific to a particular event type.
+            self: Reference to the current instance.
+            evt: Event object triggering the close.
+
         Returns:
-            None        
+            None
+
+        Raises:
+            None
         """
-    # Returns numeric code to caller
         self.EndModal(wx.ID_OK)
-     
-    def OnSize (self, evt):
+
+    def OnSize(self, evt):
         """
-        OnSize() event handler function retrieves the about window size. 
-        
+        Handle dialog resize events.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnSize() method is an 
-            object specific to a particular event type.
+            self: Reference to the current instance.
+            evt: Size event object.
+
         Returns:
-            None        
-        """ 
+            None
+
+        Raises:
+            None
+        """
         self.Layout()

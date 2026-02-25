@@ -1,39 +1,93 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: wdpLogin.py
 #
 # Description:
-#     Dialog to display windows device portal Login credentials window..
+#     Windows Device Portal (WDP) Login Credentials Dialog.
+#
+#     This module provides a wxPython dialog window to collect and store
+#     Windows Device Portal login credentials (Username & Password).
+#     Credentials are securely saved into the global configuration
+#     using the configdata module.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Jan 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
-
+# Lib imports
 import wx
+# Own modules
 import configdata
 
-# from main import Mywin
-
+##############################################################################
+# Utilities
+##############################################################################
 class LoginFrame(wx.Dialog):
     """
-    Represents a login window in the wxPython application.
+    Summary:
+        Windows Device Portal Login Dialog.
 
-    This class provides a simple login window with a username and password 
-    input for user authentication.
+    Longer Description:
+        Provides a credential input window for Windows Device Portal (WDP)
+        authentication.
 
-    Parameters:
-        parent (wx.Window): The parent window.
-        top: The top-level object or controller that manages this login window.
+        The dialog allows users to:
+
+        - Enter Username
+        - Enter Password (masked)
+        - Save credentials to configuration storage
+
+        Stored credentials are later used for:
+
+        - USB4 scanning services
+        - Device Portal communication
+        - Remote device management
+
+    Args:
+        parent (wx.Window):
+            Parent window reference.
+
+        top (object):
+            Top-level controller / main frame reference.
 
     Attributes:
-        panel (wx.Panel): The panel containing the components of the login window.
-        top: The top-level object or controller that manages this login window.
+        panel (wx.Panel):
+            Main container panel.
+
+        username_text (wx.TextCtrl):
+            Username input field.
+
+        password_text (wx.TextCtrl):
+            Password input field (masked).
+
+        login_button (wx.Button):
+            Save credentials button.
+
+        username (str):
+            Entered username value.
+
+        password (str):
+            Entered password value.
     """
     def __init__(self, parent, top):
+        """
+        Initialize Login Dialog UI.
+
+        Args:
+            parent (wx.Window):
+                Parent window.
+
+            top (object):
+                Top-level controller reference.
+
+        Returns:
+            None
+        """
         super(LoginFrame, self).__init__(parent, title="Login Window", size=(350, 280))
         self.panel = wx.Panel(self)
         self.top = top
@@ -67,19 +121,38 @@ class LoginFrame(wx.Dialog):
 
     def on_save(self, event):
         """
-            Handles the save event by extracting username and password from text input fields,
-            checking for empty values, updating portal credentials, and closing the window.
+        Handle Save Button Event.
 
-            Parameters:
-               event (wx.Event): The save event triggering this method.
+        Description:
+            - Reads username and password input values.
+            - Validates empty credentials.
+            - Updates configuration storage.
+            - Closes the dialog window.
+
+        Args:
+            event (wx.Event):
+                Button click event.
+
+        Returns:
+            None
         """
         self.username = self.username_text.GetValue()
         self.password = self.password_text.GetValue()
+
         if self.username.strip() == '' or self.password.strip() == '':
             wx.MessageBox("Please enter the user credentials")
-        
-        udict = {"msudp": {"uname": self.username, "pwd": self.password}}
+
+        # Update credentials in config
+        udict = {
+            "msudp": {
+                "uname": self.username,
+                "pwd": self.password
+            }
+        }
+
         configdata.updt_portal_credentials(udict)
 
-        # self.top.set_user_credentials(self.username, self.password)  # Use self.top here
+        # Optional callback to main frame
+        # self.top.set_user_credentials(self.username, self.password)
+
         self.Close()

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: setDialog.py
@@ -7,11 +7,11 @@
 #     Dialog to display system setup configuration
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 
 # Built-in imports
@@ -33,23 +33,31 @@ HC_PORT = 2022
 ##############################################################################
 class ScanNwThread(threading.Thread):
     """
-    A class ScannNwThread with init method.
-    using Threading in Scanning the network from client and server.
+    Thread class used to scan network nodes.
+
+    This thread scans the subnet to identify
+    available SCC / THC servers listening
+    on the specified port.
+
+    Attributes:
+        port: Network port to scan.
+        txtsysip: UI label showing system IP.
+        txtctrl: UI control displaying found IP.
+        btnScan: Scan button reference.
     """
     def __init__(self, port, txtsysip, txtctrl, btnScan, name="NwScanThread"):
         """
-        adding event with threading.
+        Initialize network scanning thread.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            port: network port number.
-            txtsysip: system listening own system ip
-            txtctrl: maually enter ipaddress in network,
-            name: name as NwScanThread. 
+            port: Network port number.
+            txtsysip: System IP label control.
+            txtctrl: Target IP text control.
+            btnScan: Scan button reference.
+            name: Thread name.
+
         Returns:
-            None:
+            None
         """
         self._stopevent = threading.Event()
 
@@ -62,15 +70,16 @@ class ScanNwThread(threading.Thread):
  
     def run(self):
         """
-        thread running
+        Execute network scan operation.
+
+        Scans subnet IP range and detects
+        active server nodes.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
-
         """
         subnet = self.get_network_subnet()[0]
         self.txtsysip.SetLabel(str(subnet))
@@ -95,13 +104,11 @@ class ScanNwThread(threading.Thread):
 
     def join(self, timeout = None):
         """
-        join the thread event
+        Stop scanning thread.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            timeout: timer is running between start and stop
+            timeout: Optional wait timeout.
+
         Returns:
             None
         """
@@ -109,36 +116,44 @@ class ScanNwThread(threading.Thread):
 
     def get_network_subnet(self):
         """
-        getting the hostcomputer network subnet with ipaddress.
+        Retrieve host system subnet address.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
-            hostcomputer ipaddress
+            tuple:
+                Local system IP and port.
         """
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 88))
         return (s.getsockname())
 
-
 class SetWindow(wx.Window):
     """
-    A  class AboutWindow with init method
-    The AboutWindow navigate to MCCI Logo with naming of 
-    application UI "Criket",Version and copyright info.  
+    Configuration window for system setup.
+
+    Provides UI to configure:
+
+    - Interface type (Serial / Network)
+    - IP address
+    - Port number
+    - Network scan
+
+    Attributes:
+        parent: Parent dialog reference.
+        top: Main application reference.
+        type: Configuration type (SCC / THC).
     """
     def __init__ (self, parent, top, type):
         """
-        AboutWindow that contains the about dialog elements.
+        Initialize SetWindow UI.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: creates an object
+            parent: Parent dialog.
+            top: Application top frame.
+            type: Configuration type identifier.
+
         Returns:
             None
         """
@@ -233,30 +248,29 @@ class SetWindow(wx.Window):
 
     def initDialog(self):
         """
-        initiating the netowork dialog windows
+        Initialize dialog default settings.
+
+        Loads configuration and prepares UI.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
-        
         pass
 
     def ScanNetwork(self, e):
         """
-        Scanning the network from Client and Server.
+        Handle network scan button event.
+
+        Starts or stops scanning based on state.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e: event in scan network button
+            e: wx Event object.
+
         Returns:
             None
-
         """
         if self.scan_flg == False:
             self.StartNwScan()
@@ -265,12 +279,14 @@ class SetWindow(wx.Window):
 
     def StartNwScan(self):
         """
-        start the server network scanning
+        Start network scanning thread.
+
+        Initializes scan parameters and
+        begins subnet scanning.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
@@ -300,12 +316,13 @@ class SetWindow(wx.Window):
         
     def StopNwScan(self):
         """
-        stop the scanning network
+        Stop active network scanning.
+
+        Terminates scan thread safely.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
@@ -315,13 +332,14 @@ class SetWindow(wx.Window):
     
     def SaveSettings(self, e):
         """
-        save the Ipaddress and port number.
+        Save configured interface settings.
+
+        Stores selected interface type,
+        IP address, and port number.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e: click on save button save the Dialog box window.
+            e: wx Event object.
+
         Returns:
             None
         """
@@ -347,36 +365,40 @@ class SetWindow(wx.Window):
     
     def get_network_subnet(self):
         """
-        getting the subnet mask hostcomputer ipaddress.
+        Retrieve system subnet details.
 
         Args:
-            self:The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
-            None
+            tuple:
+                Local IP and port details.
         """
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 88))
         return (s.getsockname())
-        
-                
+           
 class SetDialog(wx.Dialog):
     """
-    wxWindows application must have a class derived from wx.Dialog.
+    Dialog wrapper for SetWindow.
+
+    Displays configuration window
+    for SCC / THC setup.
+
+    Attributes:
+        parent: Parent frame reference.
+        top: Application reference.
+        type: Configuration type.
     """
     def __init__ (self, parent, top, type):
         """
-        A AboutDialog is Window an application creates to 
-        retrieve Cricket UI Application input.
+        Initialize SetDialog window.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
-            type: dialog box
+            parent: Parent frame.
+            top: Application top reference.
+            type: Configuration type (SCC / THC).
+
         Returns:
             None
         """
@@ -394,24 +416,19 @@ class SetDialog(wx.Dialog):
 
         # Sizes the window to fit its best size.
         self.Fit()
-        # Centre frame using CentreOnParent() function,
-        # Show window in the center of the screen.
-        # Centres the window on its parent.
         self.CenterOnParent(wx.BOTH)
     
     def OnOK (self, evt):
         """
-        OnOK() event handler function retrieves the label of 
-        source button, which caused the click event. 
+        Handle dialog confirmation event.
+
+        Closes dialog with OK status.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnOK() method is an 
-            object specific to a particular event type.
+            evt: wx Event object.
+
         Returns:
-            None        
+            None
         """
     # Returns numeric code to caller
         self.EndModal(wx.ID_OK)

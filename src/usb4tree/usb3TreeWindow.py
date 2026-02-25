@@ -1,16 +1,22 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
-# Module: USB3Treewindow.py
+#
+# Module: usb3TreeWindow.py
 #
 # Description:
-#     Scan the USB bus and get the list of devices attached
+#     This module provides a graphical Tree View representation of
+#     USB 3.x topology connected to the host system.
 #
+#     It scans, parses, and visualizes USB Host Controllers, Hubs,
+#     and Peripheral devices in a hierarchical structure using
+#     wx.TreeCtrl.
 # Author:
-#     Vinay N, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 import wx
 import sys
@@ -32,13 +38,7 @@ usbClass = {
     220: "Diagnostic Devices", 224: "Wireless Controller", 
     239: "Miscellaneous", 254: "Application Specific",
     255: "Vendor Specific",
-    # Add new class IDs and their names here
-    # For example:
-    # 220: "Diagnostic Devices",
-    # 224: "Wireless Controller",
-    # 239: "Miscellaneous",
-    # 254: "Application Specific",
-    # 255: "Vendor Specific"
+   
 }
 
 
@@ -47,9 +47,44 @@ usbClass = {
 ##############################################################################
 class Usb3TreeWindow(wx.Window):
     """
-    A class logWindow with init method
+    USB3 Tree View Window.
 
-    To show the all actions while handling ports of devices 
+    Description:
+        This class creates a graphical tree representation of
+        USB 3.x device topology connected to the host system.
+
+        The tree displays hierarchical relationships between:
+
+            • Host Controllers
+            • USB Hubs
+            • Connected Peripheral Devices
+
+        Each node includes device metadata such as:
+
+            • Vendor ID (VID)
+            • Product ID (PID)
+            • Device Speed
+            • USB Class
+            • Port Number
+
+    Parameters:
+        parent (wx.Window):
+            Parent window reference.
+
+        top (object):
+            Top-level controller reference used for
+            application-level interactions.
+
+    Attributes:
+        tree (wx.TreeCtrl):
+            Tree control used to render USB topology.
+
+        root (wx.TreeItemId):
+            Root node labeled
+            "MY COMPUTER USB Tree View".
+
+        usb3parse (object):
+            Platform-specific USB3 parser instance.
     """
 
     def __init__(self, parent, top):
@@ -88,7 +123,22 @@ class Usb3TreeWindow(wx.Window):
 
     def update_usb3_tree(self, usb3data):
         """
-        Update the USB list based on List 
+        Update USB3 Tree View with latest scan data.
+
+        Description:
+            Parses the enumerated USB3 device list and redraws
+            the Tree View hierarchy.
+
+            This method acts as the entry point for refreshing
+            the USB3 topology display.
+
+        Args:
+            usb3data (list):
+                Raw USB3 enumeration data obtained from
+                the USB device enumerator.
+
+        Returns:
+            None
         """
         self.usb3parse.parse_usb3tb_data(usb3data)
 
@@ -97,7 +147,24 @@ class Usb3TreeWindow(wx.Window):
 
     def redraw_usb3_tree(self, idata, ldata):
         """
-        Redrraw the Tree view N Levels of USB4 and Thunderbolt
+        Redraw the USB3 topology tree.
+
+        Description:
+            Clears the existing Tree View and reconstructs
+            it using parsed USB3 hierarchy data.
+
+            Devices are rendered level-wise based on their
+            topology depth.
+
+        Args:
+            idata (dict):
+                Parsed USB3 item data.
+
+            ldata (dict):
+                Level-organized USB3 topology data.
+
+        Returns:
+            None
         """
         self.delete_all_items()
         lkeys = list(ldata.keys())
@@ -115,11 +182,55 @@ class Usb3TreeWindow(wx.Window):
             print("No USB3 devices found in ldata")
 
     def OnItemSelect(self, event):
+        """
+        Handle Tree Item selection event.
+
+        Description:
+            Triggered when a user selects a device node
+            in the USB3 Tree View.
+
+            Can be extended to display additional device
+            metadata such as descriptors or logs.
+
+        Args:
+            event (wx.TreeEvent):
+                Tree selection event object.
+
+        Returns:
+            None
+        """
         # Define OnItemSelect method here
         item = event.GetItem()
         text = self.tree.GetItemText(item)
     
     def draw_level0_data(self, ddict, dlist):
+        """
+        Draw Level-0 USB3 devices in Tree View.
+
+        Description:
+            Renders top-level USB3 devices including
+            Host Controllers, Hubs, and Peripherals.
+
+            Each node displays:
+
+                • Port Number
+                • USB Class Name
+                • VID / PID
+                • Device Speed
+
+            Child port nodes are created for hub devices.
+
+        Args:
+            ddict (dict):
+                Parsed USB3 device dictionary.
+
+            dlist (list):
+                List of Level-0 topology keys.
+
+        Returns:
+            None
+        """
+
         for item in dlist:
             vid = hex(int(ddict[item]['vid']))  # Convert VID to hexadecimal
             pid = hex(int(ddict[item]['pid']))  # Convert PID to hexadecimal
@@ -145,6 +256,27 @@ class Usb3TreeWindow(wx.Window):
                     self.tree.AppendItem(hub_node, port_text)  # Add port node as child of the hub
 
     def draw_leveln_data(self, ddict, dlist, lidx):
+        """
+        Draw deeper USB3 topology levels.
+
+        Description:
+            Adds child device nodes under their
+            respective parent hubs based on topology
+            depth.
+
+        Args:
+            ddict (dict):
+                Parsed USB3 device data.
+
+            dlist (list):
+                Device keys at the specified level.
+
+            lidx (int):
+                Current topology level index.
+
+        Returns:
+            None
+        """
         for item in dlist:
             cidx = item.split(',')[lidx]
             vid = ddict[item]['vid']
@@ -154,6 +286,28 @@ class Usb3TreeWindow(wx.Window):
             self.tree.AppendItem(parent_item, node_text)
 
     def get_parent_item(self, parent, item, level):
+        """
+        Locate parent node for a USB3 device.
+
+        Description:
+            Traverses the Tree View hierarchy to
+            identify the correct parent node where
+            the device should be attached.
+
+        Args:
+            parent (wx.TreeItemId):
+                Starting parent node.
+
+            item (str):
+                Device topology key.
+
+            level (int):
+                Current topology depth.
+
+        Returns:
+            wx.TreeItemId:
+                Matching parent tree node.
+        """
         if level == 0:
             return parent
         else:
@@ -166,6 +320,22 @@ class Usb3TreeWindow(wx.Window):
             return self.get_parent_item(parent, item, level-1)
 
     def delete_all_items(self):
+        """
+        Clear all USB3 nodes from Tree View.
+
+        Description:
+            Removes all child items under the root
+            node before redrawing updated USB3
+            topology data.
+
+            The root node remains intact.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         root = self.tree.GetRootItem()
         if root.IsOk():
             self.tree.DeleteChildren(root)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: devClient.py
@@ -8,16 +9,21 @@
 #     Send device control command to Server and receive response from the server
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#    V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 # Built-in imports
-
 import socket
 import json
+
+# Lib imports
+# (None)
+
+# Own modules
+# (None)
 
 def send_request(host, port, reqdict):
     """

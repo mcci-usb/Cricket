@@ -1,4 +1,23 @@
-from random import choice, choices
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Module: dutConfigDialog.py
+#
+# Description:
+#     Firmware Update Utility for Supported MCCI Switch Models.
+#
+# Detailed Description:
+#     This module provides functionality to perform firmware updates
+#     on supported switch devices through bootloader mode using
+#     serial communication.
+#
+# Author:
+#     Vinay N, MCCI Corporation Feb 2026
+#
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
 import wx
 
 import serial.tools.list_ports
@@ -11,6 +30,34 @@ import configdata
 from uiGlobals import IMG_ICON
 
 class DutConfigDialog(wx.Frame):
+    """
+    DUT Configuration Dialog Window.
+
+    This class implements a GUI dialog used to configure communication
+    and monitoring settings for a Device Under Test (DUT).
+
+    Features:
+        • Interface selection (Serial / TCP)
+        • Serial port configuration
+        • TCP placeholder configuration
+        • DUT naming
+        • Fault sequence monitoring setup
+        • Match action configuration
+
+    The dialog reads existing DUT configuration data, allows the user
+    to modify settings, and saves updates through the configdata module.
+
+    Inherits:
+        wx.Frame : Base window class from wxPython.
+
+    Args:
+        top (wx.Window):
+            Reference to the parent/top window.
+
+        dut (dict):
+            DUT configuration dictionary containing interface,
+            serial settings, and monitoring configuration.
+    """
     def __init__(self, top, dut):
         wx.Frame.__init__(self,None, size=(360,620))
 
@@ -56,16 +103,19 @@ class DutConfigDialog(wx.Frame):
         self.Layout()
         self.CenterOnParent(wx.BOTH)
 
-
-        #--------------------- ---EVENT BIND--- #---------------------
     def filter_port(self):
         """
-        filter the Comports list from list UI supported Switch with same VID and PID.
-        Args:
-            No argument
-        Return:
-            port_name -  list of availablable port numbers and serial number of 
-            the 2101     
+        Filter Available COM Ports.
+
+        Scans all detected serial COM ports and filters out ports that match
+        specific USB VID/PID combinations associated with unsupported devices.
+
+        This ensures that only valid ports for supported switch hardware
+        are displayed in the UI.
+
+        Returns:
+            list[str]:
+                List of available COM port names that are allowed for selection.
         """
         usb_hwid_str = ["USB VID:PID=045E:0646", "USB VID:PID=2341:0042"]
         comlist = serial.tools.list_ports.comports()
@@ -79,6 +129,22 @@ class DutConfigDialog(wx.Frame):
     
     
     def InitSelectionType(self):
+        """
+        Initialize Interface Selection Controls.
+
+        Creates UI components for selecting the DUT communication interface
+        type (Serial or TCP) and configuring the DUT name.
+
+        UI Elements:
+            • Serial / TCP radio buttons
+            • DUT name text field
+            • Save button for base settings
+
+        Binds:
+            • SaveTypeName()
+            • OnSerial()
+            • OnNetowrk()
+        """
         self.hboxdr6 = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxdrn = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -117,6 +183,15 @@ class DutConfigDialog(wx.Frame):
 
 
     def InitTcpConfig(self):
+        """
+        Initialize TCP Configuration Section.
+
+        Creates placeholder UI components for TCP network configuration.
+
+        Note:
+            TCP communication support is planned for future implementation.
+            Current UI only displays an informational message.
+        """
         ab = wx.StaticBox(self, -1, "TCP Settings", size = (400, 200))
         self.vboxTcp = wx.StaticBoxSizer(ab, wx.VERTICAL)
         self.st_tcp = wx.StaticText(self, -1, "Will be implemented in future", size = (180, 15))
@@ -130,6 +205,22 @@ class DutConfigDialog(wx.Frame):
         ])
 
     def InitSerialConfig(self):
+        """
+        Initialize Serial Configuration Section.
+
+        Builds UI controls required for configuring serial communication
+        parameters for the DUT.
+
+        Configuration Options:
+            • COM Port selection
+            • Baud rate
+            • Data bits
+            • Parity
+            • Stop bits
+            • Parity error character
+
+        Also initializes control values from existing DUT settings.
+        """
         ab = wx.StaticBox(self, -1, "COM Port Settings", size = (400, 200))
         self.vboxSerial = wx.StaticBoxSizer(ab, wx.VERTICAL)
         self.cb_list = self.filter_port()
@@ -218,6 +309,18 @@ class DutConfigDialog(wx.Frame):
         self.InitSelectionCtrl()
 
     def InitDataToWatch(self):
+        """
+        Initialize “Data to Watch” Configuration Section.
+
+        Provides UI controls to configure fault sequence monitoring.
+
+        Features:
+            • Multi-line text input for fault patterns
+            • Match action selection
+            • Save configuration option
+
+        Loads existing fault sequence and action settings from DUT config.
+        """
         self.hboxdr7 = wx.BoxSizer(wx.HORIZONTAL)
         self.hbox_ap = wx.BoxSizer(wx.HORIZONTAL)
         self.hboxdr8 = wx.BoxSizer(wx.HORIZONTAL)
@@ -272,6 +375,17 @@ class DutConfigDialog(wx.Frame):
         self.tc_data.SetValue(mystr)
 
     def InitSelectionCtrl(self):
+        """
+        Load Serial Settings into UI Controls.
+
+        Populates serial configuration UI fields using stored DUT settings.
+
+        If no settings exist, default serial configuration values are loaded.
+
+        Also binds:
+            • RefreshConfig()
+            • SaveConfig()
+        """
         serkeys = list(self.dut_settings.keys())
         if(len(serkeys) == 0):
             self.dut_settings = self.dut[self.dut_key]["default"]["serial"]
@@ -287,6 +401,19 @@ class DutConfigDialog(wx.Frame):
         self.btn_saveser.Bind(wx.EVT_BUTTON, self.SaveConfig)
 
     def SaveTypeName(self, event):
+        """
+        Save DUT Name and Interface Type.
+
+        Stores the selected communication interface (Serial/TCP)
+        and DUT display name into configuration storage.
+
+        Updates:
+            • configdata base DUT settings
+
+        Args:
+            event (wx.Event):
+                Button click event.
+        """
         type = "tcp"
         name = self.tc_nameSut.GetValue()
         if(self.rbtn_ser.GetValue()):
@@ -299,6 +426,20 @@ class DutConfigDialog(wx.Frame):
         self.save_done_dialog("DUT name saved")
         
     def SaveDataToWatch(self, event):
+        """
+        Save Fault Sequence Monitoring Configuration.
+
+        Extracts fault patterns from the text field and stores them
+        along with the selected match action.
+
+        Updates:
+            • configdata watch configuration
+            • Parent UI DUT configuration
+
+        Args:
+            event (wx.Event):
+                Button click event.
+        """
         fadata = self.tc_data.GetValue()
         fault_list = re.findall(r'"([^"]*)"', fadata)
 
@@ -311,7 +452,12 @@ class DutConfigDialog(wx.Frame):
         self.save_done_dialog("Data config saved")
 
     def UpdateData(self):
-        
+        """
+        Update UI Based on Interface Type.
+
+        Shows or hides Serial/TCP configuration sections depending
+        on the currently selected DUT interface.
+        """
         if(self.dut_type == "serial"):
             self.rbtn_ser.SetValue(True)
             self.vboxParent.Hide(self.vboxTcp)
@@ -320,24 +466,92 @@ class DutConfigDialog(wx.Frame):
             self.vboxParent.Hide(self.vboxSerial)
                 
     def OnSerial(self, event):
+        """
+        Handle Serial Interface Selection Event.
+
+        Triggered when the Serial radio button is selected.
+
+        Args:
+            event (wx.Event):
+                Radio button selection event.
+        """
         btn = event.GetEventObject()
     
     def OnNetowrk(self, event):
+        """
+        Handle TCP Interface Selection Event.
+
+        Triggered when the Network (TCP) radio button is selected.
+
+        Args:
+            event (wx.Event):
+                Radio button selection event.
+        """
         btn = event.GetEventObject()
 
     def Onselectcom(self, e):
+        """
+        Handle COM Port Selection Event.
+
+        Captures the selected COM port from the dropdown.
+
+        Args:
+            e (wx.Event):
+                ComboBox selection event.
+        """
         self.cb = e.GetEventObject()
 
     def Onselectbaud(self, e):
+        """
+        Handle Baud Rate Selection Event.
+
+        Captures the selected baud rate value.
+
+        Args:
+            e (wx.Event):
+                ComboBox selection event.
+        """
         self.cb = e.GetEventObject()
     
     def Onselectdatabits(self, e):
+        """
+        Handle Data Bits Selection Event.
+
+        Captures the selected data bits configuration.
+
+        Args:
+            e (wx.Event):
+                ComboBox selection event.
+        """
         self.cb = e.GetEventObject()
     
     def Onselectstopbits(self, e):
+        """
+        Handle Stop Bits Selection Event.
+
+        Captures the selected stop bits configuration.
+
+        Args:
+            e (wx.Event):
+                ComboBox selection event.
+        """
         self.cb = e.GetEventObject()
 
     def SaveConfig(self, e):
+        """
+        Save Serial Communication Configuration.
+
+        Collects all selected serial parameters and stores them
+        in DUT configuration.
+
+        Updates:
+            • configdata serial settings
+            • Parent UI DUT configuration
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         strcom = self.cb_switch.GetValue()
         strbr = self.cb_baud.GetValue()
         strdb = self.cb_Databits.GetValue()
@@ -356,6 +570,16 @@ class DutConfigDialog(wx.Frame):
         self.save_done_dialog("Serial config saved")
            
     def RefreshConfig(self, e):
+        """
+        Refresh Available COM Ports List.
+
+        Re-scans the system for available serial ports and updates
+        the COM port dropdown list.
+
+        Args:
+            e (wx.Event):
+                Button click event.
+        """
         self.cb_list = self.filter_port()
         self.cb_switch.Clear()
         for cport in self.cb_list:
@@ -363,12 +587,39 @@ class DutConfigDialog(wx.Frame):
         self.cb_switch.SetSelection(0)
 
     def save_config_data(self, cdata):
+        """
+        Proxy Method to Save Configuration Data.
+
+        Passes configuration data to the parent window for storage.
+
+        Args:
+            cdata (dict):
+                Configuration data dictionary.
+        """
         self.top.save_config_data(cdata)
 
     def read_config_data(self):
+        """
+        Read Configuration Data from Parent.
+
+        Retrieves stored DUT configuration data.
+
+        Returns:
+            dict:
+                DUT configuration dictionary.
+        """
         return self.top.get_config_data()
 
     def save_done_dialog(self, msg):
+        """
+        Display Configuration Saved Dialog.
+
+        Shows a confirmation message dialog after successful save.
+
+        Args:
+            msg (str):
+                Message to display in the dialog.
+        """
         title = ("DUT Config Dialog")
         dlg = wx.MessageDialog(self, msg, title, wx.OK)
         dlg.ShowModal()

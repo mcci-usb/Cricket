@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
-# Module: Macusb4parse.py
+# Module: Winusb4parse.py
 #
 # Description:
-#     parsing the USB4 Tree view data in Windows
+#     USB4 Tree View Parsing module for Windows systems.
+#     Parses USB4 / Thunderbolt topology data received from
+#     Windows USB4 services and organizes it into hierarchical levels.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Jan 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
 EADR = 'EvtAddDeviceRouter'
 ERDR = 'EvtRemoveDeviceRouter'
@@ -40,28 +44,82 @@ WIDTH_DICT = {"Unknown 0": "0", "Single Lane": "1", "Dual Lane": "2", "Two Singl
 
 MAX_LEVEL = 7
 
+
+##############################################################################
+# Utilities
+##############################################################################
 class WinUsb4TreeParse():
+    """
+    Summary:
+        Windows USB4 Tree Parser.
+
+    Longer Description:
+        Parses USB4 / Thunderbolt topology data received from
+        Windows event streams and converts it into structured
+        dictionaries for UI tree rendering.
+
+    Attributes:
+        idata (dict):
+            Parsed item-level USB4 data.
+
+        ldata (dict):
+            Hierarchical level-wise USB4 topology data.
+    """
     def __init__(self):
+        """
+        Initialize Windows USB4 Tree Parser.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.idata = None
         self.ldata = None
     
     def parse_usb4tb_data(self, usb4data):
+        """
+        Parse USB4 Thunderbolt data.
+
+        Description:
+            Entry method to parse incoming USB4 event data.
+            Generates item-level data and hierarchical level data.
+
+        Args:
+            usb4data (dict):
+                Raw USB4 event JSON data.
+
+        Returns:
+            None
+        """
         self.idata = None
         self.ldata = None
         self.idata = self.get_item_data(usb4data)
         self.ldata = self.get_level_data(self.idata)
    
-
     def get_item_data(self, msg):
-       
         """
-        Extracts USB4 item data from the input message.
+        Extract USB4 item data from event message.
 
-        Parameters:
-            msg (dict): The input message containing USB4 events.
+        Description:
+            Processes USB4 router add events and extracts
+            device-level information such as:
+
+            - Description
+            - Model name
+            - Vendor name
+            - VID / PID
+            - Port mapping
+
+        Args:
+            msg (dict):
+                Input USB4 event message.
 
         Returns:
-            dict: A dictionary mapping unique identifiers to USB4 item data.
+            dict:
+                Dictionary mapping topology index strings
+                to parsed USB4 device information.
         """
         usb4e = msg["events"]
         pu4dict = {}
@@ -97,13 +155,25 @@ class WinUsb4TreeParse():
 
     def get_level_data(self, u4tbuf):
         """
-        Organizes data based on levels and returns a dictionary.
+        Organize USB4 data into hierarchical levels.
 
-        Parameters:
-            u4tbuf: The input data dictionary to be processed.
+        Description:
+            Groups parsed USB4 devices based on their
+            topology depth level for tree visualization.
+
+        Args:
+            u4tbuf (dict):
+                Parsed USB4 item dictionary.
 
         Returns:
-            dict: A dictionary organizing data items based on their level.
+            dict:
+                Dictionary with level keys such as:
+
+                    level0
+                    level1
+                    level2
+
+                Each containing topology index references.
         """
         rkarr = list(u4tbuf.keys())
         pdict = {}

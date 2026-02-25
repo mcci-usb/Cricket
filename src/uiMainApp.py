@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: uiMainApp.py
@@ -16,11 +17,11 @@
 #     Released under the MCCI Corporation.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#    V4.3.0 Mon Jan 22 2024 17:00:00   Seenivasan V
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 # Lib imports
 import wx
@@ -199,9 +200,6 @@ class UiMainFrame (wx.Frame):
         self.load_config()
         EVT_RESULT(self, self.RunServerEvent)
 
-        # Set up the layout
-        # self.setup_layout()
-
     def load_config(self):
         # Load the configuration from config_data
         # This is a sample, replace it with your logic to load from the actual file
@@ -225,10 +223,6 @@ class UiMainFrame (wx.Frame):
             - The scanned Thunderbolt devices are saved for
               further use in the USB tree.
         """
-        # scan and save ThunderBolt USB device
-        # if sys.platform == "darwin":
-        #     tbList = getTb.scan_tb()
-        #     self.save_tb_list(tbList)
         pass
     
     def init_statusBar(self):
@@ -454,10 +448,7 @@ class UiMainFrame (wx.Frame):
         """
         devControl.SetDeviceControl(self)
         thControl.SetDeviceControl(self)
-        # if self.myrole["uc"] == True:
-        #     self.auto_connect()
-        
-    
+
     def RunServerEvent(self, event):
         """
         serching the port event handling indicates 
@@ -520,6 +511,35 @@ class UiMainFrame (wx.Frame):
             self.print_on_log("No Switches found ...\n")
 
     def remove_switch(self, swname):
+        """
+        Remove Switch from UI Panel.
+
+        Detailed Description:
+            This function removes the specified
+            switch device entry from the application
+            user interface panel.
+
+            It forwards the switch removal request
+            to the panel handler responsible for
+            updating the switch view.
+
+            Execution Responsibilities:
+
+                • Receive switch name identifier
+                • Invoke panel switch removal handler
+                • Update UI switch listing
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+            swname :
+                Name / identifier of the switch
+                to be removed from the panel.
+
+        Returns:
+            None
+        """
         self.panel.remove_switch(swname)
    
     def update_slog_menu(self):
@@ -599,6 +619,31 @@ class UiMainFrame (wx.Frame):
         self.menuBar.Append(self.helpMenu,    "&Help")
     
     def build_set_menu(self):
+        """
+        Build Network Settings Menu Item.
+
+        Detailed Description:
+            This function creates and adds the
+            "Configurations" menu item under the
+            Network menu in the application menu bar.
+
+            It initializes the menu item with the
+            specified identifier and appends it
+            to the Network menu for user access.
+
+            Execution Responsibilities:
+
+                • Create Network configuration menu item
+                • Assign menu ID and label
+                • Append item to Network menu
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+        Returns:
+            None
+        """
         self.Nmenu = wx.MenuItem(self.netMenu, ID_NETWORK_MENU, "Configurations")
         self.netMenu.Append(self.Nmenu)
 
@@ -635,6 +680,33 @@ class UiMainFrame (wx.Frame):
         self.toolMenu.Enable(ID_MENU_GRAPH, True)
 
     def OnMove(self, e):
+        """
+        Handle Window Move Event.
+
+        Detailed Description:
+            This function is triggered when the
+            application window is moved on screen.
+
+            It captures the updated window position
+            and stores the latest screen layout
+            information for future restoration.
+
+            Execution Responsibilities:
+
+                • Detect window move event
+                • Read current window position
+                • Save updated screen coordinates
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+            e :
+                Window move event object.
+
+        Returns:
+            None
+        """
         x, y = e.GetPosition()
         w, h = wx.DisplaySize()
         sw = self.Size[0]
@@ -642,6 +714,32 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
 
     def initScreenSize(self):
+        """
+        Initialize Application Screen Size.
+
+        Detailed Description:
+            This function restores the application
+            window position and size from previously
+            saved configuration data.
+
+            If no saved screen information is available,
+            the window is initialized with default
+            dimensions and centered on the screen.
+
+            Execution Responsibilities:
+
+                • Read saved screen position
+                • Read saved screen size
+                • Apply stored window layout
+                • Fallback to default size if not available
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+        Returns:
+            None
+        """
        
         dw, dh = wx.DisplaySize()
         opos = self.config_data["screen"]["pos"]
@@ -655,6 +753,33 @@ class UiMainFrame (wx.Frame):
             self.SetSize((osize[0], osize[1]))
 
     def saveScreenSize(self):
+        """
+        Save Current Application Screen Size.
+
+        Detailed Description:
+            This function captures the current
+            window position and size of the
+            application screen.
+
+            The collected screen coordinates
+            and dimensions are stored into the
+            configuration data for restoring
+            the same layout in future sessions.
+
+            Execution Responsibilities:
+
+                • Read window position (X, Y)
+                • Read window size (Width, Height)
+                • Prepare screen configuration dict
+                • Update persistent config storage
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+        Returns:
+            None
+        """
         
         px, py = self.GetPosition()
         sw, sh = self.GetSize()
@@ -662,6 +787,30 @@ class UiMainFrame (wx.Frame):
         configdata.updt_screen_size(findict)
 
     def reSizeScreen(self):
+        """
+        Dynamically Resize Main Application Screen.
+
+        Detailed Description:
+            This function adjusts the application
+            window size based on enabled runtime
+            panels and current display resolution.
+
+            It evaluates DUT panels and USB4 Tree
+            visibility to determine the required
+            screen width, applies proportional
+            height scaling, and updates the layout
+            accordingly.
+
+            The resized screen is centered and
+            persisted for future sessions.
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+        Returns:
+            None
+        """
        
         w, h = wx.DisplaySize()
 
@@ -688,6 +837,28 @@ class UiMainFrame (wx.Frame):
         self.saveScreenSize()
     
     def serverResizerScreen(self):
+        """
+        Resize Application Window Based on Role.
+
+        Detailed Description:
+            This function dynamically resizes the
+            main application window according to
+            the configured system role and screen
+            resolution.
+
+            It calculates display dimensions,
+            adjusts required window width for
+            server/client modes, applies the new
+            size, re-centers the screen, and saves
+            the updated layout configuration.
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+        Returns:
+            None
+        """
         w, h = wx.DisplaySize()
 
         dw = int(w * 0.97)
@@ -726,18 +897,11 @@ class UiMainFrame (wx.Frame):
 
         """
         obj = event.GetEventObject()
-        
-        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
         self.config_data["rpanel"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
         self.config_data["rpanel"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
 
         self.update_right_panel()
         self.reSizeScreen()
-        
-        # if not self.dutLogWindow.IsShown():
-        #     obj.MenuItems[0].Check(False)
-        #     obj.MenuItems[1].Check(False)
 
     def SelectU4TREE(self, event):
         """
@@ -755,8 +919,6 @@ class UiMainFrame (wx.Frame):
         """
         obj = event.GetEventObject()
         
-        # self.duts["nodes"]["dut1"] = True if obj.MenuItems[0].IsChecked() else False
-        # self.duts["nodes"]["dut2"] = True if obj.MenuItems[1].IsChecked() else False
         self.config_data["rpanel"]["u4tree"] = True if self.usb4t.IsChecked() else False
         
         self.update_right_panel()
@@ -1004,6 +1166,30 @@ class UiMainFrame (wx.Frame):
         dlg.Destroy()
         
     def OnNetworkWindow(self, event):
+        """
+        Open Network Configuration Window.
+
+        Detailed Description:
+            This function launches the Network
+            Configuration dialog, allowing the
+            user to modify network role and
+            communication settings.
+
+            After closing the dialog, it reloads
+            the updated configuration, refreshes
+            UI panels, resizes the server layout,
+            and re-centers the application window.
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+            event :
+                Triggered button/menu event object.
+
+        Returns:
+            None
+        """
         dlg = NetConfigDialog(self, self.myrole)
         dlg.ShowModal()
         dlg.Destroy()
@@ -1166,19 +1352,6 @@ class UiMainFrame (wx.Frame):
     def disconnect_device(self, swport):
         devControl.disconnect_device(self, swport)
         
-    # def OnDisconnect (self, event):
-    #     """
-    #     click on disconnect menu the connecting device is disconnect.
-    #     Args:
-    #         self: The self parameter is a reference to the current 
-    #         instance of the class,and is used to access variables
-    #         that belongs to the class.
-    #         event: event handling on disconnect menu.
-    #     Returns:
-    #         None
-    #     """
-    #     self.device_no_response()
-    
     def OnClose(self, event):
         """
         click on close application termiante
@@ -1397,9 +1570,30 @@ class UiMainFrame (wx.Frame):
         # pass
     
     def store_usb3_win_info(self, usb3dict):
-        # print("store_usb3_win_info-->")
-        
-        # print("store_usb3_win_info-uiMainapp")
+        """
+        Store USB3 Windows Device Information.
+
+        Detailed Description:
+            This function receives the parsed USB3
+            device information dictionary and forwards
+            it to the UI panel for updating the
+            USB3 Tree View display.
+
+            It acts as an interface between the
+            backend USB detection logic and the
+            front-end visualization layer.
+
+        Args:
+            self :
+                Reference to the main application instance.
+
+            usb3dict :
+                Dictionary containing parsed USB3
+                device tree information.
+
+        Returns:
+            None
+        """
 
         self.panel.update_usb3_tree(usb3dict)
     

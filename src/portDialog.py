@@ -1,18 +1,22 @@
-
+# -*- coding: utf-8 -*-
 ##############################################################################
-# 
+#
 # Module: portDialog.py
 #
 # Description:
-#     Dialog to display system setup configuration
+#     Dialog window to configure port settings for
+#     Switch Control Computer (SCC) and Test Host Computer (THC).
+#     Allows users to select interface type (Serial / Network)
+#     and update port configuration details.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation June 2021
+#     Vinay N, MCCI Corporation Feb 2026
 #
-# Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
 ##############################################################################
+
 
 # Built-in imports
 import os
@@ -33,20 +37,27 @@ HC_PORT = 2022
 ##############################################################################
 class PortWindow(wx.Window):
     """
-    A  class AboutWindow with init method
-    The AboutWindow navigate to MCCI Logo with naming of 
-    application UI "Criket",Version and copyright info.  
+    Port configuration window.
+
+    This window provides UI controls to configure
+    communication interface and port settings for
+    SCC or THC systems.
+
+    Attributes:
+        top: Reference to main application frame.
+        parent: Parent dialog window.
+        cdata: Configuration data dictionary.
+        type: System type (SCC / THC).
     """
     def __init__ (self, parent, top, cdata):
         """
-        AboutWindow that contains the about dialog elements.
+        Initialize PortWindow UI.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: creates an object
+            parent: Parent dialog window.
+            top: Reference to main application frame.
+            cdata: Configuration data for SCC/THC.
+
         Returns:
             None
         """
@@ -118,23 +129,19 @@ class PortWindow(wx.Window):
             ])
 
         self.initDialog()
-        #self.initDialog1()
-
-        #self.SetSizer(self.vbox)
         self.SetSizerAndFit(self.vbox)
-        # Determines whether the Layout function will be called 
-        # Automatically when the window is resized.
         self.SetAutoLayout(True)
 
-    
     def initDialog(self):
         """
-        initiate the dialog box of both SCC and THC 
+        Initialize dialog controls with existing configuration.
+
+        Updates interface selection, port value,
+        and displays system IP address.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
             None
         """
@@ -147,13 +154,14 @@ class PortWindow(wx.Window):
 
     def SaveSettings(self, e):
         """
-        save the scanning network address
+        Save configured port and interface settings.
+
+        Stores selected interface type and port
+        into application configuration data.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            e: save button event
+            e: Button click event.
+
         Returns:
             None
         """
@@ -176,35 +184,39 @@ class PortWindow(wx.Window):
     
     def get_network_subnet(self):
         """
-        getting the local subnet address ethernet and LAN
+        Retrieve local system subnet/IP address.
+
+        Used to display host system network details
+        in the dialog window.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Instance reference.
+
         Returns:
-            return (socket.gethostbyname_ex(socket.gethostname())[2])
+            tuple: System IP information.
         """
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 88))
         return (s.getsockname())
         
-        
 class PortDialog(wx.Dialog):
     """
-    wxWindows application must have a class derived from wx.Dialog.
+    Port configuration dialog container.
+
+    Hosts the PortWindow and provides
+    dialog-level controls for saving
+    SCC/THC port settings.
     """
+    
     def __init__ (self, parent, top, cdata):
         """
-        A AboutDialog is Window an application creates to 
-        retrieve Cricket UI Application input.
+        Initialize PortDialog.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            parent: Pointer to a parent window.
-            top: create a object
+            parent: Parent window.
+            top: Reference to main application frame.
+            cdata: Configuration data dictionary.
+
         Returns:
             None
         """
@@ -223,24 +235,19 @@ class PortDialog(wx.Dialog):
 
         # Sizes the window to fit its best size.
         self.Fit()
-        # Centre frame using CentreOnParent() function,
-        # Show window in the center of the screen.
-        # Centres the window on its parent.
         self.CenterOnParent(wx.BOTH)
     
     def OnOK (self, evt):
         """
-        OnOK() event handler function retrieves the label of 
-        source button, which caused the click event. 
+        Handle OK/close event for the dialog.
+
+        Ends the modal dialog after saving settings.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt: The event parameter in the OnOK() method is an 
-            object specific to a particular event type.
+            evt: Dialog event.
+
         Returns:
-            None        
+            None
         """
     # Returns numeric code to caller
         self.EndModal(wx.ID_OK)

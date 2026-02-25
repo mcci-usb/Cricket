@@ -6,20 +6,22 @@
 #     Define all global variables for the entire UI Cricket App.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#     V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 #
 ##############################################################################
+
 # Lib imports
 import wx
+
 ##############################################################################
 # GLOBAL VARIABLES
 ##############################################################################
 APP_NAME = "Cricket"
-APP_VERSION = "4.6.0"
+APP_VERSION = "4.7.0"
 
 # StatusBar ID
 SB_PORT_ID   = 0
@@ -36,7 +38,6 @@ DEV_3201    = 1
 DEV_2101    = 2
 DEV_2301    = 3
 DEV_3142    = 4
-
 
 BAUDRATE = [115200, 115200, 0, 9600]
 
@@ -184,8 +185,6 @@ ID_RBTN_WIN = ID_NETWORK_MENU + 1
 ID_RBTN_LINUX = ID_RBTN_WIN + 1
 ID_RBTN_MAC = ID_RBTN_LINUX + 1
 
-
-
 usbClass1 = ["None", "Audio", "CDC-COM", "HID", "Physical",
             "Image", "Printer", "Mass Storage", "Hub",
             "CDC-DATA", "Smart Card", "Content Security",
@@ -203,46 +202,47 @@ usbClass = {0: "Unknown",
             239: "Miscellaneous", 254: "Application Specific",
             255: "Vendor Specific"}
 
-# usbClass = {0: "Unknown",
-#             1: "Audio", 2: "CDC-COM", 3: "HID", 5: "Physical",
-#             6: "Image", 7: "Printer", 8: "Mass Storage", 9: "Hub",
-#             10: "CDC-Data", 11: "Smart Card", 13: "Content Security",
-#             14: "Video", 15: "Personal Healthcare", 16: "Audio/Video Devices",
-#             18: "Type-C Bridge", 
-#             220: "Diagnostic Devices", 224: "Wireless Controller", 
-#             239: "Miscellaneous", 254: "Application Specific",
-#             255: "Vendor Specific"}
-
 usbSpeed = {0: "LowSpeed", 1: "FullSpeed", 2: "HighSpeed", 3: "SuperSpeed", 4:"SuperSpeed Plus"}
 
 portCnt = {"3141": 2,"3142":2, "3201": 4, "2301": 4, "2101": 1}
-
 
 ##############################################################################
 # GLOBAL STRINGS
 ##############################################################################
 VERSION_NAME  = "\nMCCI"+u"\u00AE "+APP_NAME
 VERSION_ID    = ""
-VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-25\nMCCI Corporation"
+VERSION_COPY  = "\nCopyright "+u"\u00A9"+" 2020-26\nMCCI Corporation"
 VERSION_STR = "Version "+APP_VERSION
-
 
 ##############################################################################
 # GLOBAL FUNCTIONS
 ##############################################################################
+
 class NumericValidator(wx.Validator):
     """
-    Validator associated NumericValidator Control.
+    Numeric input validator.
+
+    Ensures that only digit values are accepted
+    in text controls where this validator is applied.
+
+    Attributes:
+        None
     """
     def __init__(self):
         """
-        Only digits are allowed in the address.
+        Initialize the numeric validator.
+
+        Binds character input events to restrict
+        non-numeric key entries.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
+            self: Reference to the current instance
+                of the validator class.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         wx.Validator.__init__(self)
@@ -250,30 +250,33 @@ class NumericValidator(wx.Validator):
 
     def Clone(self, arg=None):
         """
-        Only digits are allowed in the address. 
+        Create a copy of the validator instance.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-        Returns:
-            NumericValidator():return True if all characters in the string are
-            numaric charecters    
+            self: Reference to the current instance.
+            arg: Optional argument (unused).
 
+        Returns:
+            NumericValidator: New validator instance.
+
+        Raises:
+            None
         """
         return NumericValidator()
    
     def Validate(self, win):
         """
-        Only digits are allowed in the textcontrol. 
+        Validate that the input contains only digits.
 
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            win: window object is created.
+            self: Reference to the current instance.
+            win: Window associated with the validator.
+
         Returns:
-           val.isdigit - "True" if all characters in the string are digits.
+            bool: True if value is numeric, else False.
+
+        Raises:
+            None
         """
         # Returns the window associated with the validator.
         tc  = self.GetWindow()
@@ -282,14 +285,20 @@ class NumericValidator(wx.Validator):
    
     def OnChar(self, evt):
         """
-        all key names and charachters dirctly can use. 
-        
+        Handle character input events.
+
+        Allows only numeric digit entry while
+        permitting control keys such as delete
+        and backspace.
+
         Args:
-            self: The self parameter is a reference to the current 
-            instance of the class,and is used to access variables
-            that belongs to the class.
-            evt:evt handler to display the characters
+            self: Reference to the current instance.
+            evt: Key event object.
+
         Returns:
+            None
+
+        Raises:
             None
         """
         # Returns the window associated with the validator.

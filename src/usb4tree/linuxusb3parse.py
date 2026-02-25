@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: linuxusb3parse.py
@@ -7,49 +7,88 @@
 #     parsing the USB3 Tree view data in Linux 
 #
 # Author:
-#     Vinay N, MCCI Corporation Mar 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+##############################################################################
+# Utilities
 ##############################################################################
 class LinuxUsb3TreeParse():
+    """
+    Linux USB3 Tree Parser.
+
+    Description:
+        Parses USB 3.x enumeration data collected from
+        Linux systems and converts it into structured
+        hierarchy buffers for Tree View visualization.
+
+        The parser generates:
+
+            • Indexed device data (idata)
+            • Level-wise hierarchy mapping (ldata)
+
+    Attributes:
+        idata (dict):
+            Parsed USB3 device dictionary indexed by node ID.
+
+        ldata (dict):
+            Hierarchy level mapping dictionary.
+    """
     def __init__(self):
         self.idata = None
         self.ldata = None
     
     def parse_usb3tb_data(self, usb3data):
         """
-        Parse USB3 data and organize it into internal data structures.
+        Parse USB3 topology data.
 
-        This method takes USB3 data and organizes it into internal data structures
-        for easier access and manipulation.
+        Description:
+            Converts raw USB3 enumeration output into structured
+            internal buffers suitable for Tree View rendering.
+
+            Processing steps:
+
+                1. Normalize USB3 attributes
+                2. Build indexed device dictionary
+                3. Generate hierarchy level mappings
 
         Args:
-            usb4data (dict): USB4TB data to be parsed.
+            usb3data (list):
+                List of USB3 device dictionaries obtained from
+                Linux enumeration modules.
 
         Returns:
             None
         """
         self.idata = self.get_item_data(usb3data)
         self.ldata = self.get_level_data(self.idata)
-        # if self.idata is not None:
-        #     self.ldata = self.get_level_data(self.idata)
-        # else:
-        #     print("Error: idata is None")
 
     def get_item_data(self, msg):
         """
-        Parse USB 3.0 data from a list of dictionaries containing USB device information.
+        Parse USB3 device list into indexed dictionary.
+
+        Description:
+            Converts a list of USB3 device dictionaries into a
+            structured mapping indexed by composite keys.
+
+            Key format:
+
+                vid,pid,bus,speed
 
         Args:
-            msg (list): A list of dictionaries containing USB device information.
+            msg (list):
+                USB3 device list collected during enumeration.
 
         Returns:
-            dict: A dictionary containing parsed USB 3.0 data with keys formatted as 'vid,pid,bus,speed'.
-                Each value is a dictionary containing details such as type, vid, pid, bus, speed, ifc,
-                and optionally mport and port if available.
-            None: If the input 'msg' is not a list or if there are missing required fields in any item.
+            dict:
+                Parsed USB3 dictionary.
+
+            None:
+                If input format is invalid.
         """
         if not isinstance(msg, list):
             print("Error: usb3data is not a list")
@@ -89,16 +128,24 @@ class LinuxUsb3TreeParse():
 
     def get_level_data(self, u3tbuf):
         """
-        Organize USB 3.0 data into levels based on the count of comma-separated keys.
+        Organize USB3 data into hierarchy levels.
+
+        Description:
+            Groups USB3 devices into levels based on the
+            number of comma separators in their keys.
+
+            This enables Tree View hierarchical rendering.
 
         Args:
-            u3tbuf (dict): A dictionary containing USB 3.0 data where keys are formatted as 'vid,pid,bus,speed'.
+            u3tbuf (dict):
+                Parsed USB3 device dictionary.
 
         Returns:
-            dict: A dictionary organizing USB 3.0 data into levels based on the count of comma-separated keys.
-                Keys are formatted as 'levelX' where X is the count of commas in the keys of u3tbuf.
-                Values are lists containing keys from u3tbuf that match the respective level.
-            None: If the input 'u3tbuf' is not a dictionary.
+            dict:
+                Level-wise USB3 hierarchy mapping.
+
+            None:
+                If input format is invalid.
         """
         if not isinstance(u3tbuf, dict):
             print("Error: u3tbuf is not a dictionary")

@@ -1,33 +1,75 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: macusb4parse.py
 #
 # Description:
-#     parsing the USB4 Tree view data in Mac 
+#     This module provides parsing utilities for USB4 and Thunderbolt
+#     topology data on macOS systems.
+#
+#     It processes the macOS System Profiler output and converts the
+#     hierarchical USB4 / Thunderbolt device structure into an
+#     indexed tree format suitable for UI Tree View rendering.
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Jan 2024
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
+#
+##############################################################################
+##############################################################################
+# Utilities
 ##############################################################################
 import copy
 
 class MacUsb4TreeParse():
+    """
+    macOS USB4 / Thunderbolt Tree Parser.
+
+    Description:
+        Parses macOS USB4 / Thunderbolt topology data obtained
+        from System Profiler and converts it into structured
+        tree buffers.
+
+        The parsed output includes:
+
+            • Indexed device data (idata)
+            • Level-wise hierarchy data (ldata)
+            • Port relationship mapping
+
+    Attributes:
+        idata (dict):
+            Indexed USB4 device data.
+
+        ldata (dict):
+            Level-wise hierarchy mapping.
+    """
     def __init__(self):
         self.idata = None
         self.ldata = None
 
     def parse_usb4tb_data(self, usb4data):
         """
-        Parse USB4TB data and organize it into internal data structures.
+        Parse USB4 / Thunderbolt topology data.
 
-        This method takes USB4TB data and organizes it into internal data structures
-        for easier access and manipulation.
+        Description:
+            Processes raw macOS System Profiler USB4 data and
+            converts it into structured tree data.
+
+            Processing steps:
+
+                1. Extract USB tree nodes
+                2. Merge multiple root buses
+                3. Build hierarchy index map
+                4. Compute level groupings
+                5. Populate downstream port mappings
 
         Args:
-            usb4data (dict): USB4TB data to be parsed.
+            usb4data (dict):
+                Raw USB4 / Thunderbolt data from macOS
+                System Profiler.
 
         Returns:
             None
@@ -63,19 +105,25 @@ class MacUsb4TreeParse():
 
     def add_ports(self, glevel, gdev, gldict, gpdict):
         """
-        Add port information for a device in the next level of USB hierarchy.
+        Populate downstream port mappings.
 
-        This method takes the current USB hierarchy level (`glevel`), the device name (`gdev`),
-        the dictionary of USB levels (`gldict`), and the dictionary of port information (`gpdict`).
-        It calculates the next level index, constructs the next level key, and retrieves the list of
-        devices at the next level. If devices at the next level exist, it adds port information for
-        the specified device (`gdev`) to the port dictionary (`gpdict`).
+        Description:
+            Identifies child routing nodes connected to a
+            given parent device and records their port
+            relationships.
 
         Args:
-            glevel (str): Current USB hierarchy level.
-            gdev (str): Device name for which ports are to be added.
-            gldict (dict): Dictionary of USB levels.
-            gpdict (dict): Dictionary to store port information for devices.
+            glevel (str):
+                Current hierarchy level.
+
+            gdev (str):
+                Device index key.
+
+            gldict (dict):
+                Level mapping dictionary.
+
+            gpdict (dict):
+                Output port mapping dictionary.
 
         Returns:
             None
@@ -92,17 +140,20 @@ class MacUsb4TreeParse():
     # Parse the USB4 JSON to Tree buffer (customized)
     def get_item_data(self, msg):
         """
-        Extract USB item data from a system profile message.
+        Extract USB4 tree data from System Profiler output.
 
-        This method takes a system profile message (`msg`) and extracts USB item data from the
-        "SPThunderboltDataType" key. It iterates through the USB data, parses each USB tree, and
-        collects the parsed data in a list.
+        Description:
+            Parses the 'SPThunderboltDataType' section and
+            builds intermediate USB tree dictionaries for
+            each Thunderbolt bus.
 
         Args:
-            msg (dict): System profile message containing USB data.
+            msg (dict):
+                macOS System Profiler JSON output.
 
         Returns:
-            list: A list containing parsed USB tree data for each Thunderbolt bus.
+            list:
+                List of parsed USB4 bus dictionaries.
         """
         usb_data = msg["SPThunderboltDataType"]
         usbt_list = []
@@ -114,19 +165,27 @@ class MacUsb4TreeParse():
     # # Recursive function extract VID, PID and other properties
     def parse_usb_tree(self, node, accdict):
         """
-        Parse a USB tree node and populate an accumulator dictionary.
+        Recursively parse USB tree nodes.
 
-        This method recursively traverses a USB tree node (`node`) and populates an accumulator
-        dictionary (`accdict`) with information about USB devices. It looks for specific keys in
-        the node to extract information such as the device name, description, vendor name, vendor ID,
-        product ID, and route string.
+        Description:
+            Traverses Thunderbolt topology nodes and extracts:
+
+                • Device name
+                • Description
+                • Vendor name
+                • VID / PID
+                • Routing index
 
         Args:
-            node (dict): USB tree node to be parsed.
-            accdict (dict): Accumulator dictionary to store information about USB devices.
+            node (dict):
+                Current USB tree node.
+
+            accdict (dict):
+                Accumulator dictionary.
 
         Returns:
-            dict: The updated accumulator dictionary with information about USB devices.
+            dict:
+                Updated accumulator dictionary.
         """
         if "_name" in node and "device_name_key" in node:
             mydict = {}
@@ -145,22 +204,29 @@ class MacUsb4TreeParse():
                 self.parse_usb_tree(item, accdict)
         return accdict
     
-    # # # For Mac - In Mac Hierarchy as "route_string_key" : "30701"
-    # # # Need to convert "30701" as "1,7,3"
     def convert_order(self, instr):
         """
-        Convert a string of digits into a comma-separated string with reversed two-digit numbers.
+        Convert macOS route string to hierarchy index.
 
-        This method takes a string of digits (`instr`) and converts it into a comma-separated string
-        with reversed two-digit numbers. The input string is processed in reverse order, and each pair
-        of digits is converted into an integer, ignoring leading zeros. The resulting numbers are then
-        reversed and joined into a comma-separated string.
+        Description:
+            macOS represents routing paths as digit strings
+            (example: "30701").
+
+            This method converts them into comma-separated
+            hierarchy indexes.
+
+            Example:
+
+                Input  → "30701"
+                Output → "1,7,3"
 
         Args:
-            instr (str): Input string of digits.
+            instr (str):
+                Route string from System Profiler.
 
         Returns:
-            str: Comma-separated string with reversed two-digit numbers.
+            str:
+                Hierarchy index string.
         """
         conv_nums = []
         for i in range(len(instr)-2, -1, -2):
@@ -171,25 +237,27 @@ class MacUsb4TreeParse():
             conv_nums.append(int(instr[0]))
         ordstr = ','.join(map(str, conv_nums))
         return ordstr
-    
-    # For Mac - In Mac root node (Ex. thunderbolt bus) is defined as "route_string_key" : "0"
-    # consider if a Mac has more than one root node, then need to prefix
-    # the node if of the root node with the childe nodes, to make all under one dictionary 
-    # this needs unique key, so prefix the node id of the root node is required 
+ 
     def merge_parent_node(self, u4dict, idx):
         """
-        Merge a parent node with its child nodes in a USB4TB data dictionary.
+        Merge Thunderbolt root buses.
 
-        This method takes a USB4TB data dictionary (`u4dict`) and merges a parent node with its
-        child nodes. The merging is done by prefixing the keys of the child nodes with the index (`idx`)
-        and a comma.
+        Description:
+            macOS may expose multiple root Thunderbolt buses.
+
+            This method prefixes child routing indexes with
+            a root index to ensure unique topology keys.
 
         Args:
-            u4dict (dict): USB4TB data dictionary to be modified.
-            idx (int): Index to be used for merging.
+            u4dict (dict):
+                Parsed USB4 dictionary.
+
+            idx (int):
+                Root bus index.
 
         Returns:
-            dict: A new USB4TB data dictionary after merging the parent node with its child nodes.
+            dict:
+                Updated dictionary with merged hierarchy keys.
         """
         nu4dict = {}
         for key, value in u4dict.items():
@@ -203,17 +271,25 @@ class MacUsb4TreeParse():
     # Both Win and Mac
     def get_level_data(self, u4tbuf):
         """
-        Group USB4TB data into levels based on comma count in keys.
+        Generate hierarchy level mapping.
 
-        This method takes a dictionary of USB4TB data (`u4tbuf`) and groups the data into levels
-        based on the number of commas in the keys.
+        Description:
+            Groups USB4 routing indexes into levels
+            based on comma depth.
+
+            Example:
+
+                level0 → Root routers
+                level1 → First downstream routers
+                level2 → Second downstream routers
 
         Args:
-            u4tbuf (dict): USB4TB data to be grouped.
+            u4tbuf (dict):
+                Indexed USB4 topology data.
 
         Returns:
-            dict: A dictionary where keys are level names ('level0', 'level1', ...) and values are
-                lists of keys from the input data belonging to each level.
+            dict:
+                Level-wise hierarchy dictionary.
         """
         rkarr = list(u4tbuf.keys())
         pdict = {}

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 ##############################################################################
 # 
 # Module: warningMessage.py
@@ -7,11 +7,11 @@
 #     Dialog to display copyright information
 #
 # Author:
-#     Seenivasan V, MCCI Corporation Mar 2020
+#     Vinay N, MCCI Corporation Feb 2026
 #
 # Revision history:
-#      V4.3.1 Mon Apr 15 2024 17:00:00   Seenivasan V 
-#       Module created
+#     V4.7.0 Mon Feb 16 2026 17:00:00   Vinay N
+#         Module created
 ##############################################################################
 
 # Built-in imports
@@ -116,7 +116,6 @@ class warningWindow(wx.Window):
             (0,5,0),
             (self.Epty_box, 1, wx.EXPAND | wx.ALL)])
             
-        
         self.chk_box.Bind(wx.EVT_CHECKBOX, self.OnCheckBox)
         self.btn_ok.Bind(wx.EVT_BUTTON, self.OnClose)
         self.image.Bind(wx.EVT_LEFT_UP, self.OnClick)
@@ -146,7 +145,6 @@ class warningWindow(wx.Window):
     
     def OnCheckBox(self, evt):
         pass
-        
     
     def OnClose(self, evt):
         dlgchoice = False
@@ -183,8 +181,6 @@ class WarningDialog(wx.Dialog):
 
         # Sizes the window to fit its best size.
         self.Fit()
-        # Centre frame using CentreOnParent() function,
-        # Show window in the center of the screen.
         # Centres the window on its parent.
         self.CenterOnParent(wx.BOTH)
     
