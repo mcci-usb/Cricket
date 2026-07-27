@@ -501,3 +501,32 @@ def read_msudp_config():
     except:
         cdata = load_default_config()
     return cdata["msudp"]
+
+import datetime
+
+def save_firmware_version(model, port, version, action):
+    """
+    Append firmware version details to a persistent log file.
+
+    Args:
+        model (str): Switch model name.
+        port (str): Communication port identifier.
+        version (str): Firmware version string.
+        action (str): Action performed (e.g., "Connect", "Disconnect").
+
+    Returns:
+        None
+    """
+    lpath = get_user_data_dir()
+    dpath = os.path.join(lpath, "MCCI", "Cricket")
+    os.makedirs(dpath, exist_ok=True)
+    log_path = os.path.join(dpath, "firmware_history.log")
+    
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"{timestamp} - {action}: {model} ({port}) FW Version: {version}\n"
+    
+    try:
+        with open(log_path, "a") as f:
+            f.write(log_entry)
+    except:
+        pass

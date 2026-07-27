@@ -25,6 +25,7 @@
 import devClient as devnw
 from cricketlib import searchswitch
 from uiGlobals import *
+import configdata
 
 def SetDeviceControl(top):
     """
@@ -105,6 +106,27 @@ def connect_device(top, swdict):
         if(swhand.connect() or swname[0] == "2101"):
             top.handlers[port[0]] = swhand
             top.swuidict[port[0]] = swname[0]
+            
+            # Fetch and store firmware version
+            try:
+                if hasattr(swhand, 'get_version'):
+                    version_res = swhand.get_version()
+                    if isinstance(version_res, tuple) and len(version_res) == 2:
+                        res, ver_str = version_res
+                        if res == 0:
+                            top.sw_versions[port[0]] = ver_str.strip()
+                        else:
+                            top.sw_versions[port[0]] = "Unknown"
+                    else:
+                        top.sw_versions[port[0]] = str(version_res).strip()
+                else:
+                    top.sw_versions[port[0]] = "N/A"
+            except:
+                top.sw_versions[port[0]] = "Unknown"
+            
+            # Persistent Save
+            configdata.save_firmware_version(swname[0], port[0], top.sw_versions[port[0]], "Connect")
+            
     elif top.devCtrl == "tcp":
         resdict = None
         nwip = top.ucConfig['mynodes']["mycc"]["tcp"]["ip"]
@@ -150,9 +172,19 @@ def disconnect_device(top, swport):
     """
     if top.devCtrl == "local":
         if swport in top.handlers:
+            swname = top.swuidict.get(swport, "Unknown")
+            version = top.sw_versions.get(swport, "Unknown")
+            top.print_on_log(f"Disconnecting {swname} ({swport}) [FW Version: {version}]\n")
+            
+            # Persistent Save
+            configdata.save_firmware_version(swname, swport, version, "Disconnect")
+            
             top.handlers[swport].disconnect()
             top.handlers.pop(swport)
-        # return top.devHand.close()
+            # top.sw_versions.pop(swport, None) # Keep it in memory if user wants to see it later? 
+            # The user said "save it once it get disconnected", 
+            # usually that means recording it somewhere permanent.
+            # For now, logging is a good start.
     elif top.devCtrl == "tcp":
         nwip = top.ucConfig['mynodes']["mycc"]["tcp"]["ip"]
         nwport = top.ucConfig['mynodes']["mycc"]["tcp"]["port"]

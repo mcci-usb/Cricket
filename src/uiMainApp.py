@@ -385,6 +385,7 @@ class UiMainFrame (wx.Frame):
 
         self.dev_list = []
         self.switch_list = []
+        self.sw_versions = {}
         self.ucbusy = True
 
         self.masterList = None
@@ -506,7 +507,8 @@ class UiMainFrame (wx.Frame):
             self.panel.add_switches(self.swuidict)
             self.update_loop_swselector()
             self.set_mode(MODE_MANUAL)
-            self.print_on_log("Switch "+swname+" ("+swid+") connected!\n")
+            version = self.sw_versions.get(swid, "Unknown")
+            self.print_on_log("Switch "+swname+" ("+swid+") connected! (FW Version: "+str(version)+")\n")
         else:
             self.print_on_log("No Switches found ...\n")
 
@@ -1341,7 +1343,8 @@ class UiMainFrame (wx.Frame):
             self.panel.add_switches(self.swuidict)
             self.update_loop_swselector()
             self.set_mode(MODE_MANUAL)
-            self.print_on_log("Switch "+swname+" ("+swid+") connected!\n")
+            version = self.sw_versions.get(swid, "Unknown")
+            self.print_on_log("Switch "+swname+" ("+swid+") connected! (FW Version: "+str(version)+")\n")
         else:
             self.print_on_log("No Switches found ...\n")
         self.Refresh()
@@ -1438,6 +1441,10 @@ class UiMainFrame (wx.Frame):
 
         for swdict in swlist:
             devControl.connect_device(self, swdict)
+            swname = list(swdict.keys())[0]
+            swid = list(swdict.values())[0]
+            version = self.sw_versions.get(swid, "Unknown")
+            self.print_on_log("Switch "+swname+" ("+swid+") connected! (FW Version: "+str(version)+")\n")
 
         self.panel.add_switches(self.swuidict)
         self.update_loop_swselector()
@@ -1471,6 +1478,10 @@ class UiMainFrame (wx.Frame):
 
         for swdict in swlist:
             devControl.connect_device(self, swdict)
+            swname = list(swdict.keys())[0]
+            swid = list(swdict.values())[0]
+            version = self.sw_versions.get(swid, "Unknown")
+            self.print_on_log("Switch "+swname+" ("+swid+") connected! (FW Version: "+str(version)+")\n")
 
         self.panel.add_switches(self.swuidict)
         self.update_loop_swselector()
