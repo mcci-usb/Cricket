@@ -205,13 +205,15 @@ def check_version():
         current version, otherwise None.
     """
     api_url = "https://api.github.com/repos/mcci-usb/Cricket/releases/latest"
-    response = requests.get(api_url)
+    try:
+        response = requests.get(api_url, timeout=5)
+        if response.status_code == 200:
+            release_info = response.json()
+            latest_version = release_info["tag_name"]
 
-    if response.status_code == 200:
-        release_info = response.json()
-        latest_version = release_info["tag_name"]
-
-        if latest_version > "v" + APP_VERSION:
-            return latest_version
+            if latest_version > "v" + APP_VERSION:
+                return latest_version
+    except Exception:
+        pass
 
     return None

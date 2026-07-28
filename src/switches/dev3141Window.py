@@ -19,6 +19,7 @@ import wx
 # Built-in imports
 import os
 import time
+import re
 
 # Own modules
 import devControl as model
@@ -279,6 +280,32 @@ class Dev3141Window(wx.Panel):
         self.timer_safe.Stop()
         self.usb_flg = False
 
+    def get_sw_delay(self):
+        """
+        Get the switch delay based on the firmware version.
+        v1.x, v2.x -> 1000ms
+        v3.x and above -> 10ms
+        """
+        version = self.top.sw_versions.get(self.swid, "v1.0.0")
+        if isinstance(version, tuple) and len(version) == 2:
+            version = version[1]
+            
+        if isinstance(version, str):
+            version_clean = version.strip().lower()
+            if version_clean.startswith('v'):
+                version_clean = version_clean[1:]
+            
+            # If 4-digit version string (e.g., "0201", "0300")
+            if version_clean.isdigit() and len(version_clean) == 4:
+                major = int(version_clean[:2])
+            else:
+                match = re.match(r"^(\d+)", version_clean)
+                major = int(match.group(1)) if match else 1
+                
+            if major >= 3:
+                return 10
+        return 1000
+
     def PortOnTimer(self, e):
         self.timer_port.Stop()
         self.port_on_cmd(self.rport)
@@ -322,6 +349,9 @@ class Dev3141Window(wx.Panel):
         """
         if self.top.con_flg == False:
             return
+
+        sw_delay = self.get_sw_delay()
+
         if(stat):
             if self.top.mode == MODE_MANUAL:
                 res, outstr = model.read_port_status(self.top, self.swid)
@@ -330,7 +360,7 @@ class Dev3141Window(wx.Panel):
                     if rport > 0:
                         self.port_off_cmd(rport)
                         self.rport = port
-                        self.timer_port.Start(1000)
+                        self.timer_port.Start(sw_delay)
                     else:
                         self.port_on_cmd(port)
             else:
@@ -342,7 +372,7 @@ class Dev3141Window(wx.Panel):
             if(self.top.get_delay_status()):
                 self.keep_delay()
             else:
-                self.timer_safe.Start(1000)
+                self.timer_safe.Start(sw_delay)
                 self.usb_flg = True
 
     def set_speed(self, speed):
