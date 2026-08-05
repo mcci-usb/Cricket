@@ -4,7 +4,7 @@ This repository contains the source code for Cricket UI, a standalone desktop ap
 
 **Note:** Prepackaged, signed releases are available at [`COLLECTION-Cricket-UI/releases`](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases). Only use this repository directly if you want to do source code development.
 
-[![Git release](https://img.shields.io/badge/release-v4.7.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.7.0)
+[![Git release](https://img.shields.io/badge/release-v4.8.0-blue)](https://github.com/mcci-usb/COLLECTION-cricket-ui/releases/tag/v4.8.0)
 <!-- markdown-shield -->
 
 ## List of Contents
@@ -48,7 +48,7 @@ This application is a simple user interface for MCCI USB Switches. It supports m
 
 Development environment
 
-* OS - Windows 10 64 bit
+* OS - Windows 11 64 bit
 * Python - 3.7.6
 * wxPython - 4.0.7.post2
 * pyserial - 3.4
@@ -273,6 +273,10 @@ The MCCI USB Switch 2301 Type-A Connection Exerciser provides a four-to-one USB 
  ![Model2301](assets/Model2301.png)
 
 ## Release History
+
+- v4.8.0 is a patch release. It contains the following change.
+
+    - Removed the **1000 ms switch delay** for **3141** switches running firmware version **3 or later**. The **1000 ms delay** continues to apply for all other switches and for 3141 switches with firmware versions earlier than 3[#157](https://github.com/mcci-usb/Cricket/commit/ccce80efa7c065cd33e28b13a2aece52b1337c12).
 
 - v4.7.0 is patach release its contains the following changes.
     - Support Per-Model Port Syntax in Batch Script Generator & Revert [#155](https://github.com/mcci-usb/Cricket/commit/007231d87f16ed34464283b59621715e12dd8771).
